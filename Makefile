@@ -16,6 +16,11 @@ help:
 server:
 	python3 -m http.server -d $(BUILDDIR)/html $(HTTPPORT)
 
+docs:
+	rm -rf docs
+	cp -rf _build/html docs
+	touch docs/.nojekyll
+
 .PHONY: help Makefile
 
 # Catch-all target: route all unknown targets to Sphinx using the new
@@ -24,6 +29,3 @@ server:
 	cp README.md index.md
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	rm index.md
-	rm -rf docs
-	cp -rf _build/html docs
-	touch docs/.nojekyll

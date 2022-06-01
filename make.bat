@@ -12,6 +12,7 @@ set BUILDDIR=_build
 
 if "%1" == "" goto help
 if "%1" == "server" goto server
+if "%1" == "docs" goto docs
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
@@ -29,6 +30,9 @@ if errorlevel 9009 (
 echo F | xcopy README.md index.md /i /y
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 del index.md
+goto end
+
+:docs
 rmdir /s /q docs
 xcopy /S /I /Q /Y /F _build\html docs
 type nul > docs\.nojekyll
