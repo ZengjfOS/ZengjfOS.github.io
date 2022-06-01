@@ -36,6 +36,7 @@ goto end
 rmdir /s /q docs
 xcopy /S /I /Q /Y /F _build\html docs
 type nul > docs\.nojekyll
+echo F | xcopy CNAME docs /i /y
 goto end
 
 :server
