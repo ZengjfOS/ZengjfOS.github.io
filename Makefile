@@ -26,3 +26,4 @@ server:
 	rm index.md
 	rm -rf docs
 	cp -rf _build/html docs
+	touch docs/.nojekyll

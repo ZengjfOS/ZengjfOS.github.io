@@ -31,6 +31,7 @@ echo F | xcopy README.md index.md /i /y
 del index.md
 rmdir /s /q docs
 xcopy /S /I /Q /Y /F _build\html docs
+type nul > docs\.nojekyll
 goto end
 
 :server
