@@ -1,0 +1,15 @@
+# Keil 
+
+Keil使用方法
+
+# Shortcut
+
+* `F12`
+* `CTRL` + `-`：这个要注意主键盘的减号不一定有效，可以试试数字键盘上的减号；
+
+# 编译环境配置
+
+* 源代码配置
+  ![0020_Keil_Components.png](images/0020_Keil_Components.png)
+* 库、头文件配置
+  ![0020_Keil_Environment.png](images/0020_Keil_Environment.png)
