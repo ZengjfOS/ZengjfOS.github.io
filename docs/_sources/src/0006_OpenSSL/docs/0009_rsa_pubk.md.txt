@@ -2,11 +2,11 @@
 
 私钥提取公钥
 
-## cmd
+# cmd
 
 ./openssl/app rsa -in rootca.key -pubout -out rsa_public_key.pem
 
-## bt
+# bt
 
 ```
 #0  EVP_PKEY_get1_RSA (pkey=pkey@entry=0x20a3c0) at p_lib.c:287

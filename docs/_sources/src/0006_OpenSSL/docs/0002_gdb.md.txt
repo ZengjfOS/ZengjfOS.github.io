@@ -2,17 +2,17 @@
 
 gdb调试openssl
 
-## 参考文档
+# 参考文档
 
 * [How to debug without "Program received signal SIGILL" using the 3.18 kernel (3.12 works)?](https://raspberrypi.stackexchange.com/questions/29020/how-to-debug-without-program-received-signal-sigill-using-the-3-18-kernel-3-1)
   * handle SIGILL pass nostop
 
-## Download
+# Download
 
 * https://www.openssl.org/source/old/1.0.1/
   * openssl-1.0.1f.tar.gz
 
-## build openssl
+# build openssl
 
 * ./config -g3 -ggdb
   * --openssldir=OPENSSLDIR: 安装目录，默认是/usr/local/ssl
@@ -21,7 +21,7 @@ gdb调试openssl
   * 不要用-j进行多核编译
 * sudo make install
 
-## gdb SIGILL
+# gdb SIGILL
 
 * gdb /usr/local/ssl/bin/openssl
   ```
@@ -63,7 +63,7 @@ gdb调试openssl
     SIGILL        No        Yes     Yes             Illegal instruction
     ```
 
-## 完整log
+# 完整log
 
 ```
 gdb /usr/local/ssl/bin/openssl

@@ -2,19 +2,19 @@
 
 GUN ddd用于可视化gdb软件调试
 
-## 参考文档
+# 参考文档
 
 * [ddd.html](https://www.gnu.org/software/ddd/manual/html_mono/ddd.html)
 
-## install
+# install
 
 sudo apt-get install ddd
 
-## 使用简介
+# 使用简介
 
 ![0004_ddd_UI.png](images/0004_ddd_UI.png)
 
-## skip SIGILL
+# skip SIGILL
 
 ```
 (gdb) handle SIGILL pass nostop

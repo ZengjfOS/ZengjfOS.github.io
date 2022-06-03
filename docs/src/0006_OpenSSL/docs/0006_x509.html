@@ -38,15 +38,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">x509</a><ul>
+<li><a class="reference internal" href="#">x509</a></li>
 <li><a class="reference internal" href="#command">command</a></li>
 <li><a class="reference internal" href="#id1">报错</a></li>
 <li><a class="reference internal" href="#cgdb">cgdb</a></li>
 <li><a class="reference internal" href="#backtrace">backtrace</a></li>
 <li><a class="reference internal" href="#x509-pubkey-get">X509_PUBKEY_get</a></li>
 <li><a class="reference internal" href="#x509-req">x509 req</a></li>
-</ul>
-</li>
 </ul>
 </div>
         </div>
@@ -75,14 +73,15 @@
   <section id="x509">
 <h1>x509<a class="headerlink" href="#x509" title="Permalink to this headline"></a></h1>
 <p>openssl x509证书生成，最终调用rsa私钥加密</p>
+</section>
 <section id="command">
-<h2>command<a class="headerlink" href="#command" title="Permalink to this headline"></a></h2>
+<h1>command<a class="headerlink" href="#command" title="Permalink to this headline"></a></h1>
 <ul class="simple">
 <li><p>/usr/local/ssl/bin/openssl req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU=”AAA”/OU=”AAA”/O=AAA/CN=”AAA Root Ca” -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256</p></li>
 </ul>
 </section>
 <section id="id1">
-<h2>报错<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<h1>报错<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">open</span> <span class="n">error</span>
 <span class="n">load_sig_file</span> <span class="n">error</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hashraw96134401_SIG</span><span class="o">.</span><span class="n">bin</span>
 <span class="mi">3069375728</span><span class="p">:</span><span class="n">error</span><span class="p">:</span><span class="mi">0</span><span class="n">D0DC006</span><span class="p">:</span><span class="n">asn1</span> <span class="n">encoding</span> <span class="n">routines</span><span class="p">:</span><span class="n">ASN1_item_sign_ctx</span><span class="p">:</span><span class="n">EVP</span> <span class="n">lib</span><span class="p">:</span><span class="n">a_sign</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">314</span><span class="p">:</span>
@@ -90,14 +89,14 @@
 </div>
 </section>
 <section id="cgdb">
-<h2>cgdb<a class="headerlink" href="#cgdb" title="Permalink to this headline"></a></h2>
+<h1>cgdb<a class="headerlink" href="#cgdb" title="Permalink to this headline"></a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">handle</span> <span class="n">SIGILL</span> <span class="k">pass</span> <span class="n">nostop</span>
 <span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="nb">set</span> <span class="n">args</span> <span class="n">req</span> <span class="o">-</span><span class="n">new</span> <span class="o">-</span><span class="n">x509</span> <span class="o">-</span><span class="n">key</span> <span class="n">rootca</span><span class="o">.</span><span class="n">key</span> <span class="o">-</span><span class="n">days</span> <span class="mi">7300</span> <span class="o">-</span><span class="n">out</span> <span class="n">oem_rootca</span><span class="o">.</span><span class="n">crt</span> <span class="o">-</span><span class="n">subj</span> <span class="o">/</span><span class="n">C</span><span class="o">=</span><span class="n">CN</span><span class="o">/</span><span class="n">ST</span><span class="o">=</span><span class="n">SZ</span><span class="o">/</span><span class="n">L</span><span class="o">=</span><span class="n">GD</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">O</span><span class="o">=</span><span class="n">AAA</span><span class="o">/</span><span class="n">CN</span><span class="o">=</span><span class="s2">&quot;AAA Root Ca&quot;</span> <span class="o">-</span><span class="n">set_serial</span> <span class="mi">1</span> <span class="o">-</span><span class="n">config</span> <span class="n">opensslroot</span><span class="o">.</span><span class="n">cfg</span> <span class="o">-</span><span class="n">sha256</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_padding_mode</span><span class="p">:</span><span class="n">pss</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_pss_saltlen</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">digest</span><span class="p">:</span><span class="n">sha256</span>
 </pre></div>
 </div>
 </section>
 <section id="backtrace">
-<h2>backtrace<a class="headerlink" href="#backtrace" title="Permalink to this headline"></a></h2>
+<h1>backtrace<a class="headerlink" href="#backtrace" title="Permalink to this headline"></a></h1>
 <p>bt</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#0  load_sig_file (_sz=&lt;synthetic pointer&gt;, data=0x212978 &quot;\036{e\303| \017ac5\365\224a^\347\035\263/\235R\004\031u\bz\316G4\205HT\302%&quot;, fn=0xbeffe498 &quot;&quot;) at rsa_eay.c:365</span>
 <span class="c1">#1  calcSignatureRaw (textpadded=textpadded@entry=0x213290 &quot;}, signature=0x212978 &quot;\036{e\303| \017ac5\365\224a^\347\035\263/\235R\004\031u\bz\316G4\205HT\302%&quot;, signature@entry=0x0) at rsa_eay.c:444</span>
@@ -120,7 +119,7 @@
 </div>
 </section>
 <section id="x509-pubkey-get">
-<h2>X509_PUBKEY_get<a class="headerlink" href="#x509-pubkey-get" title="Permalink to this headline"></a></h2>
+<h1>X509_PUBKEY_get<a class="headerlink" href="#x509-pubkey-get" title="Permalink to this headline"></a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#0  RSA_set0_key (r=r@entry=0x212a80, n=n@entry=0x20f7a0, e=0x20f380, d=d@entry=0x0) at rsa_lib.c:286</span>
 <span class="c1">#1  0x000f3208 in X509_PUBKEY_get (key=0x20f370) at x_pubkey.c:237</span>
 <span class="c1">#2  0x0010a38c in X509_REQ_get_pubkey (req=req@entry=0x2117b8) at x509_req.c:114</span>
@@ -131,9 +130,8 @@
 </div>
 </section>
 <section id="x509-req">
-<h2>x509 req<a class="headerlink" href="#x509-req" title="Permalink to this headline"></a></h2>
+<h1>x509 req<a class="headerlink" href="#x509-req" title="Permalink to this headline"></a></h1>
 <p>./openssl/apps/openssl x509 -req -in oem_attestca.csr -CA oem_rootca.crt -CAkey rootca.key -out oem_attestca.crt -set_serial 5 -days 7300 -extfile v3.ext -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256</p>
-</section>
 </section>
 
 

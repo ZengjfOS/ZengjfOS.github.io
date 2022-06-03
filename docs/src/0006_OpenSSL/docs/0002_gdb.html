@@ -38,14 +38,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">gdb</a><ul>
+<li><a class="reference internal" href="#">gdb</a></li>
 <li><a class="reference internal" href="#id1">参考文档</a></li>
 <li><a class="reference internal" href="#download">Download</a></li>
 <li><a class="reference internal" href="#build-openssl">build openssl</a></li>
 <li><a class="reference internal" href="#gdb-sigill">gdb SIGILL</a></li>
 <li><a class="reference internal" href="#log">完整log</a></li>
-</ul>
-</li>
 </ul>
 </div>
         </div>
@@ -74,8 +72,9 @@
   <section id="gdb">
 <h1>gdb<a class="headerlink" href="#gdb" title="Permalink to this headline"></a></h1>
 <p>gdb调试openssl</p>
+</section>
 <section id="id1">
-<h2>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
 <ul class="simple">
 <li><p><a class="reference external" href="https://raspberrypi.stackexchange.com/questions/29020/how-to-debug-without-program-received-signal-sigill-using-the-3-18-kernel-3-1">How to debug without “Program received signal SIGILL” using the 3.18 kernel (3.12 works)?</a></p>
 <ul>
@@ -85,7 +84,7 @@
 </ul>
 </section>
 <section id="download">
-<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline"></a></h2>
+<h1>Download<a class="headerlink" href="#download" title="Permalink to this headline"></a></h1>
 <ul class="simple">
 <li><p>https://www.openssl.org/source/old/1.0.1/</p>
 <ul>
@@ -95,7 +94,7 @@
 </ul>
 </section>
 <section id="build-openssl">
-<h2>build openssl<a class="headerlink" href="#build-openssl" title="Permalink to this headline"></a></h2>
+<h1>build openssl<a class="headerlink" href="#build-openssl" title="Permalink to this headline"></a></h1>
 <ul class="simple">
 <li><p>./config -g3 -ggdb</p>
 <ul>
@@ -112,7 +111,7 @@
 </ul>
 </section>
 <section id="gdb-sigill">
-<h2>gdb SIGILL<a class="headerlink" href="#gdb-sigill" title="Permalink to this headline"></a></h2>
+<h1>gdb SIGILL<a class="headerlink" href="#gdb-sigill" title="Permalink to this headline"></a></h1>
 <ul>
 <li><p>gdb /usr/local/ssl/bin/openssl</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>gdb /usr/local/ssl/bin/openssl
@@ -160,7 +159,7 @@ Quit anyway? (y or n) y
 </ul>
 </section>
 <section id="log">
-<h2>完整log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h2>
+<h1>完整log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gdb</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">openssl</span>
 <span class="n">GNU</span> <span class="n">gdb</span> <span class="p">(</span><span class="n">Raspbian</span> <span class="mf">8.2.1</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="mf">8.2.1</span>
 <span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mi">2018</span> <span class="n">Free</span> <span class="n">Software</span> <span class="n">Foundation</span><span class="p">,</span> <span class="n">Inc</span><span class="o">.</span>
@@ -211,7 +210,6 @@ Quit anyway? (y or n) y
 <span class="p">(</span><span class="n">gdb</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
 </section>
 
 

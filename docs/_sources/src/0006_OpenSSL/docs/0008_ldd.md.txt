@@ -2,7 +2,7 @@
 
 查看编译的openssl时候依赖了别的库
 
-## ldd命令
+# ldd命令
 
 * ldd openssl/apps/openssl
 * 从链接库看出，openssl是一个单独的程序，没有分成多个库

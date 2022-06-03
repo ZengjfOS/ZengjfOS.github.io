@@ -2,11 +2,11 @@
 
 openssl x509证书生成，最终调用rsa私钥加密
 
-## command
+# command
 
 * /usr/local/ssl/bin/openssl req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU="AAA"/OU="AAA"/O=AAA/CN="AAA Root Ca" -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
 
-## 报错
+# 报错
 
 ```
 open error
@@ -14,14 +14,14 @@ load_sig_file error /tmp/hashraw96134401_SIG.bin
 3069375728:error:0D0DC006:asn1 encoding routines:ASN1_item_sign_ctx:EVP lib:a_sign.c:314:
 ```
 
-## cgdb
+# cgdb
 
 ```
 (gdb) handle SIGILL pass nostop
 (gdb) set args req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU="AAA"/OU="AAA"/O=AAA/CN="AAA Root Ca" -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
 ```
 
-## backtrace
+# backtrace
 
 bt
 
@@ -47,7 +47,7 @@ open error
 load_sig_file error /tmp/hashraw1507780501_SIG.bin
 ```
 
-## X509_PUBKEY_get
+# X509_PUBKEY_get
 
 ```
 #0  RSA_set0_key (r=r@entry=0x212a80, n=n@entry=0x20f7a0, e=0x20f380, d=d@entry=0x0) at rsa_lib.c:286
@@ -58,6 +58,6 @@ load_sig_file error /tmp/hashraw1507780501_SIG.bin
 #5  0x00012234 in main (Argc=22, Argv=0xbefff2e8) at openssl.c:382
 ```
 
-## x509 req
+# x509 req
 
 ./openssl/apps/openssl x509 -req -in oem_attestca.csr -CA oem_rootca.crt -CAkey rootca.key -out oem_attestca.crt -set_serial 5 -days 7300 -extfile v3.ext -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
