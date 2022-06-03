@@ -4,7 +4,7 @@ boot.img合成原理
 
 # 参考文档
 
-* [0009_YOCTO_SD_Image_Generate.md](docs/0009_YOCTO_SD_Image_Generate.md)
+* [0009_YOCTO_SD_Image_Generate.md](0009_YOCTO_SD_Image_Generate.md)
 
 # boot partition
 
