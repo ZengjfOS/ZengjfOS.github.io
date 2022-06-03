@@ -2,11 +2,11 @@
 
 pem转der
 
-## cmd
+# cmd
 
 * openssl -V x509 -outform der -in rootca_pem.crt -out rootca_pem.der
 
-## steps
+# steps
 
 * cgdb ./openssl/apps/openssl
   * set args x509 -outform der -in rootca_pem.crt -out rootca_pem.der

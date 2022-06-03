@@ -2,7 +2,7 @@
 
 openssl.cnf依赖
 
-## openssl.conf
+# openssl.conf
 
 /usr/local/ssl/openssl.cnf
 

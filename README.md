@@ -13,6 +13,7 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0007| [Yocto](src/0007_Yocto/README.md) | 分析Yocto编译原理，能做的事情和Buildroot类似，不过更重要的是芯片大厂都参与维护，知名度更高
 0006| [OpenSSL](src/0006_OpenSSL/README.md) | 分析OpenSSL
 0005| [dnsmasq](src/0005_dnsmasq/README.md) | 分析dnsmasq DNS服务工作原理
 0004| [Bluetooth_Protocol](src/0004_Bluetooth_Protocol/README.md) | 就目前而言，设备带有蓝牙功能已经是很普遍的事情了，所以花点时间研究一下底层是如何实现的。在遇到问题的时候，了解底层工作原理可以更快速的定位问题可能出在数据处理的哪个阶段

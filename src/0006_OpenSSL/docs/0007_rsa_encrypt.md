@@ -2,22 +2,22 @@
 
 ras加密
 
-## hash
+# hash
 
 sha256sum rootca.key | cut -d " " -f 1 > hash.txt
 
-## command
+# command
 
 ./openssl/apps/openssl rsautl -sign -in hash.txt -out hash.sig -inkey rootca.key
 
-## cgdb
+# cgdb
 
 ```
 (gdb) handle SIGILL pass nostop
 (gdb) set args rsautl -sign -in hash.txt -out hash.sig -inkey rootca.key
 ```
 
-## error
+# error
 
 ```
 ig -inkey rootca.key
@@ -26,7 +26,7 @@ load_sig_file error /tmp/hashraw753763409_SIG.bin
 RSA operation error
 ```
 
-## bt
+# bt
 
 ```
 #0  load_sig_file (_sz=<synthetic pointer>, data=..., fn=0xbeffeba0 "") at rsa_eay.c:444
@@ -38,7 +38,7 @@ at rsa_eay.c:444
 #5  0x00012234 in main (Argc=8, Argv=0xbefff3d8) at openssl.c:382
 ```
 
-## 私钥加密
+# 私钥加密
 
 crypto/rsa/rsa_eay.c
 
