@@ -1,5 +1,8 @@
 # README
 
+* [GitHub ZengjfOS](https://github.com/ZengjfOS)
+* [ZengjfOS.github.io](https://github.com/ZengjfOS/ZengjfOS.github.io)
+
 # 常用链接
 
 * [Android官方代码跟踪](https://cs.android.com/android/platform/superproject)
@@ -8,8 +11,6 @@
 * [Linux源代码在线检索](https://elixir.bootlin.com/linux/latest/source)
 * [The Linux Kernel’s documentation](https://www.kernel.org/doc/html/latest/)
 * [i.MX驱动测试软件](https://source.codeaurora.org/external/imx/imx-test/)
-* https://github.com/ZengjfOS
-* https://github.com/ZengjfOS/ZengjfOS.github.io
 
 # docs
 
