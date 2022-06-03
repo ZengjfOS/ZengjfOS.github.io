@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>x509 &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">x509</a><ul>
+<li><a class="reference internal" href="#command">command</a></li>
+<li><a class="reference internal" href="#id1">报错</a></li>
+<li><a class="reference internal" href="#cgdb">cgdb</a></li>
+<li><a class="reference internal" href="#backtrace">backtrace</a></li>
+<li><a class="reference internal" href="#x509-pubkey-get">X509_PUBKEY_get</a></li>
+<li><a class="reference internal" href="#x509-req">x509 req</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>x509</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="x509">
+<h1>x509<a class="headerlink" href="#x509" title="Permalink to this headline"></a></h1>
+<p>openssl x509证书生成，最终调用rsa私钥加密</p>
+<section id="command">
+<h2>command<a class="headerlink" href="#command" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>/usr/local/ssl/bin/openssl req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU=”AAA”/OU=”AAA”/O=AAA/CN=”AAA Root Ca” -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256</p></li>
+</ul>
+</section>
+<section id="id1">
+<h2>报错<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">open</span> <span class="n">error</span>
+<span class="n">load_sig_file</span> <span class="n">error</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hashraw96134401_SIG</span><span class="o">.</span><span class="n">bin</span>
+<span class="mi">3069375728</span><span class="p">:</span><span class="n">error</span><span class="p">:</span><span class="mi">0</span><span class="n">D0DC006</span><span class="p">:</span><span class="n">asn1</span> <span class="n">encoding</span> <span class="n">routines</span><span class="p">:</span><span class="n">ASN1_item_sign_ctx</span><span class="p">:</span><span class="n">EVP</span> <span class="n">lib</span><span class="p">:</span><span class="n">a_sign</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">314</span><span class="p">:</span>
+</pre></div>
+</div>
+</section>
+<section id="cgdb">
+<h2>cgdb<a class="headerlink" href="#cgdb" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">handle</span> <span class="n">SIGILL</span> <span class="k">pass</span> <span class="n">nostop</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="nb">set</span> <span class="n">args</span> <span class="n">req</span> <span class="o">-</span><span class="n">new</span> <span class="o">-</span><span class="n">x509</span> <span class="o">-</span><span class="n">key</span> <span class="n">rootca</span><span class="o">.</span><span class="n">key</span> <span class="o">-</span><span class="n">days</span> <span class="mi">7300</span> <span class="o">-</span><span class="n">out</span> <span class="n">oem_rootca</span><span class="o">.</span><span class="n">crt</span> <span class="o">-</span><span class="n">subj</span> <span class="o">/</span><span class="n">C</span><span class="o">=</span><span class="n">CN</span><span class="o">/</span><span class="n">ST</span><span class="o">=</span><span class="n">SZ</span><span class="o">/</span><span class="n">L</span><span class="o">=</span><span class="n">GD</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">O</span><span class="o">=</span><span class="n">AAA</span><span class="o">/</span><span class="n">CN</span><span class="o">=</span><span class="s2">&quot;AAA Root Ca&quot;</span> <span class="o">-</span><span class="n">set_serial</span> <span class="mi">1</span> <span class="o">-</span><span class="n">config</span> <span class="n">opensslroot</span><span class="o">.</span><span class="n">cfg</span> <span class="o">-</span><span class="n">sha256</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_padding_mode</span><span class="p">:</span><span class="n">pss</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_pss_saltlen</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">digest</span><span class="p">:</span><span class="n">sha256</span>
+</pre></div>
+</div>
+</section>
+<section id="backtrace">
+<h2>backtrace<a class="headerlink" href="#backtrace" title="Permalink to this headline"></a></h2>
+<p>bt</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#0  load_sig_file (_sz=&lt;synthetic pointer&gt;, data=0x212978 &quot;\036{e\303| \017ac5\365\224a^\347\035\263/\235R\004\031u\bz\316G4\205HT\302%&quot;, fn=0xbeffe498 &quot;&quot;) at rsa_eay.c:365</span>
+<span class="c1">#1  calcSignatureRaw (textpadded=textpadded@entry=0x213290 &quot;}, signature=0x212978 &quot;\036{e\303| \017ac5\365\224a^\347\035\263/\235R\004\031u\bz\316G4\205HT\302%&quot;, signature@entry=0x0) at rsa_eay.c:444</span>
+<span class="c1">#2  0x000c3200 in RSA_eay_private_encrypt (flen=&lt;optimized out&gt;, from=&lt;optimized out&gt;, to=0x0, rsa=0x211f28, padding=3) at rsa_eay.c:602</span>
+<span class="c1">#3  0x00163310 in pkey_rsa_sign (ctx=0x211650, sig=0x212978, siglen=0xbeffe710, tbs=0xbeffe6a0, tbslen=32) at rsa_pmeth.c:266</span>
+<span class="c1">#4  0x000eac74 in EVP_DigestSignFinal (ctx=ctx@entry=0xbeffe760, sigret=sigret@entry=0x212978, siglen=0xbeffe710, siglen@</span>
+<span class="n">entry</span><span class="o">=</span><span class="mh">0xbeffe708</span><span class="p">)</span> <span class="n">at</span> <span class="n">m_sigver</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">154</span>
+<span class="c1">#5  0x0016b39c in ASN1_item_sign_ctx (it=0x1c2b08 &lt;X509_CINF_it&gt;, algor1=0x211c08, algor2=0x211c70, signature=0x211c08, asn=0x20beb8, ctx=0xbeffe760, ctx@entry=0xbeffe758) at a_sign.c:310</span>
+<span class="c1">#6  0x00111588 in X509_sign_ctx (x=x@entry=0x211b68, ctx=ctx@entry=0xbeffe758) at x_all.c:101</span>
+<span class="c1">#7  0x000148d8 in do_X509_sign (err=0x1fb150, x=x@entry=0x211b68, pkey=0x211f00, md=md@entry=0x1c0fa0 &lt;sha256_md&gt;, sigopts=0x20e6f8, sigopts@entry=0x20b1c8) at req.c:1802</span>
+<span class="c1">#8  0x0001578c in req_main (argc=&lt;optimized out&gt;, argv=&lt;optimized out&gt;) at req.c:871</span>
+<span class="c1">#9  0x00012610 in do_cmd (prog=prog@entry=0x20b310, argc=argc@entry=22, argv=argv@entry=0xbefff318) at openssl.c:490</span>
+<span class="c1">#10 0x00012234 in main (Argc=22, Argv=0xbefff318) at openssl.c:382</span>
+</pre></div>
+</div>
+<p>log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">open</span> <span class="n">error</span>
+<span class="n">load_sig_file</span> <span class="n">error</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">hashraw1507780501_SIG</span><span class="o">.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</section>
+<section id="x509-pubkey-get">
+<h2>X509_PUBKEY_get<a class="headerlink" href="#x509-pubkey-get" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#0  RSA_set0_key (r=r@entry=0x212a80, n=n@entry=0x20f7a0, e=0x20f380, d=d@entry=0x0) at rsa_lib.c:286</span>
+<span class="c1">#1  0x000f3208 in X509_PUBKEY_get (key=0x20f370) at x_pubkey.c:237</span>
+<span class="c1">#2  0x0010a38c in X509_REQ_get_pubkey (req=req@entry=0x2117b8) at x509_req.c:114</span>
+<span class="c1">#3  0x000156fc in req_main (argc=&lt;optimized out&gt;, argv=&lt;optimized out&gt;) at req.c:852</span>
+<span class="c1">#4  0x00012610 in do_cmd (prog=prog@entry=0x20b310, argc=argc@entry=22, argv=argv@entry=0xbefff2e8) at openssl.c:490</span>
+<span class="c1">#5  0x00012234 in main (Argc=22, Argv=0xbefff2e8) at openssl.c:382</span>
+</pre></div>
+</div>
+</section>
+<section id="x509-req">
+<h2>x509 req<a class="headerlink" href="#x509-req" title="Permalink to this headline"></a></h2>
+<p>./openssl/apps/openssl x509 -req -in oem_attestca.csr -CA oem_rootca.crt -CAkey rootca.key -out oem_attestca.crt -set_serial 5 -days 7300 -extfile v3.ext -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

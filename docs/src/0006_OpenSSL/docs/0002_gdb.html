@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gdb &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">gdb</a><ul>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+<li><a class="reference internal" href="#build-openssl">build openssl</a></li>
+<li><a class="reference internal" href="#gdb-sigill">gdb SIGILL</a></li>
+<li><a class="reference internal" href="#log">完整log</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>gdb</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gdb">
+<h1>gdb<a class="headerlink" href="#gdb" title="Permalink to this headline"></a></h1>
+<p>gdb调试openssl</p>
+<section id="id1">
+<h2>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://raspberrypi.stackexchange.com/questions/29020/how-to-debug-without-program-received-signal-sigill-using-the-3-18-kernel-3-1">How to debug without “Program received signal SIGILL” using the 3.18 kernel (3.12 works)?</a></p>
+<ul>
+<li><p>handle SIGILL pass nostop</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>https://www.openssl.org/source/old/1.0.1/</p>
+<ul>
+<li><p>openssl-1.0.1f.tar.gz</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="build-openssl">
+<h2>build openssl<a class="headerlink" href="#build-openssl" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>./config -g3 -ggdb</p>
+<ul>
+<li><p>–openssldir=OPENSSLDIR: 安装目录，默认是/usr/local/ssl</p></li>
+<li><p>–prefix=PREFIX: 设置lib include bin目录的前缀，默认为OPENSSLDIR目录。</p></li>
+</ul>
+</li>
+<li><p>make</p>
+<ul>
+<li><p>不要用-j进行多核编译</p></li>
+</ul>
+</li>
+<li><p>sudo make install</p></li>
+</ul>
+</section>
+<section id="gdb-sigill">
+<h2>gdb SIGILL<a class="headerlink" href="#gdb-sigill" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>gdb /usr/local/ssl/bin/openssl</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>gdb /usr/local/ssl/bin/openssl
+GNU gdb (Raspbian 8.2.1-2) 8.2.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type &quot;show copying&quot; and &quot;show warranty&quot; for details.
+This GDB was configured as &quot;arm-linux-gnueabihf&quot;.
+Type &quot;show configuration&quot; for configuration details.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+
+For help, type &quot;help&quot;.
+Type &quot;apropos word&quot; to search for commands related to &quot;word&quot;...
+Reading symbols from /usr/local/ssl/bin/openssl...done.
+(gdb) set args req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU=&quot;AAA&quot;/OU=&quot;AAA&quot;/O=AAA/CN=&quot;AAA Root Ca&quot; -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
+(gdb) run
+Starting program: /usr/local/ssl/bin/openssl req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU=&quot;AAA&quot;/OU=&quot;AAA&quot;/O=AAA/CN=&quot;AAA Root Ca&quot; -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
+
+Program received signal SIGILL, Illegal instruction.
+_armv7_tick () at armv4cpuid.S:17
+17              mrc     p15,0,r0,c9,c13,0
+(gdb) quit
+A debugging session is active.
+
+        Inferior 1 [process 28049] will be killed.
+
+Quit anyway? (y or n) y
+</pre></div>
+</div>
+<ul>
+<li><p>在gdb启动之后输入后面命令，再进行其他操作：handle SIGILL pass nostop</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">handle</span> <span class="n">SIGILL</span> <span class="k">pass</span> <span class="n">nostop</span>
+<span class="n">Signal</span>        <span class="n">Stop</span>      <span class="n">Print</span>   <span class="n">Pass</span> <span class="n">to</span> <span class="n">program</span> <span class="n">Description</span>
+<span class="n">SIGILL</span>        <span class="n">No</span>        <span class="n">Yes</span>     <span class="n">Yes</span>             <span class="n">Illegal</span> <span class="n">instruction</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="log">
+<h2>完整log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gdb</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">openssl</span>
+<span class="n">GNU</span> <span class="n">gdb</span> <span class="p">(</span><span class="n">Raspbian</span> <span class="mf">8.2.1</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="mf">8.2.1</span>
+<span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mi">2018</span> <span class="n">Free</span> <span class="n">Software</span> <span class="n">Foundation</span><span class="p">,</span> <span class="n">Inc</span><span class="o">.</span>
+<span class="n">License</span> <span class="n">GPLv3</span><span class="o">+</span><span class="p">:</span> <span class="n">GNU</span> <span class="n">GPL</span> <span class="n">version</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">later</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">gnu</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">licenses</span><span class="o">/</span><span class="n">gpl</span><span class="o">.</span><span class="n">html</span><span class="o">&gt;</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">free</span> <span class="n">software</span><span class="p">:</span> <span class="n">you</span> <span class="n">are</span> <span class="n">free</span> <span class="n">to</span> <span class="n">change</span> <span class="ow">and</span> <span class="n">redistribute</span> <span class="n">it</span><span class="o">.</span>
+<span class="n">There</span> <span class="ow">is</span> <span class="n">NO</span> <span class="n">WARRANTY</span><span class="p">,</span> <span class="n">to</span> <span class="n">the</span> <span class="n">extent</span> <span class="n">permitted</span> <span class="n">by</span> <span class="n">law</span><span class="o">.</span>
+<span class="n">Type</span> <span class="s2">&quot;show copying&quot;</span> <span class="ow">and</span> <span class="s2">&quot;show warranty&quot;</span> <span class="k">for</span> <span class="n">details</span><span class="o">.</span>
+<span class="n">This</span> <span class="n">GDB</span> <span class="n">was</span> <span class="n">configured</span> <span class="k">as</span> <span class="s2">&quot;arm-linux-gnueabihf&quot;</span><span class="o">.</span>
+<span class="n">Type</span> <span class="s2">&quot;show configuration&quot;</span> <span class="k">for</span> <span class="n">configuration</span> <span class="n">details</span><span class="o">.</span>
+<span class="n">For</span> <span class="n">bug</span> <span class="n">reporting</span> <span class="n">instructions</span><span class="p">,</span> <span class="n">please</span> <span class="n">see</span><span class="p">:</span>
+<span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">gnu</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">software</span><span class="o">/</span><span class="n">gdb</span><span class="o">/</span><span class="n">bugs</span><span class="o">/&gt;.</span>
+<span class="n">Find</span> <span class="n">the</span> <span class="n">GDB</span> <span class="n">manual</span> <span class="ow">and</span> <span class="n">other</span> <span class="n">documentation</span> <span class="n">resources</span> <span class="n">online</span> <span class="n">at</span><span class="p">:</span>
+    <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">gnu</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">software</span><span class="o">/</span><span class="n">gdb</span><span class="o">/</span><span class="n">documentation</span><span class="o">/&gt;.</span>
+
+<span class="n">For</span> <span class="n">help</span><span class="p">,</span> <span class="nb">type</span> <span class="s2">&quot;help&quot;</span><span class="o">.</span>
+<span class="n">Type</span> <span class="s2">&quot;apropos word&quot;</span> <span class="n">to</span> <span class="n">search</span> <span class="k">for</span> <span class="n">commands</span> <span class="n">related</span> <span class="n">to</span> <span class="s2">&quot;word&quot;</span><span class="o">...</span>
+<span class="n">Reading</span> <span class="n">symbols</span> <span class="kn">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">openssl</span><span class="o">...</span><span class="n">done</span><span class="o">.</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">handle</span> <span class="n">SIGILL</span> <span class="k">pass</span> <span class="n">nostop</span>
+<span class="n">Signal</span>        <span class="n">Stop</span>      <span class="n">Print</span>   <span class="n">Pass</span> <span class="n">to</span> <span class="n">program</span> <span class="n">Description</span>
+<span class="n">SIGILL</span>        <span class="n">No</span>        <span class="n">Yes</span>     <span class="n">Yes</span>             <span class="n">Illegal</span> <span class="n">instruction</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="nb">set</span> <span class="n">args</span> <span class="n">req</span> <span class="o">-</span><span class="n">new</span> <span class="o">-</span><span class="n">x509</span> <span class="o">-</span><span class="n">key</span> <span class="n">rootca</span><span class="o">.</span><span class="n">key</span> <span class="o">-</span><span class="n">days</span> <span class="mi">7300</span> <span class="o">-</span><span class="n">out</span> <span class="n">oem_rootca</span><span class="o">.</span><span class="n">crt</span> <span class="o">-</span><span class="n">subj</span> <span class="o">/</span><span class="n">C</span><span class="o">=</span><span class="n">CN</span><span class="o">/</span><span class="n">ST</span><span class="o">=</span><span class="n">SZ</span><span class="o">/</span><span class="n">L</span><span class="o">=</span><span class="n">GD</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">O</span><span class="o">=</span><span class="n">AAA</span><span class="o">/</span><span class="n">CN</span><span class="o">=</span><span class="s2">&quot;AAA Root Ca&quot;</span> <span class="o">-</span><span class="n">set_serial</span> <span class="mi">1</span> <span class="o">-</span><span class="n">config</span> <span class="n">opensslroot</span><span class="o">.</span><span class="n">cfg</span> <span class="o">-</span><span class="n">sha256</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_padding_mode</span><span class="p">:</span><span class="n">pss</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_pss_saltlen</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">digest</span><span class="p">:</span><span class="n">sha256</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">b</span> <span class="n">load_sig_file</span>
+<span class="n">Breakpoint</span> <span class="mi">1</span> <span class="n">at</span> <span class="mh">0xc2d74</span><span class="p">:</span> <span class="n">file</span> <span class="n">rsa_eay</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">line</span> <span class="mf">444.</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">run</span>
+<span class="n">Starting</span> <span class="n">program</span><span class="p">:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">openssl</span> <span class="n">req</span> <span class="o">-</span><span class="n">new</span> <span class="o">-</span><span class="n">x509</span> <span class="o">-</span><span class="n">key</span> <span class="n">rootca</span><span class="o">.</span><span class="n">key</span> <span class="o">-</span><span class="n">days</span> <span class="mi">7300</span> <span class="o">-</span><span class="n">out</span> <span class="n">oem_rootca</span><span class="o">.</span><span class="n">crt</span> <span class="o">-</span><span class="n">subj</span> <span class="o">/</span><span class="n">C</span><span class="o">=</span><span class="n">CN</span><span class="o">/</span><span class="n">ST</span><span class="o">=</span><span class="n">SZ</span><span class="o">/</span><span class="n">L</span><span class="o">=</span><span class="n">GD</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">OU</span><span class="o">=</span><span class="s2">&quot;AAA&quot;</span><span class="o">/</span><span class="n">O</span><span class="o">=</span><span class="n">AAA</span><span class="o">/</span><span class="n">CN</span><span class="o">=</span><span class="s2">&quot;AAA Root Ca&quot;</span> <span class="o">-</span><span class="n">set_serial</span> <span class="mi">1</span> <span class="o">-</span><span class="n">config</span> <span class="n">opensslroot</span><span class="o">.</span><span class="n">cfg</span> <span class="o">-</span><span class="n">sha256</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_padding_mode</span><span class="p">:</span><span class="n">pss</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">rsa_pss_saltlen</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">sigopt</span> <span class="n">digest</span><span class="p">:</span><span class="n">sha256</span>
+
+<span class="n">Program</span> <span class="n">received</span> <span class="n">signal</span> <span class="n">SIGILL</span><span class="p">,</span> <span class="n">Illegal</span> <span class="n">instruction</span><span class="o">.</span>
+<span class="p">[</span><span class="n">Detaching</span> <span class="n">after</span> <span class="n">fork</span> <span class="kn">from</span> <span class="nn">child</span> <span class="n">process</span> <span class="mi">6033</span><span class="p">]</span>
+<span class="p">[</span><span class="n">Detaching</span> <span class="n">after</span> <span class="n">fork</span> <span class="kn">from</span> <span class="nn">child</span> <span class="n">process</span> <span class="mi">6035</span><span class="p">]</span>
+<span class="p">[</span><span class="n">Detaching</span> <span class="n">after</span> <span class="n">fork</span> <span class="kn">from</span> <span class="nn">child</span> <span class="n">process</span> <span class="mi">6037</span><span class="p">]</span>
+
+<span class="n">Breakpoint</span> <span class="mi">1</span><span class="p">,</span> <span class="n">load_sig_file</span> <span class="p">(</span><span class="n">_sz</span><span class="o">=&lt;</span><span class="n">synthetic</span> <span class="n">pointer</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="mh">0x212978</span> <span class="s2">&quot;DB</span><span class="se">\271\353</span><span class="s2">S</span><span class="se">\310\334</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">incomplete</span> <span class="n">sequence</span> \<span class="mi">332</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="mh">0xbeffe498</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="n">at</span> <span class="n">rsa_eay</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">444</span>
+<span class="mi">444</span>       <span class="n">ret</span> <span class="o">=</span> <span class="n">load_sig_file</span><span class="p">(</span><span class="n">sign_file</span><span class="p">,</span> <span class="n">signature</span> <span class="p">,</span><span class="o">&amp;</span><span class="n">img_len</span><span class="p">);</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span> <span class="n">bt</span>
+<span class="c1">#0  load_sig_file (_sz=&lt;synthetic pointer&gt;, data=0x212978 &quot;DB\271\353S\310\334&quot;, &lt;incomplete sequence \332&gt;, fn=0xbeffe498 &quot;&quot;) at rsa_eay.c:444</span>
+<span class="c1">#1  calcSignatureRaw (</span>
+    <span class="n">textpadded</span><span class="o">=</span><span class="n">textpadded</span><span class="nd">@entry</span><span class="o">=</span><span class="mh">0x213290</span><span class="o">...</span><span class="p">,</span>
+    <span class="n">signature</span><span class="o">=</span><span class="mh">0x212978</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">incomplete</span> <span class="n">sequence</span> \<span class="mi">332</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">signature</span><span class="nd">@entry</span><span class="o">=</span><span class="mh">0x0</span><span class="p">)</span> <span class="n">at</span> <span class="n">rsa_eay</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">444</span>
+<span class="c1">#2  0x000c3200 in RSA_eay_private_encrypt (flen=&lt;optimized out&gt;, from=&lt;optimized out&gt;, to=0x0, rsa=0x211f28, padding=3) at rsa_eay.c:602</span>
+<span class="c1">#3  0x00163310 in pkey_rsa_sign (ctx=0x211650, sig=0x212978, &lt;incomplete sequence \332&gt;, siglen=0xbeffe710, tbs=0xbeffe6a0 , tbslen=32) at rsa_pmeth.c:266</span>
+<span class="c1">#4  0x000eac74 in EVP_DigestSignFinal (ctx=ctx@entry=0xbeffe760, sigret=sigret@entry=0x212978, &lt;incomplete sequence \332&gt;, siglen=0xbeffe710, siglen@entry=0xbeffe708) at m_sigver.c:154</span>
+<span class="c1">#5  0x0016b39c in ASN1_item_sign_ctx (it=0x1c2b08 &lt;X509_CINF_it&gt;, algor1=0x211c08, algor2=0x211c70, signature=0x211c08, asn=0x20beb8, ctx=0xbeffe760, ctx@entry=0xbeffe758) at a_sign.c:310</span>
+<span class="c1">#6  0x00111588 in X509_sign_ctx (x=x@entry=0x211b68, ctx=ctx@entry=0xbeffe758) at x_all.c:101</span>
+<span class="c1">#7  0x000148d8 in do_X509_sign (err=0x1fb150, x=x@entry=0x211b68, pkey=0x211f00, md=md@entry=0x1c0fa0 &lt;sha256_md&gt;, sigopts=0x20e6f8, sigopts@entry=0x20b1c8) at req.c:1802</span>
+<span class="c1">#8  0x0001578c in req_main (argc=&lt;optimized out&gt;, argv=&lt;optimized out&gt;) at req.c:871</span>
+<span class="c1">#9  0x00012610 in do_cmd (prog=prog@entry=0x20b310, argc=argc@entry=22, argv=argv@entry=0xbefff318) at openssl.c:490</span>
+<span class="c1">#10 0x00012234 in main (Argc=22, Argv=0xbefff318) at openssl.c:382</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

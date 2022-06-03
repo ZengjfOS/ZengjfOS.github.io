@@ -1,0 +1,63 @@
+# x509
+
+openssl x509证书生成，最终调用rsa私钥加密
+
+## command
+
+* /usr/local/ssl/bin/openssl req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU="AAA"/OU="AAA"/O=AAA/CN="AAA Root Ca" -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
+
+## 报错
+
+```
+open error
+load_sig_file error /tmp/hashraw96134401_SIG.bin
+3069375728:error:0D0DC006:asn1 encoding routines:ASN1_item_sign_ctx:EVP lib:a_sign.c:314:
+```
+
+## cgdb
+
+```
+(gdb) handle SIGILL pass nostop
+(gdb) set args req -new -x509 -key rootca.key -days 7300 -out oem_rootca.crt -subj /C=CN/ST=SZ/L=GD/OU="AAA"/OU="AAA"/O=AAA/CN="AAA Root Ca" -set_serial 1 -config opensslroot.cfg -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256
+```
+
+## backtrace
+
+bt
+
+```
+#0  load_sig_file (_sz=<synthetic pointer>, data=0x212978 "\036{e\303| \017ac5\365\224a^\347\035\263/\235R\004\031u\bz\316G4\205HT\302%", fn=0xbeffe498 "") at rsa_eay.c:365
+#1  calcSignatureRaw (textpadded=textpadded@entry=0x213290 "}, signature=0x212978 "\036{e\303| \017ac5\365\224a^\347\035\263/\235R\004\031u\bz\316G4\205HT\302%", signature@entry=0x0) at rsa_eay.c:444
+#2  0x000c3200 in RSA_eay_private_encrypt (flen=<optimized out>, from=<optimized out>, to=0x0, rsa=0x211f28, padding=3) at rsa_eay.c:602
+#3  0x00163310 in pkey_rsa_sign (ctx=0x211650, sig=0x212978, siglen=0xbeffe710, tbs=0xbeffe6a0, tbslen=32) at rsa_pmeth.c:266
+#4  0x000eac74 in EVP_DigestSignFinal (ctx=ctx@entry=0xbeffe760, sigret=sigret@entry=0x212978, siglen=0xbeffe710, siglen@
+entry=0xbeffe708) at m_sigver.c:154
+#5  0x0016b39c in ASN1_item_sign_ctx (it=0x1c2b08 <X509_CINF_it>, algor1=0x211c08, algor2=0x211c70, signature=0x211c08, asn=0x20beb8, ctx=0xbeffe760, ctx@entry=0xbeffe758) at a_sign.c:310
+#6  0x00111588 in X509_sign_ctx (x=x@entry=0x211b68, ctx=ctx@entry=0xbeffe758) at x_all.c:101
+#7  0x000148d8 in do_X509_sign (err=0x1fb150, x=x@entry=0x211b68, pkey=0x211f00, md=md@entry=0x1c0fa0 <sha256_md>, sigopts=0x20e6f8, sigopts@entry=0x20b1c8) at req.c:1802
+#8  0x0001578c in req_main (argc=<optimized out>, argv=<optimized out>) at req.c:871
+#9  0x00012610 in do_cmd (prog=prog@entry=0x20b310, argc=argc@entry=22, argv=argv@entry=0xbefff318) at openssl.c:490
+#10 0x00012234 in main (Argc=22, Argv=0xbefff318) at openssl.c:382
+```
+
+log
+
+```
+open error
+load_sig_file error /tmp/hashraw1507780501_SIG.bin
+```
+
+## X509_PUBKEY_get
+
+```
+#0  RSA_set0_key (r=r@entry=0x212a80, n=n@entry=0x20f7a0, e=0x20f380, d=d@entry=0x0) at rsa_lib.c:286
+#1  0x000f3208 in X509_PUBKEY_get (key=0x20f370) at x_pubkey.c:237
+#2  0x0010a38c in X509_REQ_get_pubkey (req=req@entry=0x2117b8) at x509_req.c:114
+#3  0x000156fc in req_main (argc=<optimized out>, argv=<optimized out>) at req.c:852
+#4  0x00012610 in do_cmd (prog=prog@entry=0x20b310, argc=argc@entry=22, argv=argv@entry=0xbefff2e8) at openssl.c:490
+#5  0x00012234 in main (Argc=22, Argv=0xbefff2e8) at openssl.c:382
+```
+
+## x509 req
+
+./openssl/apps/openssl x509 -req -in oem_attestca.csr -CA oem_rootca.crt -CAkey rootca.key -out oem_attestca.crt -set_serial 5 -days 7300 -extfile v3.ext -sha256 -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -sigopt digest:sha256

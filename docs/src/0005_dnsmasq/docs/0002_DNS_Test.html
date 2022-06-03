@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dns Test &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">dns Test</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">示例</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>dns Test</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dns-test">
+<h1>dns Test<a class="headerlink" href="#dns-test" title="Permalink to this headline"></a></h1>
+<p>模拟DNS请求访问</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://gist.github.com/fffaraz/9d9170b57791c28ccda9255b48315168">DNS Query Code in C with linux sockets</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>示例<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/a3738059984548df6e4ba9377c58d7ca/dns.c"><span class="xref download myst">dns.c</span></a></p>
+<ul>
+<li><p>make</p></li>
+<li><p>./dns</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Enter</span> <span class="n">Hostname</span> <span class="n">to</span> <span class="n">Lookup</span> <span class="p">:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>
+<span class="n">Enter</span> <span class="n">DNS</span> <span class="n">Server</span> <span class="p">:</span> <span class="mf">127.0.0.1</span>
+<span class="n">Resolving</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>
+<span class="n">Sending</span> <span class="n">Packet</span><span class="o">...</span><span class="n">Done</span>
+<span class="n">Receiving</span> <span class="n">answer</span><span class="o">...</span><span class="n">Done</span>
+<span class="n">The</span> <span class="n">response</span> <span class="n">contains</span> <span class="p">:</span>
+ <span class="mi">1</span> <span class="n">Questions</span><span class="o">.</span>
+ <span class="mi">2</span> <span class="n">Answers</span><span class="o">.</span>
+ <span class="mi">0</span> <span class="n">Authoritative</span> <span class="n">Servers</span><span class="o">.</span>
+ <span class="mi">0</span> <span class="n">Additional</span> <span class="n">records</span><span class="o">.</span>
+
+
+<span class="n">Answer</span> <span class="n">Records</span> <span class="p">:</span> <span class="mi">2</span>
+<span class="n">Name</span> <span class="p">:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span> <span class="n">has</span> <span class="n">IPv4</span> <span class="n">address</span> <span class="p">:</span> <span class="mf">220.181.38.251</span>
+<span class="n">Name</span> <span class="p">:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span> <span class="n">has</span> <span class="n">IPv4</span> <span class="n">address</span> <span class="p">:</span> <span class="mf">220.181.38.148</span>
+
+<span class="n">Authoritive</span> <span class="n">Records</span> <span class="p">:</span> <span class="mi">0</span>
+
+<span class="n">Additional</span> <span class="n">Records</span> <span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>sudo tcpdump -i wlan0 -n -nn port ‘53 or 68’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on wlan0, link-type EN10MB (Ethernet), capture size 262144 bytes
+...省略
+01:20:27.659680 IP 172.20.10.7.50887 &gt; 208.67.222.222.53: 1371+ A? baidu.com. (27)
+01:20:27.794022 IP 208.67.222.222.53 &gt; 172.20.10.7.50887: 1371 2/0/0 A 220.181.38.251, A 220.181.38.148 (59)
+...省略
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

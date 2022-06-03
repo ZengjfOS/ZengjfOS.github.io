@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hosts &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">hosts</a></li>
+<li><a class="reference internal" href="#log">log</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>hosts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hosts">
+<h1>hosts<a class="headerlink" href="#hosts" title="Permalink to this headline"></a></h1>
+<p>dnsmasq会加载Android hosts文件</p>
+</section>
+<section id="log">
+<h1>log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h1>
+<p>输出log如下</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">started</span><span class="p">,</span> <span class="n">version</span> <span class="mf">2.51</span> <span class="n">cachesize</span> <span class="mi">150</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="nb">compile</span> <span class="n">time</span> <span class="n">options</span><span class="p">:</span> <span class="n">IPv6</span> <span class="n">GNU</span><span class="o">-</span><span class="n">getopt</span> <span class="n">no</span><span class="o">-</span><span class="n">DBus</span> <span class="n">no</span><span class="o">-</span><span class="n">I18N</span> <span class="n">DHCP</span> <span class="n">TFTP</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">using</span> <span class="n">nameserver</span> <span class="mf">114.114.114.114</span><span class="c1">#53 for domain sina.com</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">read</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hosts</span> <span class="o">-</span> <span class="mi">5</span> <span class="n">addresses</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">reload_servers</span><span class="p">()</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">fname</span><span class="p">:</span> <span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">dnsmasq</span><span class="o">/</span><span class="n">resolv</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">exit</span> <span class="n">reload_servers</span><span class="p">()</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">using</span> <span class="n">nameserver</span> <span class="mf">8.8.8.8</span><span class="c1">#53</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">using</span> <span class="n">nameserver</span> <span class="mf">114.114.114.114</span><span class="c1">#53 for domain sina.com</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Dec</span>  <span class="mi">8</span> <span class="mi">21</span><span class="p">:</span><span class="mi">06</span><span class="p">:</span><span class="mi">09</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">1298</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+</pre></div>
+</div>
+<ul>
+<li><p>关键log</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Dec</span>&#160; <span class="pre">8</span> <span class="pre">21:06:09</span> <span class="pre">raspberrypi</span> <span class="pre">dnsmasq[1298]:</span> <span class="pre">read</span> <span class="pre">/etc/hosts</span> <span class="pre">-</span> <span class="pre">5</span> <span class="pre">addresses</span></code></p></li>
+</ul>
+</li>
+<li><p>/etc/hosts</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hosts</span>
+<span class="mf">127.0.0.1</span>       <span class="n">localhost</span>
+<span class="p">::</span><span class="mi">1</span>             <span class="n">localhost</span> <span class="n">ip6</span><span class="o">-</span><span class="n">localhost</span> <span class="n">ip6</span><span class="o">-</span><span class="n">loopback</span>
+<span class="n">ff02</span><span class="p">::</span><span class="mi">1</span>         <span class="n">ip6</span><span class="o">-</span><span class="n">allnodes</span>
+<span class="n">ff02</span><span class="p">::</span><span class="mi">2</span>         <span class="n">ip6</span><span class="o">-</span><span class="n">allrouters</span>
+
+<span class="mf">127.0.1.1</span>               <span class="n">raspberrypi</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

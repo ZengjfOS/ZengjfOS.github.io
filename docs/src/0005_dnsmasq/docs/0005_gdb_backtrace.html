@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gdb backtrace &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">gdb backtrace</a></li>
+<li><a class="reference internal" href="#suport-gdb">suport gdb</a></li>
+<li><a class="reference internal" href="#gdbbacktrace">gdb获取backtrace</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>gdb backtrace</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gdb-backtrace">
+<h1>gdb backtrace<a class="headerlink" href="#gdb-backtrace" title="Permalink to this headline"></a></h1>
+<p>通过gdb快速获取函数调用栈，加快代码运作分析</p>
+</section>
+<section id="suport-gdb">
+<h1>suport gdb<a class="headerlink" href="#suport-gdb" title="Permalink to this headline"></a></h1>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/dnsmasq-2.51/Makefile b/dnsmasq-2.51/Makefile</span><span class="w"></span>
+<span class="gh">index 3d07c24..5ced535 100644</span><span class="w"></span>
+<span class="gd">--- a/dnsmasq-2.51/Makefile</span><span class="w"></span>
+<span class="gi">+++ b/dnsmasq-2.51/Makefile</span><span class="w"></span>
+<span class="gu">@@ -38,7 +38,7 @@ all :   dnsmasq</span><span class="w"></span>
+
+<span class="w"> </span>dnsmasq :<span class="w"></span>
+<span class="w"> </span>       @cd $(SRC) &amp;&amp; $(MAKE) \<span class="w"></span>
+<span class="gd">- DNSMASQ_CFLAGS=&quot;$(DNSMASQ_CFLAGS)&quot; \</span><span class="w"></span>
+<span class="gi">+ DNSMASQ_CFLAGS=&quot;$(DNSMASQ_CFLAGS) -g&quot; \</span><span class="w"></span>
+<span class="w"> </span> DNSMASQ_LIBS=&quot;$(DNSMASQ_LIBS) $(SUNOS_LIBS)&quot; \<span class="w"></span>
+<span class="w"> </span> -f ../bld/Makefile dnsmasq<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="gdbbacktrace">
+<h1>gdb获取backtrace<a class="headerlink" href="#gdbbacktrace" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>gdb运行程序</p>
+<ul>
+<li><p>set args: 设置gdb运行参数</p></li>
+<li><p>break: 设置函数断点</p></li>
+<li><p>r: 运行程序</p></li>
+<li><p>c: 断点之后继续运行程序</p></li>
+<li><p>backtrace: 函数栈</p></li>
+<li><p>quit: 退出</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:dnsmasq-2.51 $ sudo gdb src/dnsmasq
+GNU gdb (Raspbian 8.2.1-2) 8.2.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type &quot;show copying&quot; and &quot;show warranty&quot; for details.
+This GDB was configured as &quot;arm-linux-gnueabihf&quot;.
+Type &quot;show configuration&quot; for configuration details.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+
+For help, type &quot;help&quot;.
+Type &quot;apropos word&quot; to search for commands related to &quot;word&quot;...
+Reading symbols from src/dnsmasq...done.
+(gdb) set args --keep-in-foreground --no-poll --dhcp-authoritative  --pid-file -C dnsmasq.conf.example -r /run/dnsmasq/resolv.conf -q
+(gdb) break cache_insert
+Breakpoint 1 at 0x1532c: file cache.c, line 384.
+(gdb) r
+Starting program: /home/pi/zengjf/dnsMonitor/dnsmasq-2.51/src/dnsmasq --keep-in-foreground --no-poll --dhcp-authoritative  --pid-file -C dnsmasq.conf.example -r /run/dnsmasq/resolv.conf -q
+
+Breakpoint 1, cache_insert (name=name@entry=0x43150 &quot;baidu.com&quot;, addr=addr@entry=0xbefff140, now=1637741386, now@entry=1, ttl=ttl@entry=322, flags=136, flags@entry=0) at cache.c:384
+384       int freed_all = flags &amp; F_REVERSE;
+(gdb) backtrace
+#0  cache_insert (name=name@entry=0x43150 &quot;baidu.com&quot;, addr=addr@entry=0xbefff140, now=1637741386, now@entry=1, ttl=ttl@entry=322, flags=136, flags@entry=0) at cache.c:384
+#1  0x00016b60 in extract_addresses (header=header@entry=0x43be0, qlen=qlen@entry=59, name=0x43150 &quot;baidu.com&quot;, now=1, now@entry=1637741386) at rfc1035.c:815
+#2  0x0001eb9c in process_reply (header=header@entry=0x43be0, now=now@entry=1637741386, server=server@entry=0x48518, n=n@entry=59) at forward.c:443
+#3  0x0001fe8c in reply_query (fd=&lt;optimized out&gt;, family=&lt;optimized out&gt;, now=now@entry=1637741386) at forward.c:558
+#4  0x000222a4 in check_dns_listeners (set=0xbefff304, set@entry=0xbefff2fc, now=now@entry=1637741386) at dnsmasq.c:1045
+#5  0x00012694 in main (argc=&lt;optimized out&gt;, argv=&lt;optimized out&gt;) at dnsmasq.c:672
+(gdb) c
+Continuing.
+
+Breakpoint 1, cache_insert (name=name@entry=0x43150 &quot;baidu.com&quot;, addr=addr@entry=0xbefff140, now=1637741386, now@entry=1, ttl=ttl@entry=322, flags=136, flags@entry=0) at cache.c:384
+384       int freed_all = flags &amp; F_REVERSE;
+(gdb) backtrace
+#0  cache_insert (name=name@entry=0x43150 &quot;baidu.com&quot;, addr=addr@entry=0xbefff140, now=1637741386,
+    now@entry=1, ttl=ttl@entry=322, flags=136, flags@entry=0) at cache.c:384
+#1  0x00016b60 in extract_addresses (header=header@entry=0x43be0, qlen=qlen@entry=59,
+    name=0x43150 &quot;baidu.com&quot;, now=1, now@entry=1637741386) at rfc1035.c:815
+#2  0x0001eb9c in process_reply (header=header@entry=0x43be0, now=now@entry=1637741386,
+    server=server@entry=0x48518, n=n@entry=59) at forward.c:443
+#3  0x0001fe8c in reply_query (fd=&lt;optimized out&gt;, family=&lt;optimized out&gt;,
+    now=now@entry=1637741386) at forward.c:558
+#4  0x000222a4 in check_dns_listeners (set=0xbefff304, set@entry=0xbefff2fc,
+    now=now@entry=1637741386) at dnsmasq.c:1045
+#5  0x00012694 in main (argc=&lt;optimized out&gt;, argv=&lt;optimized out&gt;) at dnsmasq.c:672
+(gdb) c
+Continuing.
+(gdb) quit
+A debugging session is active.
+
+        Inferior 1 [process 6723] will be killed.
+
+Quit anyway? (y or n) y
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

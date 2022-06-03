@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>parse Whitelist config &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">parse Whitelist config</a></li>
+<li><a class="reference internal" href="#maxdname">MAXDNAME</a></li>
+<li><a class="reference internal" href="#fgets">fgets</a></li>
+<li><a class="reference internal" href="#config">测试config</a></li>
+<li><a class="reference internal" href="#id1">parse Whitelist config</a></li>
+<li><a class="reference internal" href="#daemon-servers">测试daemon servers</a></li>
+<li><a class="reference internal" href="#address-whitelist">address Whitelist</a></li>
+<li><a class="reference internal" href="#server-whitelist">server Whitelist</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>parse Whitelist config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="parse-whitelist-config">
+<h1>parse Whitelist config<a class="headerlink" href="#parse-whitelist-config" title="Permalink to this headline"></a></h1>
+<p>分析配置文件server、address解析、应用原理</p>
+</section>
+<section id="maxdname">
+<h1>MAXDNAME<a class="headerlink" href="#maxdname" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/openbsd/src/blob/master/include/arpa/nameser.h#L100</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">MAXDNAME	1025		/*</span> <span class="pre">maximum</span> <span class="pre">presentation</span> <span class="pre">domain</span> <span class="pre">name</span> <span class="pre">*/</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="fgets">
+<h1>fgets<a class="headerlink" href="#fgets" title="Permalink to this headline"></a></h1>
+<p>fgets() reads in at most one less than size characters from stream and stores them into the buffer pointed to by s. Reading stops after an EOF or a newline. If a newline is read, it is stored into the buffer. A terminating null byte (‘\0’) is stored after the last character in the buffer.</p>
+<p>简单来说，一次读一行，可以如下测试看效果</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/dnsmasq-2.51/src/option.c b/dnsmasq-2.51/src/option.c</span><span class="w"></span>
+<span class="gh">index abea37e..a3f3f80 100644</span><span class="w"></span>
+<span class="gd">--- a/dnsmasq-2.51/src/option.c</span><span class="w"></span>
+<span class="gi">+++ b/dnsmasq-2.51/src/option.c</span><span class="w"></span>
+<span class="gu">@@ -2579,6 +2579,8 @@ static void one_file(char *file, int nest, int hard_opt)</span><span class="w"></span>
+<span class="w"> </span>      unsigned int lastquote;<span class="w"></span>
+<span class="w"> </span>      char *errmess;<span class="w"></span>
+
+<span class="gi">+      my_syslog(LOG_DEBUG, &quot;config file: %s&quot;, buff);</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>      /* Memory allocation failure longjmps here if mem_recover == 1 */<span class="w"></span>
+<span class="w"> </span>      if (hard_opt)<span class="w"></span>
+<span class="w"> </span>       {<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="config">
+<h1>测试config<a class="headerlink" href="#config" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>cat dnsmasq.conf.example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">server</span><span class="o">=/</span><span class="n">sina</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="mf">114.114.114.114</span>
+<span class="n">address</span><span class="o">=/</span><span class="c1">#/127.0.0.1</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id1">
+<h1>parse Whitelist config<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>在域名字段会检测#符号作为通配符；</p>
+<ul>
+<li><p>address=/#/127.0.0.1#53</p></li>
+</ul>
+</li>
+<li><p>IP字段#后面是port</p>
+<ul>
+<li><p>address=/double-click.net/127.0.0.1#53</p></li>
+</ul>
+</li>
+<li><p>&#64;可以当作直接IP转发，相当于IP直通匹配</p>
+<ul>
+<li><p>server=10.1.2.3&#64;192.168.1.1#55</p></li>
+</ul>
+</li>
+<li><p>在数据处理部分，server和address是同一个地方处理，最终也是保存在同一个链表，采用的尾插链表</p>
+<ul>
+<li><p>serv-&gt;next = daemon-&gt;servers;</p></li>
+<li><p>daemon-&gt;servers = newlist;</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* src/dnsmasq.c
+  └── int main (int argc, char **argv)
+      └── read_opts(argc, argv, compile_opts);
+          ├── else if (option == &#39;C&#39;)
+          │   └── conffile = opt_string_alloc(arg);
+          └── if (conffile)
+              └── one_file(conffile, nest, 0);
+                  ├── fgets(buff, MAXDNAME, f)
+                  ├── else if ((p=strchr(buff, &#39;=&#39;)))
+                  │   ├── for (start = buff; *start &amp;&amp; isspace((int)*start); start++);
+                  │   └── for (option = 0, i = 0; opts[i].name; i++)
+                  │       └── if (strcmp(opts[i].name, start) == 0)
+                  │           ├── option = opts[i].val;
+                  │           │   └── 从配置名，如server、address找到对应的opts列表序号，然后从序号中获取其对应的简写option，一个配置名对应一个简写option
+                  │           └── break
+                  └── errmess = one_opt(option, arg, _(&quot;error&quot;), nest + 1);
+                      └── switch (option)
+                          ├── case &#39;S&#39;:
+                          └── case &#39;A&#39;:
+                              └── if (arg &amp;&amp; *arg == &#39;/&#39;)
+                                  └── while ((end = split_chr(arg, &#39;/&#39;)))
+                                      ├── if (strcmp(arg, &quot;#&quot;) == 0)
+                                      │   └── domain = &quot;&quot;;
+                                      │       └── 通配符#，用于设置所有的域名过滤
+                                      ├── else if (strlen (arg) != 0 &amp;&amp; !(domain = canonicalise_opt(arg)))
+                                      ├── if ((newlist-&gt;addr.in.sin_addr.s_addr = inet_addr(arg)) != (in_addr_t) -1)
+                                      │   └── newlist-&gt;addr.in.sin_port = htons(serv_port);
+                                      │       └── 设置forward IP之后，设置forward port
+                                      ├── serv-&gt;next = daemon-&gt;servers;
+                                      └── daemon-&gt;servers = newlist;
+</pre></div>
+</div>
+</section>
+<section id="daemon-servers">
+<h1>测试daemon servers<a class="headerlink" href="#daemon-servers" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>./dns</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Enter</span> <span class="n">Hostname</span> <span class="n">to</span> <span class="n">Lookup</span> <span class="p">:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>
+<span class="n">Enter</span> <span class="n">DNS</span> <span class="n">Server</span> <span class="p">:</span> <span class="mf">127.0.0.1</span>
+<span class="n">Resolving</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>
+<span class="n">Sending</span> <span class="n">Packet</span><span class="o">...</span><span class="n">Done</span>
+<span class="n">Receiving</span> <span class="n">answer</span><span class="o">...</span><span class="n">Done</span>
+<span class="n">The</span> <span class="n">response</span> <span class="n">contains</span> <span class="p">:</span>
+ <span class="mi">1</span> <span class="n">Questions</span><span class="o">.</span>
+ <span class="mi">1</span> <span class="n">Answers</span><span class="o">.</span>
+ <span class="mi">0</span> <span class="n">Authoritative</span> <span class="n">Servers</span><span class="o">.</span>
+ <span class="mi">0</span> <span class="n">Additional</span> <span class="n">records</span><span class="o">.</span>
+
+
+<span class="n">Answer</span> <span class="n">Records</span> <span class="p">:</span> <span class="mi">1</span>
+<span class="n">Name</span> <span class="p">:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span> <span class="n">has</span> <span class="n">IPv4</span> <span class="n">address</span> <span class="p">:</span> <span class="mf">127.0.0.1</span>
+
+<span class="n">Authoritive</span> <span class="n">Records</span> <span class="p">:</span> <span class="mi">0</span>
+
+<span class="n">Additional</span> <span class="n">Records</span> <span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">start</span> <span class="k">for</span> <span class="n">loop</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">receive_query</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">extract_request</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">namebuff</span><span class="p">:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">query</span><span class="p">[</span><span class="n">A</span><span class="p">]</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span> <span class="kn">from</span> <span class="mf">127.0.0.1</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">answer_request</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">extract_request</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">forward_query</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">search_servers</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">config</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span> <span class="ow">is</span> <span class="mf">127.0.0.1</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">exit</span> <span class="n">search_servers</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">exit</span> <span class="n">forward_query</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">exit</span> <span class="n">receive_query</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul>
+<li><p>关键信息，forward里面查询servers</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">enter</span> <span class="n">search_servers</span><span class="p">()</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">config</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span> <span class="ow">is</span> <span class="mf">127.0.0.1</span>
+<span class="n">Nov</span> <span class="mi">25</span> <span class="mi">06</span><span class="p">:</span><span class="mi">04</span><span class="p">:</span><span class="mi">35</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">3730</span><span class="p">]:</span> <span class="n">exit</span> <span class="n">search_servers</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="address-whitelist">
+<h1>address Whitelist<a class="headerlink" href="#address-whitelist" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>在正常的forward之前，会查询daemon-&gt;servers</p></li>
+<li><p>查询的使用的是域名尾匹配，就是只要域名的后面部分相同就算是相同的，便于处理子域名，这里比较重要的是设置了</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">*type</span> <span class="pre">=</span> <span class="pre">SERV_HAS_DOMAIN;</span></code></p></li>
+</ul>
+</li>
+<li><p>当查询到预置域名且是address时，会直接返回预置IP；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* src/dnsmasq.c
+  └── int main (int argc, char **argv)
+      └── check_dns_listeners(&amp;rset, now);
+          └── for (listener = daemon-&gt;listeners; listener; listener = listener-&gt;next)
+              └── if (listener-&gt;fd != -1 &amp;&amp; FD_ISSET(listener-&gt;fd, set))
+                  └── receive_query(listener, now);
+                      ├── n = recvmsg(listen-&gt;fd, &amp;msg, 0)
+                      ├── if (extract_request(header, (size_t)n, daemon-&gt;namebuff, &amp;type))
+                      │   └── log_query(F_QUERY | F_IPV4 | F_FORWARD, daemon-&gt;namebuff, (struct all_addr *)&amp;source_addr.in.sin_addr, types);
+                      │       └── Nov 24 06:52:10 raspberrypi dnsmasq[5107]: query[A] baidu.com from 127.0.0.1
+                      ├── m = answer_request (header, ((char *) header) + PACKETSZ, (size_t)n, dst_addr_4, netmask, now);
+                      └── else if (forward_query(listen-&gt;fd, &amp;source_addr, &amp;dst_addr, if_index, header, (size_t)n, now, NULL))
+                          └── static int forward_query(int udpfd, union mysockaddr *udpaddr, ...)
+                              ├── flags = search_servers(now, &amp;addrp, gotname, daemon-&gt;namebuff, &amp;type, &amp;domain);
+                              │   └── for (serv = daemon-&gt;servers; serv; serv=serv-&gt;next)
+                              │       ├── else if (serv-&gt;flags &amp; SERV_HAS_DOMAIN)
+                              │       │   └── if (namelen &gt;= domainlen &amp;&amp; hostname_isequal(matchstart, serv-&gt;domain) &amp;&amp; ...)
+                              │       │       ├── *type = SERV_HAS_DOMAIN;
+                              │       │       └── 匹配上了
+                              │       └── log_query(logflags | flags | F_CONFIG | F_FORWARD, qdomain, *addrpp, NULL);
+                              │           └── Nov 25 06:04:35 raspberrypi dnsmasq[3730]: config baidu.com is 127.0.0.1
+                              │               └── 如果在config中配置了，就用config中配置的
+                              └── if (udpfd != -1)
+                                  ├── plen = setup_reply(header, plen, addrp, flags, daemon-&gt;local_ttl);
+                                  └── send_from(udpfd, daemon-&gt;options &amp; OPT_NOWILD, (char *)header, plen, udpaddr, dst_addr, dst_iface);
+</pre></div>
+</div>
+</section>
+<section id="server-whitelist">
+<h1>server Whitelist<a class="headerlink" href="#server-whitelist" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>在正常的forward之前，会查询daemon-&gt;servers</p></li>
+<li><p>查询的使用的是域名尾匹配，就是只要域名的后面部分相同就算是相同的，便于处理子域名，这里比较重要的是设置了</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">*type</span> <span class="pre">=</span> <span class="pre">SERV_HAS_DOMAIN;</span></code></p></li>
+</ul>
+</li>
+<li><p>当查询到预置域名且是server时，走的是正常的forward流程，但是</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">forward-&gt;forwardall</span> <span class="pre">=</span> <span class="pre">0;</span></code></p></li>
+</ul>
+</li>
+<li><p>在后面迭代daemon-&gt;servers的时候</p>
+<ul>
+<li><p>只要找到了server发送完请求就会break，不会往下继续迭代</p></li>
+<li><p>默认的/run/dnsmasq/resolv.conf中的nameserver是在链表最底部，所以不会被迭代</p></li>
+<li><p>正常的域名解析会迭代所有的</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* src/dnsmasq.c
+  * int main (int argc, char **argv)
+    * check_dns_listeners(&amp;rset, now);
+      * for (listener = daemon-&gt;listeners; listener; listener = listener-&gt;next)
+        * if (listener-&gt;fd != -1 &amp;&amp; FD_ISSET(listener-&gt;fd, set))
+          * receive_query(listener, now);
+            * n = recvmsg(listen-&gt;fd, &amp;msg, 0)
+            * if (extract_request(header, (size_t)n, daemon-&gt;namebuff, &amp;type))
+              * log_query(F_QUERY | F_IPV4 | F_FORWARD, daemon-&gt;namebuff, (struct all_addr *)&amp;source_addr.in.sin_addr, types);
+                * Nov 24 06:52:10 raspberrypi dnsmasq[5107]: query[A] baidu.com from 127.0.0.1
+            * m = answer_request (header, ((char *) header) + PACKETSZ, (size_t)n, dst_addr_4, netmask, now);
+            * else if (forward_query(listen-&gt;fd, &amp;source_addr, &amp;dst_addr, if_index, header, (size_t)n, now, NULL))
+              * static int forward_query(int udpfd, union mysockaddr *udpaddr, ...)
+                * flags = search_servers(now, &amp;addrp, gotname, daemon-&gt;namebuff, &amp;type, &amp;domain);
+                  * for (serv = daemon-&gt;servers; serv; serv=serv-&gt;next)
+                    * else if (serv-&gt;flags &amp; SERV_HAS_DOMAIN)
+                      * if (namelen &gt;= domainlen &amp;&amp; hostname_isequal(matchstart, serv-&gt;domain) &amp;&amp; ...)
+                        * *type = SERV_HAS_DOMAIN;
+                          * 这个type会决定是只迭代一次daemon-&gt;servers，还是所有
+                    * log_query(logflags | flags | F_CONFIG | F_FORWARD, qdomain, *addrpp, NULL);
+                      * Nov 25 06:04:35 raspberrypi dnsmasq[3730]: config baidu.com is 127.0.0.1
+                        * 如果在config中配置了，就用config中配置的
+                * if (forward)
+                  * forward-&gt;forwardall = 0;
+                    * if (type != 0  || (daemon-&gt;options &amp; OPT_ORDER))
+                      * 这里很关键的，没有设置forward-&gt;forwardall = 1
+                * sendto(fd, (char *)header, plen, 0, &amp;start-&gt;addr.sa, sa_len(&amp;start-&gt;addr))
+                * log_query(F_SERVER | F_IPV4 | F_FORWARD, daemon-&gt;namebuff, (struct all_addr *)&amp;start-&gt;addr.in.sin_addr, NULL);
+                  * Nov 24 07:26:36 raspberrypi dnsmasq[5523]: forwarded baidu.com to 8.8.8.8
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

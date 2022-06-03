@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dump Domain Cache &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Dump Domain Cache</a></li>
+<li><a class="reference internal" href="#dump-cache">dump cache</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Dump Domain Cache</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dump-domain-cache">
+<h1>Dump Domain Cache<a class="headerlink" href="#dump-domain-cache" title="Permalink to this headline"></a></h1>
+<p>查询当前域名缓存</p>
+</section>
+<section id="dump-cache">
+<h1>dump cache<a class="headerlink" href="#dump-cache" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>查询pid</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span> <span class="n">aux</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">dnsmasq</span>
+<span class="n">pi</span>        <span class="mi">7311</span>  <span class="mf">0.2</span>  <span class="mf">0.0</span>  <span class="mi">12816</span>  <span class="mi">6548</span> <span class="n">pts</span><span class="o">/</span><span class="mi">4</span>    <span class="n">S</span><span class="o">+</span>   <span class="mi">08</span><span class="p">:</span><span class="mi">29</span>   <span class="mi">0</span><span class="p">:</span><span class="mi">03</span> <span class="n">vim</span> <span class="n">dnsmasq</span><span class="o">.</span><span class="n">c</span>
+<span class="n">root</span>      <span class="mi">7495</span>  <span class="mf">0.0</span>  <span class="mf">0.0</span>  <span class="mi">10584</span>  <span class="mi">3228</span> <span class="n">pts</span><span class="o">/</span><span class="mi">3</span>    <span class="n">S</span><span class="o">+</span>   <span class="mi">08</span><span class="p">:</span><span class="mi">47</span>   <span class="mi">0</span><span class="p">:</span><span class="mi">00</span> <span class="n">sudo</span> <span class="n">src</span><span class="o">/</span><span class="n">dnsmasq</span> <span class="o">--</span><span class="n">keep</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">foreground</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">poll</span> <span class="o">--</span><span class="n">dhcp</span><span class="o">-</span><span class="n">authoritative</span> <span class="o">--</span><span class="n">pid</span><span class="o">-</span><span class="n">file</span> <span class="o">-</span><span class="n">C</span> <span class="n">dnsmasq</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">example</span> <span class="o">-</span><span class="n">r</span> <span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">dnsmasq</span><span class="o">/</span><span class="n">resolv</span><span class="o">.</span><span class="n">conf</span> <span class="o">-</span><span class="n">q</span>
+<span class="n">nobody</span>    <span class="mi">7496</span>  <span class="mf">0.0</span>  <span class="mf">0.0</span>   <span class="mi">2408</span>   <span class="mi">480</span> <span class="n">pts</span><span class="o">/</span><span class="mi">3</span>    <span class="n">S</span><span class="o">+</span>   <span class="mi">08</span><span class="p">:</span><span class="mi">47</span>   <span class="mi">0</span><span class="p">:</span><span class="mi">00</span> <span class="n">src</span><span class="o">/</span><span class="n">dnsmasq</span> <span class="o">--</span><span class="n">keep</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">foreground</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">poll</span> <span class="o">--</span><span class="n">dhcp</span><span class="o">-</span><span class="n">authoritative</span> <span class="o">--</span><span class="n">pid</span><span class="o">-</span><span class="n">file</span> <span class="o">-</span><span class="n">C</span> <span class="n">dnsmasq</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">example</span> <span class="o">-</span><span class="n">r</span> <span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">dnsmasq</span><span class="o">/</span><span class="n">resolv</span><span class="o">.</span><span class="n">conf</span> <span class="o">-</span><span class="n">q</span>
+<span class="n">pi</span>        <span class="mi">7521</span>  <span class="mf">0.0</span>  <span class="mf">0.0</span>   <span class="mi">7348</span>   <span class="mi">496</span> <span class="n">pts</span><span class="o">/</span><span class="mi">7</span>    <span class="n">S</span><span class="o">+</span>   <span class="mi">08</span><span class="p">:</span><span class="mi">49</span>   <span class="mi">0</span><span class="p">:</span><span class="mi">00</span> <span class="n">grep</span> <span class="o">--</span><span class="n">color</span><span class="o">=</span><span class="n">auto</span> <span class="n">dnsmasq</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo kill -s USR1 74951</p>
+<ul class="simple">
+<li><p>pidof dnsmasq | xargs sudo kill -s USR1</p></li>
+</ul>
+</li>
+<li><p>tail -f /var/log/daemon.log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">start</span> <span class="k">for</span> <span class="n">loop</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">time</span> <span class="mi">1637744250</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">cache</span> <span class="n">size</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="o">/</span><span class="mi">2</span> <span class="n">cache</span> <span class="n">insertions</span> <span class="n">re</span><span class="o">-</span><span class="n">used</span> <span class="n">unexpired</span> <span class="n">cache</span> <span class="n">entries</span><span class="o">.</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">queries</span> <span class="n">forwarded</span> <span class="mi">1</span><span class="p">,</span> <span class="n">queries</span> <span class="n">answered</span> <span class="n">locally</span> <span class="mi">1</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">server</span> <span class="mf">8.8.8.8</span><span class="c1">#53: queries sent 1, retried or failed 0</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">Host</span>                                     <span class="n">Address</span>                        <span class="n">Flags</span>     <span class="n">Expires</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">ip6</span><span class="o">-</span><span class="n">loopback</span>                             <span class="p">::</span><span class="mi">1</span>                            <span class="mi">6</span><span class="n">F</span> <span class="n">I</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">ip6</span><span class="o">-</span><span class="n">allrouters</span>                           <span class="n">ff02</span><span class="p">::</span><span class="mi">2</span>                        <span class="mi">6</span><span class="n">FRI</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>                                <span class="mf">220.181.38.148</span>                 <span class="mi">4</span><span class="n">F</span>        <span class="n">Wed</span> <span class="n">Nov</span> <span class="mi">24</span> <span class="mi">09</span><span class="p">:</span><span class="mi">05</span><span class="p">:</span><span class="mi">13</span> <span class="mi">2021</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">baidu</span><span class="o">.</span><span class="n">com</span>                                <span class="mf">220.181.38.251</span>                 <span class="mi">4</span><span class="n">F</span>        <span class="n">Wed</span> <span class="n">Nov</span> <span class="mi">24</span> <span class="mi">09</span><span class="p">:</span><span class="mi">05</span><span class="p">:</span><span class="mi">13</span> <span class="mi">2021</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">ip6</span><span class="o">-</span><span class="n">allnodes</span>                             <span class="n">ff02</span><span class="p">::</span><span class="mi">1</span>                        <span class="mi">6</span><span class="n">FRI</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">raspberrypi</span>                              <span class="mf">127.0.1.1</span>                      <span class="mi">4</span><span class="n">FRI</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">localhost</span>                                <span class="p">::</span><span class="mi">1</span>                            <span class="mi">6</span><span class="n">FRI</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">localhost</span>                                <span class="mf">127.0.0.1</span>                      <span class="mi">4</span><span class="n">FRI</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">ip6</span><span class="o">-</span><span class="n">localhost</span>                            <span class="p">::</span><span class="mi">1</span>                            <span class="mi">6</span><span class="n">F</span> <span class="n">I</span>   <span class="n">H</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">sfds</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">start</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">end</span> <span class="n">check</span> <span class="n">daemon</span><span class="o">-&gt;</span><span class="n">randomsocks</span>
+<span class="n">Nov</span> <span class="mi">24</span> <span class="mi">08</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">30</span> <span class="n">raspberrypi</span> <span class="n">dnsmasq</span><span class="p">[</span><span class="mi">7496</span><span class="p">]:</span> <span class="n">start</span> <span class="k">for</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

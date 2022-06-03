@@ -9,7 +9,7 @@ GPIF接口使用
   * [EZ-USB FX2LP GPIF And Slave FIFO Configuration Examples Using An 8-Bit Asynchronous Interface](https://www.cypress.com/file/202291/download)
 * [AN66806 - Getting Started with EZ-USB® FX2LP™ GPIF](https://www.cypress.com/documentation/application-notes/an66806-getting-started-ez-usb-fx2lp-gpif)
   * [EZ-USB® FX2LP™ GPIF 入门](https://www.cypress.com/file/135391/download)
-* [USB Vendor Command](docs/0022_Vendor_Command.md)
+* [0022_Vendor_Command.md](0022_Vendor_Command.md)
 
 
 # 硬件连接器
