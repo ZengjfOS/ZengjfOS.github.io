@@ -13,6 +13,7 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0008| [ASoC](src/0008_ASoC/README.md) | 分析i.MX6 CS42888 ASoC驱动工作原理
 0007| [Yocto](src/0007_Yocto/README.md) | 分析Yocto编译原理，能做的事情和Buildroot类似，不过更重要的是芯片大厂都参与维护，知名度更高
 0006| [OpenSSL](src/0006_OpenSSL/README.md) | 分析OpenSSL
 0005| [dnsmasq](src/0005_dnsmasq/README.md) | 分析dnsmasq DNS服务工作原理
