@@ -1,7 +1,7 @@
 # README
 
-* [GitHub ZengjfOS](https://github.com/ZengjfOS)
-* [ZengjfOS.github.io](https://github.com/ZengjfOS/ZengjfOS.github.io)
+* [个人GitHub账号：ZengjfOS](https://github.com/ZengjfOS)
+* [本网址Markdown源代码：ZengjfOS.github.io](https://github.com/ZengjfOS/ZengjfOS.github.io)
 
 # 常用链接
 
@@ -11,6 +11,14 @@
 * [Linux源代码在线检索](https://elixir.bootlin.com/linux/latest/source)
 * [The Linux Kernel’s documentation](https://www.kernel.org/doc/html/latest/)
 * [i.MX驱动测试软件](https://source.codeaurora.org/external/imx/imx-test/)
+
+# 独立开源工具仓库
+
+索引 | 仓库名及链接 | LICENSE | 备注
+-----|:------|:------:|:-----
+0001 | [MDPlant](https://github.com/ZengjfOS/MDPlant)         | MIT | VSCode Markdown文档辅助工具插件，支持Windows、Linux、mac OS
+0002 | [PluginsPy](https://pypi.org/project/PluginsPy/)       | MIT | Python3插件化脚本框架，便于制作一些小的数据分析工具
+0003 | [anpp](https://github.com/ZengjfOS/anpp)               | MIT | anpp(android project product)，解决android BSP多项目目录跳转问题
 
 # docs
 
