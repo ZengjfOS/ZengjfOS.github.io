@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android SystemUI Battery &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android SystemUI Battery</a><ul>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#systemui">SystemUI</a></li>
+<li><a class="reference internal" href="#batteryservice">BatteryService</a></li>
+<li><a class="reference internal" href="#id2">低电量</a></li>
+<li><a class="reference internal" href="#healthdbatteryservice">Healthd如何调用到BatteryService</a></li>
+<li><a class="reference internal" href="#alarm">Alarm唤醒周期</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android SystemUI Battery</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-systemui-battery">
+<h1>Android SystemUI Battery<a class="headerlink" href="#android-systemui-battery" title="Permalink to this headline"></a></h1>
+<p>分析SystemUI Battery电量变化的原理</p>
+<section id="id1">
+<h2>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cnblogs.com/cczheng-666/p/10958920.html">Android8.1 SystemUI源码分析之 电池时钟刷新</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/041cbdc9edfe">电源 | Battery系列(一) BatteryService分析</a></p></li>
+<li><p><a class="reference external" href="https://www.cnblogs.com/linhaostudy/p/12002068.html">Android Healthd电池服务分析</a></p></li>
+<li><p><a class="reference external" href="http://www.cjcbill.com/2020/03/01/battery-frame/">Android10.0电源框架源码分析</a></p></li>
+</ul>
+</section>
+<section id="systemui">
+<h2>SystemUI<a class="headerlink" href="#systemui" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>监听ACTION_BATTERY_CHANGED广播</p></li>
+<li><p>收到广播后会更新图标；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">base</span><span class="o">/</span><span class="n">packages</span><span class="o">/</span><span class="n">SystemUI</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">com</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">systemui</span><span class="o">/</span><span class="n">statusbar</span><span class="o">/</span><span class="n">policy</span><span class="o">/</span><span class="n">BatteryControllerImpl</span><span class="o">.</span><span class="n">java</span>
+  <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">init</span><span class="p">()</span>
+    <span class="o">*</span> <span class="n">registerReceiver</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">IntentFilter</span> <span class="nb">filter</span> <span class="o">=</span> <span class="n">new</span> <span class="n">IntentFilter</span><span class="p">();</span>
+        <span class="o">*</span> <span class="nb">filter</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">Intent</span><span class="o">.</span><span class="n">ACTION_BATTERY_CHANGED</span><span class="p">);</span>
+        <span class="o">*</span> <span class="nb">filter</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">PowerManager</span><span class="o">.</span><span class="n">ACTION_POWER_SAVE_MODE_CHANGED</span><span class="p">);</span>
+        <span class="o">*</span> <span class="nb">filter</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">ACTION_LEVEL_TEST</span><span class="p">);</span>
+        <span class="o">*</span> <span class="n">mBroadcastDispatcher</span><span class="o">.</span><span class="n">registerReceiver</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="nb">filter</span><span class="p">);</span>
+  <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onReceive</span><span class="p">(</span><span class="n">final</span> <span class="n">Context</span> <span class="n">context</span><span class="p">,</span> <span class="n">Intent</span> <span class="n">intent</span><span class="p">)</span>
+    <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">Intent</span><span class="o">.</span><span class="n">ACTION_BATTERY_CHANGED</span><span class="p">))</span>
+      <span class="o">*</span> <span class="n">fireBatteryLevelChanged</span><span class="p">();</span>
+        <span class="o">*</span> <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">mChangeCallbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">onBatteryLevelChanged</span><span class="p">(</span><span class="n">mLevel</span><span class="p">,</span> <span class="n">mPluggedIn</span><span class="p">,</span> <span class="n">mCharging</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">base</span><span class="o">/</span><span class="n">packages</span><span class="o">/</span><span class="n">SystemUI</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">com</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">systemui</span><span class="o">/</span><span class="n">BatteryMeterView</span><span class="o">.</span><span class="n">java</span>
+              <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onBatteryLevelChanged</span><span class="p">(</span><span class="nb">int</span> <span class="n">level</span><span class="p">,</span> <span class="n">boolean</span> <span class="n">pluggedIn</span><span class="p">,</span> <span class="n">boolean</span> <span class="n">charging</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">mDrawable</span><span class="o">.</span><span class="n">setCharging</span><span class="p">(</span><span class="n">pluggedIn</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">mDrawable</span><span class="o">.</span><span class="n">setBatteryLevel</span><span class="p">(</span><span class="n">level</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">mCharging</span> <span class="o">=</span> <span class="n">pluggedIn</span><span class="p">;</span>
+                <span class="o">*</span> <span class="n">mLevel</span> <span class="o">=</span> <span class="n">level</span><span class="p">;</span>
+                <span class="o">*</span> <span class="n">updatePercentText</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="batteryservice">
+<h2>BatteryService<a class="headerlink" href="#batteryservice" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>向Health注册IHealthInfoCallback Binder回调函数；</p></li>
+<li><p>当Health监听到电池变化的时候，会通过IHealthInfoCallback运行到BatteryService进程，最终发ACTION_BATTERY_CHANGED广播出去；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">base</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">java</span><span class="o">/</span><span class="n">com</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">server</span><span class="o">/</span><span class="n">BatteryService</span><span class="o">.</span><span class="n">java</span>
+  <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onStart</span><span class="p">()</span>
+    <span class="o">*</span> <span class="n">registerHealthCallback</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">mHealthHalCallback</span> <span class="o">=</span> <span class="n">new</span> <span class="n">HealthHalCallback</span><span class="p">();</span>
+        <span class="o">*</span> <span class="n">private</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">HealthHalCallback</span> <span class="n">extends</span> <span class="n">IHealthInfoCallback</span><span class="o">.</span><span class="n">Stub</span> <span class="n">implements</span> <span class="n">HealthServiceWrapper</span><span class="o">.</span><span class="n">Callback</span>
+          <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">healthInfoChanged</span><span class="p">(</span><span class="n">android</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">health</span><span class="o">.</span><span class="n">V2_0</span><span class="o">.</span><span class="n">HealthInfo</span> <span class="n">props</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">BatteryService</span><span class="o">.</span><span class="n">this</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">propsLatest</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">private</span> <span class="n">void</span> <span class="n">update</span><span class="p">(</span><span class="n">android</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">health</span><span class="o">.</span><span class="n">V2_1</span><span class="o">.</span><span class="n">HealthInfo</span> <span class="n">info</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">processValuesLocked</span><span class="p">(</span><span class="n">false</span><span class="p">);</span>
+                  <span class="o">*</span> <span class="n">sendBatteryChangedIntentLocked</span><span class="p">();</span>
+                    <span class="o">*</span> <span class="n">final</span> <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Intent</span><span class="p">(</span><span class="n">Intent</span><span class="o">.</span><span class="n">ACTION_BATTERY_CHANGED</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">mHandler</span><span class="o">.</span><span class="n">post</span><span class="p">(()</span> <span class="o">-&gt;</span> <span class="n">ActivityManager</span><span class="o">.</span><span class="n">broadcastStickyIntent</span><span class="p">(</span><span class="n">intent</span><span class="p">,</span> <span class="n">UserHandle</span><span class="o">.</span><span class="n">USER_ALL</span><span class="p">));</span>
+      <span class="o">*</span> <span class="n">mHealthServiceWrapper</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">mHealthHalCallback</span><span class="p">,</span> <span class="n">new</span> <span class="n">HealthServiceWrapper</span><span class="o">.</span><span class="n">IServiceManagerSupplier</span><span class="p">()</span> <span class="p">{},</span> <span class="n">new</span> <span class="n">HealthServiceWrapper</span><span class="o">.</span><span class="n">IHealthSupplier</span><span class="p">()</span> <span class="p">{});</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">init</span><span class="p">(</span><span class="nd">@Nullable</span> <span class="n">Callback</span> <span class="n">callback</span><span class="p">,</span> <span class="n">IServiceManagerSupplier</span> <span class="n">managerSupplier</span><span class="p">,</span> <span class="n">IHealthSupplier</span> <span class="n">healthSupplier</span><span class="p">)</span>
+          <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">callback</span> <span class="o">!=</span> <span class="n">null</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">mCallback</span> <span class="o">=</span> <span class="n">callback</span><span class="p">;</span>
+            <span class="o">*</span> <span class="n">mCallback</span><span class="o">.</span><span class="n">onRegistration</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">newService</span><span class="p">,</span> <span class="n">mInstanceName</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">private</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">HealthHalCallback</span> <span class="n">extends</span> <span class="n">IHealthInfoCallback</span><span class="o">.</span><span class="n">Stub</span> <span class="n">implements</span> <span class="n">HealthServiceWrapper</span><span class="o">.</span><span class="n">Callback</span>
+                <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onRegistration</span><span class="p">(</span><span class="n">IHealth</span> <span class="n">oldService</span><span class="p">,</span> <span class="n">IHealth</span> <span class="n">newService</span><span class="p">,</span> <span class="n">String</span> <span class="n">instance</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="nb">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">newService</span><span class="o">.</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">this</span><span class="p">);</span>
+                  <span class="o">*</span> <span class="n">newService</span><span class="o">.</span><span class="n">update</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>低电量<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<p>在BatteryService启动的时候会监听低电量属性，从而可以及时发送低电量问题</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">base</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">java</span><span class="o">/</span><span class="n">com</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">server</span><span class="o">/</span><span class="n">BatteryService</span><span class="o">.</span><span class="n">java</span>
+  <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onBootPhase</span><span class="p">(</span><span class="nb">int</span> <span class="n">phase</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">ContentObserver</span> <span class="n">obs</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ContentObserver</span><span class="p">(</span><span class="n">mHandler</span><span class="p">)</span>
+      <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onChange</span><span class="p">(</span><span class="n">boolean</span> <span class="n">selfChange</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">updateBatteryWarningLevelLocked</span><span class="p">();</span>
+    <span class="o">*</span> <span class="n">final</span> <span class="n">ContentResolver</span> <span class="n">resolver</span> <span class="o">=</span> <span class="n">mContext</span><span class="o">.</span><span class="n">getContentResolver</span><span class="p">();</span>
+    <span class="o">*</span> <span class="n">resolver</span><span class="o">.</span><span class="n">registerContentObserver</span><span class="p">(</span><span class="n">Settings</span><span class="o">.</span><span class="n">Global</span><span class="o">.</span><span class="n">getUriFor</span><span class="p">(</span><span class="n">Settings</span><span class="o">.</span><span class="n">Global</span><span class="o">.</span><span class="n">LOW_POWER_MODE_TRIGGER_LEVEL</span><span class="p">),</span> <span class="n">false</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">UserHandle</span><span class="o">.</span><span class="n">USER_ALL</span><span class="p">);</span>
+    <span class="o">*</span> <span class="n">updateBatteryWarningLevelLocked</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="healthdbatteryservice">
+<h2>Healthd如何调用到BatteryService<a class="headerlink" href="#healthdbatteryservice" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.cjcbill.com/2020/03/01/battery-frame/">Android10.0电源框架源码分析</a></p></li>
+<li><p>在以往的Android平台中，该服务名为Healthd,Android 10.0使用了”android.hardware.health&#64;2.0-service”来代替了服务Healthd。但后续为了方便分析，还是将android.hardware.health&#64;2.0-service简称为healthd；</p></li>
+<li><p>system/core/healthd/</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">healthd</span><span class="o">/</span><span class="n">HealthServiceDefault</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+    <span class="o">*</span> <span class="k">return</span> <span class="n">health_service_main</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">utils</span><span class="o">/</span><span class="n">libhealthservice</span><span class="o">/</span><span class="n">HealthServiceCommon</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="nb">int</span> <span class="n">health_service_main</span><span class="p">(</span><span class="n">const</span> <span class="n">char</span><span class="o">*</span> <span class="n">instance</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">healthd_mode_ops</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">healthd_mode_service_2_0_ops</span><span class="p">;</span>
+            <span class="o">*</span> <span class="n">static</span> <span class="n">struct</span> <span class="n">healthd_mode_ops</span> <span class="n">healthd_mode_service_2_0_ops</span>
+              <span class="o">*</span> <span class="o">.</span><span class="n">battery_update</span> <span class="o">=</span> <span class="n">healthd_mode_service_2_0_battery_update</span><span class="p">,</span>
+                <span class="o">*</span> <span class="n">void</span> <span class="n">healthd_mode_service_2_0_battery_update</span><span class="p">(</span><span class="n">struct</span> <span class="n">android</span><span class="p">::</span><span class="n">BatteryProperties</span><span class="o">*</span> <span class="n">prop</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">convertToHealthInfo</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">legacy</span><span class="p">);</span>
+                  <span class="o">*</span> <span class="n">Health</span><span class="p">::</span><span class="n">getImplementation</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">notifyListeners</span><span class="p">(</span><span class="o">&amp;</span><span class="n">info</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">Health</span><span class="o">.</span><span class="n">cpp</span>
+                      <span class="o">*</span> <span class="n">void</span> <span class="n">Health</span><span class="p">::</span><span class="n">notifyListeners</span><span class="p">(</span><span class="n">HealthInfo</span><span class="o">*</span> <span class="n">healthInfo</span><span class="p">)</span>
+                        <span class="o">*</span> <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">callbacks_</span><span class="o">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">callbacks_</span><span class="o">.</span><span class="n">end</span><span class="p">();)</span>
+                          <span class="o">*</span> <span class="n">auto</span> <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">it</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">healthInfoChanged</span><span class="p">(</span><span class="o">*</span><span class="n">healthInfo</span><span class="p">);</span>
+                            <span class="o">*</span> <span class="n">这里调用到了BatteryService注册的回调函数中</span>
+          <span class="o">*</span> <span class="k">return</span> <span class="n">healthd_main</span><span class="p">();</span>
+            <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">healthd_common_adapter</span><span class="o">.</span><span class="n">cpp</span>
+              <span class="o">*</span> <span class="nb">int</span> <span class="n">healthd_main</span><span class="p">()</span>
+                <span class="o">*</span> <span class="n">health_loop</span> <span class="o">=</span> <span class="n">std</span><span class="p">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">HealthLoopAdapter</span><span class="o">&gt;</span><span class="p">();</span>
+                <span class="o">*</span> <span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">health_loop</span><span class="o">-&gt;</span><span class="n">StartLoop</span><span class="p">();</span>
+                  <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="n">utils</span><span class="o">/</span><span class="n">libhealthloop</span><span class="o">/</span><span class="n">HealthLoop</span><span class="o">.</span><span class="n">cpp</span>
+                    <span class="o">*</span> <span class="nb">int</span> <span class="n">HealthLoop</span><span class="p">::</span><span class="n">StartLoop</span><span class="p">()</span>
+                      <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">InitInternal</span><span class="p">();</span>
+                        <span class="o">*</span> <span class="n">Init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">healthd_config_</span><span class="p">);</span>
+                        <span class="o">*</span> <span class="n">WakeAlarmInit</span><span class="p">();</span>
+                          <span class="o">*</span> <span class="n">wakealarm_fd_</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">timerfd_create</span><span class="p">(</span><span class="n">CLOCK_BOOTTIME_ALARM</span><span class="p">,</span> <span class="n">TFD_NONBLOCK</span><span class="p">));</span>
+                            <span class="o">*</span> <span class="n">CLOCK_BOOTTIME_ALARM</span>
+                              <span class="o">*</span> <span class="n">This</span> <span class="n">clock</span> <span class="ow">is</span> <span class="n">like</span> <span class="n">CLOCK_BOOTTIME</span><span class="p">,</span> <span class="n">but</span> <span class="n">will</span> <span class="n">wake</span> <span class="n">the</span> <span class="n">system</span> <span class="k">if</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">suspended</span><span class="o">.</span> <span class="n">The</span> <span class="n">caller</span> <span class="n">must</span> <span class="n">have</span> <span class="n">the</span> <span class="n">CAP_WAKE_ALARM</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">a</span> <span class="n">timer</span> <span class="n">against</span> <span class="n">this</span> <span class="n">clock</span><span class="o">.</span>
+                          <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">RegisterEvent</span><span class="p">(</span><span class="n">wakealarm_fd_</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">HealthLoop</span><span class="p">::</span><span class="n">WakeAlarmEvent</span><span class="p">,</span> <span class="n">EVENT_WAKEUP_FD</span><span class="p">))</span>
+                            <span class="o">*</span> <span class="nb">int</span> <span class="n">HealthLoop</span><span class="p">::</span><span class="n">RegisterEvent</span><span class="p">(</span><span class="nb">int</span> <span class="n">fd</span><span class="p">,</span> <span class="n">BoundFunction</span> <span class="n">func</span><span class="p">,</span> <span class="n">EventWakeup</span> <span class="n">wakeup</span><span class="p">)</span>
+                              <span class="o">*</span> <span class="n">auto</span><span class="o">*</span> <span class="n">event_handler</span> <span class="o">=</span> <span class="n">event_handlers_</span><span class="o">.</span><span class="n">emplace_back</span><span class="p">(</span><span class="n">std</span><span class="p">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">EventHandler</span><span class="o">&gt;</span><span class="p">(</span><span class="n">EventHandler</span><span class="p">{</span><span class="n">this</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">func</span><span class="p">}))</span><span class="o">.</span><span class="n">get</span><span class="p">();</span>
+                              <span class="o">*</span> <span class="n">ev</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">reinterpret_cast</span><span class="o">&lt;</span><span class="n">void</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">event_handler</span><span class="p">);</span>
+                              <span class="o">*</span> <span class="n">epoll_ctl</span><span class="p">(</span><span class="n">epollfd_</span><span class="p">,</span> <span class="n">EPOLL_CTL_ADD</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ev</span><span class="p">)</span>
+                          <span class="o">*</span> <span class="n">WakeAlarmSetInterval</span><span class="p">(</span><span class="n">healthd_config_</span><span class="o">.</span><span class="n">periodic_chores_interval_fast</span><span class="p">);</span>
+                            <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="n">utils</span><span class="o">/</span><span class="n">libhealthloop</span><span class="o">/</span><span class="n">utils</span><span class="o">.</span><span class="n">cpp</span>
+                              <span class="o">*</span> <span class="n">void</span> <span class="n">InitHealthdConfig</span><span class="p">(</span><span class="n">struct</span> <span class="n">healthd_config</span><span class="o">*</span> <span class="n">healthd_config</span><span class="p">)</span>
+                                <span class="o">*</span> <span class="o">*</span><span class="n">healthd_config</span>
+                                  <span class="o">*</span> <span class="o">.</span><span class="n">periodic_chores_interval_fast</span> <span class="o">=</span> <span class="n">DEFAULT_PERIODIC_CHORES_INTERVAL_FAST</span><span class="p">,</span>
+                                    <span class="o">*</span> <span class="c1">#define DEFAULT_PERIODIC_CHORES_INTERVAL_FAST (60 * 1)</span>
+                                      <span class="o">*</span> <span class="n">Periodic</span> <span class="n">chores</span> <span class="n">fast</span> <span class="n">interval</span> <span class="ow">in</span> <span class="n">seconds</span>
+                            <span class="o">*</span> <span class="n">现在知道为什么有Alarm唤醒了</span>
+                        <span class="o">*</span> <span class="n">UeventInit</span><span class="p">();</span>
+                      <span class="o">*</span> <span class="n">MainLoop</span><span class="p">();</span>
+                        <span class="o">*</span> <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                          <span class="o">*</span> <span class="n">nevents</span> <span class="o">=</span> <span class="n">epoll_wait</span><span class="p">(</span><span class="n">epollfd_</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">eventct</span><span class="p">,</span> <span class="n">timeout</span><span class="p">);</span>
+                          <span class="o">*</span> <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">nevents</span><span class="p">;</span> <span class="o">++</span><span class="n">n</span><span class="p">)</span>
+                            <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span><span class="p">)</span>
+                              <span class="o">*</span> <span class="n">auto</span><span class="o">*</span> <span class="n">event_handler</span> <span class="o">=</span> <span class="n">reinterpret_cast</span><span class="o">&lt;</span><span class="n">EventHandler</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ptr</span><span class="p">);</span>
+                              <span class="o">*</span> <span class="n">event_handler</span><span class="o">-&gt;</span><span class="n">func</span><span class="p">(</span><span class="n">event_handler</span><span class="o">-&gt;</span><span class="nb">object</span><span class="p">,</span> <span class="n">events</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">events</span><span class="p">);</span>
+                                <span class="o">*</span> <span class="n">void</span> <span class="n">HealthLoop</span><span class="p">::</span><span class="n">WakeAlarmEvent</span><span class="p">(</span><span class="n">uint32_t</span> <span class="o">/*</span><span class="n">epevents</span><span class="o">*/</span><span class="p">)</span>
+                                  <span class="o">*</span> <span class="n">PeriodicChores</span><span class="p">();</span>
+                                    <span class="o">*</span> <span class="n">ScheduleBatteryUpdate</span><span class="p">();</span>
+                                      <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">healthd_common_adapter</span><span class="o">.</span><span class="n">cpp</span>
+                                        <span class="o">*</span> <span class="n">void</span> <span class="n">ScheduleBatteryUpdate</span><span class="p">()</span> <span class="n">override</span> <span class="p">{</span> <span class="n">Health</span><span class="p">::</span><span class="n">getImplementation</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">();</span> <span class="p">}</span>
+                                          <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">Health</span><span class="o">.</span><span class="n">cpp</span>
+                                            <span class="o">*</span> <span class="n">Return</span><span class="o">&lt;</span><span class="n">Result</span><span class="o">&gt;</span> <span class="n">Health</span><span class="p">::</span><span class="n">update</span><span class="p">()</span>
+                                              <span class="o">*</span> <span class="n">battery_monitor_</span><span class="o">-&gt;</span><span class="n">updateValues</span><span class="p">();</span>
+                                              <span class="o">*</span> <span class="n">const</span> <span class="n">HealthInfo_1_0</span><span class="o">&amp;</span> <span class="n">health_info</span> <span class="o">=</span> <span class="n">battery_monitor_</span><span class="o">-&gt;</span><span class="n">getHealthInfo_1_0</span><span class="p">();</span>
+                                              <span class="o">*</span> <span class="n">convertFromHealthInfo</span><span class="p">(</span><span class="n">health_info</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">props</span><span class="p">);</span>
+                                              <span class="o">*</span> <span class="n">healthd_mode_ops</span><span class="o">-&gt;</span><span class="n">battery_update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">props</span><span class="p">);</span>
+                                                <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">utils</span><span class="o">/</span><span class="n">libhealthservice</span><span class="o">/</span><span class="n">HealthServiceCommon</span><span class="o">.</span><span class="n">cpp</span>
+                                                  <span class="o">*</span> <span class="n">static</span> <span class="n">struct</span> <span class="n">healthd_mode_ops</span> <span class="n">healthd_mode_service_2_0_ops</span>
+                                                    <span class="o">*</span> <span class="o">.</span><span class="n">battery_update</span> <span class="o">=</span> <span class="n">healthd_mode_service_2_0_battery_update</span><span class="p">,</span>
+                                                      <span class="o">*</span> <span class="n">void</span> <span class="n">healthd_mode_service_2_0_battery_update</span><span class="p">(</span><span class="n">struct</span> <span class="n">android</span><span class="p">::</span><span class="n">BatteryProperties</span><span class="o">*</span> <span class="n">prop</span><span class="p">)</span>
+                                                        <span class="o">*</span> <span class="n">convertToHealthInfo</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">legacy</span><span class="p">);</span>
+                                                        <span class="o">*</span> <span class="n">Health</span><span class="p">::</span><span class="n">getImplementation</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">notifyListeners</span><span class="p">(</span><span class="o">&amp;</span><span class="n">info</span><span class="p">);</span>
+                                                          <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">Health</span><span class="o">.</span><span class="n">cpp</span>
+                                                            <span class="o">*</span> <span class="n">void</span> <span class="n">Health</span><span class="p">::</span><span class="n">notifyListeners</span><span class="p">(</span><span class="n">HealthInfo</span><span class="o">*</span> <span class="n">healthInfo</span><span class="p">)</span>
+                                                              <span class="o">*</span> <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">callbacks_</span><span class="o">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">callbacks_</span><span class="o">.</span><span class="n">end</span><span class="p">();)</span>
+                                                                <span class="o">*</span> <span class="n">auto</span> <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">it</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">healthInfoChanged</span><span class="p">(</span><span class="o">*</span><span class="n">healthInfo</span><span class="p">);</span>
+                                                                  <span class="o">*</span> <span class="n">这里调用到了BatteryService注册的回调函数中</span>
+</pre></div>
+</div>
+</section>
+<section id="alarm">
+<h2>Alarm唤醒周期<a class="headerlink" href="#alarm" title="Permalink to this headline"></a></h2>
+<p>从下面唤醒周期来看分两种：</p>
+<ul class="simple">
+<li><p>1分钟唤醒一次叫FAST；</p></li>
+<li><p>10分钟唤醒一次叫SLOW；</p></li>
+</ul>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// hardware/interfaces/health/utils/libhealthloop/utils.cpp</span>
+
+<span class="c1">// Periodic chores fast interval in seconds</span>
+<span class="cp">#define DEFAULT_PERIODIC_CHORES_INTERVAL_FAST (60 * 1)</span>
+<span class="c1">// Periodic chores fast interval in seconds</span>
+<span class="cp">#define DEFAULT_PERIODIC_CHORES_INTERVAL_SLOW (60 * 10)</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">InitHealthdConfig</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">healthd_config</span><span class="o">*</span><span class="w"> </span><span class="n">healthd_config</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="o">*</span><span class="n">healthd_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">periodic_chores_interval_fast</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_PERIODIC_CHORES_INTERVAL_FAST</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">periodic_chores_interval_slow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_PERIODIC_CHORES_INTERVAL_SLOW</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">energyCounter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">boot_min_cap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">screen_on</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

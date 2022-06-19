@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPM Power Analysis &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SPM Power Analysis</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#log">休眠唤醒log</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>SPM Power Analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="spm-power-analysis">
+<h1>SPM Power Analysis<a class="headerlink" href="#spm-power-analysis" title="Permalink to this headline"></a></h1>
+<p>System Power Manager功耗分析</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0001_Deep_Sleep.html"><span class="doc std std-doc">0001_Deep_Sleep.md</span></a></p></li>
+</ul>
+</section>
+<section id="log">
+<h1>休眠唤醒log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>如下log中包含：</p>
+<ul class="simple">
+<li><p>CPU进入休眠的log；</p></li>
+<li><p>CPU被R12_CLDMA_EVENT_B唤醒的log；</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;6&gt;[</span>&#160; <span class="pre">462.081720]</span> <span class="pre">-(0)[3082:Binder:467_2][SPM]</span> <span class="pre">suspend</span> <span class="pre">wake</span> <span class="pre">up</span> <span class="pre">by</span>&#160; <span class="pre">R12_CLDMA_EVENT_B,</span> <span class="pre">timer_out</span> <span class="pre">=</span> <span class="pre">7,</span> <span class="pre">r13</span> <span class="pre">=</span> <span class="pre">0x604010c,</span> <span class="pre">debug_flag</span> <span class="pre">=</span> <span class="pre">0x11000</span> <span class="pre">0x0,</span> <span class="pre">r12</span> <span class="pre">=</span> <span class="pre">0x4000000,</span> <span class="pre">r12_ext</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">raw_sta</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">idle_sta</span> <span class="pre">=</span> <span class="pre">0x97f,</span>&#160; <span class="pre">req_sta</span> <span class="pre">=</span>&#160; <span class="pre">0x420000a0,</span> <span class="pre">event_reg</span> <span class="pre">=</span> <span class="pre">0x30000000,</span> <span class="pre">isr</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">raw_ext_sta</span> <span class="pre">=</span> <span class="pre">0x4006a095,</span> <span class="pre">wake_misc</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">pcm_flag</span> <span class="pre">=</span> <span class="pre">0x80080</span> <span class="pre">0x40,</span> <span class="pre">req</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">wlk_cntcv_l</span> <span class="pre">=</span> <span class="pre">0xb6d0676b,</span> <span class="pre">wlk_cntcv_h</span> <span class="pre">=</span> <span class="pre">0x2,</span> <span class="pre">26M_off_pct</span> <span class="pre">=</span> <span class="pre">0</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>根据这一段log，可以理解CPU休眠唤醒的基本流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;5&gt;[  461.706933] -(4)[3082:Binder:467_2][MUSB]musb_hub_control 379: port status 00000100,devctl=0x80
+&lt;6&gt;[  461.707555]  (4)[3082:Binder:467_2][mt_udi] UDI suspend
+&lt;5&gt;[  461.709989]  (4)[3082:Binder:467_2]alarmtimer_suspend convert 921861000000 to 2021/02/08 08:16:51 (now = 2021/02/08 08:16:21)
+&lt;5&gt;[  461.713357]  (4)[3082:Binder:467_2]mtk_rtc_common: set al time = 2021/02/08 08:16:52 (1)
+&lt;5&gt;[  461.713548] -(4)[3082:Binder:467_2]mtk_rtc_hal_common: mon = 48130, day = 20488, hour = 16392
+&lt;5&gt;[  461.713907] -(4)[3082:Binder:467_2]mtk_rtc_hal_common: mon = 48130, day = 20488, hour = 16392
+&lt;4&gt;[  461.714811]  (4)[3082:Binder:467_2]&lt;blestech_fp&gt;[bf_suspend:1374]  ++
+&lt;4&gt;[  461.714811] 
+&lt;4&gt;[  461.714857]  (4)[3082:Binder:467_2]&lt;blestech_fp&gt;[bf_suspend:1379]
+&lt;4&gt;[  461.714857] 
+&lt;6&gt;[  461.716069]  (4)[3082:Binder:467_2][ISP][ISP_suspend] cam2 - X. UserCount=0,wakelock:0,devct:4
+&lt;5&gt;[  461.717104]  (4)[3082:Binder:467_2][Thermal/TZ/CPU]tscpu_thermal_suspend
+&lt;5&gt;[  461.717795]  (4)[3082:Binder:467_2][CMDQ]cmdq_suspend ignore
+&lt;5&gt;[  461.717841]  (4)[3082:Binder:467_2][CMDQ]cmdq_core_suspend usage:0 exec thread:0x0
+&lt;5&gt;[  461.718419]  (4)[3082:Binder:467_2]******** battery_suspend!! iavg=0 ***GM3 disable:0 0 0 0 tmp_intr:0***
+&lt;5&gt;[  461.718458]  (4)[3082:Binder:467_2][enable_bat_temp_det] smart reset not support!
+&lt;5&gt;[  461.719402]  (4)[3082:Binder:467_2][Power/PPM] ppm_main_suspend: suspend callback in
+&lt;6&gt;[  461.720037]  (4)[3082:Binder:467_2]PM: suspend of devices complete after 77.927 msecs
+&lt;6&gt;[  461.727342]  (4)[3082:Binder:467_2]PM: late suspend of devices complete after 7.246 msecs
+&lt;6&gt;[  461.734757]  (4)[3082:Binder:467_2]PM: noirq suspend of devices complete after 7.345 msecs
+&lt;6&gt;[  461.734815]  (4)[3082:Binder:467_2]Disabling non-boot CPUs ...
+&lt;5&gt;[  461.761689]  (4)[3082:Binder:467_2]CPU1: shutdown
+&lt;6&gt;[  461.779081]  (4)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  461.779134]  (4)[3082:Binder:467_2]psci: CPU1 killed.
+&lt;5&gt;[  461.805312]  (4)[3082:Binder:467_2]CPU2: shutdown
+&lt;6&gt;[  461.823074]  (4)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  461.823127]  (4)[3082:Binder:467_2]psci: CPU2 killed.
+&lt;5&gt;[  461.849108]  (7)[3082:Binder:467_2]CPU3: shutdown
+&lt;6&gt;[  461.867092]  (7)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  461.867144]  (7)[3082:Binder:467_2]psci: CPU3 killed.
+&lt;5&gt;[  461.903527]  (7)[3082:Binder:467_2]CPU4: shutdown
+&lt;6&gt;[  461.923087]  (7)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  461.923138]  (7)[3082:Binder:467_2]psci: CPU4 killed.
+&lt;5&gt;[  461.966736]  (7)[3082:Binder:467_2]CPU5: shutdown
+&lt;6&gt;[  461.983148]  (6)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  461.983206]  (6)[3082:Binder:467_2]psci: CPU5 killed.
+&lt;5&gt;[  462.018208]  (7)[3082:Binder:467_2]CPU6: shutdown
+&lt;6&gt;[  462.035222]  (7)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  462.035272]  (7)[3082:Binder:467_2]psci: CPU6 killed.
+&lt;5&gt;[  462.062272]  (0)[3082:Binder:467_2]CPU7: shutdown
+&lt;6&gt;[  462.078962]  (0)[3082:Binder:467_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  462.078975]  (0)[3082:Binder:467_2]psci: CPU7 killed.
+&lt;5&gt;[  462.081720] -(0)[3082:Binder:467_2][clkchk] unexpected unclosed MTCMOS: pg_conn 
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2]NO spm_get_is_infra_pdn !!!
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2][SPM-PMIC] [dlpt_R] pre_SOC=60 SOC=60 skip
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2][SPM] sec = 4800, wakesrc = 0xe87ddef (1)(1)
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2][SPM] wlk_cntcv_l = 0xb6d005ea, wlk_cntcv_h = 0x2
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2][SPM] md_settle = 99, settle = 99
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2]restore UART register start!
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2]restore UART register finish!
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2][SPM] suspend wake up by  R12_CLDMA_EVENT_B, timer_out = 7, r13 = 0x604010c, debug_flag = 0x11000 0x0, r12 = 0x4000000, r12_ext = 0x0, raw_sta = 0x0, idle_sta = 0x97f,  req_sta =  0x420000a0, event_reg = 0x30000000, isr = 0x0, raw_ext_sta = 0x4006a095, wake_misc = 0x0, pcm_flag = 0x80080 0x40, req = 0x0, wlk_cntcv_l = 0xb6d0676b, wlk_cntcv_h = 0x2, 26M_off_pct = 0
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2][SPM] dormant = 7, s_ddr = 0, s_vcore = 0, 
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2]ddr = 0, vcore = 0, sleep_count = 82
+&lt;5&gt;[  462.081720] -(0)[3082:Binder:467_2][ccci1/cif] CCIF wakeup channel: 0x0
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2]Resume caused by IRQ 179, SPM
+&lt;6&gt;[  462.081720] -(0)[3082:Binder:467_2]Suspended for 0.002 seconds
+&lt;6&gt;[  462.081739] -(0)[3082:Binder:467_2][ccci1/mcd]Resume cldma pdn register: No need  ...
+&lt;6&gt;[  462.081756] -(0)[3082:Binder:467_2][ccci1/mcd]Resume cldma ao register: No need  ...
+&lt;6&gt;[  462.081878]  (0)[3082:Binder:467_2]Enabling non-boot CPUs ...
+&lt;6&gt;[  462.083162] -(1)[0:swapper/1]Detected VIPT I-cache on CPU1
+&lt;6&gt;[  462.083199] -(1)[0:swapper/1]GICv3: CPU1: found redistributor 1 region 0:0x000000000c120000
+&lt;6&gt;[  462.083248] -(1)[0:swapper/1]CPU1: update cpu_capacity 1024
+&lt;6&gt;[  462.083253] -(1)[0:swapper/1]CPU1: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.084215]  (0)[3082:Binder:467_2]CPU1 is up
+&lt;6&gt;[  462.085533] -(2)[0:swapper/2]Detected VIPT I-cache on CPU2
+&lt;6&gt;[  462.085558] -(2)[0:swapper/2]GICv3: CPU2: found redistributor 2 region 0:0x000000000c140000
+&lt;6&gt;[  462.085585] -(2)[0:swapper/2]CPU2: update cpu_capacity 1024
+&lt;6&gt;[  462.085590] -(2)[0:swapper/2]CPU2: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.086495]  (0)[3082:Binder:467_2]CPU2 is up
+&lt;6&gt;[  462.087699] -(3)[0:swapper/3]Detected VIPT I-cache on CPU3
+&lt;6&gt;[  462.087726] -(3)[0:swapper/3]GICv3: CPU3: found redistributor 3 region 0:0x000000000c160000
+&lt;6&gt;[  462.087756] -(3)[0:swapper/3]CPU3: update cpu_capacity 1024
+&lt;6&gt;[  462.087760] -(3)[0:swapper/3]CPU3: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.088882]  (0)[3082:Binder:467_2]CPU3 is up
+&lt;6&gt;[  462.090853] -(4)[0:swapper/4]Detected VIPT I-cache on CPU4
+&lt;6&gt;[  462.090946] -(4)[0:swapper/4]GICv3: CPU4: found redistributor 100 region 0:0x000000000c180000
+&lt;6&gt;[  462.091047] -(4)[0:swapper/4]CPU4: update cpu_capacity 853
+&lt;6&gt;[  462.091065] -(4)[0:swapper/4]CPU4: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.092387]  (4)[28:cpuhp/4][Power/cpufreq] 7,0,32,0,833,833,833,833
+&lt;6&gt;[  462.096591]  (4)[3082:Binder:467_2]CPU4 is up
+&lt;6&gt;[  462.098975] -(5)[0:swapper/5]Detected VIPT I-cache on CPU5
+&lt;6&gt;[  462.099058] -(5)[0:swapper/5]GICv3: CPU5: found redistributor 101 region 0:0x000000000c1a0000
+&lt;6&gt;[  462.099143] -(5)[0:swapper/5]CPU5: update cpu_capacity 853
+&lt;6&gt;[  462.099162] -(5)[0:swapper/5]CPU5: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.104096]  (4)[3082:Binder:467_2]CPU5 is up
+&lt;6&gt;[  462.106327] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+&lt;6&gt;[  462.106412] -(6)[0:swapper/6]GICv3: CPU6: found redistributor 102 region 0:0x000000000c1c0000
+&lt;6&gt;[  462.106502] -(6)[0:swapper/6]CPU6: update cpu_capacity 853
+&lt;6&gt;[  462.106521] -(6)[0:swapper/6]CPU6: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.112080]  (4)[3082:Binder:467_2]CPU6 is up
+&lt;6&gt;[  462.114302] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+&lt;6&gt;[  462.114389] -(7)[0:swapper/7]GICv3: CPU7: found redistributor 103 region 0:0x000000000c1e0000
+&lt;6&gt;[  462.114485] -(7)[0:swapper/7]CPU7: update cpu_capacity 853
+&lt;6&gt;[  462.114503] -(7)[0:swapper/7]CPU7: Booted secondary processor [410fd034]
+&lt;6&gt;[  462.125331]  (4)[3082:Binder:467_2]CPU7 is up
+&lt;4&gt;[  462.128344] -(4)[3082:Binder:467_2]usb_6765_dpidle_request: 5 callbacks suppressed
+&lt;5&gt;[  462.128375] -(4)[3082:Binder:467_2][MUSB]usb_6765_dpidle_request 104: USB_DPIDLE_FORBIDDEN, skip_cnt&lt;5&gt;
+&lt;4&gt;[  462.128509] -(4)[3082:Binder:467_2]usb_6765_dpidle_request: 5 callbacks suppressed
+&lt;5&gt;[  462.128529] -(4)[3082:Binder:467_2][MUSB]usb_6765_dpidle_request 97: USB_DPIDLE_ALLOWED, skip_cnt&lt;5&gt;
+&lt;6&gt;[  462.130482]  (4)[3082:Binder:467_2]PM: noirq resume of devices complete after 4.604 msecs
+&lt;6&gt;[  462.131217] -(1)[0:swapper/1][ccci1/cldma]wake up by CLDMA_MD L2(11/0)(f000/18)!
+&lt;6&gt;[  462.136152]  (4)[3082:Binder:467_2]PM: early resume of devices complete after 4.576 msecs
+&lt;5&gt;[  462.136643]  (4)[3082:Binder:467_2][Power/PPM] ppm_main_resume: resume callback in
+&lt;5&gt;[  462.138213]  (4)[3082:Binder:467_2]******** battery_resume!! iavg=0 ***GM3 disable:0 0 0 0***
+&lt;5&gt;[  462.138259]  (4)[3082:Binder:467_2][enable_bat_temp_det] smart reset not support!
+&lt;5&gt;[  462.138619]  (4)[3082:Binder:467_2][CMDQ]cmdq_resume ignore
+&lt;6&gt;[  462.139075]  (7)[5021:kworker/u17:1][ccci1/cldma]CLDMA_AP wakeup source:(0/22)(54)
+&lt;5&gt;[  462.139384]  (4)[3082:Binder:467_2][Thermal/TZ/CPU]tscpu_thermal_resume
+&lt;5&gt;[  462.139703] -(2)[0:swapper/2][Thermal/TZ/CPU]Driver is ready to report valid temperatures
+&lt;6&gt;[  462.141978]  (4)[3082:Binder:467_2]vcodec_resume ok
+&lt;6&gt;[  462.142078]  (4)[3082:Binder:467_2][ISP][ISP_resume] cam2 - X. UserCount=0
+&lt;4&gt;[  462.142711]  (4)[3082:Binder:467_2]&lt;blestech_fp&gt;[bf_resume:1384]  ++
+&lt;4&gt;[  462.142711] 
+&lt;4&gt;[  462.142759]  (4)[3082:Binder:467_2]&lt;blestech_fp&gt;[bf_resume:1389]
+&lt;4&gt;[  462.142759] 
+&lt;6&gt;[  462.143470]  (4)[3082:Binder:467_2][mt_udi] UDI resume
+&lt;5&gt;[  462.143678] -(4)[3082:Binder:467_2][MUSB]musb_hub_control 379: port status 00000100,devctl=0x80
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>log中没有看到CPU0 shutdown的原因是logcat记录log的程序已经被冻结了，无法进路了，如果要看到，应该要用debug port看</p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

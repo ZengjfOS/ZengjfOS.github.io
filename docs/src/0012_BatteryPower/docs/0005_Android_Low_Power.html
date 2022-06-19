@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android Low Power &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Low Power</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#spm">SPM简述</a></li>
+<li><a class="reference internal" href="#wake-lock">wake lock</a></li>
+<li><a class="reference internal" href="#suspend-flow">Suspend Flow</a></li>
+<li><a class="reference internal" href="#check-ap-suspend">Check AP suspend</a></li>
+<li><a class="reference internal" href="#wake-source">wake source</a></li>
+<li><a class="reference internal" href="#wakeup-reasons">Wakeup Reasons</a></li>
+<li><a class="reference internal" href="#suspendapk">Suspend抓出联网的apk</a></li>
+<li><a class="reference internal" href="#wakeup-log">Wakeup log分析思路</a></li>
+<li><a class="reference internal" href="#mediatek">Mediatek平台功耗数据及测试手法</a></li>
+<li><a class="reference internal" href="#ap-suspenddebuglog">AP suspend异常debug及log分析</a></li>
+<li><a class="reference internal" href="#id2">定位系统无法待机原因</a></li>
+<li><a class="reference internal" href="#kernel-log">kernel log定位方法</a></li>
+<li><a class="reference internal" href="#suspend-resume">快速定位suspend/resume耗时较长问题</a></li>
+<li><a class="reference internal" href="#id3">电池充放电</a></li>
+<li><a class="reference internal" href="#suspend-log">进入suspend log时间</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android Low Power</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-low-power">
+<h1>Android Low Power<a class="headerlink" href="#android-low-power" title="Permalink to this headline"></a></h1>
+<p>开了MTK debugger log系统也是能够进入深度休眠，3C Battery Manager.apk记录电池电流使用</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0001_Deep_Sleep.html"><span class="doc std std-doc">0001_Deep_Sleep.md</span></a></p></li>
+<li><p><a class="reference internal" href="0002_SPM_Power_Analysis.html"><span class="doc std std-doc">0002_SPM_Power_Analysis.md</span></a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/zhangbijun1230/article/details/79827907">MTK 驱动开发（36）—低功耗基础知识</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/Vince_/article/details/112303134">FwmarkServer 实现以及功能分析</a></p></li>
+<li><p><a class="reference external" href="https://online.mediatek.com/FAQ#/SW/FAQ07421">[FAQ07421] [lowpower]AP suspend异常debug及log分析</a></p></li>
+<li><p><a class="reference external" href="https://online.mediatek.com/FAQ#/SW/FAQ22807">[FAQ22807] 【响应速度】按power键亮屏响应延迟定位方法</a></p></li>
+<li><p><a class="reference internal" href="0004_Android_Typc-C_Charger.html"><span class="doc std std-doc">0004_Android_Typc-C_Charger.md</span></a></p></li>
+</ul>
+</section>
+<section id="spm">
+<h1>SPM简述<a class="headerlink" href="#spm" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>suspend确切的说是MCU（ARM ）的suspend，也就是cpu进入Wait for interrupt状态（WFI）；因为对整个系统来说，CPU进WFI是整个系统睡眠的先决条件，debug也是从CPU是否进入WFI开始。</p></li>
+<li><p>从Linux的角度来说，CPU进入suspend就是SW完全不跑了，停在suspend workqueue里面</p></li>
+<li><p>SPM =System Power Manager，它掌控着cpu suspend之后系统是否能掉到最小电流的关键逻辑，你可以把它理解成一个投票机制，当系统的关键资源（memory、clock）没有任何人使用的时候，它就会让系统进入一个真正的深睡状态（最小电流）只要它检测到有任何资源请求还没释放，系统就无法降到底电。所以在底电问题上的debug流程中，不仅仅要看cpu有没有suspend成功，还要看SPM的状态是否正确。SPM里面有一个可编程控制器PCM（Programmable Command Master）。CPU在进去WFI之前会把SPM的firmware写入PCM，然后PCM就依据firmware的逻辑来控制SPM的工作。跟SPM强相关的一个东西就是系统中的时钟请求信号，也就是26M时钟开关的控制逻辑；因为系统工作在最小电流的时候，SPM只依靠32K时钟工作；因此要判断系统是不是已经到深睡状态，就要看26M有没有关闭。</p></li>
+<li><p>kernel-4.19/drivers/misc/mediatek/base/power/spm/mt6765</p></li>
+</ul>
+</section>
+<section id="wake-lock">
+<h1>wake lock<a class="headerlink" href="#wake-lock" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>cat sys/power/wake_lock</p>
+<ul>
+<li><p>Android Q能看，Android R没了</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="suspend-flow">
+<h1>Suspend Flow<a class="headerlink" href="#suspend-flow" title="Permalink to this headline"></a></h1>
+<p><img alt="0005_Suspend_Flow.png" src="../../../_images/0005_Suspend_Flow.png" /></p>
+<ul class="simple">
+<li><p>code path</p>
+<ul>
+<li><p>frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java</p></li>
+<li><p>frameworks/base/services/core/jni/com_android_server_power_PowerManagerService.cpp</p></li>
+<li><p>system/hardware/interfaces/suspend/1.0/default/</p></li>
+<li><p>kernel-x.x/kernel/power/</p></li>
+</ul>
+</li>
+<li><p>note:</p>
+<ul>
+<li><p>如果系统完全休眠，则CPU相关power下电（包括Vproc/Vsram）、DRAM进入self-refresh状态（DRAMC所在power domain Vcore进入lowpower mode）、26M off，SPM（work clk 32K）接手监控系统；</p></li>
+<li><p>如果26M clk没有关闭，则表明sub-system仍有work，需从log尝试分析定位；</p></li>
+<li><p>wake_lock是由内核维护的，当没有进程使用的时候，就会开始进入Suspend Flow；</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="check-ap-suspend">
+<h1>Check AP suspend<a class="headerlink" href="#check-ap-suspend" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>AP suspend后console均被disable，只能从kernel log中确认AP是否进入suspend；</p></li>
+<li><p>如下log表示CPU休眠下去后被唤醒源唤醒：<br />
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] suspend wake up by  R12_CCIF0_EVENT_B, timer_out = 1722381, r13 = 0xc400112c, debug_flag = 0x201913ff 0x0, r12 = 0x100, r12_ext = 0x0, raw_sta = 0x0, idle_sta = 0x979,  req_sta =  0x420020ea, event_reg = 0x90100000, isr = 0x0, raw_ext_sta = 0x80069095, wake_misc = 0x0, pcm_flag = 0x80080 0x40, req = 0x0, wlk_cntcv_l = 0xd510a85e, wlk_cntcv_h = 0xbe, 26M_off_pct = 0</p></li>
+<li><p>示例log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;6&gt;[ 1921.017769]  (4)[5339:Binder:424_2][ISP][ISP_suspend] cam2 - X. UserCount=0,wakelock:0,devct:4
+&lt;5&gt;[ 1921.018457]  (4)[5339:Binder:424_2][Thermal/TZ/CPU]tscpu_thermal_suspend
+&lt;6&gt;[ 1921.018823]  (4)[5339:Binder:424_2][SSPM_TS] update base: ts=1921018810005, tick=0xbeac370f15, fz=1, ver=2
+&lt;5&gt;[ 1921.018862]  (4)[5339:Binder:424_2][CMDQ]cmdq_suspend ignore
+&lt;5&gt;[ 1921.018879]  (4)[5339:Binder:424_2][CMDQ]cmdq_core_suspend usage:0 exec thread:0x0
+&lt;6&gt;[ 1921.019098]  (4)[5339:Binder:424_2][M4U] M4U backup in suspend
+&lt;5&gt;[ 1921.019482]  (4)[5339:Binder:424_2][Power/PPM] ppm_main_suspend: suspend callback in
+&lt;6&gt;[ 1921.019755]  (4)[5339:Binder:424_2]suspend of devices complete after 37.083 msecs
+&lt;6&gt;[ 1921.024445]  (4)[5339:Binder:424_2]late suspend of devices complete after 4.659 msecs
+&lt;6&gt;[ 1921.025112]  (4)[5339:Binder:424_2][WMT-CONSYS-HW][I]mtk_wmt_suspend: mtk_wmt_suspend !!
+&lt;6&gt;[ 1921.029375]  (4)[5339:Binder:424_2]noirq suspend of devices complete after 4.331 msecs
+&lt;6&gt;[ 1921.029407]  (4)[5339:Binder:424_2]Disabling non-boot CPUs ...
+&lt;5&gt;[ 1921.043789]  (4)[5339:Binder:424_2]CPU1: shutdown
+&lt;6&gt;[ 1921.044855]  (4)[5339:Binder:424_2]psci: CPU1 killed (polled 0 ms)
+&lt;6&gt;[ 1921.046024]  (6)[0:swapper/6]CPU6: update max cpu_capacity 667
+&lt;6&gt;[ 1921.046350]  (0)[0:swapper/0]CPU2: update max cpu_capacity 1024
+&lt;5&gt;[ 1921.063064]  (4)[5339:Binder:424_2]CPU2: shutdown
+&lt;6&gt;[ 1921.064123]  (4)[5339:Binder:424_2]psci: CPU2 killed (polled 0 ms)
+&lt;6&gt;[ 1921.065945]  (4)[0:swapper/4]CPU4: update max cpu_capacity 667
+&lt;5&gt;[ 1921.078925]  (4)[5339:Binder:424_2]CPU3: shutdown
+&lt;6&gt;[ 1921.079980]  (4)[5339:Binder:424_2]psci: CPU3 killed (polled 0 ms)
+&lt;6&gt;[ 1921.081984]  (6)[0:swapper/6]CPU6: update max cpu_capacity 667
+&lt;5&gt;[ 1921.095201]  (5)[5339:Binder:424_2]CPU4: shutdown
+&lt;6&gt;[ 1921.096262]  (5)[5339:Binder:424_2]psci: CPU4 killed (polled 0 ms)
+&lt;6&gt;[ 1921.097969]  (0)[0:swapper/0]CPU7: update max cpu_capacity 667
+&lt;5&gt;[ 1921.118996]  (6)[5339:Binder:424_2]CPU5: shutdown
+&lt;6&gt;[ 1921.120051]  (6)[5339:Binder:424_2]psci: CPU5 killed (polled 0 ms)
+&lt;6&gt;[ 1921.122001] -(0)[10:rcu_preempt]CPU0: update max cpu_capacity 1024
+&lt;4&gt;[ 1921.142571] -(6)[41:migration/6]IRQ 6: no longer affine to CPU6
+&lt;5&gt;[ 1921.142927]  (7)[5339:Binder:424_2]CPU6: shutdown
+&lt;6&gt;[ 1921.143978]  (7)[5339:Binder:424_2]psci: CPU6 killed (polled 0 ms)
+&lt;6&gt;[ 1921.146012] -(0)[10:rcu_preempt]CPU0: update max cpu_capacity 1024
+&lt;5&gt;[ 1921.167652]  (0)[5339:Binder:424_2]CPU7: shutdown
+&lt;6&gt;[ 1921.169707]  (0)[5339:Binder:424_2]psci: CPU7 killed (polled 0 ms)
+&lt;6&gt;[ 1921.171922] -(0)[5339:Binder:424_2][ccci1/mcd][ccci_modem_plt_suspend] md-&gt;hif_flag = 3
+&lt;4&gt;[ 1921.171941] -(0)[5339:Binder:424_2]scp status: sleep mode
+&lt;6&gt;[ 1921.171967] -(0)[5339:Binder:424_2]auxadc_cali_imix_r pre_SOC=68 SOC=68, skip
+&lt;6&gt;[ 1921.171991] -(0)[5339:Binder:424_2][ccci1/cldma][cldma_plat_suspend]
+&lt;5&gt;[ 1921.171999] -(0)[5339:Binder:424_2]suspend warning[0m: pg_md1
+&lt;5&gt;[ 1921.171999] -(0)[5339:Binder:424_2]suspend warning[0m: pg_conn
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;]NO pll_if_on !!!
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;]NO subsys_if_on !!!
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;]NO spm_get_is_infra_pdn !!!
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] sec = 5401, wakesrc = 0xe87ddef (1)(1)
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] wlk_cntcv_l = 0xac558184, wlk_cntcv_h = 0xbe
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] md_settle = 99, settle = 99
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] suspend wake up by  R12_CCIF0_EVENT_B, timer_out = 1722381, r13 = 0xc400112c, debug_flag = 0x201913ff 0x0, r12 = 0x100, r12_ext = 0x0, raw_sta = 0x0, idle_sta = 0x979,  req_sta =  0x420020ea, event_reg = 0x90100000, isr = 0x0, raw_ext_sta = 0x80069095, wake_misc = 0x0, pcm_flag = 0x80080 0x40, req = 0x0, wlk_cntcv_l = 0xd510a85e, wlk_cntcv_h = 0xbe, 26M_off_pct = 0
+&lt;4&gt;[ 1921.171999] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] sleep_count = 978
+&lt;6&gt;[ 1921.172026] -(0)[5339:Binder:424_2][ccci1/cldma]cldma_plat_resume
+&lt;6&gt;[ 1921.172103] -(0)[5339:Binder:424_2][ccci1/cldma]Resume cldma pdn register ...11
+&lt;6&gt;[ 1921.172133] -(0)[5339:Binder:424_2][ccci1/cldma]Resume cldma pdn register done
+&lt;4&gt;[ 1921.172259] -(0)[5339:Binder:424_2]scp status: sleep mode
+&lt;6&gt;[ 1921.172273] -(0)[5339:Binder:424_2][ccci1/mcd][ccci_modem_plt_resume] md-&gt;hif_flag = 3
+&lt;6&gt;[ 1921.172407]  (0)[5339:Binder:424_2]Enabling non-boot CPUs ...
+&lt;6&gt;[ 1921.173890] -(1)[0:swapper/1]Detected VIPT I-cache on CPU1
+&lt;6&gt;[ 1921.173937] -(1)[0:swapper/1]GICv3: CPU1: found redistributor 1 region 0:0x000000000c120000
+&lt;6&gt;[ 1921.173997] -(1)[0:swapper/1]CPU1: Booted secondary processor 0x0000000001 [0x410fd034]
+&lt;6&gt;[ 1921.174947]  (0)[5339:Binder:424_2]CPU1 is up
+&lt;6&gt;[ 1921.176496] -(2)[0:swapper/2]Detected VIPT I-cache on CPU2
+&lt;6&gt;[ 1921.176534] -(2)[0:swapper/2]GICv3: CPU2: found redistributor 2 region 0:0x000000000c140000
+&lt;6&gt;[ 1921.176581] -(2)[0:swapper/2]CPU2: Booted secondary processor 0x0000000002 [0x410fd034]
+&lt;6&gt;[ 1921.177394]  (0)[5339:Binder:424_2]CPU2 is up
+&lt;6&gt;[ 1921.178782] -(3)[0:swapper/3]Detected VIPT I-cache on CPU3
+&lt;6&gt;[ 1921.178824] -(3)[0:swapper/3]GICv3: CPU3: found redistributor 3 region 0:0x000000000c160000
+&lt;6&gt;[ 1921.178871] -(3)[0:swapper/3]CPU3: Booted secondary processor 0x0000000003 [0x410fd034]
+&lt;6&gt;[ 1921.179730]  (0)[5339:Binder:424_2]CPU3 is up
+&lt;6&gt;[ 1921.181753] -(4)[0:swapper/4]Detected VIPT I-cache on CPU4
+&lt;6&gt;[ 1921.181846] -(4)[0:swapper/4]GICv3: CPU4: found redistributor 100 region 0:0x000000000c180000
+&lt;6&gt;[ 1921.181853]  (2)[0:swapper/2]CPU2: update max cpu_capacity 1024
+&lt;6&gt;[ 1921.181961] -(4)[0:swapper/4]CPU4: Booted secondary processor 0x0000000100 [0x410fd034]
+&lt;6&gt;[ 1921.183917]  (4)[30:cpuhp/4][Power/cpufreq] 7,0,32,0,833,833,833,833
+&lt;3&gt;[ 1921.184567]  (4)[30:cpuhp/4]cpu cpu4: opp_list_debug_create_link: Failed to create link
+&lt;3&gt;[ 1921.184585]  (4)[30:cpuhp/4]cpu cpu4: _add_opp_dev: Failed to register opp debugfs (-12)
+&lt;3&gt;[ 1921.184614]  (4)[30:cpuhp/4]cpu cpu5: opp_list_debug_create_link: Failed to create link
+&lt;3&gt;[ 1921.184629]  (4)[30:cpuhp/4]cpu cpu5: _add_opp_dev: Failed to register opp debugfs (-12)
+&lt;3&gt;[ 1921.184655]  (4)[30:cpuhp/4]cpu cpu6: opp_list_debug_create_link: Failed to create link
+&lt;3&gt;[ 1921.184670]  (4)[30:cpuhp/4]cpu cpu6: _add_opp_dev: Failed to register opp debugfs (-12)
+&lt;3&gt;[ 1921.184695]  (4)[30:cpuhp/4]cpu cpu7: opp_list_debug_create_link: Failed to create link
+&lt;3&gt;[ 1921.184711]  (4)[30:cpuhp/4]cpu cpu7: _add_opp_dev: Failed to register opp debugfs (-12)
+&lt;5&gt;[ 1921.184726]  (4)[30:cpuhp/4][Power/cpufreq] energy model register result -17
+&lt;5&gt;[ 1921.184738]  (4)[30:cpuhp/4][Power/cpufreq] energy model regist fail
+&lt;6&gt;[ 1921.185284]  (0)[5339:Binder:424_2]CPU4 is up
+&lt;6&gt;[ 1921.186626] -(5)[0:swapper/5]Detected VIPT I-cache on CPU5
+&lt;6&gt;[ 1921.186675] -(5)[0:swapper/5]GICv3: CPU5: found redistributor 101 region 0:0x000000000c1a0000
+&lt;6&gt;[ 1921.186721] -(5)[0:swapper/5]CPU5: Booted secondary processor 0x0000000101 [0x410fd034]
+&lt;6&gt;[ 1921.187811]  (4)[5339:Binder:424_2]CPU5 is up
+&lt;6&gt;[ 1921.189337] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+&lt;6&gt;[ 1921.189382] -(6)[0:swapper/6]GICv3: CPU6: found redistributor 102 region 0:0x000000000c1c0000
+&lt;6&gt;[ 1921.189435] -(6)[0:swapper/6]CPU6: Booted secondary processor 0x0000000102 [0x410fd034]
+&lt;6&gt;[ 1921.189836]  (3)[0:swapper/3]CPU3: update max cpu_capacity 1024
+&lt;6&gt;[ 1921.190697]  (0)[5339:Binder:424_2]CPU6 is up
+&lt;6&gt;[ 1921.192038] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+&lt;6&gt;[ 1921.192086] -(7)[0:swapper/7]GICv3: CPU7: found redistributor 103 region 0:0x000000000c1e0000
+&lt;6&gt;[ 1921.192137] -(7)[0:swapper/7]CPU7: Booted secondary processor 0x0000000103 [0x410fd034]
+&lt;6&gt;[ 1921.193360]  (0)[5339:Binder:424_2]CPU7 is up
+&lt;6&gt;[ 1921.193840]  (1)[0:swapper/1]CPU1: update max cpu_capacity 1024
+&lt;6&gt;[ 1921.196519]  (0)[5339:Binder:424_2][WMT-CONSYS-HW][I]mtk_wmt_resume: mtk_wmt_resume !!
+&lt;6&gt;[ 1921.196678]  (0)[5339:Binder:424_2]noirq resume of devices complete after 3.148 msecs
+&lt;6&gt;[ 1921.197095]  (7)[958:kworker/u17:2][ccci1/cif]CCIF_MD wakeup source:(5/10/0)(679)
+&lt;3&gt;[ 1921.197654]  (6)[655:mtk_wmtd][WMT-CONSYS-HW][E]consys_check_reg_readable(1235):connsys clock check fail 0x18007000(0x50001)
+&lt;4&gt;[ 1921.197669]  (0)[5644:kworker/0:1][WMT-CORE][I]opfunc_get_consys_state:cr cannot readable
+&lt;6&gt;[ 1921.197722]  (0)[5644:kworker/0:1][WMT-CONSYS-HW][I]plat_resume_handler:0x00000000;0x00000000;0x00000000;0x00000000;0x00000000;0x00000000;0x00000000;0,0,0,0,0;0,0,0,0,0
+&lt;6&gt;[ 1921.200433]  (0)[5339:Binder:424_2]early resume of devices complete after 3.123 msecs
+&lt;5&gt;[ 1921.200797]  (0)[5339:Binder:424_2][Power/PPM] ppm_main_resume: resume callback in
+&lt;6&gt;[ 1921.201090]  (0)[5339:Binder:424_2][M4U] M4U restore in resume
+&lt;5&gt;[ 1921.201246]  (0)[5339:Binder:424_2][CMDQ]cmdq_resume ignore
+&lt;6&gt;[ 1921.201292]  (0)[5339:Binder:424_2][SSPM_TS] update base: ts=1921201282235, tick=0xbed5169011, fz=0, ver=3
+&lt;5&gt;[ 1921.202601]  (0)[5339:Binder:424_2][Thermal/TZ/CPU]tscpu_thermal_resume
+&lt;6&gt;[ 1921.203399]  (0)[5339:Binder:424_2]vcodec_resume ok
+&lt;6&gt;[ 1921.203462]  (0)[5339:Binder:424_2][ISP][ISP_resume] cam2 - X. UserCount=0
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="wake-source">
+<h1>wake source<a class="headerlink" href="#wake-source" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>adb shell cat /sys/kernel/debug/wakeup_sources &gt; wakeup_sources.xls</p>
+<ul>
+<li><p>通过读取上述节点可以dump出系统wakeup sources详情，读取的节点内容文件最好用excel打开、方便对齐查看：</p>
+<ul>
+<li><p>active_count:对应wakeup source被激活的次数.</p></li>
+<li><p>event_count:被信号唤醒的次数</p></li>
+<li><p>wakeup_count:中止suspend的次数.</p></li>
+<li><p>expire_count:对应wakeup source超时的次数.</p></li>
+<li><p>active_since:本地激活时长，时间单位跟kernel log前缀时间是一样(kernel单调递增时间). 0表示未激活；</p></li>
+<li><p>total_time:对应wakeup source活跃的总时长.</p></li>
+<li><p>max_time:对应的wakeup source持续活跃最长的一次时间.</p></li>
+<li><p>last_change:上一次wakeup source变化的时间(从持锁到释放or释放到持锁)，时间单位跟kernel log前缀时间是一样(kernel单调递增时间).</p></li>
+<li><p>prevent_suspend_time:对应wakeup source阻止进入autosleep的总累加时间.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>cat /proc/interrupts</p>
+<ul>
+<li><p>可以查看当前中断统计情况</p></li>
+</ul>
+</li>
+<li><p>cat /proc/mtk_lpm/cpuidle/spm/spm_sleep_count</p></li>
+</ul>
+</section>
+<section id="wakeup-reasons">
+<h1>Wakeup Reasons<a class="headerlink" href="#wakeup-reasons" title="Permalink to this headline"></a></h1>
+<p>SPM R12寄存器记录MCU的唤醒源，MCU被唤醒时log中会将具体唤醒源打印：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#define R12_PCM_TIMER_EVENT                   (1U &lt;&lt; 0) ----&gt; SPM 定时器唤醒，基本不会有，只有当系统没有其他唤醒源时，超过1h，才会有此timer唤醒，可以理解为SPM 里面的看门狗</span>
+<span class="c1">#define R12_SPM_TWAM_IRQ_B                    (1U &lt;&lt; 1) ----&gt; SPM 用来debug的中断，不会有</span>
+<span class="c1">#define R12_KP_IRQ_B                          (1U &lt;&lt; 2) ----&gt; 按键中断</span>
+<span class="c1">#define R12_APWDT_EVENT_B                     (1U &lt;&lt; 3) ----&gt; AP侧的WDT(看门狗)中断</span>
+<span class="c1">#define R12_APXGPT1_EVENT_B                   (1U &lt;&lt; 4) ----&gt; APXGPT，这个是system timer，对应到软件的hrtimer，只有在idle时才有</span>
+<span class="c1">#define R12_CONN2AP_SPM_WAKEUP_B              (1U &lt;&lt; 5) ----&gt; CONN，WCN的中断，wifi/BT/GPS/FM的唤醒</span>
+<span class="c1">#define R12_EINT_EVENT_B                      (1U &lt;&lt; 6) ----&gt; 外部中断唤醒，譬如PMIC EINT，这类唤醒比较常见</span>
+<span class="c1">#define R12_CONN_WDT_IRQ_B                    (1U &lt;&lt; 7) ----&gt; CONN的WDT(看门狗)中断</span>
+<span class="c1">#define R12_CCIF0_EVENT_B                     (1U &lt;&lt; 8) ----&gt; Modem的CCIF0唤醒，譬如，网络唤醒，网络URC唤醒，这类唤醒比较常见</span>
+<span class="c1">#define R12_LOWBATTERY_IRQ_B                  (1U &lt;&lt; 9) ----&gt; 低电池唤醒，基本没有</span>
+<span class="c1">#define R12_SC_SSPM2SPM_WAKEUP                (1U &lt;&lt; 10) ----&gt; SSPM唤醒，基本没有</span>
+<span class="c1">#define R12_SC_SCP2SPM_WAKEUP                 (1U &lt;&lt; 11) ----&gt; sensor hub唤醒</span>
+<span class="c1">#define R12_SC_ADSP2SPM_WAKEUP                (1U &lt;&lt; 12) ----&gt; ADSP 也就是audio之类的唤醒，基本没有</span>
+<span class="c1">#define R12_PCM_WDT_EVENT_B                   (1U &lt;&lt; 13) ----&gt;跟1是类似</span>
+<span class="c1">#define R12_USBX_CDSC_B                       (1U &lt;&lt; 14) ----&gt;USB 唤醒</span>
+<span class="c1">#define R12_USBX_POWERDWN_B                   (1U &lt;&lt; 15) ----&gt;USB 唤醒</span>
+<span class="c1">#define R12_SYS_TIMER_EVENT_B                 (1U &lt;&lt; 16) ----&gt;跟4类似</span>
+<span class="c1">#define R12_EINT_EVENT_SECURE_B               (1U &lt;&lt; 17) ----&gt;跟 SECURE EINT唤醒</span>
+<span class="c1">#define R12_CCIF1_EVENT_B                     (1U &lt;&lt; 18) ----&gt;跟8类似</span>
+<span class="c1">#define R12_UART0_IRQ_B                       (1U &lt;&lt; 19) ----&gt;uart 0唤醒</span>
+<span class="c1">#define R12_AFE_IRQ_MCU_B                     (1U &lt;&lt; 20) ----&gt;AFE，audio相关的唤醒</span>
+<span class="c1">#define R12_THERMAL_CTRL_EVENT_B              (1U &lt;&lt; 21) ----&gt;Thermal的唤醒</span>
+<span class="c1">#define R12_SYS_CIRQ_IRQ_B                    (1U &lt;&lt; 22) ----&gt; CIRQ的唤醒，系统休眠时会将GIC backup到CIRQ</span>
+<span class="c1">#define R12_MD2AP_PEER_WAKEUP_EVENT           (1U &lt;&lt; 23) ----&gt; 数据业务唤醒</span>
+<span class="c1">#define R12_CSYSPWREQ_B                       (1U &lt;&lt; 24) ----&gt; debug用</span>
+<span class="c1">#define R12_MD1_WDT_B                         (1U &lt;&lt; 25) ----&gt; Modem的WDT(看门狗)唤醒</span>
+<span class="c1">#define R12_AP2AP_PEER_WAKEUP_EVENT           (1U &lt;&lt; 26) ----&gt; 数据业务唤醒</span>
+<span class="c1">#define R12_SEJ_EVENT_B                       (1U &lt;&lt; 27) ----&gt; SEJ模块唤醒</span>
+<span class="c1">#define R12_SPM_CPU_WAKEUP_EVENT              (1U &lt;&lt; 28) ----&gt; CPU唤醒</span>
+<span class="c1">#define R12_CPU_IRQOUT                        (1U &lt;&lt; 29) ----&gt; CPU唤醒</span>
+<span class="c1">#define R12_CPU_WFI                           (1U &lt;&lt; 30) ----&gt; CPU唤醒</span>
+<span class="c1">#define R12_MCUSYS_IDLE_TO_EMI_ALL            (1U &lt;&lt; 31) ----&gt; CPU唤醒</span>
+</pre></div>
+</div>
+<p>针对CCIF的唤醒，一般可以对应到对应的channel，每个channel都对应到不同的user，CCCI user table；</p>
+</section>
+<section id="suspendapk">
+<h1>Suspend抓出联网的apk<a class="headerlink" href="#suspendapk" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>system/netd/server/FwmarkServer.cpp</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">FwmarkServer</span><span class="p">::</span><span class="n">processClient</span><span class="p">(</span><span class="n">SocketClient</span><span class="o">*</span> <span class="n">client</span><span class="p">,</span> <span class="nb">int</span><span class="o">*</span> <span class="n">socketFd</span><span class="p">){</span>
+
+  <span class="o">//</span> <span class="o">...</span><span class="n">省略</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">netdEventListener</span> <span class="o">!=</span> <span class="n">nullptr</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">char</span> <span class="n">addrstr</span><span class="p">[</span><span class="n">INET6_ADDRSTRLEN</span><span class="p">];</span>
+      <span class="n">char</span> <span class="n">portstr</span><span class="p">[</span><span class="n">sizeof</span><span class="p">(</span><span class="s2">&quot;65536&quot;</span><span class="p">)];</span>
+      <span class="n">const</span> <span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">getnameinfo</span><span class="p">((</span><span class="n">sockaddr</span><span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">connectInfo</span><span class="o">.</span><span class="n">addr</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">connectInfo</span><span class="o">.</span><span class="n">addr</span><span class="p">),</span>
+                 <span class="n">addrstr</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">addrstr</span><span class="p">),</span> <span class="n">portstr</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">portstr</span><span class="p">),</span>
+               <span class="n">NI_NUMERICHOST</span> <span class="o">|</span> <span class="n">NI_NUMERICSERV</span><span class="p">);</span>
+           <span class="o">+</span>  <span class="n">LOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;FwmarkServer connect uid = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">client</span><span class="o">-&gt;</span><span class="n">getUid</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; pid = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">client</span><span class="o">-&gt;</span><span class="n">getPid</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; addr = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">addrstr</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;, port &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">portstr</span><span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Called after a socket connect() completes. This reports connect event including netId, destination IP address, destination port, uid, connect latency, and connect errno if any.</p></li>
+</ul>
+</li>
+<li><p>查看mobile main log(logcat log)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Line</span> <span class="mi">25240</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.355904</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mf">111.12.28.85</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25309</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.702679</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mi">2409</span><span class="p">:</span><span class="mi">8</span><span class="n">c54</span><span class="p">:</span><span class="mi">1011</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">::</span><span class="mi">3</span><span class="n">fd</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25314</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.703503</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mi">2409</span><span class="p">:</span><span class="mi">8</span><span class="n">c54</span><span class="p">:</span><span class="mi">1011</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">::</span><span class="mi">3</span><span class="n">fd</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25319</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.704260</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mi">2409</span><span class="p">:</span><span class="mi">8</span><span class="n">c54</span><span class="p">:</span><span class="mi">1011</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">::</span><span class="mi">3</span><span class="n">fd</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25324</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.704985</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mi">2409</span><span class="p">:</span><span class="mi">8</span><span class="n">c54</span><span class="p">:</span><span class="mi">1011</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">::</span><span class="mi">3</span><span class="n">fd</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25329</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.705705</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mi">2409</span><span class="p">:</span><span class="mi">8</span><span class="n">c54</span><span class="p">:</span><span class="mi">1011</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">::</span><span class="mi">3</span><span class="n">fd</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25334</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">42.706373</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mi">2409</span><span class="p">:</span><span class="mi">8</span><span class="n">c54</span><span class="p">:</span><span class="mi">1011</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">::</span><span class="mi">3</span><span class="n">fd</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25346</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">43.132873</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mf">183.232.152.223</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+<span class="n">Line</span> <span class="mi">25351</span><span class="p">:</span> <span class="mi">11</span><span class="o">-</span><span class="mi">21</span> <span class="mi">10</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mf">43.135799</span> <span class="mi">560</span> <span class="mi">737</span> <span class="n">E</span> <span class="n">libnetd_resolv</span><span class="p">:</span> <span class="n">FwmarkServer</span> <span class="n">connect</span> <span class="n">uid</span> <span class="o">=</span> <span class="mi">10122</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">7412</span> <span class="n">addrstr</span> <span class="mf">183.232.152.223</span><span class="p">,</span> <span class="n">portstr</span> <span class="mi">443</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>通过查看系统的UID和PID指导进程</p></li>
+</ul>
+</li>
+<li><p>wireshark是我们用来分析netlog的一个工具，通常用来定位开数据连接的待机功耗问题，查找是哪个APP/Process在使用数据</p>
+<ul class="simple">
+<li><p>首先需要在抓log时，打开mtklog中的netlog，就可以找到netlog对应的文件</p></li>
+<li><p>有时候最前面的【时间戳】格式会不对，会跟mobile log对不上，如果遇到了，可以通过如下菜单调整</p>
+<ul>
+<li><p>[View]-&gt;[Time Display Format]</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="wakeup-log">
+<h1>Wakeup log分析思路<a class="headerlink" href="#wakeup-log" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>原始唤醒源log，未经时间处理</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;]NO pll_if_on !!!
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;]NO subsys_if_on !!!
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;]NO spm_get_is_infra_pdn !!!
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] sec = 5401, wakesrc = 0xe87ddef (1)(1)
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] wlk_cntcv_l = 0x8c1fc309, wlk_cntcv_h = 0x106
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] md_settle = 99, settle = 99
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] suspend wake up by  R12_EINT_EVENT_B, timer_out = 2168563, r13 = 0x26040000, debug_flag = 0x201913ff 0x0, r12 = 0x40, r12_ext = 0x0, raw_sta = 0x0, idle_sta = 0x97f,  req_sta =  0x42000000, event_reg = 0x90100000, isr = 0x0, raw_ext_sta = 0x4006a0aa, wake_misc = 0x10000, pcm_flag = 0x80080 0x40, req = 0x0, wlk_cntcv_l = 0xbf683222, wlk_cntcv_h = 0x106, 26M_off_pct = 75
+&lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] sleep_count = 1123
+&lt;6&gt;[11420.069700] -(0)[5339:Binder:424_2][ccci1/cldma]cldma_plat_resume
+&lt;6&gt;[11420.069777] -(0)[5339:Binder:424_2][ccci1/cldma]Resume cldma pdn register ...11
+&lt;6&gt;[11420.069808] -(0)[5339:Binder:424_2][ccci1/cldma]Resume cldma pdn register done
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>使用<code class="docutils literal notranslate"><span class="pre">suspend</span> <span class="pre">wake</span> <span class="pre">up</span> <span class="pre">by</span></code>在kernel log中查找行，获取唤醒源<br />
+<code class="docutils literal notranslate"><span class="pre">&lt;4&gt;[11420.069673]</span> <span class="pre">-(0)[5339:Binder:424_2][name:spm&amp;][SPM]</span> <span class="pre">suspend</span> <span class="pre">wake</span> <span class="pre">up</span> <span class="pre">by</span>&#160; <span class="pre">R12_EINT_EVENT_B,</span> <span class="pre">timer_out</span> <span class="pre">=</span> <span class="pre">2168563,</span> <span class="pre">r13</span> <span class="pre">=</span> <span class="pre">0x26040000,</span> <span class="pre">debug_flag</span> <span class="pre">=</span> <span class="pre">0x201913ff</span> <span class="pre">0x0,</span> <span class="pre">r12</span> <span class="pre">=</span> <span class="pre">0x40,</span> <span class="pre">r12_ext</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">raw_sta</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">idle_sta</span> <span class="pre">=</span> <span class="pre">0x97f,</span>&#160; <span class="pre">req_sta</span> <span class="pre">=</span>&#160; <span class="pre">0x42000000,</span> <span class="pre">event_reg</span> <span class="pre">=</span> <span class="pre">0x90100000,</span> <span class="pre">isr</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">raw_ext_sta</span> <span class="pre">=</span> <span class="pre">0x4006a0aa,</span> <span class="pre">wake_misc</span> <span class="pre">=</span> <span class="pre">0x10000,</span> <span class="pre">pcm_flag</span> <span class="pre">=</span> <span class="pre">0x80080</span> <span class="pre">0x40,</span> <span class="pre">req</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">wlk_cntcv_l</span> <span class="pre">=</span> <span class="pre">0xbf683222,</span> <span class="pre">wlk_cntcv_h</span> <span class="pre">=</span> <span class="pre">0x106,</span> <span class="pre">26M_off_pct</span> <span class="pre">=</span> <span class="pre">75</span></code></p></li>
+</ul>
+</li>
+<li><p>使用<a class="reference external" href="https://github.com/ZengjfOS/KernelTime/blob/master/DateConvert.py">DateConvert.py</a>对kernel log时间进行转换；</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;]NO pll_if_on !!!
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;]NO subsys_if_on !!!
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;]NO spm_get_is_infra_pdn !!!
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] sec = 5401, wakesrc = 0xe87ddef (1)(1)
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] wlk_cntcv_l = 0x8c1fc309, wlk_cntcv_h = 0x106
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] md_settle = 99, settle = 99
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] suspend wake up by  R12_EINT_EVENT_B, timer_out = 2168563, r13 = 0x26040000, debug_flag = 0x201913ff 0x0, r12 = 0x40, r12_ext = 0x0, raw_sta = 0x0, idle_sta = 0x97f,  req_sta =  0x42000000, event_reg = 0x90100000, isr = 0x0, raw_ext_sta = 0x4006a0aa, wake_misc = 0x10000, pcm_flag = 0x80080 0x40, req = 0x0, wlk_cntcv_l = 0xbf683222, wlk_cntcv_h = 0x106, 26M_off_pct = 75
+2021-05-27 15:18:36.572280750 &lt;4&gt;[11420.069673] -(0)[5339:Binder:424_2][name:spm&amp;][SPM] sleep_count = 1123
+2021-05-27 15:18:36.572280777 &lt;6&gt;[11420.069700] -(0)[5339:Binder:424_2][ccci1/cldma]cldma_plat_resume
+2021-05-27 15:18:36.572280854 &lt;6&gt;[11420.069777] -(0)[5339:Binder:424_2][ccci1/cldma]Resume cldma pdn register ...11
+2021-05-27 15:18:36.572280885 &lt;6&gt;[11420.069808] -(0)[5339:Binder:424_2][ccci1/cldma]Resume cldma pdn register done
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>使用<code class="docutils literal notranslate"><span class="pre">suspend</span> <span class="pre">wake</span> <span class="pre">up</span> <span class="pre">by</span></code>在kernel log中查找行，获取唤醒源，并获取当前唤醒源log时间：<br />
+<code class="docutils literal notranslate"><span class="pre">2021-05-27</span> <span class="pre">15:18:36.572280750</span> <span class="pre">&lt;4&gt;[11420.069673]</span> <span class="pre">-(0)[5339:Binder:424_2][name:spm&amp;][SPM]</span> <span class="pre">suspend</span> <span class="pre">wake</span> <span class="pre">up</span> <span class="pre">by</span>&#160; <span class="pre">R12_EINT_EVENT_B,</span> <span class="pre">timer_out</span> <span class="pre">=</span> <span class="pre">2168563,</span> <span class="pre">r13</span> <span class="pre">=</span> <span class="pre">0x26040000,</span> <span class="pre">debug_flag</span> <span class="pre">=</span> <span class="pre">0x201913ff</span> <span class="pre">0x0,</span> <span class="pre">r12</span> <span class="pre">=</span> <span class="pre">0x40,</span> <span class="pre">r12_ext</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">raw_sta</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">idle_sta</span> <span class="pre">=</span> <span class="pre">0x97f,</span>&#160; <span class="pre">req_sta</span> <span class="pre">=</span>&#160; <span class="pre">0x42000000,</span> <span class="pre">event_reg</span> <span class="pre">=</span> <span class="pre">0x90100000,</span> <span class="pre">isr</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">raw_ext_sta</span> <span class="pre">=</span> <span class="pre">0x4006a0aa,</span> <span class="pre">wake_misc</span> <span class="pre">=</span> <span class="pre">0x10000,</span> <span class="pre">pcm_flag</span> <span class="pre">=</span> <span class="pre">0x80080</span> <span class="pre">0x40,</span> <span class="pre">req</span> <span class="pre">=</span> <span class="pre">0x0,</span> <span class="pre">wlk_cntcv_l</span> <span class="pre">=</span> <span class="pre">0xbf683222,</span> <span class="pre">wlk_cntcv_h</span> <span class="pre">=</span> <span class="pre">0x106,</span> <span class="pre">26M_off_pct</span> <span class="pre">=</span> <span class="pre">75</span></code></p></li>
+<li><p>15:18:36.572280750</p>
+<ul>
+<li><p>15:18:36</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>利用kernel log获取的log时间在mobile main log(logcat log)对应开始处理大概位置，一般晚于kernel log时间，从这里分析看logcat log处理了哪些事务也可以大体判断被哪些事件触发了；</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>05-27 15:18:36.906838  3236  3236 D KeyguardUpdateMonitor: handleBatteryUpdate
+05-27 15:18:36.948070  3236  3236 D KeyguardUpdateMonitor: received broadcast android.intent.action.BATTERY_CHANGED
+05-27 15:18:36.949810  3236  3236 D KeyguardUpdateMonitor: handleBatteryUpdate
+05-27 15:18:37.868659  3236  3236 D NotificationListener: onRankingUpdate
+05-27 15:18:41.468714   767   767 I thermal_src: big tpcb jump! previous/current = -274000/29000
+05-27 15:18:41.524269  1132  3522 D SntpClient: request time failed: java.net.SocketTimeoutException: Poll timed out
+05-27 15:18:41.845205   565   565 E ccci_fsd(1): Failed to read from FS device (-1) !! errno = 4
+05-27 15:18:41.845346   573   573 E ccci_rpcd: Failed to read from RPC device (-1) !! errno = 4
+05-27 15:18:41.846069   773   855 D PQ      : ccorr table index=0
+05-27 15:18:41.846380   773   855 D PQ      : [PQ_SERVICE] setPQParamWithFilter configFlag: 1
+05-27 15:18:41.846485   961  1008 E VoLTE IMSM: Interrupt happen Interrupted system call (4) (module/mdagent/volte_imsm_93/src/imsmmd.c:2952)
+05-27 15:18:41.847015   959   963 I [BIP]   :  [BIP AGENT] can not read data now, FD = (4), error number = (-395654453)
+05-27 15:18:41.848376   986  1003 E VoLTE IMCB-CM: RECEIVE error code: EINTR, Need to retry #51
+05-27 15:18:41.890310   767   767 I thermal_src: big tpcb jump! previous/current = 29000/-274000
+05-27 15:18:41.893291  1132  5727 I BatteryStatsService: In wakeup_callback: suspend aborted
+05-27 15:19:02.051607   565   565 E ccci_fsd(1): Failed to read from FS device (-1) !! errno = 4
+05-27 15:19:02.051941   570   590 I ccci_mdinit: (1):is_delta_same delta t:26 delta b:25 delta:1
+05-27 15:19:02.052013   570   590 D ccci_mdinit: (1):monitor_time_update_thread round:1465 ########
+05-27 15:19:02.052323   773   855 D PQ      : ccorr table index=0
+05-27 15:19:02.052719   773   855 D PQ      : [PQ_SERVICE] setPQParamWithFilter configFlag: 1
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">05-27</span> <span class="pre">15:18:41.893291</span>&#160; <span class="pre">1132</span>&#160; <span class="pre">5727</span> <span class="pre">I</span> <span class="pre">BatteryStatsService:</span> <span class="pre">In</span> <span class="pre">wakeup_callback:</span> <span class="pre">suspend</span> <span class="pre">aborted</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">android</span><span class="o">.</span><span class="n">googlesource</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">platform</span><span class="o">/</span><span class="n">frameworks</span><span class="o">/</span><span class="n">base</span><span class="o">/+/</span><span class="n">master</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">jni</span><span class="o">/</span><span class="n">com_android_server_am_BatteryStatsService</span><span class="o">.</span><span class="n">cpp</span><span class="c1">#150</span>
+  <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">base</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">jni</span><span class="o">/</span><span class="n">com_android_server_am_BatteryStatsService</span><span class="o">.</span><span class="n">cpp</span>
+    <span class="o">*</span> <span class="n">static</span> <span class="n">jint</span> <span class="n">nativeWaitWakeup</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">clazz</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">outBuf</span><span class="p">)</span>
+      <span class="o">*</span> <span class="n">ALOGV</span><span class="p">(</span><span class="s2">&quot;Got </span><span class="si">%d</span><span class="s2"> reasons&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="n">wakeupReasons</span><span class="o">.</span><span class="n">size</span><span class="p">());</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="mediatek">
+<h1>Mediatek平台功耗数据及测试手法<a class="headerlink" href="#mediatek" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>低功耗数据参考</p>
+<ul>
+<li><p>[FAQ23255] MTK WIFI待机功耗</p>
+<ul>
+<li><p>DCC搜索：MTXXXX_Low_Power_Data，例如：MT6762_Low_Power_Data</p>
+<ul>
+<li><p>DCC/Smartphone/HW/Smart Phone/LTE_6M/MT6762/Test Report/Low Power</p>
+<ul>
+<li><p>MT6762_Low_Power_Data_V1.3(LPDDR3).pdf</p></li>
+<li><p>MT6762_Low_Power_Data_V1.2(LPDDR4X).pdf</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>测试手法</p>
+<ul>
+<li><p>测试功耗数据之前，请先确认以下配置：</p>
+<ul>
+<li><p>关闭 WIFI/BT/GPS，关闭数据连接，设置飞行模式。 （根据具体测试场景设置）</p></li>
+<li><p>关闭 mobile log/modem log/net log，打开LOG会增加电流。注意：确认 /sdcard/mtklog （/data/mtklog） 中是否有 LOG 生成，确定关闭成功。</p></li>
+<li><p>确认各个模块是否已经正常工作，各个模块都会影响功耗，需要在模块工作 OK 之后再测试功耗问题。</p></li>
+<li><p>测试将所有第三方 APK 删除，排除第三方 APK 问题。</p></li>
+<li><p>亮屏场景要关闭自动背光调节等功能；</p></li>
+</ul>
+</li>
+<li><p>打开log会增加电流，但无法抓取log，在出问题的时候，不用关心电流，而是关心什么唤醒了机器，也就是测试的时候关闭，解决问题的时候是需要打开的，获取log来解决问题；</p></li>
+</ul>
+</li>
+<li><p>各场景测试手法：
+<img alt="0005_LowPowerTestMethod.png" src="../../../_images/0005_LowPowerTestMethod.png" /></p></li>
+</ul>
+</section>
+<section id="ap-suspenddebuglog">
+<h1>AP suspend异常debug及log分析<a class="headerlink" href="#ap-suspenddebuglog" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://online.mediatek.com/FAQ#/SW/FAQ07421">[FAQ07421] [lowpower]AP suspend异常debug及log分析</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>定位系统无法待机原因<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>blocking wakelock一般分为两种，一是上层应用透过PowerManagerService（后简称PMS）拿锁，另一种是kernel wakelock。</p></li>
+<li><p>设备连接powermonitor可以直接从电流图判断休眠情况的定位方法，如果从电流图看到系统无法suspend，插入USB通过如下cmd dump当前阻止休眠的wakelocks：</p>
+<ul>
+<li><p>adb shell</p></li>
+<li><p>cat /sys/kernel/debug/wakeup_sources |sed -e ‘s/”^ “/”unnamed”/g’ | awk ‘{print $6 “\t” $1}’ | grep -v “^0” |sort -n</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>active_since name
+24               WLAN 
+79               mt6360_pmu_chg.2.auto
+24271         PowerManagerService.WakeLocks （PMS持锁）
+35558         musb-hdrc （USB持锁，因插usb，属于正常现象）
+</pre></div>
+</div>
+<ul>
+<li><p>如果有PMS持锁，则再执行如下cmd dump持锁的应用：</p>
+<ul class="simple">
+<li><p>dumpsys power | grep “PARTIAL_WAKE_LOCK”</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PARTIAL_WAKE_LOCK</span> <span class="s1">&#39;wake:com.google.android.gms/.auth.account.be.accountstate.LoginAccountsChangedIntentService&#39;</span> <span class="n">ACQ</span><span class="o">=-</span><span class="mi">15</span><span class="n">s910ms</span> <span class="p">(</span><span class="n">uid</span><span class="o">=</span><span class="mi">10177</span> <span class="p">(</span><span class="n">displayid</span> <span class="o">=</span><span class="mi">0</span> <span class="n">pid</span><span class="o">=</span><span class="mi">4937</span> <span class="n">pkg</span><span class="o">=</span><span class="n">com</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">android</span><span class="o">.</span><span class="n">gms</span> <span class="n">uid</span><span class="o">=</span><span class="mi">10177</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>GMS应用持锁</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>通过查看中断次数来判断：cat /proc/interrupts</p></li>
+</ul>
+</section>
+<section id="kernel-log">
+<h1>kernel log定位方法<a class="headerlink" href="#kernel-log" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>在对应时间段log中搜索”active wakeup source”，可以定位到阻止系统休眠的wakelock：</p>
+<ul>
+<li><p>active wakeup source: WLAN timeout</p></li>
+<li><p>active wakeup source: PowerManagerService.WakeLocks</p></li>
+<li><p>active wakeup source: ccci_poll</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="suspend-resume">
+<h1>快速定位suspend/resume耗时较长问题<a class="headerlink" href="#suspend-resume" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>adb shell “echo 1 &gt; /sys/module/kernel/parameters/initcall_debug”</p></li>
+<li><p>adb shell “echo 1 &gt; /sys/power/pm_print_times”</p></li>
+<li><p>拔掉USB灭屏待机，确认系统suspend后，插入usb执行如下cmd:</p>
+<ul class="simple">
+<li><p>adb shell</p></li>
+<li><p>dmesg | grep ‘call ‘ | awk ‘{print $4 “\t” $8}’ | sort -k 2 -rn &gt; /data/result.txt</p></li>
+<li><p>adb pull /data/result.txt</p></li>
+</ul>
+</li>
+<li><p>打开result文件，可以看的每个device resume耗时（如下），找到耗时长的函数请相关owner确认是否可以优化：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dpm_name</span> <span class="n">usecs</span>
+<span class="n">bootdevice</span><span class="o">+</span> <span class="mi">25318</span>
+<span class="n">mt_charger</span><span class="o">+</span> <span class="mi">6406</span>
+<span class="mf">13000000.</span><span class="n">mfg_lorne</span><span class="o">+</span> <span class="mi">5208</span>
+<span class="n">mt</span><span class="o">-</span><span class="n">pmic</span><span class="o">+</span> <span class="mi">3334</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>电池充放电<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>3CBatteryManager.apk</p></li>
+<li><p>在设置选项中，电池可以将记录的数据保存出来</p>
+<ul>
+<li><p>[History]</p></li>
+<li><p>[左上角三条杠] -&gt; [Settings] -&gt; [Battery] -&gt; [Export battery history]</p></li>
+</ul>
+</li>
+<li><p>修改监听参数</p>
+<ul>
+<li><p>[左上角三条杠] -&gt; [Settings] -&gt; [Battery] -&gt; [Monitoring]</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="suspend-log">
+<h1>进入suspend log时间<a class="headerlink" href="#suspend-log" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;5&gt;[  334.589624]  (3)[2918:Binder:389_2][Power/PPM] ppm_main_suspend: suspend callback in
+&lt;6&gt;[  334.589792]  (3)[2918:Binder:389_2]PM: suspend of devices complete after 45.398 msecs
+&lt;6&gt;[  334.592290]  (3)[2918:Binder:389_2]PM: late suspend of devices complete after 2.480 msecs
+&lt;6&gt;[  334.594776]  (3)[2918:Binder:389_2]PM: noirq suspend of devices complete after 2.462 msecs
+&lt;6&gt;[  334.594793]  (3)[2918:Binder:389_2]Disabling non-boot CPUs ...
+&lt;5&gt;[  334.617144]  (3)[2918:Binder:389_2]CPU1: shutdown
+&lt;6&gt;[  334.635834]  (0)[2918:Binder:389_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  334.635849]  (0)[2918:Binder:389_2]psci: CPU1 killed.
+&lt;5&gt;[  334.652860]  (0)[2918:Binder:389_2]CPU2: shutdown
+&lt;6&gt;[  334.671829]  (3)[2918:Binder:389_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  334.671880]  (3)[2918:Binder:389_2]psci: CPU2 killed.
+&lt;5&gt;[  334.692712]  (0)[2918:Binder:389_2]CPU3: shutdown
+&lt;6&gt;[  334.711805]  (0)[2918:Binder:389_2]psci: Retrying again to check for CPU kill
+&lt;6&gt;[  334.711818]  (0)[2918:Binder:389_2]psci: CPU3 killed.
+&lt;7&gt;[  334.713139] -(0)[2918:Binder:389_2]update base: ts=334713139257, tick=0x12e918b1e, fz=1, ver=0
+&lt;5&gt;[  334.713139] -(0)[2918:Binder:389_2][clkchk] unexpected unclosed MTCMOS: pg_conn
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]NO pll_if_on !!!
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2][SPM-PMIC] [dlpt_R] pre_SOC=54 SOC=54 skip
+&lt;7&gt;[  334.713139] -(0)[2918:Binder:389_2]mode change to 0xdc (write 0x220000dc), pid: 2918
+&lt;7&gt;[  334.713139] -(0)[2918:Binder:389_2][WDT] suspend
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2][SPM] sec = 4800, wakesrc = 0xe87ddef (1)(1)
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2][SPM] wlk_cntcv_l = 0x2e919a13, wlk_cntcv_h = 0x1
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2][SPM] md_settle = 99, settle = 99
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]restore UART register start!
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]restore UART register finish!
+&lt;3&gt;[  334.713139] -(0)[2918:Binder:389_2]CANNOT GET UART1 WAKE ACK
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2][SPM] suspend wake up by  R12_CCIF0_EVENT_B, timer_out = 8525789, r13 = 0x4604632c, debug_flag = 0x201913ff 0x80000002, r12 = 0x100, r12_ext = 0x0, raw_sta = 0x0, idle_sta = 0x979,  req_sta =  0x420024e8, event_reg = 0x90100000, isr = 0x0, raw_ext_sta = 0x4005a095, wake_misc = 0x0, pcm_flag = 0x80080 0x0, req = 0x0, wlk_cntcv_l = 0xf82d846c, wlk_cntcv_h = 0x1, 26M_off_pct = 88
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2][SPM] dormant = 7, s_ddr = 0, s_vcore = 0,
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]ddr = 0, vcore = 0, sleep_count = 4
+&lt;5&gt;[  334.713139] -(0)[2918:Binder:389_2][ccci1/cif] CCIF wakeup channel: 0x60
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]Resume caused by IRQ 16, SPM
+&lt;7&gt;[  334.713139] -(0)[2918:Binder:389_2]mode change to 0xdd (write 0x220000dd), pid: 2918
+&lt;7&gt;[  334.713139] -(0)[2918:Binder:389_2]mode change to 0xdd (write 0x220000dd), pid: 2918
+&lt;7&gt;[  334.713139] -(0)[2918:Binder:389_2][WDT] resume(1)
+&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]Suspended for 260.188 seconds
+&lt;7&gt;[  334.713152] -(0)[2918:Binder:389_2]update base: ts=334713145564, tick=0x1f82d9bb7, fz=0, ver=1
+&lt;6&gt;[  334.713168] -(0)[2918:Binder:389_2][ccci1/mcd]Resume cldma pdn register ...11
+&lt;6&gt;[  334.713187] -(0)[2918:Binder:389_2][ccci1/mcd]Resume cldma pdn register done
+&lt;6&gt;[  334.713358]  (0)[2918:Binder:389_2]Enabling non-boot CPUs ...
+&lt;6&gt;[  334.714154] -(1)[0:swapper/1]Detected VIPT I-cache on CPU1
+&lt;6&gt;[  334.714182] -(1)[0:swapper/1]GICv3: CPU1: found redistributor 1 region 0:0x000000000c0a0000
+&lt;6&gt;[  334.714219] -(1)[0:swapper/1]CPU1: update cpu_capacity 1024
+&lt;6&gt;[  334.714224] -(1)[0:swapper/1]CPU1: Booted secondary processor [410fd034]
+&lt;6&gt;[  334.714997]  (0)[2918:Binder:389_2]CPU1 is up
+&lt;6&gt;[  334.715936] -(2)[0:swapper/2]Detected VIPT I-cache on CPU2
+&lt;6&gt;[  334.715958] -(2)[0:swapper/2]GICv3: CPU2: found redistributor 2 region 0:0x000000000c0c0000
+&lt;6&gt;[  334.715982] -(2)[0:swapper/2]CPU2: update cpu_capacity 1024
+&lt;6&gt;[  334.715987] -(2)[0:swapper/2]CPU2: Booted secondary processor [410fd034]
+&lt;6&gt;[  334.716840]  (0)[2918:Binder:389_2]CPU2 is up
+&lt;6&gt;[  334.717703] -(3)[0:swapper/3]Detected VIPT I-cache on CPU3
+&lt;6&gt;[  334.717725] -(3)[0:swapper/3]GICv3: CPU3: found redistributor 3 region 0:0x000000000c0e0000
+&lt;6&gt;[  334.717750] -(3)[0:swapper/3]CPU3: update cpu_capacity 1024
+&lt;6&gt;[  334.717755] -(3)[0:swapper/3]CPU3: Booted secondary processor [410fd034]
+&lt;6&gt;[  334.719429]  (0)[2918:Binder:389_2]CPU3 is up
+&lt;6&gt;[  334.721390]  (0)[2918:Binder:389_2]PM: noirq resume of devices complete after 1.798 msecs
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>&lt;6&gt;[  334.713139] -(0)[2918:Binder:389_2]Suspended for 260.188 seconds</p>
+<ul>
+<li><p>Suspended for 260.188 seconds</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deep Sleep &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Deep Sleep</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#linux">Linux系统电源状态</a></li>
+<li><a class="reference internal" href="#android">Android电源模式</a></li>
+<li><a class="reference internal" href="#id2">处理方式</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Deep Sleep</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deep-sleep">
+<h1>Deep Sleep<a class="headerlink" href="#deep-sleep" title="Permalink to this headline"></a></h1>
+<p>深睡眠机制，貌似树莓派上没使用</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.jianshu.com/p/cc553c9c75b0">Android电源管理基础知识整理</a></p></li>
+<li><p><a class="reference external" href="http://www.wowotech.net/pm_subsystem/wakelocks.html">Linux电源管理(9)_wakelocks</a></p></li>
+<li><p><a class="reference external" href="http://www.wowotech.net/pm_subsystem/autosleep.html">Linux电源管理(10)_autosleep</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/dachai/article/details/103785380">使用sleepgraph工具分析并优化suspend/resume流程</a></p></li>
+<li><p>https://github.com/intel/pm-graph</p></li>
+<li><p><a class="reference external" href="http://www.wowotech.net/pm_subsystem/237.html">Linux进程冻结技术</a></p></li>
+</ul>
+</section>
+<section id="linux">
+<h1>Linux系统电源状态<a class="headerlink" href="#linux" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ACPI</p></th>
+<th class="head"><p>State</p></th>
+<th class="head"><p>Linux State	Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>S0</p></td>
+<td><p>On(on)</p></td>
+<td><p>Working</p></td>
+</tr>
+<tr class="row-odd"><td><p>S1</p></td>
+<td><p>Standby(standby)</p></td>
+<td><p>CPU and RAM are powered but not executed</p></td>
+</tr>
+<tr class="row-even"><td><p>S2</p></td>
+<td><p>——</p></td>
+<td><p>——</p></td>
+</tr>
+<tr class="row-odd"><td><p>S3</p></td>
+<td><p>Suspend to RAM（mem)</p></td>
+<td><p>CPU is Off,RAM is powered and the running content is saved to RAM</p></td>
+</tr>
+<tr class="row-even"><td><p>S4</p></td>
+<td><p>Suspend to Disk(disk)</p></td>
+<td><p>All content is saved to Disk and power down</p></td>
+</tr>
+<tr class="row-odd"><td><p>S5</p></td>
+<td><p>Shutdown</p></td>
+<td><p>Shutdown the system</p></td>
+</tr>
+</tbody>
+</table>
+<p>STR(Suspend to RAM): 挂起到内存，俗称待机、睡眠（Sleep），进入该状态，系统的主要工作如下：</p>
+<ol class="arabic simple">
+<li><p>将系统当前的运行状态等数据保存在内存中，此时仍需要向RAM供电，以保证后续快速恢复至工作状态</p></li>
+<li><p>冻结用户态的进程和内核态的任务（进入内核态的进程或内核自己的task）</p></li>
+<li><p>关闭外围设备，如显示屏、鼠标等,中断唤醒外设不会关闭，如电源键</p></li>
+<li><p>CPU停止工作</p></li>
+</ol>
+<p>Standby也属于睡眠的一种方式，属于浅睡眠。该模式下CPU并未断电，依旧可以接收处理某些特定事件，视具体设备而定，恢复至正常工作状态的速度也比STR更快，但也更为耗电。举个例子来说，以该方式进入睡眠时，后续通过点击键盘也能将系统唤醒。而以mem进入的睡眠为深度睡眠，只能通过中断唤醒设备唤醒系统，如电源键(此时按电源键，不会经过正常的开机流程的BIOS、BOOTLOAD等)，此时按键盘是无法唤醒系统的。</p>
+<p>STD(Suspend to Disk): 挂起到硬盘，俗称休眠（Hibernation）将系统当前的运行状态等数据保存到硬盘上，并自动关机。下次开机时便从硬盘上读取之前保存的数据，恢复到休眠关机之前的状态。
+譬如在休眠关机时，桌面打开了一个应用，那么下一次开机启动时，该应用也处于打开状态。而正常的关机-开机流程，该应用是不会打开的。</p>
+<p>在新版内核中，进程freeze的功能被单独抽离出来作为一个电源状态，该状态仅仅是冻结进程，并不会使系统进入低功耗状态（如切断CPU时钟源、关闭外设供电等）。相当于是Standby状态。</p>
+<p>autosleep也是从Android wakelocks补丁集中演化而来的（Linux电源管理(9)_wakelocks），用于取代Android wakelocks中的自动休眠功能。它基于wakeup source实现。autosleep的功能很已经很直白了，”系统没有事情在做”的时候，就将系统切换到低功耗状态。autosleep的实现位于kernel/power/autosleep.c中，基于wakeup count和suspend &amp; hibernate功能，并通过PM core的main模块向用户空间提供sysfs文件（/sys/power/autosleep）。</p>
+<p>相比Android wakelocks，Kernel wakelocks的实现非常简单（简单的才是最好的），就是在PM core中增加一个wakelock模块（kernel/power/wakelock.c），该模块依赖wakeup events framework提供的wakeup source机制，实现用户空间的wakeup source（就是wakelocks），并通过PM core main模块，向用户空间提供两个同名的sysfs文件，wake_lock和wake_unlock。</p>
+</section>
+<section id="android">
+<h1>Android电源模式<a class="headerlink" href="#android" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">/sys/power/state</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">freeze</span> <span class="n">mem</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>处理方式<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>禁止debug工具；</p></li>
+<li><p>进入飞行模式；</p></li>
+<li><p>断开USB连接线；</p></li>
+<li><p>通过uart口看是否杀死其他CPU，无log输出，进入mtk_spm_suspend_process；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tools</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">pm</span><span class="o">-</span><span class="n">graph</span><span class="o">/</span><span class="n">sleepgraph</span><span class="o">.</span><span class="n">py</span>
+<span class="mi">3604</span><span class="p">:</span>               <span class="s1">&#39;post_resume&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.*Restarting tasks \.\.\..*&#39;</span><span class="p">],</span>
+
+<span class="n">kernel</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">process</span><span class="o">.</span><span class="n">c</span>
+<span class="mi">202</span><span class="p">:</span>    <span class="n">pr_info</span><span class="p">(</span><span class="s2">&quot;Restarting tasks ... &quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

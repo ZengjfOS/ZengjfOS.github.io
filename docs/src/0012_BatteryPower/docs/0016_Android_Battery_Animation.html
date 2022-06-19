@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android Battery Animation &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Battery Animation</a></li>
+<li><a class="reference internal" href="#charger-block">Charger Block</a></li>
+<li><a class="reference internal" href="#charger">charger模式进程情况</a></li>
+<li><a class="reference internal" href="#health-hal-service">health hal service</a></li>
+<li><a class="reference internal" href="#kpoc-charger-health-binder">kpoc_charger health binder</a></li>
+<li><a class="reference internal" href="#kpoc-charger">kpoc_charger绘制电量图</a></li>
+<li><a class="reference internal" href="#screen-power-on-off">Screen Power ON/OFF</a></li>
+<li><a class="reference internal" href="#id1">获取电量</a></li>
+<li><a class="reference internal" href="#kernel-battery-driver">kernel battery driver</a></li>
+<li><a class="reference internal" href="#capacity">Capacity</a></li>
+<li><a class="reference internal" href="#id2">电池曲线</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android Battery Animation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-battery-animation">
+<h1>Android Battery Animation<a class="headerlink" href="#android-battery-animation" title="Permalink to this headline"></a></h1>
+<p>关机充电动画怎么工作的，如何获取电量信息，无mobile log，只能看uart port</p>
+</section>
+<section id="charger-block">
+<h1>Charger Block<a class="headerlink" href="#charger-block" title="Permalink to this headline"></a></h1>
+<p>如下是实际Rsense实际连接图，CS_N/CS_P就是ISENSE/BATSNS，其会连进Gauge中。NTC连接热敏电阻，从而可以测量电池温度。</p>
+<p><img alt="0016_Android_Battery_SCH.png" src="../../../_images/0016_Android_Battery_SCH.png" /></p>
+</section>
+<section id="charger">
+<h1>charger模式进程情况<a class="headerlink" href="#charger" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>如下是procrank输出情况，ps -A输出了内核线程，太多了，procrank只输出用户进程情况，貌似有时候无效</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">PID</span>       <span class="n">Vss</span>      <span class="n">Rss</span>      <span class="n">Pss</span>      <span class="n">Uss</span>  <span class="n">cmdline</span>
+  <span class="mi">389</span>    <span class="mi">57280</span><span class="n">K</span>   <span class="mi">20396</span><span class="n">K</span>   <span class="mi">19341</span><span class="n">K</span>   <span class="mi">18488</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">kpoc_charger</span>
+    <span class="mi">1</span>    <span class="mi">88064</span><span class="n">K</span>   <span class="mi">10716</span><span class="n">K</span>    <span class="mi">6004</span><span class="n">K</span>    <span class="mi">4632</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">init</span>
+  <span class="mi">363</span>    <span class="mi">39520</span><span class="n">K</span>    <span class="mi">7828</span><span class="n">K</span>    <span class="mi">3245</span><span class="n">K</span>    <span class="mi">1960</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">init</span>
+  <span class="mi">365</span>    <span class="mi">39008</span><span class="n">K</span>    <span class="mi">7740</span><span class="n">K</span>    <span class="mi">3240</span><span class="n">K</span>    <span class="mi">2012</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">ueventd</span>
+  <span class="mi">378</span>  <span class="mi">2136056</span><span class="n">K</span>    <span class="mi">6044</span><span class="n">K</span>    <span class="mi">2878</span><span class="n">K</span>    <span class="mi">2496</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">hwservicemanager</span>
+  <span class="mi">364</span>    <span class="mi">39008</span><span class="n">K</span>    <span class="mi">6968</span><span class="n">K</span>    <span class="mi">2565</span><span class="n">K</span>    <span class="mi">1372</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">init</span>
+  <span class="mi">405</span>    <span class="mi">38056</span><span class="n">K</span>    <span class="mi">5796</span><span class="n">K</span>    <span class="mi">2469</span><span class="n">K</span>    <span class="mi">1580</span><span class="n">K</span>  <span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">light</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">service</span><span class="o">-</span><span class="n">mediatek</span><span class="o">-</span><span class="n">lazy</span>
+  <span class="mi">401</span>    <span class="mi">37588</span><span class="n">K</span>    <span class="mi">5340</span><span class="n">K</span>    <span class="mi">2018</span><span class="n">K</span>    <span class="mi">1136</span><span class="n">K</span>  <span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">health</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">service</span>
+  <span class="mi">387</span>     <span class="mi">9552</span><span class="n">K</span>    <span class="mi">2960</span><span class="n">K</span>    <span class="mi">1949</span><span class="n">K</span>    <span class="mi">1100</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">volte_md_status</span>
+  <span class="mi">376</span>   <span class="mi">141924</span><span class="n">K</span>    <span class="mi">4932</span><span class="n">K</span>    <span class="mi">1937</span><span class="n">K</span>    <span class="mi">1492</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">logd</span>
+  <span class="mi">379</span>    <span class="mi">36312</span><span class="n">K</span>    <span class="mi">4132</span><span class="n">K</span>    <span class="mi">1425</span><span class="n">K</span>    <span class="mi">1048</span><span class="n">K</span>  <span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">vndservicemanager</span>
+  <span class="mi">407</span>    <span class="mi">52372</span><span class="n">K</span>    <span class="mi">3976</span><span class="n">K</span>    <span class="mi">1289</span><span class="n">K</span>     <span class="mi">736</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">traced</span>
+  <span class="mi">408</span>    <span class="mi">52372</span><span class="n">K</span>    <span class="mi">3864</span><span class="n">K</span>    <span class="mi">1202</span><span class="n">K</span>     <span class="mi">656</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">traced_probes</span>
+  <span class="mi">377</span>    <span class="mi">35664</span><span class="n">K</span>    <span class="mi">3936</span><span class="n">K</span>    <span class="mi">1113</span><span class="n">K</span>     <span class="mi">796</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">servicemanager</span>
+  <span class="mi">409</span>    <span class="mi">34700</span><span class="n">K</span>    <span class="mi">3744</span><span class="n">K</span>     <span class="mi">999</span><span class="n">K</span>     <span class="mi">616</span><span class="n">K</span>  <span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">stp_dump3</span>
+  <span class="mi">425</span>    <span class="mi">52032</span><span class="n">K</span>    <span class="mi">3296</span><span class="n">K</span>     <span class="mi">969</span><span class="n">K</span>     <span class="mi">756</span><span class="n">K</span>  <span class="n">procrank</span>
+  <span class="mi">402</span>    <span class="mi">33596</span><span class="n">K</span>    <span class="mi">3264</span><span class="n">K</span>     <span class="mi">936</span><span class="n">K</span>     <span class="mi">588</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+  <span class="mi">417</span>    <span class="mi">33596</span><span class="n">K</span>    <span class="mi">3264</span><span class="n">K</span>     <span class="mi">926</span><span class="n">K</span>     <span class="mi">580</span><span class="n">K</span>  <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+                           <span class="o">------</span>   <span class="o">------</span>  <span class="o">------</span>
+                           <span class="mi">54513</span><span class="n">K</span>   <span class="mi">42044</span><span class="n">K</span>  <span class="n">TOTAL</span>
+
+ <span class="n">RAM</span><span class="p">:</span> <span class="mi">1892880</span><span class="n">K</span> <span class="n">total</span><span class="p">,</span> <span class="mi">1754584</span><span class="n">K</span> <span class="n">free</span><span class="p">,</span> <span class="mi">1816</span><span class="n">K</span> <span class="n">buffers</span><span class="p">,</span> <span class="mi">36376</span><span class="n">K</span> <span class="n">cached</span><span class="p">,</span> <span class="mi">1656</span><span class="n">K</span> <span class="n">shmem</span><span class="p">,</span> <span class="mi">42392</span><span class="n">K</span> <span class="n">slab</span>
+</pre></div>
+</div>
+</li>
+<li><p>ps -ef | awk ‘$3!= “2” {print $0}’</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>UID            PID  PPID C STIME TTY          TIME CMD
+root             1     0 1 00:00:07 ?     00:00:03 init second_stage
+root             2     0 0 00:00:07 ?     00:00:00 [kthreadd]
+root           362     1 0 00:00:12 ?     00:00:00 init subcontext u:r:vendor_init:s0 12
+root           363     1 0 00:00:12 ?     00:00:00 init subcontext u:r:vendor_init:s0 13
+root           364     1 0 00:00:13 ?     00:00:01 ueventd
+logd           375     1 0 00:00:14 ?     00:00:00 logd
+system         376     1 0 00:00:14 ?     00:00:00 servicemanager
+system         377     1 0 00:00:14 ?     00:00:00 hwservicemanager
+system         378     1 0 00:00:14 ?     00:00:00 vndservicemanager /dev/vndbinder
+root           386     1 0 00:00:14 ?     00:00:00 volte_md_status
+root           388     1 1 00:00:14 ?     00:00:03 kpoc_charger
+system         399     1 0 00:00:14 ?     00:00:00 android.hardware.health@2.0-service
+shell          401     1 0 00:00:14 4:64  00:00:00 sh
+nobody         404     1 0 00:00:14 ?     00:00:00 traced
+nobody         405     1 0 00:00:14 ?     00:00:00 traced_probes
+system         406     1 0 00:00:14 ?     00:00:00 stp_dump3
+system         409     1 0 00:00:15 ?     00:00:00 android.hardware.light@2.0-service-mediatek-lazy
+shell          441   401 5 00:07:47 4:64  00:00:00 ps -ef
+shell          442   401 0 00:07:47 4:64  00:00:00 awk $3!= &quot;2&quot; {print $0}
+</pre></div>
+</div>
+</li>
+<li><p>ps -A | grep healthd</p>
+<ul>
+<li><p>暂时不知道为什么没有这个进程</p></li>
+<li><p>可能是这个overrides导致的</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span>  <span class="n">system</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">healthd</span><span class="o">/</span><span class="n">Android</span><span class="o">.</span><span class="n">bp</span>
+
+<span class="n">cc_library_static</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;libbatterymonitor&quot;</span><span class="p">,</span>
+    <span class="n">srcs</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;BatteryMonitor.cpp&quot;</span><span class="p">],</span>
+    <span class="n">cflags</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;-Wall&quot;</span><span class="p">,</span> <span class="s2">&quot;-Werror&quot;</span><span class="p">],</span>
+    <span class="n">vendor_available</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="n">recovery_available</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="n">export_include_dirs</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;include&quot;</span><span class="p">],</span>
+    <span class="n">shared_libs</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;libutils&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;libbase&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">header_libs</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;libhealthd_headers&quot;</span><span class="p">],</span>
+    <span class="n">export_header_lib_headers</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;libhealthd_headers&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="o">...</span><span class="n">省略</span>
+
+<span class="n">cc_binary</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;android.hardware.health@2.0-service&quot;</span><span class="p">,</span>
+    <span class="n">defaults</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;android.hardware.health@2.0-service_defaults&quot;</span><span class="p">],</span>
+
+    <span class="n">vendor</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="n">relative_install_path</span><span class="p">:</span> <span class="s2">&quot;hw&quot;</span><span class="p">,</span>
+    <span class="n">init_rc</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;android.hardware.health@2.0-service.rc&quot;</span><span class="p">],</span>
+    <span class="n">srcs</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;HealthServiceDefault.cpp&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+
+    <span class="n">overrides</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;healthd&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<p>主要进程如下：</p>
+<ul class="simple">
+<li><p>ueventd</p></li>
+<li><p>/system/bin/kpoc_charger</p></li>
+<li><p>/system/bin/logd</p></li>
+<li><p>/vendor/bin/hw/android.hardware.health&#64;2.0-service</p></li>
+<li><p>/vendor/bin/hw/android.hardware.light&#64;2.0-service-mediatek-lazy</p></li>
+</ul>
+<p>如下是charger主函数main使用到health、light对应的service的init，其主要是获取服务的Binder</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// vendor/mediatek/proprietary/external/charger/main.cpp</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">__attribute__</span><span class="p">((</span><span class="n">unused</span><span class="p">))</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">unused</span><span class="p">))</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="n">health_service_init</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">light_init</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//stop_backlight();</span>
+<span class="w">    </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;stop_backlight 1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="health-hal-service">
+<h1>health hal service<a class="headerlink" href="#health-hal-service" title="Permalink to this headline"></a></h1>
+<p>确认一下health service涉及的代码在哪里</p>
+<ul>
+<li><p>vendor/etc/init/android.hardware.health&#64;2.0-service.rc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">health</span><span class="o">-</span><span class="n">hal</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">0</span> <span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">hw</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">health</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">service</span>
+    <span class="k">class</span> <span class="nc">hal</span>
+    <span class="n">user</span> <span class="n">system</span>
+    <span class="n">group</span> <span class="n">system</span>
+    <span class="n">capabilities</span> <span class="n">WAKE_ALARM</span>
+    <span class="n">file</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">kmsg</span> <span class="n">w</span>
+</pre></div>
+</div>
+</li>
+<li><p>源代码位于system/core/healthd，由上面的进程信息可知，没有跑healthd，只跑了HIDL的service；</p></li>
+<li><p>system/core/healthd/Android.bp</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>cc_defaults {
+    name: &quot;android.hardware.health@2.0-service_defaults&quot;,
+
+    cflags: [
+        &quot;-Wall&quot;,
+        &quot;-Werror&quot;,
+    ],
+
+    static_libs: [
+        &quot;android.hardware.health@2.0-impl&quot;,
+        &quot;android.hardware.health@1.0-convert&quot;,
+        &quot;libhealthservice&quot;,
+        &quot;libhealthstoragedefault&quot;,
+        &quot;libbatterymonitor&quot;,
+    ],
+
+    shared_libs: [
+        &quot;libbase&quot;,
+        &quot;libcutils&quot;,
+        &quot;libhidlbase&quot;,
+        &quot;libhidltransport&quot;,
+        &quot;libhwbinder&quot;,
+        &quot;liblog&quot;,
+        &quot;libutils&quot;,
+        &quot;android.hardware.health@2.0&quot;,
+    ],
+}
+
+cc_binary {
+    name: &quot;android.hardware.health@2.0-service&quot;,
+    defaults: [&quot;android.hardware.health@2.0-service_defaults&quot;],
+
+    vendor: true,
+    relative_install_path: &quot;hw&quot;,
+    init_rc: [&quot;android.hardware.health@2.0-service.rc&quot;],
+    srcs: [
+        &quot;HealthServiceDefault.cpp&quot;,
+    ],
+
+    overrides: [
+        &quot;healthd&quot;,
+    ]
+}
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>“libhealthservice”,</p>
+<ul>
+<li><p>hardware/interfaces/health/2.0/utils/libhealthservice</p></li>
+</ul>
+</li>
+<li><p>“android.hardware.health&#64;2.0-impl”,</p>
+<ul>
+<li><p>hardware/interfaces/health/2.0/default/Android.bp</p></li>
+</ul>
+</li>
+<li><p>“android.hardware.health&#64;1.0-convert”,</p>
+<ul>
+<li><p>hardware/interfaces/health/1.0/default/Android.bp</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="kpoc-charger-health-binder">
+<h1>kpoc_charger health binder<a class="headerlink" href="#kpoc-charger-health-binder" title="Permalink to this headline"></a></h1>
+<p>kpoc_charger通过binder通信获取电量，依赖的库如下所示</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="n">charger</span>
+  <span class="o">*</span> <span class="n">Android</span><span class="o">.</span><span class="n">mk</span>
+    <span class="o">*</span> <span class="n">LOCAL_STATIC_LIBRARIES</span> <span class="o">:=</span> <span class="n">libhealthhalutils</span>
+        <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">utils</span><span class="o">/</span><span class="n">libhealthhalutils</span>
+</pre></div>
+</div>
+</section>
+<section id="kpoc-charger">
+<h1>kpoc_charger绘制电量图<a class="headerlink" href="#kpoc-charger" title="Permalink to this headline"></a></h1>
+<p>kpoc_charger内部线程工作架构如下</p>
+<p><img alt="0016_Android_Charger_Threads.png" src="../../../_images/0016_Android_Charger_Threads.png" /></p>
+<p>每一帧图绘图由该函数处理：bootlogo_show_charging</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// vendor/mediatek/proprietary/external/charger/bootlogo.cpp</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Show charging animation with battery capacity</span>
+<span class="cm"> *</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">bootlogo_show_charging</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">capacity</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">cnt</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;[ChargingAnimation: %s %d]%d, %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">__FUNCTION__</span><span class="p">,</span><span class="n">__LINE__</span><span class="p">,</span><span class="w"> </span><span class="n">capacity</span><span class="p">,</span><span class="w"> </span><span class="n">cnt</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">get_battnotify_status</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;[ChargingAnimation: %s %d] show_charger_error_logo, get_battnotify_status()= %d </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">__FUNCTION__</span><span class="p">,</span><span class="n">__LINE__</span><span class="p">,</span><span class="w"> </span><span class="n">get_battnotify_status</span><span class="p">());</span><span class="w"></span>
+<span class="w">        </span><span class="n">show_charger_ov_logo</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">showLowBattLogo</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;[ChargingAnimation: %s %d] show_low_battery , showLowBattLogo = %d </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">__FUNCTION__</span><span class="p">,</span><span class="n">__LINE__</span><span class="p">,</span><span class="n">showLowBattLogo</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">show_low_battery</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">show_battery_capacity</span><span class="p">(</span><span class="n">capacity</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="screen-power-on-off">
+<h1>Screen Power ON/OFF<a class="headerlink" href="#screen-power-on-off" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>blank_mode这个参数的值主要有两个，FB_BLANK_UNBLANK和FB_BLANK_POWERDOWN，</p>
+<ul class="simple">
+<li><p>FB_BLANK_UNBLANK是亮屏操作；</p></li>
+<li><p>FB_BLANK_POWERDOWN 是灭屏操作；</p></li>
+</ul>
+</li>
+<li><p>屏上电</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// vendor/mediatek/proprietary/external/charger/charging_control.cpp</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">draw_with_interval</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">func</span><span class="p">)(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">bc</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">total_time_msec</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">interval_msec</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">time_exceed</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="w"> </span><span class="n">total_time_msec</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">key_trigger_suspend</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// ...省略</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">resume_started</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">resume_started</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/* make fb unblank */</span><span class="w"></span>
+<span class="w">            </span><span class="n">snprintf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;/dev/graphics/fb0&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">fd_fb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="n">O_RDWR</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fd_fb</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;Failed to open fb0 device: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ioctl</span><span class="p">(</span><span class="n">fd_fb</span><span class="p">,</span><span class="w"> </span><span class="n">FBIOBLANK</span><span class="p">,</span><span class="w"> </span><span class="n">FB_BLANK_UNBLANK</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;Failed to unblank fb0 device: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fd_fb</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">close</span><span class="p">(</span><span class="n">fd_fb</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>屏下电</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="nf">draw_thread_routine</span><span class="p">(</span><span class="n">__attribute__</span><span class="p">((</span><span class="n">unused</span><span class="p">))</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">arg</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// ...省略</span>
+
+<span class="w">        </span><span class="n">snprintf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;/dev/graphics/fb0&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">fd_fb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="n">O_RDWR</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fd_fb</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;Failed to open fb0 device: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ioctl</span><span class="p">(</span><span class="n">fd_fb</span><span class="p">,</span><span class="w"> </span><span class="n">FBIOBLANK</span><span class="p">,</span><span class="w"> </span><span class="n">FB_BLANK_POWERDOWN</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">KPOC_LOGI</span><span class="p">(</span><span class="s">&quot;Failed to blank fb0 device: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fd_fb</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">close</span><span class="p">(</span><span class="n">fd_fb</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id1">
+<h1>获取电量<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>获取电量函数调用流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="n">charger</span><span class="o">/</span><span class="n">charging_control</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">bc</span> <span class="o">=</span> <span class="n">get_capacity</span><span class="p">();</span>
+    <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">get_health_capacity</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bat_level</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">auto</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">g_health</span><span class="o">-&gt;</span><span class="n">getCapacity</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">Health</span><span class="o">.</span><span class="n">cpp</span>
+          <span class="o">*</span> <span class="n">Return</span><span class="o">&lt;</span><span class="n">void</span><span class="o">&gt;</span> <span class="n">Health</span><span class="p">::</span><span class="n">getCapacity</span><span class="p">(</span><span class="n">getCapacity_cb</span> <span class="n">_hidl_cb</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">getProperty</span><span class="o">&lt;</span><span class="n">int32_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">battery_monitor_</span><span class="p">,</span> <span class="n">BATTERY_PROP_CAPACITY</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_hidl_cb</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">status_t</span> <span class="n">err</span> <span class="o">=</span> <span class="n">monitor</span><span class="o">-&gt;</span><span class="n">getProperty</span><span class="p">(</span><span class="n">static_cast</span><span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">prop</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">healthd</span><span class="o">/</span><span class="n">BatteryMonitor</span><span class="o">.</span><span class="n">cpp</span>
+                  <span class="o">*</span> <span class="n">status_t</span> <span class="n">BatteryMonitor</span><span class="p">::</span><span class="n">getProperty</span><span class="p">(</span><span class="nb">int</span> <span class="nb">id</span><span class="p">,</span> <span class="n">struct</span> <span class="n">BatteryProperty</span> <span class="o">*</span><span class="n">val</span><span class="p">)</span>
+<span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">health</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">Health</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">Health</span><span class="p">::</span><span class="n">Health</span><span class="p">(</span><span class="n">struct</span> <span class="n">healthd_config</span><span class="o">*</span> <span class="n">c</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">battery_monitor_</span> <span class="o">=</span> <span class="n">std</span><span class="p">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">BatteryMonitor</span><span class="o">&gt;</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">healthd</span><span class="o">/</span><span class="n">BatteryMonitor</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">status_t</span> <span class="n">BatteryMonitor</span><span class="p">::</span><span class="n">getProperty</span><span class="p">(</span><span class="nb">int</span> <span class="nb">id</span><span class="p">,</span> <span class="n">struct</span> <span class="n">BatteryProperty</span> <span class="o">*</span><span class="n">val</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">case</span> <span class="n">BATTERY_PROP_CAPACITY</span><span class="p">:</span>
+            <span class="o">*</span> <span class="n">val</span><span class="o">-&gt;</span><span class="n">valueInt64</span> <span class="o">=</span> <span class="n">getIntField</span><span class="p">(</span><span class="n">mHealthdConfig</span><span class="o">-&gt;</span><span class="n">batteryCapacityPath</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">readFromFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">battery_monitor_</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">healthd</span><span class="o">/</span><span class="n">BatteryMonitor</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">BatteryMonitor</span><span class="p">::</span><span class="n">init</span><span class="p">(</span><span class="n">struct</span> <span class="n">healthd_config</span> <span class="o">*</span><span class="n">hc</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">mHealthdConfig</span><span class="o">-&gt;</span><span class="n">batteryCapacityPath</span><span class="o">.</span><span class="n">isEmpty</span><span class="p">()</span>
+            <span class="o">*</span> <span class="n">path</span><span class="o">.</span><span class="n">appendFormat</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">/capacity&quot;</span><span class="p">,</span> <span class="n">POWER_SUPPLY_SYSFS_PATH</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+              <span class="o">*</span> <span class="c1">#define POWER_SUPPLY_SUBSYSTEM &quot;power_supply&quot;</span>
+              <span class="o">*</span> <span class="c1">#define POWER_SUPPLY_SYSFS_PATH &quot;/sys/class/&quot; POWER_SUPPLY_SUBSYSTEM</span>
+              <span class="o">*</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">class</span><span class="o">/</span><span class="n">power_supply</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">capacity</span>
+</pre></div>
+</div>
+</li>
+<li><p>uart调试port</p>
+<ul>
+<li><p>ls /sys/class/power_supply</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ac</span> <span class="n">battery</span> <span class="n">charger</span> <span class="n">usb</span>
+</pre></div>
+</div>
+</li>
+<li><p>cat /sys/class/power_supply/battery/capacity</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">14</span>
+</pre></div>
+</div>
+</li>
+<li><p>ls /sys/class/power_supply/battery/*</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>console:/ $ ls /sys/class/power_supply/battery/*
+
+/sys/class/power_supply/battery/battery_version
+/sys/class/power_supply/battery/capacity
+/sys/class/power_supply/battery/capacity_level
+/sys/class/power_supply/battery/charge_counter
+/sys/class/power_supply/battery/charge_full
+/sys/class/power_supply/battery/current_avg
+/sys/class/power_supply/battery/current_now
+/sys/class/power_supply/battery/cycle_count
+/sys/class/power_supply/battery/health
+/sys/class/power_supply/battery/manufacturer
+/sys/class/power_supply/battery/present
+/sys/class/power_supply/battery/serial_number
+/sys/class/power_supply/battery/soh
+/sys/class/power_supply/battery/status
+/sys/class/power_supply/battery/technology
+/sys/class/power_supply/battery/temp
+/sys/class/power_supply/battery/type
+/sys/class/power_supply/battery/uevent
+/sys/class/power_supply/battery/voltage_now
+
+/sys/class/power_supply/battery/device:
+BAT_EC                        UI_SOC           power_supply
+Battery_Temperature           disable_nafg     reset_aging_factor
+FG_Battery_CurrentConsumption driver           reset_battery_cycle
+FG_daemon_disable             driver_override  shutdown_condition_enable
+FG_daemon_log_level           modalias         subsystem
+FG_meter_resistance           ntc_disable_nafg uevent
+Power_Off_Voltage             of_node          uisoc_update_type
+Power_On_Voltage              power
+
+/sys/class/power_supply/battery/power:
+autosuspend_delay_ms   wakeup              wakeup_expire_count
+control                wakeup_abort_count  wakeup_last_time_ms
+runtime_active_time    wakeup_active       wakeup_max_time_ms
+runtime_status         wakeup_active_count wakeup_total_time_ms
+runtime_suspended_time wakeup_count
+
+/sys/class/power_supply/battery/subsystem:
+ac battery charger usb
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>kernel-4.9/drivers/power/supply/power_supply_sysfs.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">device_attribute</span><span class="w"> </span><span class="n">power_supply_attrs</span><span class="p">[]</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Properties of type `int&#39; */</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">status</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_type</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">health</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">present</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">online</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">authentic</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">technology</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">cycle_count</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_max</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_min</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_max_design</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_min_design</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_now</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_avg</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_ocv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">voltage_boot</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">current_max</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">current_now</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">current_avg</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">current_boot</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">power_now</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">power_avg</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_full_design</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_empty_design</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_full</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_empty</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_now</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_avg</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_ATTR</span><span class="p">(</span><span class="n">charge_counter</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="kernel-battery-driver">
+<h1>kernel battery driver<a class="headerlink" href="#kernel-battery-driver" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>kernel-4.9/arch/arm64/boot/dts/mediatek/bat_setting/mt6765_battery_prop.dtsi</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bat_gm30</span><span class="p">:</span> <span class="n">battery</span><span class="p">{</span>
+    <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;mediatek,bat_gm30&quot;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Charging</span> <span class="n">termination</span> <span class="n">current</span><span class="o">.*/</span>
+    <span class="n">DIFFERENCE_FULLOCV_ITH</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span><span class="n">If</span> <span class="n">ui_soc</span> <span class="n">shows</span> <span class="mi">1</span><span class="o">%</span> <span class="n">more</span> <span class="n">than</span> <span class="n">X</span> <span class="n">minites</span><span class="p">,</span> <span class="n">system</span> <span class="n">will</span> <span class="n">shutdown</span><span class="o">.*/</span>
+    <span class="n">SHUTDOWN_1_TIME</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span><span class="n">The</span> <span class="n">ui_soc</span> <span class="n">will</span> <span class="n">keep</span> <span class="mi">100</span><span class="o">%</span> <span class="n">until</span> <span class="n">SOC</span> <span class="n">drop</span> <span class="n">X</span> <span class="n">percents</span> <span class="n">after</span> <span class="n">unplugged</span><span class="o">.*/</span>
+    <span class="n">KEEP_100_PERCENT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">R_sense</span> <span class="n">resistance</span><span class="o">.*/</span>
+    <span class="n">R_FG_VALUE</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Configures</span> <span class="n">whether</span> <span class="n">using</span> <span class="n">embedded</span> <span class="n">battery</span> <span class="ow">or</span> <span class="ow">not</span><span class="o">.*/</span>
+    <span class="n">EMBEDDED_SEL</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">System</span> <span class="n">shutdown</span> <span class="n">current</span><span class="o">.*/</span>
+    <span class="n">PMIC_SHUTDOWN_CURRENT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">The</span> <span class="n">resistance</span> <span class="n">of</span> <span class="n">PCB</span><span class="o">*/</span>
+    <span class="n">FG_METER_RESISTANCE</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">75</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Tune</span> <span class="n">value</span> <span class="k">for</span> <span class="n">current</span> <span class="n">measurement</span><span class="o">.*/</span>
+    <span class="n">CAR_TUNE_VALUE</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">104</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Battery</span> <span class="n">temperature</span> <span class="n">T0</span><span class="o">*/</span>
+    <span class="n">PMIC_MIN_VOL</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">33500</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">vboot</span> <span class="n">voltage</span> <span class="k">for</span> <span class="n">gauge</span> <span class="mi">0</span><span class="o">%.*/</span>
+    <span class="n">POWERON_SYSTEM_IBOOT</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">power</span> <span class="n">on</span> <span class="n">system</span> <span class="n">iboot</span><span class="o">*/</span>
+    <span class="n">SHUTDOWN_GAUGE0_VOLTAGE</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">34000</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">shutdown</span> <span class="n">gauge</span> <span class="mi">0</span><span class="o">%</span> <span class="n">voltage</span><span class="o">*/</span>
+    <span class="n">TEMPERATURE_T0</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Battery</span> <span class="n">temperature</span> <span class="n">T1</span><span class="o">*/</span>
+    <span class="n">TEMPERATURE_T1</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Battery</span> <span class="n">temperature</span> <span class="n">T2</span><span class="o">*/</span>
+    <span class="n">TEMPERATURE_T2</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Battery</span> <span class="n">temperature</span> <span class="n">T3</span><span class="o">*/</span>
+    <span class="n">TEMPERATURE_T3</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Pseudo</span> <span class="mi">100</span><span class="o">%</span> <span class="n">percentage</span> <span class="n">at</span> <span class="n">T0</span><span class="o">.*/</span>
+    <span class="n">g_FG_PSEUDO100_T0</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Pseudo</span> <span class="mi">100</span><span class="o">%</span> <span class="n">percentage</span> <span class="n">at</span> <span class="n">T1</span><span class="o">.*/</span>
+    <span class="n">g_FG_PSEUDO100_T1</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Pseudo</span> <span class="mi">100</span><span class="o">%</span> <span class="n">percentage</span> <span class="n">at</span> <span class="n">T2</span><span class="o">.*/</span>
+    <span class="n">g_FG_PSEUDO100_T2</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">Pseudo</span> <span class="mi">100</span><span class="o">%</span> <span class="n">percentage</span> <span class="n">at</span> <span class="n">T3</span><span class="o">.*/</span>
+    <span class="n">g_FG_PSEUDO100_T3</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">System</span> <span class="n">shut</span> <span class="n">down</span> <span class="n">voltage</span><span class="o">.*/</span>
+    <span class="n">Q_MAX_SYS_VOLTAGE_BAT0</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">3350</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">System</span> <span class="n">shut</span> <span class="n">down</span> <span class="n">voltage</span><span class="o">.*/</span>
+    <span class="n">Q_MAX_SYS_VOLTAGE_BAT1</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">3350</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">System</span> <span class="n">shut</span> <span class="n">down</span> <span class="n">voltage</span><span class="o">.*/</span>
+    <span class="n">Q_MAX_SYS_VOLTAGE_BAT2</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">3350</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="o">/*</span>  <span class="n">System</span> <span class="n">shut</span> <span class="n">down</span> <span class="n">voltage</span><span class="o">.*/</span>
+    <span class="n">Q_MAX_SYS_VOLTAGE_BAT3</span> <span class="o">=</span> <span class="o">&lt;</span><span class="p">(</span><span class="mi">3350</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="c1">#include &quot;mt6765_battery_table.dtsi&quot;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p>probe</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// kernel-4.9/drivers/power/supply/mediatek/battery/mtk_battery.c</span>
+
+<span class="cp">#ifdef CONFIG_OF</span>
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">of_device_id</span><span class="w"> </span><span class="n">mtk_bat_of_match</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">{.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mediatek,bat_gm30&quot;</span><span class="p">,},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">MODULE_DEVICE_TABLE</span><span class="p">(</span><span class="n">of</span><span class="p">,</span><span class="w"> </span><span class="n">mtk_bat_of_match</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="n">battery_device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;battery&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_driver</span><span class="w"> </span><span class="n">battery_driver_probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_probe</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">remove</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">shutdown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_shutdown</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">suspend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_suspend</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">resume</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_resume</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;battery&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="cp">#ifdef CONFIG_OF</span>
+<span class="w">        </span><span class="p">.</span><span class="n">of_match_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mtk_bat_of_match</span><span class="p">,</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">__init</span><span class="w"> </span><span class="nf">battery_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">platform_driver_register</span><span class="p">(</span><span class="o">&amp;</span><span class="n">battery_driver_probe</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">bm_err</span><span class="p">(</span><span class="s">&quot;[%s] Initialization : DONE</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>power_supply sysfs关联</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="nc">power_supply_property</span><span class="w"> </span><span class="n">battery_props</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_STATUS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_HEALTH</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_PRESENT</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_TECHNOLOGY</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_CYCLE_COUNT</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_CAPACITY</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_CURRENT_NOW</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_CURRENT_AVG</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_VOLTAGE_NOW</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_CHARGE_FULL</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_CHARGE_COUNTER</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">POWER_SUPPLY_PROP_TEMP</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/* battery_data initialization */</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">battery_data</span><span class="w"> </span><span class="n">battery_main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">psd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;battery&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_TYPE_BATTERY</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_props</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">num_properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">battery_props</span><span class="p">),</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">get_property</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_get_property</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_STATUS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_STATUS_DISCHARGING</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_HEALTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_HEALTH_GOOD</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_PRESENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_TECHNOLOGY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_TECHNOLOGY_LION</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_CAPACITY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_batt_vol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">BAT_batt_temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">evb_battery_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_STATUS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_STATUS_FULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_HEALTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_HEALTH_GOOD</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_PRESENT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_TECHNOLOGY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">POWER_SUPPLY_TECHNOLOGY_LION</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_CAPACITY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_batt_vol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4200</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">BAT_batt_temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">22</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">__init</span><span class="w"> </span><span class="nf">battery_probe</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+
+<span class="w">    </span><span class="n">mtk_battery_init</span><span class="p">(</span><span class="n">dev</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Power supply class */</span><span class="w"></span>
+<span class="cp">#if !defined(CONFIG_MTK_DISABLE_GAUGE)</span>
+<span class="w">    </span><span class="n">battery_main</span><span class="p">.</span><span class="n">psy</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">        </span><span class="n">power_supply_register</span><span class="p">(</span><span class="w"></span>
+<span class="w">            </span><span class="o">&amp;</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">battery_main</span><span class="p">.</span><span class="n">psd</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">battery_main</span><span class="p">.</span><span class="n">psy</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_err</span><span class="p">(</span><span class="s">&quot;[BAT_probe] power_supply_register Battery Fail !!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">battery_main</span><span class="p">.</span><span class="n">psy</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">bm_err</span><span class="p">(</span><span class="s">&quot;[BAT_probe] power_supply_register Battery Success !!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>根据数组中的选项选择需要的的文件节点：static enum power_supply_property battery_props[]</p></li>
+</ul>
+</li>
+<li><p>获取数据</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">battery_get_property</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">power_supply</span><span class="w"> </span><span class="o">*</span><span class="n">psy</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">enum</span><span class="w"> </span><span class="nc">power_supply_property</span><span class="w"> </span><span class="n">psp</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">union</span><span class="w"> </span><span class="nc">power_supply_propval</span><span class="w"> </span><span class="o">*</span><span class="n">val</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">fgcurrent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">b_ischarging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">battery_data</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">        </span><span class="n">container_of</span><span class="p">(</span><span class="n">psy</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">battery_data</span><span class="p">,</span><span class="w"> </span><span class="n">psd</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">psp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">POWER_SUPPLY_PROP_CAPACITY</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">gm</span><span class="p">.</span><span class="n">fixed_uisoc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mh">0xffff</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gm</span><span class="p">.</span><span class="n">fixed_uisoc</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">-&gt;</span><span class="n">BAT_CAPACITY</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">POWER_SUPPLY_PROP_CURRENT_NOW</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">b_ischarging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gauge_get_current</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fgcurrent</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">b_ischarging</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">fgcurrent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">fgcurrent</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fgcurrent</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">POWER_SUPPLY_PROP_CURRENT_AVG</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">battery_get_bat_avg_current</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">POWER_SUPPLY_PROP_CHARGE_FULL</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">            </span><span class="n">fg_table_cust_data</span><span class="p">.</span><span class="n">fg_profile</span><span class="p">[</span><span class="n">gm</span><span class="p">.</span><span class="n">battery_id</span><span class="p">].</span><span class="n">q_max</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">POWER_SUPPLY_PROP_CHARGE_COUNTER</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gm</span><span class="p">.</span><span class="n">ui_soc</span><span class="w"> </span><span class="o">*</span><span class="w"></span>
+<span class="w">            </span><span class="n">fg_table_cust_data</span><span class="p">.</span><span class="n">fg_profile</span><span class="p">[</span><span class="n">gm</span><span class="p">.</span><span class="n">battery_id</span><span class="p">].</span><span class="n">q_max</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">POWER_SUPPLY_PROP_VOLTAGE_NOW</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">-&gt;</span><span class="n">BAT_batt_vol</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p>POWER_SUPPLY_PROP_CURRENT_NOW内核调用关系</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">battery_get_property</span><span class="p">(</span><span class="n">struct</span> <span class="n">power_supply</span> <span class="o">*</span><span class="n">psy</span><span class="p">,</span> <span class="n">enum</span> <span class="n">power_supply_property</span> <span class="n">psp</span><span class="p">,</span> <span class="n">union</span> <span class="n">power_supply_propval</span> <span class="o">*</span><span class="n">val</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">case</span> <span class="n">POWER_SUPPLY_PROP_CURRENT_NOW</span><span class="p">:</span>
+      <span class="o">*</span> <span class="n">b_ischarging</span> <span class="o">=</span> <span class="n">gauge_get_current</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fgcurrent</span><span class="p">);</span>
+        <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span>
+          <span class="o">*</span> <span class="nb">bool</span> <span class="n">gauge_get_current</span><span class="p">(</span><span class="nb">int</span> <span class="o">*</span><span class="n">bat_current</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">gauge_dev_get_current</span><span class="p">(</span><span class="n">gm</span><span class="o">.</span><span class="n">gdev</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">is_charging</span><span class="p">,</span> <span class="n">bat_current</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_gauge_class</span><span class="o">.</span><span class="n">c</span>
+                <span class="o">*</span> <span class="nb">int</span> <span class="n">gauge_dev_get_current</span><span class="p">(</span><span class="n">struct</span> <span class="n">gauge_device</span> <span class="o">*</span><span class="n">gauge_dev</span><span class="p">,</span> <span class="nb">bool</span> <span class="o">*</span><span class="n">is_charging</span><span class="p">,</span> <span class="nb">int</span> <span class="o">*</span><span class="n">battery_current</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">gauge_dev</span><span class="o">-&gt;</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">gauge_read_current</span><span class="p">(</span><span class="n">gauge_dev</span><span class="p">,</span> <span class="n">is_charging</span><span class="p">,</span> <span class="n">battery_current</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">pmic</span><span class="o">/</span><span class="n">mt6357</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">mt6357_gauge</span><span class="o">.</span><span class="n">c</span>
+                      <span class="o">*</span> <span class="n">static</span> <span class="n">struct</span> <span class="n">gauge_ops</span> <span class="n">mt6357_gauge_ops</span>
+                        <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">fgauge_read_current</span><span class="p">(</span><span class="n">struct</span> <span class="n">gauge_device</span> <span class="o">*</span><span class="n">gauge_dev</span><span class="p">,</span> <span class="nb">bool</span> <span class="o">*</span><span class="n">fg_is_charging</span><span class="p">,</span> <span class="nb">int</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>fgauge最终读取PMIC处理方法</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">fgauge_read_current</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">gauge_device</span><span class="w"> </span><span class="o">*</span><span class="n">gauge_dev</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="o">*</span><span class="n">fg_is_charging</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">uvalue16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">signed</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dvalue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* HW Init</span>
+<span class="cm">     *(1)    i2c_write (0x60, 0xC8, 0x01); // Enable VA2</span>
+<span class="cm">     *(2)    i2c_write (0x61, 0x15, 0x00); // Enable FGADC clock for digital</span>
+<span class="cm">     *(3)    i2c_write (0x61, 0x69, 0x28);</span>
+<span class="cm">     * // Set current mode, auto-calibration mode and 32KHz clock source</span>
+<span class="cm">     *(4)    i2c_write (0x61, 0x69, 0x29); // Enable FGADC</span>
+<span class="cm">     */</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Read HW Raw Data</span>
+<span class="cm">     *(1)    Set READ command</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmic_config_interface</span><span class="p">(</span><span class="n">MT6357_FGADC_CON1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0001</span><span class="p">,</span><span class="w"> </span><span class="mh">0x000F</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*(2)     Keep i2c read when status = 1 (0x06) */</span><span class="w"></span>
+<span class="w">    </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fg_get_data_ready_status</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">m</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">bm_err</span><span class="p">(</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;[fgauge_read_current] fg_get_data_ready_status timeout 1 !</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     *(3)    Read FG_CURRENT_OUT[15:08]</span>
+<span class="cm">     *(4)    Read FG_CURRENT_OUT[07:00]</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">uvalue16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmic_get_register_value</span><span class="p">(</span><span class="n">PMIC_FG_CURRENT_OUT</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">bm_trace</span><span class="p">(</span><span class="s">&quot;[fgauge_read_current] : FG_CURRENT = %x</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">uvalue16</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     *(5)    (Read other data)</span>
+<span class="cm">     *(6)    Clear status to 0</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmic_config_interface</span><span class="p">(</span><span class="n">MT6357_FGADC_CON1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0008</span><span class="p">,</span><span class="w"> </span><span class="mh">0x000F</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     *(7)    Keep i2c read when status = 0 (0x08)</span>
+<span class="cm">     * while ( fg_get_sw_clear_status() != 0 )</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">fg_get_data_ready_status</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">m</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">bm_err</span><span class="p">(</span><span class="w"></span>
+<span class="w">                    </span><span class="s">&quot;[fgauge_read_current] fg_get_data_ready_status timeout 2 !</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*(8)    Recover original settings */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmic_config_interface</span><span class="p">(</span><span class="n">MT6357_FGADC_CON1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0000</span><span class="p">,</span><span class="w"> </span><span class="mh">0x000F</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*calculate the real world data    */</span><span class="w"></span>
+<span class="w">    </span><span class="n">dvalue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="n">uvalue16</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dvalue</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="w"> </span><span class="n">dvalue</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="n">fg_is_charging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dvalue</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">32767</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/* &gt; 0x8000 */</span><span class="w"></span>
+<span class="w">            </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">dvalue</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">65535</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="n">fg_is_charging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="w"> </span><span class="n">dvalue</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="n">fg_is_charging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Temp_Value</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">UNIT_FGCURRENT</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">do_div</span><span class="p">(</span><span class="n">Temp_Value</span><span class="p">,</span><span class="w"> </span><span class="mi">100000</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dvalue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="n">Temp_Value</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">fg_is_charging</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_trace</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;[fgauge_read_current] current(charging) = %d mA</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">dvalue</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_trace</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;[fgauge_read_current] current(discharging) = %d mA</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">dvalue</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Auto adjust value */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">gauge_dev</span><span class="o">-&gt;</span><span class="n">fg_cust_data</span><span class="o">-&gt;</span><span class="n">r_fg_value</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">bm_trace</span><span class="p">(</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;[fgauge_read_current] Auto adjust value due to the Rfg is %d</span><span class="se">\n</span><span class="s"> Ori current=%d, &quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">gauge_dev</span><span class="o">-&gt;</span><span class="n">fg_cust_data</span><span class="o">-&gt;</span><span class="n">r_fg_value</span><span class="p">,</span><span class="w"> </span><span class="n">dvalue</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">dvalue</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="n">dvalue</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"></span>
+<span class="w">                </span><span class="n">gauge_dev</span><span class="o">-&gt;</span><span class="n">fg_cust_data</span><span class="o">-&gt;</span><span class="n">r_fg_value</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">bm_trace</span><span class="p">(</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;[fgauge_read_current] new current=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">dvalue</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">bm_trace</span><span class="p">(</span><span class="s">&quot;[fgauge_read_current] ori current=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dvalue</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">dvalue</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">            </span><span class="p">((</span><span class="n">dvalue</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gauge_dev</span><span class="o">-&gt;</span><span class="n">fg_cust_data</span><span class="o">-&gt;</span><span class="n">car_tune_value</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="o">/</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">bm_debug</span><span class="p">(</span><span class="s">&quot;[fgauge_read_current] final current=%d (ratio=%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">dvalue</span><span class="p">,</span><span class="w"> </span><span class="n">gauge_dev</span><span class="o">-&gt;</span><span class="n">fg_cust_data</span><span class="o">-&gt;</span><span class="n">car_tune_value</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="o">*</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dvalue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="capacity">
+<h1>Capacity<a class="headerlink" href="#capacity" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>内核调用</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery</span><span class="o">.</span><span class="n">c</span>
+
+<span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">__init</span> <span class="n">battery_probe</span><span class="p">(</span><span class="n">struct</span> <span class="n">platform_device</span> <span class="o">*</span><span class="n">dev</span><span class="p">)</span>
+  <span class="o">*</span> <span class="n">gm</span><span class="o">.</span><span class="n">pbat_consumer</span> <span class="o">=</span> <span class="n">charger_manager_get_by_name</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">),</span> <span class="s2">&quot;charger&quot;</span><span class="p">);</span>
+  <span class="o">*</span> <span class="n">gm</span><span class="o">.</span><span class="n">bat_nb</span><span class="o">.</span><span class="n">notifier_call</span> <span class="o">=</span> <span class="n">battery_callback</span><span class="p">;</span>
+    <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">battery_callback</span><span class="p">(</span><span class="n">struct</span> <span class="n">notifier_block</span> <span class="o">*</span><span class="n">nb</span><span class="p">,</span> <span class="n">unsigned</span> <span class="n">long</span> <span class="n">event</span><span class="p">,</span> <span class="n">void</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+      <span class="o">*</span> <span class="n">case</span> <span class="n">CHARGER_NOTIFY_NORMAL</span><span class="p">:</span>
+        <span class="o">*</span> <span class="n">battery_main</span><span class="o">.</span><span class="n">BAT_STATUS</span> <span class="o">=</span> <span class="n">POWER_SUPPLY_STATUS_CHARGING</span><span class="p">;</span>
+        <span class="o">*</span> <span class="n">battery_update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">battery_main</span><span class="p">);</span>
+          <span class="o">*</span> <span class="n">battery_update_psd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">battery_main</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">bat_data</span><span class="o">-&gt;</span><span class="n">BAT_batt_vol</span> <span class="o">=</span> <span class="n">battery_get_bat_voltage</span><span class="p">();</span>
+              <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">mt6765</span><span class="o">/</span><span class="n">mtk_battery_intf</span><span class="o">.</span><span class="n">c</span>
+                <span class="o">*</span> <span class="n">signed</span> <span class="nb">int</span> <span class="n">battery_get_bat_voltage</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="k">return</span> <span class="n">pmic_get_battery_voltage</span><span class="p">();</span>
+                    <span class="o">*</span> <span class="n">查询电压</span>
+            <span class="o">*</span> <span class="n">bat_data</span><span class="o">-&gt;</span><span class="n">BAT_batt_temp</span> <span class="o">=</span> <span class="n">battery_get_bat_temperature</span><span class="p">();</span>
+              <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">mt6765</span><span class="o">/</span><span class="n">mtk_battery_intf</span><span class="o">.</span><span class="n">c</span>
+                <span class="o">*</span> <span class="n">signed</span> <span class="nb">int</span> <span class="n">battery_get_bat_temperature</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="k">return</span> <span class="n">force_get_tbat</span><span class="p">(</span><span class="n">true</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">bat_temperature_val</span> <span class="o">=</span> <span class="n">force_get_tbat_internal</span><span class="p">(</span><span class="n">update</span><span class="p">);</span>
+                      <span class="o">*</span> <span class="n">bat_temperature_volt</span> <span class="o">=</span> <span class="n">pmic_get_v_bat_temp</span><span class="p">();</span>
+                        <span class="o">*</span> <span class="n">电压转换成温度</span>
+          <span class="o">*</span> <span class="n">power_supply_changed</span><span class="p">(</span><span class="n">bat_psy</span><span class="p">);</span>
+  <span class="o">*</span> <span class="n">register_charger_manager_notifier</span><span class="p">(</span><span class="n">gm</span><span class="o">.</span><span class="n">pbat_consumer</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">gm</span><span class="o">.</span><span class="n">bat_nb</span><span class="p">);</span>
+<span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">battery_get_property</span><span class="p">(</span><span class="n">struct</span> <span class="n">power_supply</span> <span class="o">*</span><span class="n">psy</span><span class="p">,</span> <span class="n">enum</span> <span class="n">power_supply_property</span> <span class="n">psp</span><span class="p">,</span> <span class="n">union</span> <span class="n">power_supply_propval</span> <span class="o">*</span><span class="n">val</span><span class="p">)</span>
+  <span class="o">*</span> <span class="n">case</span> <span class="n">POWER_SUPPLY_PROP_CAPACITY</span>
+    <span class="o">*</span> <span class="n">val</span><span class="o">-&gt;</span><span class="n">intval</span> <span class="o">=</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">BAT_CAPACITY</span><span class="p">;</span>
+<span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">static</span> <span class="n">void</span> <span class="n">nl_data_handler</span><span class="p">(</span><span class="n">struct</span> <span class="n">sk_buff</span> <span class="o">*</span><span class="n">skb</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">bmd_ctrl_cmd_from_user</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fgd_ret_msg</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">bmd_ctrl_cmd_from_user</span><span class="p">(</span><span class="n">void</span> <span class="o">*</span><span class="n">nl_data</span><span class="p">,</span> <span class="n">struct</span> <span class="n">fgd_nl_msg_t</span> <span class="o">*</span><span class="n">ret_msg</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">case</span> <span class="n">FG_DAEMON_CMD_SET_KERNEL_UISOC</span><span class="p">:</span>
+            <span class="o">*</span> <span class="n">battery_main</span><span class="o">.</span><span class="n">BAT_CAPACITY</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">ui_soc</span><span class="p">;</span>
+              <span class="o">*</span> <span class="n">battery_update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">battery_main</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>添加dump stack</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">--</span><span class="n">git</span> <span class="n">a</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span> <span class="n">b</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span>
+<span class="n">index</span> <span class="mi">54</span><span class="n">d181c3c14</span><span class="o">.</span><span class="mf">.86</span><span class="n">a21d7c115</span> <span class="mi">100755</span>
+<span class="o">---</span> <span class="n">a</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span>
+<span class="o">+++</span> <span class="n">b</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span>
+<span class="o">@@</span> <span class="o">-</span><span class="mi">3844</span><span class="p">,</span><span class="mi">6</span> <span class="o">+</span><span class="mi">3844</span><span class="p">,</span><span class="mi">8</span> <span class="o">@@</span> <span class="n">void</span> <span class="n">bmd_ctrl_cmd_from_user</span><span class="p">(</span><span class="n">void</span> <span class="o">*</span><span class="n">nl_data</span><span class="p">,</span> <span class="n">struct</span> <span class="n">fgd_nl_msg_t</span> <span class="o">*</span><span class="n">ret_msg</span><span class="p">)</span>
+                        <span class="n">battery_main</span><span class="o">.</span><span class="n">BAT_CAPACITY</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">ui_soc</span><span class="p">;</span>
+                        <span class="n">battery_update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">battery_main</span><span class="p">);</span>
+                <span class="p">}</span>
+<span class="o">+</span>
+<span class="o">+</span>               <span class="n">dump_stack</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">break</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>dump stack log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.155626</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">101</span><span class="p">:</span><span class="n">pmic_thread</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_irq</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_irq</span><span class="o">&amp;</span><span class="p">][</span><span class="n">PMIC</span><span class="p">]</span> <span class="p">[</span><span class="n">PMIC_INT</span><span class="p">]</span> <span class="n">Reg</span><span class="p">[</span><span class="mh">0xf9e</span><span class="p">]</span><span class="o">=</span><span class="mh">0x200</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.156957</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">101</span><span class="p">:</span><span class="n">pmic_thread</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">]</span><span class="n">GM3log</span><span class="o">-</span><span class="n">nafg</span> <span class="mi">146</span> <span class="mi">146</span> <span class="mi">42852</span> <span class="mi">41660</span> <span class="mi">1191</span> <span class="mi">11</span> <span class="mi">12852</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.158620</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">101</span><span class="p">:</span><span class="n">pmic_thread</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">fg_nafg_int_handler</span><span class="p">][</span><span class="n">fg_bat_nafg</span><span class="p">]</span> <span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">1191</span><span class="p">:</span><span class="mi">12852</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.160326</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">101</span><span class="p">:</span><span class="n">pmic_thread</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">CH3_DBG</span><span class="p">]</span> <span class="n">bat_cur</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4113</span>
+<span class="o">&lt;</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.162057</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">101</span><span class="p">:</span><span class="n">pmic_thread</span><span class="p">]</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span> <span class="n">mt</span><span class="o">-</span><span class="n">pmic</span><span class="p">:</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span><span class="p">:</span> <span class="n">name</span><span class="p">:</span><span class="n">BAT_TEMP</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">adc_out</span><span class="o">=</span><span class="mh">0x529</span><span class="p">,</span> <span class="n">adc_result</span><span class="o">=</span><span class="mi">580</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.163779</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">101</span><span class="p">:</span><span class="n">pmic_thread</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">fg_bat_temp_int_sw_check</span><span class="p">]</span> <span class="n">tmp</span> <span class="mi">30</span> <span class="n">lt</span> <span class="mi">29</span> <span class="n">ht</span> <span class="mi">31</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.166506</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">CH3_DBG</span><span class="p">]</span> <span class="n">bat_cur</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3529</span>
+<span class="o">&lt;</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.168184</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span> <span class="n">mt</span><span class="o">-</span><span class="n">pmic</span><span class="p">:</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span><span class="p">:</span> <span class="n">name</span><span class="p">:</span><span class="n">BAT_TEMP</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">adc_out</span><span class="o">=</span><span class="mh">0x52f</span><span class="p">,</span> <span class="n">adc_result</span><span class="o">=</span><span class="mi">583</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.170753</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mt6357_gauge</span><span class="o">&amp;</span><span class="p">][</span><span class="n">read_nafg_vbat</span><span class="p">]</span> <span class="n">i</span><span class="p">:</span><span class="mi">0</span> <span class="n">nag_vbat_reg</span> <span class="mh">0xe2c0</span> <span class="n">nag_vbat_mv</span> <span class="mi">41660</span><span class="p">:</span><span class="mi">25280</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.172174</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mt6357_gauge</span><span class="o">&amp;</span><span class="p">][</span><span class="n">read_nafg_vbat1</span><span class="p">]</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">26003</span> <span class="mi">7404</span> <span class="mi">0</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.173385</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mt6357_gauge</span><span class="o">&amp;</span><span class="p">][</span><span class="n">read_nafg_vbat2</span><span class="p">]</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.175795</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">]</span><span class="n">MTK_FG</span><span class="p">:</span> <span class="p">[</span><span class="n">fg_bat_int1_handler</span><span class="p">]</span><span class="n">g_bat_cycle_ncar</span><span class="o">=</span><span class="mi">187</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.182126</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">fr</span><span class="p">]</span> <span class="n">FG_DAEMON_CMD_SET_FG_BAT_INT1_GAP</span> <span class="o">=</span> <span class="mi">155</span> <span class="n">car</span><span class="p">:</span><span class="o">-</span><span class="mi">137</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.184256</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">]</span><span class="n">MTK_FG</span><span class="p">:</span> <span class="p">[</span><span class="n">fg_bat_int2_handler</span><span class="p">]</span><span class="n">car</span><span class="p">:</span><span class="o">-</span><span class="mi">137</span> <span class="n">pre_car</span><span class="p">:</span><span class="o">-</span><span class="mi">126</span> <span class="n">ht</span><span class="p">:</span><span class="mi">31</span> <span class="n">lt</span><span class="p">:</span><span class="mi">143</span> <span class="n">u_type</span><span class="p">:</span><span class="mi">0</span> <span class="nb">type</span><span class="p">:</span><span class="mi">2</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.188843</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">fr</span><span class="p">][</span><span class="n">fg_bat_int2</span><span class="p">]</span> <span class="n">FG_DAEMON_CMD_SET_FG_BAT_INT2_HT_GAP</span> <span class="o">=</span> <span class="mi">35</span>
+<span class="o">&lt;</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.194688</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span> <span class="n">mt</span><span class="o">-</span><span class="n">pmic</span><span class="p">:</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span><span class="p">:</span> <span class="n">name</span><span class="p">:</span><span class="n">ISENSE</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">adc_out</span><span class="o">=</span><span class="mh">0x62e6</span><span class="p">,</span> <span class="n">adc_result</span><span class="o">=</span><span class="mi">4172</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.196577</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">CH3_DBG</span><span class="p">]</span> <span class="n">bat_cur</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4371</span>
+<span class="o">&lt;</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.198574</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span> <span class="n">mt</span><span class="o">-</span><span class="n">pmic</span><span class="p">:</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span><span class="p">:</span> <span class="n">name</span><span class="p">:</span><span class="n">BAT_TEMP</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">adc_out</span><span class="o">=</span><span class="mh">0x527</span><span class="p">,</span> <span class="n">adc_result</span><span class="o">=</span><span class="mi">579</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.201059</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">]</span><span class="n">MTK_FG</span><span class="p">:</span> <span class="p">[</span><span class="n">FGADC_info</span><span class="p">]</span> <span class="n">tmp</span><span class="p">:</span><span class="mi">30</span> <span class="mi">30</span> <span class="mi">30</span> <span class="n">rdnafg</span><span class="p">:</span><span class="mi">0</span> <span class="n">vc</span><span class="p">:</span><span class="mi">1</span> <span class="n">disable_fg</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span> <span class="n">fg_v</span><span class="p">:</span><span class="mi">701</span><span class="p">:</span><span class="mi">9299</span><span class="p">:</span><span class="mi">42850</span><span class="p">:</span><span class="o">-</span><span class="mi">165</span><span class="p">:</span><span class="mi">31025</span><span class="p">:</span><span class="mi">754</span><span class="p">:</span><span class="mi">9246</span><span class="p">:</span><span class="mi">9246</span> <span class="n">low_temp</span><span class="p">:</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.203724</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_battery_core</span><span class="o">&amp;</span><span class="p">]</span><span class="n">MTK_FG</span><span class="p">:</span> <span class="p">[</span><span class="n">FGADC_intr_end</span><span class="p">][</span><span class="n">FG_INTR_NAFG_VOLTAGE</span><span class="p">]</span><span class="n">soc</span><span class="p">:</span><span class="mi">9255</span> <span class="n">fg_c_soc</span><span class="p">:</span><span class="mi">9255</span> <span class="n">fg_v_soc</span><span class="p">:</span><span class="mi">9246</span> <span class="n">ui_soc</span><span class="p">:</span><span class="mi">9643</span> <span class="n">vc_diff</span><span class="p">:</span><span class="mi">9</span> <span class="n">vc_mode</span> <span class="mi">1</span> <span class="n">VBAT</span> <span class="mi">41720</span> <span class="n">T</span><span class="p">:[</span><span class="mi">30</span> <span class="n">V</span> <span class="mi">30</span> <span class="n">C</span> <span class="mi">30</span> <span class="n">avg</span><span class="p">:</span><span class="mi">30</span><span class="p">]</span> <span class="n">D0_C</span> <span class="mi">9299</span> <span class="n">D0_V</span> <span class="mi">9299</span> <span class="n">CAR</span><span class="p">[</span><span class="n">c</span><span class="p">:</span><span class="o">-</span><span class="mi">137</span> <span class="n">v</span><span class="p">:</span><span class="o">-</span><span class="mi">165</span><span class="p">]</span> <span class="n">Q</span><span class="p">:[</span><span class="mi">31025</span> <span class="mi">31025</span> <span class="mi">31025</span> <span class="mi">31025</span><span class="p">]</span> <span class="n">aging</span> <span class="mi">10000</span> <span class="n">bat_cycle</span> <span class="mi">0</span> <span class="n">Trk</span><span class="p">[</span><span class="mi">0</span><span class="p">(</span><span class="mi">61</span><span class="p">):</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="n">UI</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="n">Chr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="n">pseudo1</span> <span class="o">-</span><span class="mi">9</span>  <span class="n">DC_ratio</span> <span class="mi">100</span> <span class="n">dodinit</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">ag</span><span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span><span class="n">I</span><span class="p">:</span><span class="o">-</span><span class="mi">4628</span>
+<span class="o">&lt;</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.210911</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span> <span class="n">mt</span><span class="o">-</span><span class="n">pmic</span><span class="p">:</span><span class="n">mt635x</span><span class="o">-</span><span class="n">auxadc</span><span class="p">:</span> <span class="n">name</span><span class="p">:</span><span class="n">ISENSE</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">adc_out</span><span class="o">=</span><span class="mh">0x6203</span><span class="p">,</span> <span class="n">adc_result</span><span class="o">=</span><span class="mi">4134</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.212662</span><span class="p">]</span> <span class="o">.</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">pmic_auxadc</span><span class="o">&amp;</span><span class="p">][</span><span class="n">CH3_DBG</span><span class="p">]</span> <span class="n">bat_cur</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4565</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.215001</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">CPU</span><span class="p">:</span> <span class="mi">7</span> <span class="n">PID</span><span class="p">:</span> <span class="mi">568</span> <span class="n">Comm</span><span class="p">:</span> <span class="n">fuelgauged</span> <span class="n">Tainted</span><span class="p">:</span> <span class="n">P</span>        <span class="n">W</span>  <span class="n">O</span>    <span class="mf">4.9.190</span> <span class="c1">#2</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.216211</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">Hardware</span> <span class="n">name</span><span class="p">:</span> <span class="n">MT6762V</span><span class="o">/</span><span class="n">WD</span> <span class="p">(</span><span class="n">DT</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.216986</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">]</span><span class="n">Call</span> <span class="n">trace</span><span class="p">:</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.217562</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a2568cbd4</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">dump_backtrace</span><span class="o">+</span><span class="mh">0x0</span><span class="o">/</span><span class="mh">0x2c4</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.218500</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a2568cbcc</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">show_stack</span><span class="o">+</span><span class="mh">0x14</span><span class="o">/</span><span class="mh">0x1c</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.219397</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a25a7a668</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">dump_stack</span><span class="o">+</span><span class="mh">0xdc</span><span class="o">/</span><span class="mh">0x12c</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.220305</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a2629f010</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">bmd_ctrl_cmd_from_user</span><span class="o">+</span><span class="mh">0x2d48</span><span class="o">/</span><span class="mh">0x30c4</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.221374</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a262841b4</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">nl_data_handler</span><span class="o">+</span><span class="mh">0x1e0</span><span class="o">/</span><span class="mh">0x25c</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.222345</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a264b27c4</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">netlink_unicast</span><span class="o">+</span><span class="mh">0x1b8</span><span class="o">/</span><span class="mh">0x2ac</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.223314</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a264b6c04</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">netlink_sendmsg</span><span class="o">+</span><span class="mh">0x2f8</span><span class="o">/</span><span class="mh">0x350</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.224285</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a26442ea0</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">___sys_sendmsg</span><span class="o">+</span><span class="mh">0x1d4</span><span class="o">/</span><span class="mh">0x2b8</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.225243</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a26442c7c</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">__sys_sendmsg</span><span class="o">+</span><span class="mh">0x84</span><span class="o">/</span><span class="mh">0xd4</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.226172</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a2649a6c0</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">compat_SyS_sendmsg</span><span class="o">+</span><span class="mh">0x10</span><span class="o">/</span><span class="mh">0x18</span>
+<span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.227153</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff8a25683e00</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">el0_svc_naked</span><span class="o">+</span><span class="mh">0x34</span><span class="o">/</span><span class="mh">0x38</span>
+<span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">146.229299</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">568</span><span class="p">:</span><span class="n">fuelgauged</span><span class="p">][</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_rtc_hal_common</span><span class="o">&amp;</span><span class="p">]</span><span class="n">mtk_rtc_hal_common</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">:</span><span class="n">mtk_rtc_hal_common</span><span class="o">&amp;</span><span class="p">]</span><span class="n">hal_rtc_get_spare_register</span><span class="p">:</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">get</span> <span class="n">rg</span><span class="p">[</span><span class="mh">0x5aa</span><span class="p">,</span> <span class="mh">0xff</span> <span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xe0</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>上面的log差不多是一次pmic_irq处理流程</p></li>
+<li><p>操作的进程：fuelgauged</p></li>
+<li><p>fuelgauged将log写入了kmsg</p></li>
+</ul>
+</li>
+<li><p>vendor/mediatek/proprietary/external/fuelgauged</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fuelgauged</span>  <span class="n">fuelgauged_nvram</span>  <span class="n">fuelgauged_static</span>  <span class="n">libfgauge</span>  <span class="n">libfgauge_static</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>里面内容未开源，无法进一步分析</p></li>
+<li><p>adb shell echo 8 &gt; /sys/devices/platform/battery/FG_daemon_log_level</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>电池曲线<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>电池曲线数据所在位置</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">mt6765</span><span class="o">.</span><span class="n">dts</span>
+  <span class="o">*</span> <span class="c1">#include &quot;bat_setting/mt6765_battery_prop.dtsi&quot;</span>
+    <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">bat_setting</span><span class="o">/</span><span class="n">mt6765_battery_prop</span><span class="o">.</span><span class="n">dtsi</span>
+      <span class="o">*</span> <span class="c1">#include &quot;mt6765_battery_table.dtsi&quot;</span>
+</pre></div>
+</div>
+<p>不过，貌似实际使用的电池曲线来自这里：kernel-4.9/drivers/misc/mediatek/include/mt-plat/mt6765/include/mach/mtk_battery_table.h，如下分析可知，默认会使用mtk_battery_table.h中的配置，同时如果打开了CONFIG_ZCV_DTS_TABLE宏，那么也会使用dtsi中的电池曲线；</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">__init</span> <span class="n">battery_probe</span><span class="p">(</span><span class="n">struct</span> <span class="n">platform_device</span> <span class="o">*</span><span class="n">dev</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">mtk_battery_init</span><span class="p">(</span><span class="n">dev</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">battery</span><span class="o">/</span><span class="n">mtk_battery_core</span><span class="o">.</span><span class="n">c</span>
+        <span class="o">*</span> <span class="n">fg_custom_init_from_header</span><span class="p">();</span>
+          <span class="o">*</span> <span class="n">fg_table_cust_data</span><span class="o">.</span><span class="n">fg_profile</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">fg_profile_t0</span><span class="p">[</span><span class="n">gm</span><span class="o">.</span><span class="n">battery_id</span><span class="p">])</span> <span class="o">/</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">struct</span> <span class="n">FUELGAUGE_PROFILE_STRUCT</span><span class="p">);</span>
+          <span class="o">*</span> <span class="n">memcpy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fg_table_cust_data</span><span class="o">.</span><span class="n">fg_profile</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">fg_profile</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fg_profile_t0</span><span class="p">[</span><span class="n">gm</span><span class="o">.</span><span class="n">battery_id</span><span class="p">],</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">fg_profile_t0</span><span class="p">[</span><span class="n">gm</span><span class="o">.</span><span class="n">battery_id</span><span class="p">]));</span>
+        <span class="o">*</span> <span class="n">fg_custom_init_from_dts</span><span class="p">(</span><span class="n">dev</span><span class="p">);</span>
+          <span class="o">*</span> <span class="n">sprintf</span><span class="p">(</span><span class="n">node_name</span><span class="p">,</span> <span class="s2">&quot;battery</span><span class="si">%d</span><span class="s2">_profile_t</span><span class="si">%d</span><span class="s2">_num&quot;</span><span class="p">,</span> <span class="n">bat_id</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+          <span class="o">*</span> <span class="n">fg_read_dts_val</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">fg_table_cust_data</span><span class="o">.</span><span class="n">fg_profile</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>如下所示，将dtsi中的宏声明关闭</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">configs</span><span class="o">/</span><span class="n">k62v1_64_bsp_defconfig</span>
+  <span class="o">*</span> <span class="c1">#CONFIG_ZCV_DTS_TABLE is not set</span>
+<span class="o">*</span> <span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">configs</span><span class="o">/</span><span class="n">k62v1_64_bsp_debug_defconfig</span>
+  <span class="o">*</span> <span class="c1"># CONFIG_ZCV_DTS_TABLE is not set</span>
+</pre></div>
+</div>
+<p>ZCV(Zero Current Voltage)电池放电曲线</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -25,6 +25,8 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0013| [Linux](src/0013_Linux/README.md) | 记录一些零散的Linux方面的使用文档
+0012| [BatteryPower](src/0012_BatteryPower/README.md) | Android休眠功耗分析，休眠原理
 0011| [Terminal_UI](src/0011_Terminal_UI/README.md) | 终端cmd下图形界面
 0010| [SurfaceFlinger](src/0010_SurfaceFlinger/README.md) | Android SurfaceFlinger分析
 0009| [V4L2](src/0009_V4L2/README.md) | 分析V4L2的架构，其中包括显示部分和摄像头部分

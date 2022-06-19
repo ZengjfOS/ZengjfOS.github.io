@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>README &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">README</a></li>
+<li><a class="reference internal" href="#code">code</a></li>
+<li><a class="reference internal" href="#power-monitor">Power Monitor</a></li>
+<li><a class="reference internal" href="#resumed-from-suspend">resumed from suspend</a></li>
+<li><a class="reference internal" href="#id1">分析思路</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>README</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Permalink to this headline"></a></h1>
+<p>通过功耗分布和resume分布可以知道哪些resume导致的问题，进而看对应的resume的log就可以知道系统做了什么导致的功耗问题</p>
+</section>
+<section id="code">
+<h1>code<a class="headerlink" href="#code" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/713e749e0f8999b3afb61fc4aeeeac29/0011_LogcatWakeup.py"><span class="xref download myst">0011_LogcatWakeup.py</span></a></p></li>
+</ul>
+</section>
+<section id="power-monitor">
+<h1>Power Monitor<a class="headerlink" href="#power-monitor" title="Permalink to this headline"></a></h1>
+<p>实时电流消耗情况如下图所示：</p>
+<p><img alt="0011_PowerMonitor.png" src="../../../_images/0011_PowerMonitor.png" /></p>
+</section>
+<section id="resumed-from-suspend">
+<h1>resumed from suspend<a class="headerlink" href="#resumed-from-suspend" title="Permalink to this headline"></a></h1>
+<p>resume时间分布图如下</p>
+<p><img alt="0011_python3_plot_Interruptes.png" src="../../../_images/0011_python3_plot_Interruptes.png" /></p>
+</section>
+<section id="id1">
+<h1>分析思路<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p>获取main log中的唤醒编号，并和PowerMonitor功耗波形图拟合上，注意调整对应上</p>
+<p><img alt="0011_PowerMonitor_get_wakeup_index.png" src="../../../_images/0011_PowerMonitor_get_wakeup_index.png" /></p>
+<p>debugreport和main log中的唤醒编号应该是一一对应的，可以用于确认main log中的唤醒编号的正确性</p>
+<p><img alt="0011_debugreport_confirm_wakeup_index.png" src="../../../_images/0011_debugreport_confirm_wakeup_index.png" /></p>
+<p>根据main log中的异常功耗唤醒编号找到debugreport中的wakelock提示信息，下图是11号功耗信息</p>
+<p><img alt="0011_confirm_11_case.png" src="../../../_images/0011_confirm_11_case.png" /></p>
+<p>根据main log中的异常功耗唤醒编号找到debugreport中的wakelock提示信息，下图是20号功耗信息</p>
+<p><img alt="0011_confirm_20_case.png" src="../../../_images/0011_confirm_20_case.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

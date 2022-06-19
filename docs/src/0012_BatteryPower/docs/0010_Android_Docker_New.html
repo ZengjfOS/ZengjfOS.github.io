@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android Docker New &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Docker New</a><ul>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">创建推送容器镜像</a></li>
+<li><a class="reference internal" href="#pull">重新pull</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android Docker New</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-docker-new">
+<h1>Android Docker New<a class="headerlink" href="#android-docker-new" title="Permalink to this headline"></a></h1>
+<p>学习如何创建自己的Docker，后续准备自己处理Docker</p>
+<section id="id1">
+<h2>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="0008_Android_BatteryStats.html"><span class="doc std std-doc">0008_Android_BatteryStats.md</span></a></p></li>
+<li><p><a class="reference internal" href="0009_Android_BatteryStats_Docker.html"><span class="doc std std-doc">0009_Android_BatteryStats_Docker.md</span></a></p></li>
+<li><p><a class="reference external" href="https://cloud.tencent.com/developer/article/1348423">通过容器提交镜像（docker commit）以及推送镜像（docker push）笔记</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>创建推送容器镜像<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>桌面版登录docker</p></li>
+<li><p>docker pull runcare/battery-historian</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">default</span> <span class="n">tag</span><span class="p">:</span> <span class="n">latest</span>
+<span class="n">latest</span><span class="p">:</span> <span class="n">Pulling</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">f7277927d38a</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">8</span><span class="n">d3eac894db4</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="n">edf72af6d627</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mf">3e4</span><span class="n">f86211d23</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="n">ac5d6e8f41a3</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mf">89e1</span><span class="n">cca7c291</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">1</span><span class="n">c6b579f97fc</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="n">a73d3370a7dc</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">52</span><span class="n">c70f621a64</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">179010</span><span class="n">a8bccd</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mf">28e23</span><span class="n">dff79a8</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">0091</span><span class="n">c74a4cdb</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">20</span><span class="n">a67986b74d</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="mi">9</span><span class="n">ca8867c1f1f</span><span class="p">:</span> <span class="n">Pull</span> <span class="n">complete</span>
+<span class="n">Digest</span><span class="p">:</span> <span class="n">sha256</span><span class="p">:</span><span class="mi">1</span><span class="n">d1c380419eb28f0667f26bc42cff490cd8043d7dbe40493ded309d668e13fec</span>
+<span class="n">Status</span><span class="p">:</span> <span class="n">Downloaded</span> <span class="n">newer</span> <span class="n">image</span> <span class="k">for</span> <span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="p">:</span><span class="n">latest</span>
+<span class="n">docker</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="p">:</span><span class="n">latest</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker images</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REPOSITORY</span>                  <span class="n">TAG</span>       <span class="n">IMAGE</span> <span class="n">ID</span>       <span class="n">CREATED</span>         <span class="n">SIZE</span>
+<span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>   <span class="n">latest</span>    <span class="mi">422</span><span class="n">db14cf445</span>   <span class="mi">13</span> <span class="n">months</span> <span class="n">ago</span>   <span class="mf">1.13</span><span class="n">GB</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker run -ti –name battery-historian -d runcare/battery-historian</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3</span><span class="n">dbb0fd5275903aed032401bfcb9fbd62f3c0e7fd8d13fe6d0bc42aebe5e6699</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker ps</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONTAINER</span> <span class="n">ID</span>   <span class="n">IMAGE</span>                       <span class="n">COMMAND</span>                  <span class="n">CREATED</span>         <span class="n">STATUS</span>         <span class="n">PORTS</span>      <span class="n">NAMES</span>
+<span class="mi">3</span><span class="n">dbb0fd52759</span>   <span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>   <span class="s2">&quot;battery-historian -…&quot;</span>   <span class="mi">3</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="n">Up</span> <span class="mi">3</span> <span class="n">minutes</span>   <span class="mi">9999</span><span class="o">/</span><span class="n">tcp</span>   <span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker commit -a “zengjf” -m “this is test” 3dbb0fd52759 zengjf/battery-historian</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sha256</span><span class="p">:</span><span class="mi">35</span><span class="n">aad6c74fce19ca37a8c04b144832c8afb06d4c23a5ccfc2cee6f9e3d95c263</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>docker commit -a “zengjf” -m “this is test” 3dbb0fd52759 zengjf/battery-historian:v1</p>
+<ul>
+<li><p>docker images执行的时候会：TAG -&gt; v1</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>docker images</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REPOSITORY</span>                  <span class="n">TAG</span>       <span class="n">IMAGE</span> <span class="n">ID</span>       <span class="n">CREATED</span>          <span class="n">SIZE</span>
+<span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>    <span class="n">latest</span>    <span class="mi">35</span><span class="n">aad6c74fce</span>   <span class="mi">41</span> <span class="n">seconds</span> <span class="n">ago</span>   <span class="mf">1.13</span><span class="n">GB</span>
+<span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>   <span class="n">latest</span>    <span class="mi">422</span><span class="n">db14cf445</span>   <span class="mi">13</span> <span class="n">months</span> <span class="n">ago</span>    <span class="mf">1.13</span><span class="n">GB</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>docker rmi 35aad6c74fce</p></li>
+<li><p>docker rmi zengjf/battery-historian</p></li>
+</ul>
+</li>
+<li><p>docker push –disable-content-trust zengjf/battery-historian</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">default</span> <span class="n">tag</span><span class="p">:</span> <span class="n">latest</span>
+<span class="n">The</span> <span class="n">push</span> <span class="n">refers</span> <span class="n">to</span> <span class="n">repository</span> <span class="p">[</span><span class="n">docker</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="p">]</span>
+<span class="mi">6</span><span class="n">f4f5ed6a7c8</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mi">8262793</span><span class="n">ec9ed</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">b3a94af713c2</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mi">30512634</span><span class="n">cec0</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mi">2</span><span class="n">ad6c3c3c07c</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mf">42e4</span><span class="n">ffa375d2</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mi">0</span><span class="n">a9f08f95895</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mi">11</span><span class="n">aab68dfc13</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">e6ab394032ae</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mi">7</span><span class="n">c0520a37f29</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">e79142719515</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">aeda103e78c9</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="mf">2558e637</span><span class="n">fbff</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">f749b9b0fb21</span><span class="p">:</span> <span class="n">Mounted</span> <span class="kn">from</span> <span class="nn">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">latest</span><span class="p">:</span> <span class="n">digest</span><span class="p">:</span> <span class="n">sha256</span><span class="p">:</span><span class="mi">7402</span><span class="n">b93de6d98dbaab23c6d621557f2d23ea10ed22239abee7e40128c5e3f80d</span> <span class="n">size</span><span class="p">:</span> <span class="mi">3251</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>docker push –disable-content-trust zengjf/battery-historian:v1</p></li>
+</ul>
+</li>
+<li><p>https://hub.docker.com/repositories</p>
+<ul class="simple">
+<li><p>https://hub.docker.com/repository/docker/zengjf/battery-historian<br />
+<img alt="0010_Android_Docker_Hub.png" src="../../../_images/0010_Android_Docker_Hub.png" /></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="pull">
+<h2>重新pull<a class="headerlink" href="#pull" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>docker rmi zengjf/battery-historian</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Untagged</span><span class="p">:</span> <span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="p">:</span><span class="n">latest</span>
+<span class="n">Untagged</span><span class="p">:</span> <span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="nd">@sha256</span><span class="p">:</span><span class="mi">7402</span><span class="n">b93de6d98dbaab23c6d621557f2d23ea10ed22239abee7e40128c5e3f80d</span>
+<span class="n">Deleted</span><span class="p">:</span> <span class="n">sha256</span><span class="p">:</span><span class="n">de90fbc8e494cfea43aeb023fec6ec4ffd48cb3b4250848779ab6c53dd8ee718</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker images</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REPOSITORY</span>                  <span class="n">TAG</span>       <span class="n">IMAGE</span> <span class="n">ID</span>       <span class="n">CREATED</span>         <span class="n">SIZE</span>
+<span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>   <span class="n">latest</span>    <span class="mi">422</span><span class="n">db14cf445</span>   <span class="mi">13</span> <span class="n">months</span> <span class="n">ago</span>   <span class="mf">1.13</span><span class="n">GB</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker pull zengjf/battery-historian:latest</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">latest</span><span class="p">:</span> <span class="n">Pulling</span> <span class="kn">from</span> <span class="nn">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>
+<span class="n">f7277927d38a</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">8</span><span class="n">d3eac894db4</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="n">edf72af6d627</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mf">3e4</span><span class="n">f86211d23</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="n">ac5d6e8f41a3</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mf">89e1</span><span class="n">cca7c291</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">1</span><span class="n">c6b579f97fc</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="n">a73d3370a7dc</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">52</span><span class="n">c70f621a64</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">179010</span><span class="n">a8bccd</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mf">28e23</span><span class="n">dff79a8</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">0091</span><span class="n">c74a4cdb</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">20</span><span class="n">a67986b74d</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="mi">9</span><span class="n">ca8867c1f1f</span><span class="p">:</span> <span class="n">Already</span> <span class="n">exists</span>
+<span class="n">Digest</span><span class="p">:</span> <span class="n">sha256</span><span class="p">:</span><span class="mi">7402</span><span class="n">b93de6d98dbaab23c6d621557f2d23ea10ed22239abee7e40128c5e3f80d</span>
+<span class="n">Status</span><span class="p">:</span> <span class="n">Downloaded</span> <span class="n">newer</span> <span class="n">image</span> <span class="k">for</span> <span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="p">:</span><span class="n">latest</span>
+<span class="n">docker</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="p">:</span><span class="n">latest</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker images</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REPOSITORY</span>                  <span class="n">TAG</span>       <span class="n">IMAGE</span> <span class="n">ID</span>       <span class="n">CREATED</span>          <span class="n">SIZE</span>
+<span class="n">zengjf</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>    <span class="n">latest</span>    <span class="n">de90fbc8e494</span>   <span class="mi">16</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="mf">1.13</span><span class="n">GB</span>
+<span class="n">runcare</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span>   <span class="n">latest</span>    <span class="mi">422</span><span class="n">db14cf445</span>   <span class="mi">13</span> <span class="n">months</span> <span class="n">ago</span>    <span class="mf">1.13</span><span class="n">GB</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

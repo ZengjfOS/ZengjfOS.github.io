@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android Battery Current &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Battery Current</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简要说明</a></li>
+<li><a class="reference internal" href="#id3">电池充放电</a></li>
+<li><a class="reference internal" href="#sysfs">sysfs</a></li>
+<li><a class="reference internal" href="#battery-id">battery id</a></li>
+<li><a class="reference internal" href="#id4">电池的信息</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android Battery Current</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-battery-current">
+<h1>Android Battery Current<a class="headerlink" href="#android-battery-current" title="Permalink to this headline"></a></h1>
+<p>通过查看电池电流情况，了解系统深度休眠功耗情况</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0002_SPM_Power_Analysis.html"><span class="doc std std-doc">0002_SPM_Power_Analysis.md</span></a></p></li>
+<li><p><a class="reference internal" href="0004_Android_Typc-C_Charger.html"><span class="doc std std-doc">0004_Android_Typc-C_Charger.md</span></a></p></li>
+<li><p><a class="reference internal" href="0005_Android_Low_Power.html"><span class="doc std std-doc">0005_Android_Low_Power.md</span></a></p></li>
+<li><p>https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-power</p></li>
+<li><p><a class="reference external" href="https://online.mediatek.com/FAQ#/SW/FAQ09903">[FAQ09903] Fuel Gauge兼容多电池，软件&amp;硬件上应该怎么做？</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/4a296481149a">Android 电量测试-电量分析（二）</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简要说明<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Battery current (Ibat)</p></li>
+<li><p>Battery voltage (Vbat)</p></li>
+<li><p>Battery State-of-Charge (SoC)</p></li>
+<li><p>NTC: 热敏电阻，根据电阻产生的分压不同，得到温度；</p></li>
+<li><p>ID: 根据不同内阻，判断不同的电池</p></li>
+<li><p>Rsense: 采样电阻</p></li>
+</ul>
+</section>
+<section id="id3">
+<h1>电池充放电<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>3CBatteryManager.apk</p></li>
+<li><p>在设置选项中，电池可以将记录的数据保存出来</p>
+<ul>
+<li><p>[History]</p></li>
+<li><p>[左上角三条杠] -&gt; [Settings] -&gt; [Battery] -&gt; [Export battery history]</p></li>
+</ul>
+</li>
+<li><p>修改监听参数</p>
+<ul>
+<li><p>[左上角三条杠] -&gt; [Settings] -&gt; [Battery] -&gt; [Monitoring]</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="sysfs">
+<h1>sysfs<a class="headerlink" href="#sysfs" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>cd /sys/devices/platform/battery/power_supply/battery</p></li>
+<li><p>ls</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">capacity</span>       <span class="n">charge_full</span> <span class="n">current_now</span> <span class="n">device</span> <span class="n">power</span>   <span class="n">status</span>    <span class="n">technology</span> <span class="nb">type</span>   <span class="n">voltage_now</span>
+<span class="n">charge_counter</span> <span class="n">current_avg</span> <span class="n">cycle_count</span> <span class="n">health</span> <span class="n">present</span> <span class="n">subsystem</span> <span class="n">temp</span>       <span class="n">uevent</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>current_avg</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="battery-id">
+<h1>battery id<a class="headerlink" href="#battery-id" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>如果需要兼容多个电池，硬件上首先要有一个独立的电池ID pin，供软件做区分。一般做法，是电池端，制作多一个pin，该pin连接的阻值不同，通过BB端的ADC，获取的电压值就不同。从而软件上可以做区分。</p></li>
+<li><p>Android Q</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// kernel-4.9/drivers/power/supply/mediatek/battery/mtk_battery_core.c</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">fgauge_get_profile_id</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">id_volt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//int id = 0;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IMM_GetOneChannelValue_Cali</span><span class="p">(</span><span class="n">BATTERY_ID_CHANNEL_NUM</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">id_volt</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_debug</span><span class="p">(</span><span class="s">&quot;[%s]id_volt read fail</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_debug</span><span class="p">(</span><span class="s">&quot;[%s]id_volt = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">id_volt</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="k">sizeof</span><span class="p">(</span><span class="n">g_battery_id_voltage</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"></span>
+<span class="w">        </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">TOTAL_BATTERY_NUMBER</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_debug</span><span class="p">(</span><span class="s">&quot;[%s]error! voltage range incorrect!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="cm">/*</span>
+<span class="cm">    for (id = 0; id &lt; TOTAL_BATTERY_NUMBER; id++) {</span>
+<span class="cm">        if (id_volt &lt; g_battery_id_voltage[id]) {</span>
+<span class="cm">            gm.battery_id = id;</span>
+<span class="cm">            break;</span>
+<span class="cm">        } else if (g_battery_id_voltage[id] == -1) {</span>
+<span class="cm">            gm.battery_id = TOTAL_BATTERY_NUMBER - 1;</span>
+<span class="cm">        }</span>
+<span class="cm">    }</span>
+<span class="cm">*/</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id_volt</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">Vekan_Battery_Volt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_err</span><span class="p">(</span><span class="s">&quot;select Veken Battery</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">gm</span><span class="p">.</span><span class="n">battery_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id_volt</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">Icon_Battery_Volt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_err</span><span class="p">(</span><span class="s">&quot;select Icon Energy Battery</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">gm</span><span class="p">.</span><span class="n">battery_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">bm_err</span><span class="p">(</span><span class="s">&quot;[%s]error! voltage range incorrect!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">bm_debug</span><span class="p">(</span><span class="s">&quot;[%s]Battery id (%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">__func__</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">gm</span><span class="p">.</span><span class="n">battery_id</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Android R</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// drivers/power/supply/mtk_battery.c</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">fgauge_get_profile_id</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">battery_id_cmd</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">battery_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">battery_id_cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cmdline_get_value</span><span class="p">(</span><span class="s">&quot;androidboot.battery.id&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">battery_id_cmd</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;0&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">battery_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">battery_id_cmd</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">battery_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">printk</span><span class="p">(</span><span class="s">&quot;battery_id = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">battery_id</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">battery_id</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h1>电池的信息<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>lk</p>
+<ul>
+<li><p>vendor/mediatek/proprietary/bootable/bootloader/lk/target/k62v1_64_bsp/include/target/cust_battery.h</p></li>
+</ul>
+</li>
+<li><p>Kernel</p>
+<ul>
+<li><p>Android Q</p>
+<ul>
+<li><p>kernel-4.9/drivers/misc/mediatek/include/mt-plat/mt6765/include/mach/mtk_battery_table.h</p></li>
+</ul>
+</li>
+<li><p>Android R</p>
+<ul>
+<li><p>kernel-4.9/drivers/power/supply/mtk_battery_table.h</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

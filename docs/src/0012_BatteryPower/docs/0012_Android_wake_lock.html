@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android wake lock &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android wake lock</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">尝试查看</a></li>
+<li><a class="reference internal" href="#id3">实战查看</a></li>
+<li><a class="reference internal" href="#wakelock">代码中怎么处理WakeLock</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android wake lock</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-wake-lock">
+<h1>Android wake lock<a class="headerlink" href="#android-wake-lock" title="Permalink to this headline"></a></h1>
+<p>测试软件自动关屏，adb查看测试软件wake lock，查看是否有额外的进程持锁，adb的USB是正常的，忽略</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0005_Android_Low_Power.html"><span class="doc std std-doc">0005_Android_Low_Power.md</span></a></p></li>
+<li><p><a class="reference external" href="https://online.mediatek.com/FAQ#/SW/FAQ07421">[FAQ07421] [lowpower]AP suspend异常debug及log分析</a></p></li>
+<li><p><a class="reference external" href="https://developer.android.com/training/scheduling/wakelock#java">Keep the CPU on</a></p></li>
+<li><p><a class="reference external" href="https://developer.android.com/reference/android/os/PowerManager.WakeLock">PowerManager.WakeLock</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>尝试查看<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>adb shell</p></li>
+<li><p>cat /sys/kernel/debug/wakeup_sources | sed -e ‘s/”^ “/”unnamed”/g’ | awk ‘{print $6 “\t” $1}’ | grep -v “^0” | sort -n</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">active_since</span>    <span class="n">name</span>
+<span class="mi">451487</span>  <span class="n">PowerManagerService</span><span class="o">.</span><span class="n">WakeLocks</span>
+<span class="mi">461121</span>  <span class="n">ws_charge</span>
+</pre></div>
+</div>
+</li>
+<li><p>dumpsys power | grep “PARTIAL_WAKE_LOCK”</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">PARTIAL_WAKE_LOCK</span>              <span class="s1">&#39;ZZZBatteryManagerService&#39;</span> <span class="n">ACQ</span><span class="o">=-</span><span class="mi">7</span><span class="n">m57s516ms</span> <span class="n">LONG</span> <span class="p">(</span><span class="n">uid</span><span class="o">=</span><span class="mi">1000</span> <span class="n">pid</span><span class="o">=</span><span class="mi">1005</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>实战查看<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>adb shell</p></li>
+<li><p>cat /sys/kernel/debug/wakeup_sources | sed -e ‘s/”^ “/”unnamed”/g’ | awk ‘{print $6 “\t” $1}’ | grep -v “^0” | sort -n
+g’ | awk ‘{print $6 “\t” $1}’ | grep -v “^0” | sort -n</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">active_since</span>    <span class="n">name</span>
+<span class="mi">195</span>     <span class="n">WLAN</span>
+<span class="mi">216583</span>  <span class="n">PowerManagerService</span><span class="o">.</span><span class="n">WakeLocks</span>
+<span class="mi">342052</span>  <span class="n">ws_charge</span>
+</pre></div>
+</div>
+</li>
+<li><p>dumpsys power | grep “PARTIAL_WAKE_LOCK”</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">PARTIAL_WAKE_LOCK</span>              <span class="s1">&#39;ICC WackLock&#39;</span> <span class="n">ACQUIRE_CAUSES_WAKEUP</span> <span class="n">ON_AFTER_RELEASE</span> <span class="n">ACQ</span><span class="o">=-</span><span class="mi">4</span><span class="n">m10s769ms</span> <span class="n">LONG</span> <span class="p">(</span><span class="n">uid</span><span class="o">=</span><span class="mi">1000</span> <span class="n">pid</span><span class="o">=</span><span class="mi">1748</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>ICC进程占有wake lock，导致系统无法休眠</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="wakelock">
+<h1>代码中怎么处理WakeLock<a class="headerlink" href="#wakelock" title="Permalink to this headline"></a></h1>
+<div class="highlight-Java notranslate"><div class="highlight"><pre><span></span><span class="c1">// packages/ZZZManager/src/com/zzz/daemon/observer/ServerService.java</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">super</span><span class="p">.</span><span class="na">onCreate</span><span class="p">();</span>
+    <span class="n">ZZZLog</span><span class="p">.</span><span class="na">w</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span><span class="s">&quot;onCreate&quot;</span><span class="p">);</span>
+    <span class="n">isrun</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="n">mTaskHandler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TaskHandler</span><span class="p">();</span> <span class="c1">// Handler</span>
+    <span class="cm">/* 获取powermanager服务 */</span>
+    <span class="n">PowerManager</span> <span class="n">powerMg</span> <span class="o">=</span> <span class="p">(</span><span class="n">PowerManager</span><span class="p">)</span> <span class="n">getSystemService</span><span class="p">(</span><span class="n">Context</span><span class="p">.</span><span class="na">POWER_SERVICE</span><span class="p">);</span>
+    <span class="c1">// PowerManager.ACQUIRE_CAUSES_WAKEUP是唤醒屏幕的一个参数</span>
+    <span class="n">mWakeLock</span> <span class="o">=</span> <span class="n">powerMg</span><span class="p">.</span><span class="na">newWakeLock</span><span class="p">(</span><span class="n">PowerManager</span><span class="p">.</span><span class="na">FULL_WAKE_LOCK</span>
+            <span class="o">|</span> <span class="n">PowerManager</span><span class="p">.</span><span class="na">ACQUIRE_CAUSES_WAKEUP</span>
+            <span class="o">|</span> <span class="n">PowerManager</span><span class="p">.</span><span class="na">ON_AFTER_RELEASE</span><span class="p">,</span> <span class="s">&quot;PED WackLock&quot;</span><span class="p">);</span>
+
+    <span class="n">mIccWakeLock</span> <span class="o">=</span> <span class="n">powerMg</span><span class="p">.</span><span class="na">newWakeLock</span><span class="p">(</span><span class="n">PowerManager</span><span class="p">.</span><span class="na">PARTIAL_WAKE_LOCK</span>
+            <span class="o">|</span> <span class="n">PowerManager</span><span class="p">.</span><span class="na">ACQUIRE_CAUSES_WAKEUP</span>
+            <span class="o">|</span> <span class="n">PowerManager</span><span class="p">.</span><span class="na">ON_AFTER_RELEASE</span><span class="p">,</span><span class="s">&quot;ICC WackLock&quot;</span><span class="p">);</span>
+
+    <span class="n">notifyMg</span> <span class="o">=</span> <span class="p">(</span><span class="n">NotificationManager</span><span class="p">)</span> <span class="n">getSystemService</span><span class="p">(</span><span class="n">Context</span><span class="p">.</span><span class="na">NOTIFICATION_SERVICE</span><span class="p">);</span>
+
+    <span class="c1">// ...省略</span>
+<span class="p">}</span>
+
+<span class="cm">/************</span>
+<span class="cm"> * 插卡状态通知</span>
+<span class="cm"> */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">smartCardNotify</span><span class="p">(){</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">getCurrentSmartCardStatus</span><span class="p">()</span><span class="o">==</span><span class="n">SMART_CARD_INSERTION</span><span class="p">){</span>
+        <span class="c1">// ...省略</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="n">mIccWakeLock</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">mIccWakeLock</span><span class="p">.</span><span class="na">isHeld</span><span class="p">()))</span> <span class="p">{</span>
+            <span class="n">ZZZLog</span><span class="p">.</span><span class="na">v</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;acquire wakelock&quot;</span><span class="p">);</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">mIccWakeLock</span><span class="p">.</span><span class="na">acquire</span><span class="p">();</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">Throwable</span> <span class="n">th</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="c1">// should never happen during normal workflow</span>
+            <span class="n">ZZZLog</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;The sp reported event may be abnormal,so do not acquire wakeLock!&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">isIccRemove</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">getCurrentSmartCardStatus</span><span class="p">()</span><span class="o">==</span><span class="n">SMART_CARD_REMOVEL</span><span class="p">){</span>
+        <span class="c1">// ...省略</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">mIccWakeLock</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">mIccWakeLock</span><span class="p">.</span><span class="na">isHeld</span><span class="p">())</span> <span class="p">{</span>
+            <span class="n">ZZZLog</span><span class="p">.</span><span class="na">v</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Releasing wakelock&quot;</span><span class="p">);</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">mIccWakeLock</span><span class="p">.</span><span class="na">release</span><span class="p">();</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">Throwable</span> <span class="n">th</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// ignoring this exception, probably wakeLock was already released</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="c1">// should never happen during normal workflow</span>
+            <span class="n">ZZZLog</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;The sp reported event may be abnormal,so do not release wakeLock!&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// ...省略</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">mIccWakeLock</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">mIccWakeLock</span><span class="p">.</span><span class="na">isHeld</span><span class="p">())</span> <span class="p">{</span>
+        <span class="n">ZZZLog</span><span class="p">.</span><span class="na">v</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Releasing wakelock&quot;</span><span class="p">);</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">mIccWakeLock</span><span class="p">.</span><span class="na">release</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">Throwable</span> <span class="n">th</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// ignoring this exception, probably wakeLock was already released</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// should never happen during normal workflow</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

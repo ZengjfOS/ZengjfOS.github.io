@@ -3,7 +3,7 @@
 * [可以看到这些Unit和Terminal是如何组建起来的](0001_USB_Camera_Descriptor.md#VC架构)
 * 从代码来看，正常来说，Ouput Terminal一般是第一个VC头之后的部分；
 * 所有的Chain被添加再`dev->chains`，结构类似于这种；  
-  ![images\UVC_Chain.jpg](images\UVC_Chain.jpg)
+  ![images/UVC_Chain.jpg](images/UVC_Chain.jpg)
 * 个人感觉这里就是每个节点往下看都是一个链路，所以看上去有很多个链路；
 
 ## 参考文档

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android BatteryStats &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android BatteryStats</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">模块耗电配置</a></li>
+<li><a class="reference internal" href="#id3">简述</a></li>
+<li><a class="reference internal" href="#id4">术语</a></li>
+<li><a class="reference internal" href="#dumpsys-batterystats">dumpsys batterystats</a></li>
+<li><a class="reference internal" href="#battery-history">Battery History</a></li>
+<li><a class="reference internal" href="#x86-64-docker">x86-64 docker</a></li>
+<li><a class="reference internal" href="#go-build">go build</a></li>
+<li><a class="reference internal" href="#battery-historian-online">Battery Historian Online</a></li>
+<li><a class="reference internal" href="#bug-report">bug report</a></li>
+<li><a class="reference internal" href="#id5">模块耗电配置</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android BatteryStats</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-batterystats">
+<h1>Android BatteryStats<a class="headerlink" href="#android-batterystats" title="Permalink to this headline"></a></h1>
+<p>参考文档对BatteryStats中的信息说明的很详细</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://duanqz.github.io/2015-07-21-batterystats-part1">电量统计(1)-原理</a></p></li>
+<li><p><a class="reference external" href="https://duanqz.github.io/2015-07-21-batterystats-part2">电量统计(2)-日志</a></p></li>
+<li><p><a class="reference internal" href="0006_Android_Battery_Current.html"><span class="doc std std-doc">0006_Android_Battery_Current.md</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>模块耗电配置<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>frameworks/base/core/res/res/xml/power_profile.xml</p>
+<ul>
+<li><p>一般会被overlay</p></li>
+<li><p><a class="reference internal" href="0007_Android_res_Overlay.html"><span class="doc std std-doc">0007_Android_res_Overlay.md</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>简述<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<p>手机有很多硬件模块：CPU，蓝牙，GPS，显示屏，Wifi，射频(Cellular Radio)等，在手机使用过程中，这些硬件模块可能处于不同的状态，譬如Wifi打开或关闭，屏幕是亮还是暗，CPU运行或休眠。 硬件模块在不同的状态下的耗电量是不同的。Android在进行电量统计时，并不是采用直接记录电流消耗量的方式，而是跟踪硬件模块在不同状态下的使用时间，收集一些可用信息，用来近似的计算出电池消耗量。</p>
+<p>从用户使用层面来看，Android需要统计出应用程序的耗电量。应用程序的耗电量由很多部分组成，可能使用了GPS，蓝牙等模块，可能应用程序要求长时间亮屏(譬如游戏、视频类应用)。 一个应用程序的电量统计，可以采用累计应用程序使用所有硬件模块时间这种方式近似计算出来。</p>
+<p>举一个例子，假定某个APK的使用了GPS，使用时间用 t 表示。GPS模块单位时间的耗电量用 w 表示，那么，这个APK使用GPS的耗电量就可以按照如下方式计算：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>耗电量 = 单位时间耗电量(w) × 使用时间(t)
+</pre></div>
+</div>
+<p>Android框架层通过一个名为batterystats的系统服务，实现了电量统计的功能。batterystats获取电量的使用信息有两种方式：</p>
+<ul class="simple">
+<li><p>被动(push)：有些硬件模块(wifi, 蓝牙)在发生状态改变时，通知batterystats记录状态变更的时间点</p></li>
+<li><p>主动(pull)：有些硬件模块(cpu)需要batterystats主动记录时间点，譬如记录Activity的启动和终止时间，就能计算出Activity使用CPU的时间</p></li>
+</ul>
+<p>batterystats有主动和被动收集电量使用信息的方式，收集的信息基本都包含硬件模块的状态和被使用的时间两个维度。为什么仅仅是收集不同硬件模块的使用时间呢？ 前面我们说过，手机电压通常是恒定的，耗电量是通过 “单位时间电流量(I) × 使用时间(t)” 来计算，而单位时间电流量是由厂商给定的，定义在power_profile.xml中， 所以，只需要收集不同硬件模块的使用时间，就可以近似的计算出耗电量了</p>
+<p>收集信息被组织起来，在内存中的数据结构是由BatteryStats类描述的。 为了能够从不同维度统计耗电量，这个数据结构设计得比较复杂，我们不在这里展开讨论，仅通过一个收集应用程序前台运行时间的例子，来说明信息收集过程。</p>
+</section>
+<section id="id4">
+<h1>术语<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>realtime：正常流逝的时间，通常把这个时间叫做”墙上时间(walltime)”，就像挂在墙上的时钟一样，走过了一小时就是小时</p></li>
+<li><p>uptime：CPU工作的时间。“墙上时间”经过一小时，但CPU可能就工作了一分钟，其他时间CPU都在休眠</p></li>
+<li><p>休眠率： (realtime-uptime)/realtime，既手机休眠的时间占整个待机时间的比率。休眠率越高，就表明越省电</p></li>
+<li><p>Total partial wakelock time：应用层持有wakelock的总时间</p></li>
+<li><p>Time on battery screen off：在灭屏状态下，电池的使用时间。通常，在灭屏时，我们希望手机可以快速进入休眠状态，所以，这里计算出的休眠率使我们考察耗电问题的重要指标</p></li>
+<li><p>kernel active time：射频模块的kernel层活跃时间。如果长时间处于活跃，那会比较快的消耗电量</p></li>
+<li><p>Radio Access Technology：接入的网络类型(none未插卡、umts、hspa、lte、hspap等)</p></li>
+<li><p>Rx signal strength：信号强度。如果长时间处于信号不好的情况，射频模块会提高功率，从而引起更大的耗电</p></li>
+<li><p>Sleep time/Idle time/Rx time/Tx time：射频模块分别处于休眠、空闲、接收数据、发送数据这几种不同状态下的时间Wifi和Bluetooth的使用统计与Cellular大同小异，不再赘述。</p></li>
+</ul>
+</section>
+<section id="dumpsys-batterystats">
+<h1>dumpsys batterystats<a class="headerlink" href="#dumpsys-batterystats" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">dumpsys</span> <span class="pre">batterystats</span></code></p>
+<p><img alt="0008_Android_batterystats_structure.png" src="../../../_images/0008_Android_batterystats_structure.png" /></p>
+<ul class="simple">
+<li><p>Battery History: 耗电统计的历史记录，每一条记录以HistoryItem的形式存在</p></li>
+<li><p>Per-PID Stats: 每个进程唤醒工作的时间</p></li>
+<li><p>Discharge step durations: 每掉一隔电的时间点和设备的状态</p></li>
+<li><p>Daily stats: 以天为单位展示每掉一隔电的时间点和设备状态</p></li>
+<li><p>Statistics since last charge: 从上次充电以来的统计详情，包含很多子板块</p>
+<ul>
+<li><p>Cellular Statistics: 移动数据网络状态和使用情况</p></li>
+<li><p>Wifi Statistics: WIFI的网络状态和使用情况</p></li>
+<li><p>Bluetooth: 蓝牙在不同工作状态下的使用情况</p></li>
+<li><p>Estimated power use (mAh): 近似计算出的各个用户(uid)的耗电量，一个APK通常对应到一个用户，当然，也有多个APK共享一个用户的情况</p></li>
+<li><p>All kernel wake locks: 内核锁的使用统计</p></li>
+<li><p>All partial wake locks: 应用锁的使用统计</p></li>
+<li><p>All wakeup reasons: 所有的唤醒原因</p></li>
+<li><p>Statistics by uid: 每一个uid的耗电细节</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="battery-history">
+<h1>Battery History<a class="headerlink" href="#battery-history" title="Permalink to this headline"></a></h1>
+<p><img alt="0008_Android_batterystats_history.png" src="../../../_images/0008_Android_batterystats_history.png" /></p>
+<ul class="simple">
+<li><p>https://duanqz.github.io/2015-07-21-batterystats-part2#21-battery-history</p></li>
+</ul>
+</section>
+<section id="x86-64-docker">
+<h1>x86-64 docker<a class="headerlink" href="#x86-64-docker" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>sudo apt-get update</p></li>
+<li><p>curl -fsSL https://get.docker.com -o get-docker.sh</p></li>
+<li><p>sudo sh get-docker.sh</p></li>
+<li><p>sudo docker – run -p 5555:9999 gcr.io/android-battery-historian/stable:3.0 –port 9999</p>
+<ul>
+<li><p>无法获取</p></li>
+<li><p>https://hub.docker.com/r/bhaavan/battery-historian</p></li>
+<li><p>sudo docker pull bhaavan/battery-historian</p>
+<ul>
+<li><p>https://github.com/bhaavanmerchant/battery-historian-docker</p></li>
+<li><p>sudo docker run -d -p 9999:9999 bhaavan/battery-historian</p></li>
+<li><p>x86-64的系统，不是ARM的系统</p></li>
+</ul>
+</li>
+<li><p>存在无法解析的现象，无法使用，主要是版本旧了，有些数据解析不出来；</p></li>
+</ul>
+</li>
+<li><p>sudo docker – run -p 9999:9999 gcr.io/android-battery-historian/stable:3.1 –port 9999</p>
+<ul>
+<li><p>https://hub.docker.com/search?q=android-battery-historian&amp;type=image</p>
+<ul>
+<li><p>靠后一点有3.1版本的</p></li>
+<li><p>详细实现方式参考： https://github.com/gusha915/no-ssr-battery-historian</p></li>
+</ul>
+</li>
+<li><p>sudo docker pull runcare/battery-historian</p></li>
+<li><p>sudo docker run -it -d -p 9999:9999 runcare/battery-historian –port 9999</p></li>
+<li><p>http://192.168.182.129:9999/</p>
+<ul>
+<li><p>要支持能够访问google才行，否者加载文件会出问题，导致加载不了文件，正常能够分析出来；</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img alt="0006_Battery_Historian_Bugreport_Home.png" src="../../../_images/0006_Battery_Historian_Bugreport_Home.png" /></p>
+</section>
+<section id="go-build">
+<h1>go build<a class="headerlink" href="#go-build" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://github.com/google/battery-historian</p></li>
+<li><p>sudo apt-get install golang</p></li>
+<li><p>export GOPATH=$HOME/work</p></li>
+<li><p>export GOBIN=$GOPATH/bin</p></li>
+<li><p>export PATH=$PATH:$GOBIN</p></li>
+<li><p>go get -d -u github.com/google/battery-historian/…</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/weixin_44448273/article/details/105571483">go get 找不到 google.golang.org/protobuf 解决办法</a></p></li>
+<li><p>方法一：</p>
+<ul>
+<li><p>git clone https://e.coding.net/robinqiwei/googleprotobuf.git $GOPATH/src/google.golang.org/protobuf</p></li>
+</ul>
+</li>
+<li><p>方法二：</p>
+<ul>
+<li><p>https://pkg.go.dev/google.golang.org/protobuf</p>
+<ul>
+<li><p>https://github.com/protocolbuffers/protobuf-go</p></li>
+</ul>
+</li>
+<li><p>mkdir -p $GOPATH/src/google.golang.org</p></li>
+<li><p>cd $GOPATH/src/google.golang.org</p></li>
+<li><p>git clone git&#64;github.com:protocolbuffers/protobuf-go.git</p></li>
+<li><p>cp protobuf-go protobuf -r</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>cd $GOPATH/src/github.com/google/battery-historian</p></li>
+<li><p>go run setup.go</p>
+<ul>
+<li><p>error 1</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">tree</span><span class="o">/</span><span class="n">typeahead_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">151</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">tree</span><span class="o">/</span><span class="n">typeahead_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">161</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">tree</span><span class="o">/</span><span class="n">typeahead_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">166</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">tree</span><span class="o">/</span><span class="n">typeahead_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">176</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">tree</span><span class="o">/</span><span class="n">typeahead_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">181</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">window</span><span class="o">/</span><span class="n">window</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">123</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">window</span><span class="o">/</span><span class="n">window_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">window</span><span class="o">/</span><span class="n">window_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">59</span><span class="p">:</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="n">unknown</span> <span class="nd">@suppress</span> <span class="n">parameter</span><span class="p">:</span> <span class="n">strictMissingProperties</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">module</span><span class="o">/</span><span class="n">modulemanager_test</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">281</span><span class="p">:</span> <span class="n">ERROR</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="s1">&#39;}&#39;</span> <span class="n">expected</span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">battery</span><span class="o">-</span><span class="n">historian</span><span class="o">/</span><span class="n">third_party</span><span class="o">/</span><span class="n">closure</span><span class="o">-</span><span class="n">library</span><span class="o">/</span><span class="n">closure</span><span class="o">/</span><span class="n">goog</span><span class="o">/</span><span class="n">streams</span><span class="o">/</span><span class="n">full_test_cases</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">631</span><span class="p">:</span> <span class="n">ERROR</span> <span class="o">-</span> <span class="n">Parse</span> <span class="n">error</span><span class="o">.</span> <span class="s1">&#39;(&#39;</span> <span class="n">expected</span>
+<span class="mi">2</span> <span class="n">error</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="mi">1128</span> <span class="n">warning</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/google/closure-library/issues/988">closure-library/closure/goog/streams/full_test_cases.js:635: ERROR - Parse error. ‘(’ expected #988</a></p></li>
+<li><p>cd third_party/closure-library/</p></li>
+<li><p>git reset –hard v20170409</p></li>
+<li><p>go run setup.go</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>go run cmd/battery-historian/battery-historian.go</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2021</span><span class="o">/</span><span class="mi">06</span><span class="o">/</span><span class="mi">22</span> <span class="mi">04</span><span class="p">:</span><span class="mi">26</span><span class="p">:</span><span class="mi">42</span> <span class="n">Listening</span> <span class="n">on</span> <span class="n">port</span><span class="p">:</span>  <span class="mi">9999</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>不加后面的port参数，默认端口号是9999</p></li>
+<li><p>go run cmd/battery-historian/battery-historian.go [–port &lt;default:9999&gt;]</p></li>
+</ul>
+</li>
+<li><p>http://192.168.137.2:9999/</p></li>
+<li><p>上传bug report文件，submit，查看分析内容</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">error</span> <span class="n">getting</span> <span class="n">appID</span> <span class="kn">from</span> <span class="nn">string</span><span class="p">:</span> <span class="n">strconv</span><span class="o">.</span><span class="n">Atoi</span><span class="p">:</span> <span class="n">parsing</span> <span class="s2">&quot;u0ai9000&quot;</span><span class="p">:</span> <span class="n">invalid</span> <span class="n">syntax</span>
+<span class="n">strconv</span><span class="o">.</span><span class="n">ParseInt</span><span class="p">:</span> <span class="n">parsing</span> <span class="s2">&quot;0.0&quot;</span><span class="p">:</span> <span class="n">invalid</span> <span class="n">syntax</span>
+<span class="o">...</span><span class="n">省略</span>
+<span class="n">could</span> <span class="ow">not</span> <span class="n">parse</span> <span class="n">aggregated</span> <span class="n">battery</span> <span class="n">stats</span>
+<span class="n">device</span> <span class="n">capacity</span> <span class="ow">is</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<ul>
+<li><p>详细实现方式参考： https://github.com/gusha915/no-ssr-battery-historian</p>
+<ul class="simple">
+<li><p>base.html 替换原码下的 battery-historian/templates/base.html</p></li>
+<li><p>cdn目录 放入到battery-historian/third_party 目录</p></li>
+<li><p>go run setup.go</p></li>
+</ul>
+</li>
+<li><p>自己编译的存在各种问题，貌似不能解析显示，数据可能存在问题，其实本质应该是Google没有发布后续版本，采用了docker的形式；</p></li>
+<li><p>荣耀10手机导出的bug report显示是正常的，可能还是跟Android系统版本有关系</p>
+<ul>
+<li><p><a class="reference external" href="https://blog.csdn.net/lhd201006/article/details/54287494">Battery Historian2.0使用过程中遇到的一些问题</a></p>
+<ul class="simple">
+<li><p>其实”,vers,”，”,bt,”和”,bt,”都是在– CHECKIN BATTERYSTATS (dumpsys batterystats -c) –下的，只不过这里这三行并不连续，中间穿插一大段数据内容，而刚才删除的那三行却是连续的，而且后面带的参数都是0，经过比较发现，后面带的参数本应该是uid，进程名等参数，这些参数是不可能都为0的所以就猜测刚才删除的那些数据可能是异常数据，也许就是这里导致视图分析报错，于是就把那一整段都全部删除：</p></li>
+</ul>
+</li>
+<li><p>解压zip文件；</p></li>
+<li><p>删除压缩文件中的<code class="docutils literal notranslate"><span class="pre">bugreport-xxx-RP1A.200720.011-2021-06-21-15-31-54.txt</span></code>中的下面这段数据，然后图形显示正常</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">ctr</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">bt</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">90749</span><span class="p">,</span><span class="mi">12551</span><span class="p">,</span><span class="mi">242110</span><span class="p">,</span><span class="mi">163911</span><span class="p">,</span><span class="mi">1624260578842</span><span class="p">,</span><span class="mi">80495</span><span class="p">,</span><span class="mi">2297</span><span class="p">,</span><span class="mi">3013</span><span class="p">,</span><span class="mi">3013000</span><span class="p">,</span><span class="mi">3013000</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">gn</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">gmcd</span><span class="p">,</span><span class="mi">2937</span><span class="p">,</span><span class="mi">385</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">gwfl</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="mi">10254</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">324</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10074</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">br</span><span class="p">,</span><span class="mi">2237</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">8017</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">sgt</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">90749</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">sst</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">sgc</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">dct</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">dcc</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wst</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wsc</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wsst</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wssc</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wsgt</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wsgc</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">wmct</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+<span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">dc</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>Battery Historian加载bugreport-xxx-RP1A.200720.011-2021-06-21-15-31-54.txt解析显示</p>
+<ul class="simple">
+<li><p><img alt="0008_Android_BatteryStats_Data_Modified.png" src="../../../_images/0008_Android_BatteryStats_Data_Modified.png" /></p></li>
+<li><p>Historian V2显示正常，Historian显示还是存在问题，这个貌似不是那么重要；</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="battery-historian-online">
+<h1>Battery Historian Online<a class="headerlink" href="#battery-historian-online" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://bathist.ef.lc/</p></li>
+<li><p>其他的方式貌似多少都是存在问题的，docker和自行编译都无法显示完整；</p></li>
+</ul>
+<p><img alt="0008_Android_BatteryStats_Online.png" src="../../../_images/0008_Android_BatteryStats_Online.png" /></p>
+<ul>
+<li><p>Errors</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">error</span> <span class="n">getting</span> <span class="n">appID</span> <span class="kn">from</span> <span class="nn">string</span><span class="p">:</span> <span class="n">strconv</span><span class="o">.</span><span class="n">ParseInt</span><span class="p">:</span> <span class="n">parsing</span> <span class="s2">&quot;u0ai9000&quot;</span><span class="p">:</span> <span class="n">invalid</span> <span class="n">syntax</span>
+<span class="n">strconv</span><span class="o">.</span><span class="n">ParseInt</span><span class="p">:</span> <span class="n">parsing</span> <span class="s2">&quot;0.0&quot;</span><span class="p">:</span> <span class="n">invalid</span> <span class="n">syntax</span>
+<span class="nb">open</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">go</span><span class="o">-</span><span class="mf">1.6</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">time</span><span class="o">/</span><span class="n">zoneinfo</span><span class="o">.</span><span class="n">zip</span><span class="p">:</span> <span class="n">no</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span>
+<span class="o">**</span> <span class="n">Error</span> <span class="ow">in</span> <span class="mi">9</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">Bl</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">Bs</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">Bh</span><span class="o">=</span><span class="n">g</span><span class="p">,</span><span class="n">Bp</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="n">Bt</span><span class="o">=</span><span class="mi">289</span><span class="p">,</span><span class="n">Bv</span><span class="o">=</span><span class="mi">4279</span><span class="p">,</span><span class="n">Bcc</span><span class="o">=</span><span class="mi">3013</span><span class="p">,</span><span class="n">Mrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">Wrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="o">+</span><span class="n">r</span><span class="p">,</span><span class="o">+</span><span class="n">w</span><span class="p">,</span><span class="o">+</span><span class="n">S</span><span class="p">,</span><span class="n">Pss</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">Sb</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="o">+</span><span class="n">Ud</span><span class="p">,</span><span class="n">Epr</span><span class="o">=</span><span class="mi">0</span> <span class="k">with</span> <span class="n">Mrc</span><span class="o">=</span><span class="mi">0</span> <span class="p">:</span> <span class="n">unknown</span> <span class="n">key</span> <span class="n">Mrc</span>
+<span class="o">**</span> <span class="n">Error</span> <span class="ow">in</span> <span class="mi">9</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">Bl</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">Bs</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">Bh</span><span class="o">=</span><span class="n">g</span><span class="p">,</span><span class="n">Bp</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="n">Bt</span><span class="o">=</span><span class="mi">289</span><span class="p">,</span><span class="n">Bv</span><span class="o">=</span><span class="mi">4279</span><span class="p">,</span><span class="n">Bcc</span><span class="o">=</span><span class="mi">3013</span><span class="p">,</span><span class="n">Mrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">Wrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="o">+</span><span class="n">r</span><span class="p">,</span><span class="o">+</span><span class="n">w</span><span class="p">,</span><span class="o">+</span><span class="n">S</span><span class="p">,</span><span class="n">Pss</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">Sb</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="o">+</span><span class="n">Ud</span><span class="p">,</span><span class="n">Epr</span><span class="o">=</span><span class="mi">0</span> <span class="k">with</span> <span class="n">Wrc</span><span class="o">=</span><span class="mi">0</span> <span class="p">:</span> <span class="n">unknown</span> <span class="n">key</span> <span class="n">Wrc</span>
+<span class="o">**</span> <span class="n">Error</span> <span class="ow">in</span> <span class="mi">9</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">Bl</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">Bs</span><span class="o">=</span><span class="n">d</span><span class="p">,</span><span class="n">Bh</span><span class="o">=</span><span class="n">g</span><span class="p">,</span><span class="n">Bp</span><span class="o">=</span><span class="n">n</span><span class="p">,</span><span class="n">Bt</span><span class="o">=</span><span class="mi">289</span><span class="p">,</span><span class="n">Bv</span><span class="o">=</span><span class="mi">4279</span><span class="p">,</span><span class="n">Bcc</span><span class="o">=</span><span class="mi">3013</span><span class="p">,</span><span class="n">Mrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">Wrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="o">+</span><span class="n">r</span><span class="p">,</span><span class="o">+</span><span class="n">w</span><span class="p">,</span><span class="o">+</span><span class="n">S</span><span class="p">,</span><span class="n">Pss</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">Sb</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="o">+</span><span class="n">Ud</span><span class="p">,</span><span class="n">Epr</span><span class="o">=</span><span class="mi">0</span> <span class="k">with</span> <span class="o">+</span><span class="n">Ud</span> <span class="p">:</span> <span class="n">unknown</span> <span class="n">key</span> <span class="n">Ud</span>
+<span class="o">**</span> <span class="n">Error</span> <span class="ow">in</span> <span class="mi">9</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="mi">834</span><span class="p">,</span><span class="o">-</span><span class="n">Ud</span><span class="p">,</span><span class="o">+</span><span class="n">Ewl</span><span class="o">=</span><span class="mi">33</span> <span class="k">with</span> <span class="o">-</span><span class="n">Ud</span> <span class="p">:</span> <span class="n">unknown</span> <span class="n">key</span> <span class="n">Ud</span>
+<span class="o">**</span> <span class="n">Error</span> <span class="ow">in</span> <span class="mi">9</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">+</span><span class="n">Ud</span><span class="p">,</span><span class="o">-</span><span class="n">Ewl</span><span class="o">=</span><span class="mi">40</span> <span class="k">with</span> <span class="o">+</span><span class="n">Ud</span> <span class="p">:</span> <span class="n">unknown</span> <span class="n">key</span> <span class="n">Ud</span>
+<span class="nb">open</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">go</span><span class="o">-</span><span class="mf">1.6</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">time</span><span class="o">/</span><span class="n">zoneinfo</span><span class="o">.</span><span class="n">zip</span><span class="p">:</span> <span class="n">no</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span>
+</pre></div>
+</div>
+</li>
+<li><p>有报错，但依然能够正常显示，自己弄的服务器就无法显示正常</p></li>
+</ul>
+</section>
+<section id="bug-report">
+<h1>bug report<a class="headerlink" href="#bug-report" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>battery可以查看电池信息，batterystats可以查看电池消耗信息；</p></li>
+<li><p>打开开发者模式</p></li>
+<li><p>adb shell dumpsys battery</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Current</span> <span class="n">Battery</span> <span class="n">Service</span> <span class="n">state</span><span class="p">:</span>
+  <span class="n">AC</span> <span class="n">powered</span><span class="p">:</span> <span class="n">false</span>
+  <span class="n">USB</span> <span class="n">powered</span><span class="p">:</span> <span class="n">true</span>
+  <span class="n">Wireless</span> <span class="n">powered</span><span class="p">:</span> <span class="n">false</span>
+  <span class="n">Max</span> <span class="n">charging</span> <span class="n">current</span><span class="p">:</span> <span class="mi">500000</span>
+  <span class="n">Max</span> <span class="n">charging</span> <span class="n">voltage</span><span class="p">:</span> <span class="mi">5000000</span>
+  <span class="n">Charge</span> <span class="n">counter</span><span class="p">:</span> <span class="mi">2092360</span>
+  <span class="n">status</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="n">health</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="n">present</span><span class="p">:</span> <span class="n">true</span>
+  <span class="n">level</span><span class="p">:</span> <span class="mi">68</span>
+  <span class="n">scale</span><span class="p">:</span> <span class="mi">100</span>
+  <span class="n">voltage</span><span class="p">:</span> <span class="mi">3913</span>
+  <span class="n">temperature</span><span class="p">:</span> <span class="mi">311</span>
+  <span class="n">technology</span><span class="p">:</span> <span class="n">Li</span><span class="o">-</span><span class="n">ion</span>
+</pre></div>
+</div>
+</li>
+<li><p>adb shell dumpsys batterystats –enable full-wake-history</p></li>
+<li><p>adb shell dumpsys batterystats –reset</p></li>
+<li><p>拔出USB</p>
+<ul class="simple">
+<li><p>为什么要拔出USB? 因为如果你一直插着USB，如果电充满了，你的数据会被清空的。batterystats只会记录最后一次充满电后的记录，因此强烈建议先把电充满，完成以上操作后，拔出USB电源。</p></li>
+</ul>
+</li>
+<li><p>等个几分钟</p></li>
+<li><p>插入USB</p></li>
+<li><p>adb shell dumpsys batterystats –history</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Battery</span> <span class="n">History</span> <span class="p">(</span><span class="mi">0</span><span class="o">%</span> <span class="n">used</span><span class="p">,</span> <span class="mi">784</span> <span class="n">used</span> <span class="n">of</span> <span class="mi">4096</span><span class="n">KB</span><span class="p">,</span> <span class="mi">14</span> <span class="n">strings</span> <span class="n">using</span> <span class="mi">770</span><span class="p">):</span>
+                    <span class="mi">0</span> <span class="p">(</span><span class="mi">14</span><span class="p">)</span> <span class="n">RESET</span><span class="p">:</span><span class="n">TIME</span><span class="p">:</span> <span class="mi">2021</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">18</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">06</span>
+                    <span class="mi">0</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="n">status</span><span class="o">=</span><span class="n">charging</span> <span class="n">health</span><span class="o">=</span><span class="n">good</span> <span class="n">plug</span><span class="o">=</span><span class="n">usb</span> <span class="n">temp</span><span class="o">=</span><span class="mi">311</span> <span class="n">volt</span><span class="o">=</span><span class="mi">4017</span> <span class="n">charge</span><span class="o">=</span><span class="mi">2153</span> <span class="n">modemRailChargemAh</span><span class="o">=</span><span class="mi">0</span> <span class="n">wifiRailChargemAh</span><span class="o">=</span><span class="mi">0</span> <span class="o">+</span><span class="n">running</span> <span class="o">+</span><span class="n">plugged</span> <span class="o">+</span><span class="n">usb_data</span>
+                    <span class="mi">0</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">fg</span><span class="o">=</span><span class="n">u0a58</span><span class="p">:</span><span class="s2">&quot;com.debug.loggerui&quot;</span>
+                    <span class="mi">0</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">top</span><span class="o">=</span><span class="mi">1001</span><span class="p">:</span><span class="s2">&quot;com.mediatek.engineermode&quot;</span>
+                    <span class="mi">0</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">user</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;0&quot;</span>
+                    <span class="mi">0</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">userfg</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;0&quot;</span>
+                 <span class="o">+</span><span class="mi">4</span><span class="n">ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;wakelock-change&quot;</span>
+                <span class="o">+</span><span class="mi">75</span><span class="n">ms</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="mi">070</span> <span class="o">+</span><span class="n">wake_lock</span><span class="o">=</span><span class="mi">1000</span><span class="p">:</span><span class="s2">&quot;*alarm*:TIME_TICK&quot;</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;dump&quot;</span>
+             <span class="o">+</span><span class="mi">1</span><span class="n">s751ms</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">wake_lock</span>
+             <span class="o">+</span><span class="mi">5</span><span class="n">s404ms</span> <span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="mi">070</span> <span class="o">+</span><span class="n">wake_lock</span><span class="o">=-</span><span class="mi">1</span><span class="p">:</span><span class="s2">&quot;screen&quot;</span> <span class="o">+</span><span class="n">screen</span> <span class="n">brightness</span><span class="o">=</span><span class="n">medium</span> <span class="n">screenwake</span><span class="o">=</span><span class="mi">1000</span><span class="p">:</span><span class="s2">&quot;android.server.power:PLUGGED:false&quot;</span>
+             <span class="o">+</span><span class="mi">5</span><span class="n">s439ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;battery-state&quot;</span>
+             <span class="o">+</span><span class="mi">5</span><span class="n">s543ms</span> <span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="mi">070</span> <span class="n">status</span><span class="o">=</span><span class="n">discharging</span> <span class="n">plug</span><span class="o">=</span><span class="n">none</span> <span class="n">temp</span><span class="o">=</span><span class="mi">319</span> <span class="n">volt</span><span class="o">=</span><span class="mi">3927</span> <span class="o">-</span><span class="n">plugged</span> <span class="o">-</span><span class="n">usb_data</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;screen-state&quot;</span>
+             <span class="o">+</span><span class="mi">8</span><span class="n">s191ms</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">wake_lock</span> <span class="o">-</span><span class="n">screen</span> <span class="n">brightness</span><span class="o">=</span><span class="n">dark</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;screen-state&quot;</span>
+            <span class="o">+</span><span class="mi">10</span><span class="n">s868ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">wake_reason</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;Abort:noirq suspend of  device failed&quot;</span>
+            <span class="o">+</span><span class="mi">12</span><span class="n">s335ms</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">running</span>
+          <span class="o">+</span><span class="mi">1</span><span class="n">m02s280ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="o">+</span><span class="n">running</span> <span class="o">+</span><span class="n">wake_lock</span><span class="o">=</span><span class="mi">1000</span><span class="p">:</span><span class="s2">&quot;*alarm*:TIME_TICK&quot;</span> <span class="n">wake_reason</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;179:SPM&quot;</span>
+          <span class="o">+</span><span class="mi">1</span><span class="n">m02s362ms</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">wake_lock</span>
+          <span class="o">+</span><span class="mi">1</span><span class="n">m03s782ms</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">running</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m03s296ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="o">+</span><span class="n">running</span> <span class="o">+</span><span class="n">wake_lock</span><span class="o">=</span><span class="mi">1000</span><span class="p">:</span><span class="s2">&quot;*alarm*:TIME_TICK&quot;</span> <span class="n">wake_reason</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;179:SPM&quot;</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m03s345ms</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">wake_lock</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m03s382ms</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="mi">070</span> <span class="n">volt</span><span class="o">=</span><span class="mi">3905</span> <span class="n">wake_reason</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;Abort:Last active Wakeup Source: bat_percent_notify_lock wakelock&quot;</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m05s012ms</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">running</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m09s333ms</span> <span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="mi">070</span> <span class="o">+</span><span class="n">running</span> <span class="o">+</span><span class="n">wake_lock</span><span class="o">=-</span><span class="mi">1</span><span class="p">:</span><span class="s2">&quot;screen&quot;</span> <span class="o">+</span><span class="n">screen</span> <span class="n">brightness</span><span class="o">=</span><span class="n">medium</span> <span class="n">wake_reason</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;179:SPM&quot;</span> <span class="n">screenwake</span><span class="o">=</span><span class="mi">1000</span><span class="p">:</span><span class="s2">&quot;android.server.power:PLUGGED:true&quot;</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m10s018ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;battery-state&quot;</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m10s082ms</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="mi">070</span> <span class="n">status</span><span class="o">=</span><span class="n">charging</span> <span class="n">plug</span><span class="o">=</span><span class="n">usb</span> <span class="n">temp</span><span class="o">=</span><span class="mi">314</span> <span class="n">volt</span><span class="o">=</span><span class="mi">3933</span> <span class="o">+</span><span class="n">plugged</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m10s105ms</span> <span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="mi">070</span> <span class="n">volt</span><span class="o">=</span><span class="mi">4004</span> <span class="o">+</span><span class="n">audio</span> <span class="o">+</span><span class="n">usb_data</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;screen-state&quot;</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m14s071ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">audio</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m17s964ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">brightness</span><span class="o">=</span><span class="n">dark</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m20s303ms</span> <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="mi">070</span> <span class="o">-</span><span class="n">wake_lock</span> <span class="o">-</span><span class="n">screen</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;screen-state&quot;</span>
+          <span class="o">+</span><span class="mi">2</span><span class="n">m28s937ms</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="mi">070</span> <span class="n">stats</span><span class="o">=</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;dump&quot;</span>
+
+<span class="n">Total</span> <span class="n">cpu</span> <span class="n">time</span> <span class="n">reads</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Batched</span> <span class="n">cpu</span> <span class="n">time</span> <span class="n">reads</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Batching</span> <span class="n">Duration</span> <span class="p">(</span><span class="nb">min</span><span class="p">):</span> <span class="mi">187</span>
+<span class="n">All</span> <span class="n">UID</span> <span class="n">cpu</span> <span class="n">time</span> <span class="n">reads</span> <span class="n">since</span> <span class="n">the</span> <span class="n">later</span> <span class="n">of</span> <span class="n">device</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">stats</span> <span class="n">reset</span><span class="p">:</span> <span class="mi">36</span>
+<span class="n">UIDs</span> <span class="n">removed</span> <span class="n">since</span> <span class="n">the</span> <span class="n">later</span> <span class="n">of</span> <span class="n">device</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">stats</span> <span class="n">reset</span><span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>adb shell dumpsys batterystats &gt; batterystats.txt</p></li>
+<li><p>adb bugreport</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">user_de</span><span class="o">/</span><span class="mi">0</span><span class="o">/</span><span class="n">com</span><span class="o">.</span><span class="n">android</span><span class="o">.</span><span class="n">shell</span><span class="o">/</span><span class="n">files</span><span class="o">/</span><span class="n">bugreports</span><span class="o">/</span><span class="n">bugrepo</span><span class="o">...</span><span class="n">file</span> <span class="n">pulled</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skipped</span><span class="o">.</span> <span class="mf">7.1</span> <span class="n">MB</span><span class="o">/</span><span class="n">s</span> <span class="p">(</span><span class="mi">3062878</span> <span class="nb">bytes</span> <span class="ow">in</span> <span class="mf">0.413</span><span class="n">s</span><span class="p">)</span>
+<span class="n">Bug</span> <span class="n">report</span> <span class="n">copied</span> <span class="n">to</span> <span class="n">X</span><span class="p">:</span>\<span class="n">log</span>\<span class="n">bugreport</span><span class="o">-</span><span class="n">xxx</span><span class="o">-</span><span class="n">RP1A</span><span class="mf">.200720.011</span><span class="o">-</span><span class="mi">2021</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">21</span><span class="o">-</span><span class="mi">15</span><span class="o">-</span><span class="mi">31</span><span class="o">-</span><span class="mf">54.</span><span class="n">zip</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Battery Historian针对Batterystats进行电池用量分析</p></li>
+<li><p>adb bugreport bugreport.zip</p></li>
+</ul>
+</li>
+<li><p>手机端操作</p>
+<ul class="simple">
+<li><p>在Developer选项中，点击<code class="docutils literal notranslate"><span class="pre">Bug</span> <span class="pre">report</span></code></p></li>
+<li><p>选择所需的错误报告类型，然后点击”report”</p></li>
+<li><p>在下拉状态栏就可以看到Bug report正在生成，等到生成完成</p></li>
+<li><p>可以看到进度条和前面个的<code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">bugreport</span></code>有交互运行；</p></li>
+</ul>
+</li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/96cca14c16c8fb09cfbf869bdb437500/0008_bugreport-xxx-RP1A.200720.011-2021-06-21-15-31-54.zip"><span class="xref download myst">0008_bugreport-xxx-RP1A.200720.011-2021-06-21-15-31-54.zip</span></a></p></li>
+</ul>
+</section>
+<section id="id5">
+<h1>模块耗电配置<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>frameworks/base/core/res/res/xml/power_profile.xml</p>
+<ul>
+<li><p>一般会被overlay</p></li>
+<li><p><a class="reference internal" href="0007_Android_res_Overlay.html"><span class="doc std std-doc">0007_Android_res_Overlay.md</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

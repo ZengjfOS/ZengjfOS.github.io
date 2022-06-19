@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android BatteryStats Docker &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android BatteryStats Docker</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#batterystats">batterystats</a></li>
+<li><a class="reference internal" href="#bug-report">bug report</a></li>
+<li><a class="reference internal" href="#docker-desktop">Docker Desktop</a></li>
+<li><a class="reference internal" href="#disable-wsl-2-based-engine">Disable WSL 2 based engine</a></li>
+<li><a class="reference internal" href="#id2">镜像站配置</a></li>
+<li><a class="reference internal" href="#battery-historian">Battery Historian</a></li>
+<li><a class="reference internal" href="#id3">系统镜像在哪里</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android BatteryStats Docker</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-batterystats-docker">
+<h1>Android BatteryStats Docker<a class="headerlink" href="#android-batterystats-docker" title="Permalink to this headline"></a></h1>
+<p>采用Docker形式的Battery Historian v3.1分析BatteryStats，以及电源分析示例</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0008_Android_BatteryStats.html"><span class="doc std std-doc">0008_Android_BatteryStats.md</span></a></p></li>
+</ul>
+</section>
+<section id="batterystats">
+<h1>batterystats<a class="headerlink" href="#batterystats" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>adb shell dumpsys batterystats –enable full-wake-history</p></li>
+<li><p>adb shell dumpsys batterystats –reset</p></li>
+<li><p>USB拔出</p></li>
+<li><p>等待测试功耗完成</p></li>
+<li><p>USB插入</p></li>
+<li><p>adb shell dumpsys batterystats &gt; batterystats.txt</p>
+<ul>
+<li><p>或者</p>
+<ul>
+<li><p>adb shell dumpsys batterystats –history</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="bug-report">
+<h1>bug report<a class="headerlink" href="#bug-report" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>adb shell dumpsys batterystats –enable full-wake-history</p></li>
+<li><p>adb shell dumpsys batterystats –reset</p></li>
+<li><p>USB拔出</p></li>
+<li><p>等待测试功耗完成</p></li>
+<li><p>USB插入</p></li>
+<li><p>adb bugreport</p></li>
+</ul>
+</section>
+<section id="docker-desktop">
+<h1>Docker Desktop<a class="headerlink" href="#docker-desktop" title="Permalink to this headline"></a></h1>
+<p>https://www.docker.com/products/docker-desktop</p>
+</section>
+<section id="disable-wsl-2-based-engine">
+<h1>Disable WSL 2 based engine<a class="headerlink" href="#disable-wsl-2-based-engine" title="Permalink to this headline"></a></h1>
+<p>主要是不想安装WSL，只是简单的使用一下Docker，感觉没必要，又不是经常用</p>
+<p><img alt="0009_Android_BatteryStats_Docker_WSL2_Disable.png" src="../../../_images/0009_Android_BatteryStats_Docker_WSL2_Disable.png" /></p>
+</section>
+<section id="id2">
+<h1>镜像站配置<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>https://yeasy.gitbook.io/docker_practice/install/mirror</p>
+<p><img alt="0009_Android_BatteryStats_Docker_Mirror.png" src="../../../_images/0009_Android_BatteryStats_Docker_Mirror.png" /></p>
+<ul>
+<li><p>config</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;registry-mirrors&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;https://hub-mirror.c.163.com&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;https://mirror.baidubce.com&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;insecure-registries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;debug&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;experimental&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;features&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;buildkit&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;builder&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;gc&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;defaultKeepStorage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;20GB&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>cmd: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">info</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">...</span><span class="n">省略</span>
+ <span class="n">Registry</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">index</span><span class="o">.</span><span class="n">docker</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span>
+ <span class="n">Labels</span><span class="p">:</span>
+ <span class="n">Experimental</span><span class="p">:</span> <span class="n">false</span>
+ <span class="n">Insecure</span> <span class="n">Registries</span><span class="p">:</span>
+  <span class="mf">127.0.0.0</span><span class="o">/</span><span class="mi">8</span>
+ <span class="n">Registry</span> <span class="n">Mirrors</span><span class="p">:</span>
+  <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">hub</span><span class="o">-</span><span class="n">mirror</span><span class="o">.</span><span class="n">c</span><span class="mf">.163</span><span class="o">.</span><span class="n">com</span><span class="o">/</span>
+  <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mirror</span><span class="o">.</span><span class="n">baidubce</span><span class="o">.</span><span class="n">com</span><span class="o">/</span>
+ <span class="n">Live</span> <span class="n">Restore</span> <span class="n">Enabled</span><span class="p">:</span> <span class="n">false</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="battery-historian">
+<h1>Battery Historian<a class="headerlink" href="#battery-historian" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>docker pull runcare/battery-historian<br />
+<img alt="0009_Android_BatteryStats_Docker_BatteryHistorian_v3.1.png" src="../../../_images/0009_Android_BatteryStats_Docker_BatteryHistorian_v3.1.png" /></p></li>
+<li><p>选中，配置，然后点击运行<br />
+<img alt="0009_Android_BatteryStats_Docker_BatteryHistorian_Config.png" src="../../../_images/0009_Android_BatteryStats_Docker_BatteryHistorian_Config.png" /></p></li>
+<li><p>Web访问，听说这个也需要能访问Google才行，不过貌似有些地方又不需要，看情况，如果不行就用工具，可以就不用工具<br />
+<img alt="0009_Android_BatteryStats_Docker_BatteryHistorian_Web_Access.png" src="../../../_images/0009_Android_BatteryStats_Docker_BatteryHistorian_Web_Access.png" /></p></li>
+<li><p>正常显示数据，Historian V2能够正常显示，Historian那个页面还是不能正常显示<br />
+<img alt="0009_Android_BatteryStats_Docker_BatteryHistorian_Data_Show.png" src="../../../_images/0009_Android_BatteryStats_Docker_BatteryHistorian_Data_Show.png" /></p></li>
+</ul>
+</section>
+<section id="id3">
+<h1>系统镜像在哪里<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>默认系统是下载在了C盘，比较尴尬<br />
+<img alt="0009_Android_BatteryStats_Docker_Store.png" src="../../../_images/0009_Android_BatteryStats_Docker_Store.png" /></p></li>
+<li><p>选择新的路径，会自动把系统拷贝过去，并清理之前的目录，点赞；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

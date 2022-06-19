@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android Type-C Charger &mdash; 分析文档 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Type-C Charger</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简述</a></li>
+<li><a class="reference internal" href="#dts">dts</a></li>
+<li><a class="reference internal" href="#driver">driver</a></li>
+<li><a class="reference internal" href="#id3">充电电流</a></li>
+<li><a class="reference internal" href="#id4">电池容量</a></li>
+<li><a class="reference internal" href="#id5">电池充放电</a></li>
+<li><a class="reference internal" href="#usb-plug-in-log">usb plug in log</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android Type-C Charger</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-type-c-charger">
+<h1>Android Type-C Charger<a class="headerlink" href="#android-type-c-charger" title="Permalink to this headline"></a></h1>
+<p>Android Type-C 充电</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/zhenwenxian/article/details/7471892">锂电池充电的原理</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/yuewen2008/article/details/80899568">MTK平台充电模块梳理</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/u012719256/article/details/78865196">MTK Battery系统</a></p></li>
+<li><p><a class="reference internal" href="0003_USB_PD_Protocol.html"><span class="doc std std-doc">0003_USB_PD_Protocol.md</span></a></p></li>
+<li><p>https://github.com/MediaTek-Labs/common-kernel-4.19</p></li>
+<li><p><a class="reference external" href="https://www.cnblogs.com/linhaostudy/p/12002068.html">Android Healthd电池服务分析</a></p></li>
+<li><p>Smartphone/HW/Common Design Notes/PMU/Charger</p>
+<ul>
+<li><p>Charging_study_for_Customer_SW_V0.1_20191118.pdf</p>
+<ul>
+<li><p><strong>重点阅读</strong></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>简述<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>MTK方案的电池充电过程分为预充、恒流充电（CC模式）、恒压充电（CV模式）三种模式，从充电状态图看出来，刚开始充电的时候，代码先判断是插USB充电还是插ac充电，电池在进入充电阶段分为快速充电、CC（恒流充电）、CV（恒压充电）。</p>
+<p>Charger所处的位置，在通往电池Battery的那条通路上，会有一个毫欧级别的电阻，两端接着Gauge，以此来判定电池电流状态</p>
+</section>
+<section id="dts">
+<h1>dts<a class="headerlink" href="#dts" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>kernel-4.19/arch/arm64/boot/dts/mediatek/mt6765.dts</p>
+<div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="nl">charger</span><span class="p">:</span><span class="w"> </span><span class="nf">charger</span><span class="cm"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mediatek,charger&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">gauge</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">mtk_gauge</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">charger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">mt6370_chg</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">bootmode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">chosen</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pmic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">main_pmic</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">algorithm_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Basic&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">charger_configuration</span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>kernel-4.19/arch/arm64/boot/dts/mediatek/mt6370.dtsi</p>
+<div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="nl">mt6370_chg</span><span class="p">:</span><span class="w"> </span><span class="nf">charger</span><span class="cm"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mediatek,mt6370_pmu_charger&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">interrupt-names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;chg_mivr&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;chg_aiclmeasi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;attachi&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ovpctrl_uvp_d_evt&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;chg_wdtmri&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;chg_vbusov&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;chg_tmri&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;chg_treg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dcdti&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">charger_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;primary_chg&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">load_switch_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;primary_load_switch&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="n">charger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">mt6370_chg</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">bc12_sel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="nl">otg_vbus</span><span class="p">:</span><span class="w"> </span><span class="nf">usb-otg-vbus</span><span class="cm"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">regulator-compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;usb-otg-vbus&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">regulator-name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;usb-otg-vbus&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">regulator-min-microvolt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">4350000</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">regulator-max-microvolt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">5800000</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">regulator-min-microamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">500000</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">regulator-max-microamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mi">3000000</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>kernel-4.19/arch/arm64/boot/dts/mediatek/mt6357.dtsi</p>
+<div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="nl">mtk_gauge</span><span class="p">:</span><span class="w"> </span><span class="nf">mtk_gauge</span><span class="cm"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mediatek,mt6357-gauge&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">charger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">mt6370_chg</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">bootmode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="na">chosen</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>kernel-4.9/arch/arm64/boot/dts/mediatek/bat_setting/mt6765_battery_prop.dtsi</p>
+<div class="highlight-dts notranslate"><div class="highlight"><pre><span></span><span class="nl">bat_gm30</span><span class="p">:</span><span class="w"> </span><span class="nf">battery</span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kr">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mediatek,bat_gm30&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="cp">#include</span><span class="cm"> </span><span class="cpf">&quot;mt6765_battery_table.dtsi&quot;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="driver">
+<h1>driver<a class="headerlink" href="#driver" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Android Q</p>
+<ul>
+<li><p>kernel-4.9/drivers/power/supply/mediatek/charger</p>
+<ul>
+<li><p>充电</p></li>
+</ul>
+</li>
+<li><p>kernel-4.9/drivers/power/supply/mediatek/battery</p>
+<ul>
+<li><p>电池</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Android R</p>
+<ul>
+<li><p>kernel-4.19/drivers/power/supply/mtk_charger.c</p></li>
+<li><p>kernel-4.19/drivers/power/supply/mtk_battery.c</p></li>
+<li><p>kernel-4.19/drivers/power/supply/mt6357-gauge.c</p></li>
+<li><p>kernel-4.19/drivers/misc/mediatek/pmic/mt6370/mt6370_pmu_charger.c</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>充电电流<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Android R</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mtk_charger</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">mtk_charger_probe</span><span class="p">(</span><span class="n">struct</span> <span class="n">platform_device</span> <span class="o">*</span><span class="n">pdev</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">mtk_charger_parse_dt</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">mtk_basic_charger_init</span><span class="p">(</span><span class="n">info</span><span class="p">);</span>
+        <span class="o">*</span> <span class="n">drivers</span><span class="o">/</span><span class="n">power</span><span class="o">/</span><span class="n">supply</span><span class="o">/</span><span class="n">mtk_basic_charger</span><span class="o">.</span><span class="n">c</span>
+          <span class="o">*</span> <span class="nb">int</span> <span class="n">mtk_basic_charger_init</span><span class="p">(</span><span class="n">struct</span> <span class="n">mtk_charger</span> <span class="o">*</span><span class="n">info</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">do_algorithm</span><span class="p">(</span><span class="n">struct</span> <span class="n">mtk_charger</span> <span class="o">*</span><span class="n">info</span><span class="p">)</span>
+              <span class="o">*</span> <span class="n">static</span> <span class="nb">bool</span> <span class="n">select_charging_current_limit</span><span class="p">(</span><span class="n">struct</span> <span class="n">mtk_charger</span> <span class="o">*</span><span class="n">info</span><span class="p">,</span> <span class="n">struct</span> <span class="n">chg_limit_setting</span> <span class="o">*</span><span class="n">setting</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h1>电池容量<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>vendor/mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/power/res/xml/power_profile.xml</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- This is the battery capacity in mAh (measured at nominal voltage) --&gt;</span>
+<span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">&quot;battery.capacity&quot;</span><span class="nt">&gt;</span>3000<span class="nt">&lt;/item&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id5">
+<h1>电池充放电<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>3CBatteryManager.apk</p></li>
+<li><p>在设置选项中，电池可以将记录的数据保存出来</p>
+<ul>
+<li><p>[History]</p></li>
+<li><p>[左上角三条杠] -&gt; [Settings] -&gt; [Battery] -&gt; [Export battery history]</p></li>
+</ul>
+</li>
+<li><p>修改监听参数</p>
+<ul>
+<li><p>[左上角三条杠] -&gt; [Settings] -&gt; [Battery] -&gt; [Monitoring]</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="usb-plug-in-log">
+<h1>usb plug in log<a class="headerlink" href="#usb-plug-in-log" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;6&gt;[ 2776.747612]  (6)[235:irq/30-mt6370_p]mt6370_pmu_irq_handler
+&lt;6&gt;[ 2776.749495]  (6)[61:pd_dbg_info]///PD dbg info 34d
+&lt;4&gt;[ 2776.749536]  (6)[61:pd_dbg_info]&lt; 2776.749&gt;TCPC-TCPC:ps_change=2
+&lt;6&gt;[ 2776.755642]  (5)[235:irq/30-mt6370_p]mt6370_pmu 5-0034: mt6370_pmu_irq_handler: handler irq_domain = (8, 4)
+&lt;5&gt;[ 2776.785404] -(4)[238:type_c_port0]alarmtimer_enqueue, 1620820906063218464
+&lt;6&gt;[ 2776.785430]  (6)[61:pd_dbg_info]///PD dbg info 63d
+&lt;4&gt;[ 2776.785466]  (6)[61:pd_dbg_info]&lt; 2776.785&gt;TCPC-TCPC:Wakeup
+&lt;4&gt;[ 2776.785466] &lt; 2776.785&gt;TCPC-TCPC:wakeup_timer
+&lt;6&gt;[ 2776.786957]  (4)[238:type_c_port0]pd_tcp_notifier_call attach wait sink
+&lt;6&gt;[ 2776.811292]  (6)[61:pd_dbg_info]///PD dbg info 113d
+&lt;4&gt;[ 2776.811359]  (6)[61:pd_dbg_info]&lt; 2776.786&gt;TCPC-TYPEC:[CC_Alert] 5/5
+&lt;4&gt;[ 2776.811359] &lt; 2776.787&gt;TCPC-TYPEC:** AttachWait.SNK
+&lt;4&gt;[ 2776.811359] &lt; 2776.788&gt;TCPC-TCPC:ps_change=2
+&lt;5&gt;[ 2776.886613] -(4)[916:readSpeechMessa][MUSB]musb_stage0_irq 1208: musb_stage0_irq:1208 MUSB_INTR_RESET (b_peripheral)
+&lt;5&gt;[ 2776.886689] -(4)[916:readSpeechMessa]QMU_WARN,&lt;musb_disable_q_all 333&gt;, disable_q_all
+&lt;5&gt;[ 2776.886731] -(4)[916:readSpeechMessa]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable RQ(1)
+&lt;5&gt;[ 2776.886841] -(4)[916:readSpeechMessa]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable RQ(2)
+&lt;5&gt;[ 2776.886897] -(4)[916:readSpeechMessa]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable TQ(1)
+&lt;5&gt;[ 2776.887004] -(4)[916:readSpeechMessa]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable TQ(2)
+&lt;5&gt;[ 2776.887056] -(4)[916:readSpeechMessa]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable TQ(3)
+&lt;5&gt;[ 2776.887113] -(4)[916:readSpeechMessa]BATTERY_SetUSBState Success! Set 1
+&lt;6&gt;[ 2776.887147] -(4)[916:readSpeechMessa]android_disconnect
+&lt;4&gt;[ 2776.887352] -(4)[916:readSpeechMessa]nuke: 3 callbacks suppressed
+&lt;5&gt;[ 2776.887375] -(4)[916:readSpeechMessa][MUSB]nuke 302: call musb_g_giveback on function nuke ep is ep1out
+&lt;5&gt;[ 2776.887375] , skip_cnt&lt;3&gt;
+&lt;5&gt;[ 2776.887454] -(4)[916:readSpeechMessa][MUSB]nuke 302: call musb_g_giveback on function nuke ep is ep1out
+&lt;5&gt;[ 2776.887454] , skip_cnt&lt;0&gt;
+&lt;5&gt;[ 2776.887511] -(4)[916:readSpeechMessa][MUSB]nuke 302: call musb_g_giveback on function nuke ep is ep1out
+&lt;5&gt;[ 2776.887511] , skip_cnt&lt;0&gt;
+&lt;5&gt;[ 2776.887567] -(4)[916:readSpeechMessa][MUSB]nuke 302: call musb_g_giveback on function nuke ep is ep1out
+&lt;5&gt;[ 2776.887567] , skip_cnt&lt;0&gt;
+&lt;5&gt;[ 2776.887623] -(4)[916:readSpeechMessa][MUSB]nuke 302: call musb_g_giveback on function nuke ep is ep1out
+&lt;5&gt;[ 2776.887623] , skip_cnt&lt;0&gt;
+&lt;6&gt;[ 2776.887864] -(4)[916:readSpeechMessa]configfs-gadget gadget: acm ttyGS0 deactivated
+&lt;6&gt;[ 2776.889496]  (4)[15102:kworker/4:1]android_work: sent uevent USB_STATE=DISCONNECTED
+&lt;6&gt;[ 2776.907492]  (7)[236:tcpc_timer_type]pd_tcp_notifier_call sink vbus 5000mv 150ma type(1)
+&lt;6&gt;[ 2776.907541]  (6)[61:pd_dbg_info]///PD dbg info 76d
+&lt;4&gt;[ 2776.907568]  (6)[61:pd_dbg_info]&lt; 2776.907&gt;TCPC-TYPEC:[CC_Change] 5/5
+&lt;4&gt;[ 2776.907568] &lt; 2776.907&gt;TCPC-TYPEC:** Custom.SRC
+&lt;6&gt;[ 2776.907912]  (4)[236:tcpc_timer_type]charger_manager_enable_power_path: enable power path = 1
+&lt;6&gt;[ 2776.907980]  (4)[236:tcpc_timer_type]mt6370_pmu_charger mt6370_pmu_charger: mt6370_enable_power_path: en = 1
+&lt;6&gt;[ 2776.908031]  (4)[236:tcpc_timer_type]mt6370_pmu_charger mt6370_pmu_charger: __mt6370_set_mivr: mivr = 4500000 (0x06)
+&lt;6&gt;[ 2776.908425]  (4)[236:tcpc_timer_type]mt6370_pmu_charger mt6370_pmu_charger: mt6370_enable_irq: (chg_mivr) en = 1
+&lt;7&gt;[ 2776.908692] -(4)[236:tcpc_timer_type]mt6370_pmu 5-0034: mt6370_pmu_irq_enable: hwirq = 6, chg_mivr
+&lt;6&gt;[ 2776.909139]  (5)[235:irq/30-mt6370_p]mt6370_pmu_irq_handler
+&lt;5&gt;[ 2776.909160]  (4)[236:tcpc_timer_type]PD charger event:14 0
+&lt;6&gt;[ 2776.909191]  (4)[236:tcpc_timer_type]pd_tcp_notifier_call USB Plug in, pol = 0
+&lt;5&gt;[ 2776.909309]  (4)[236:tcpc_timer_type][MUSB]otg_tcp_notifier_call 343: TCP_NOTIFY_TYPEC_STATE, old_state=0, new_state=6
+&lt;6&gt;[ 2776.909461]  (6)[252:chgdet_thread]charger type: charger IN
+&lt;6&gt;[ 2776.923966]  (5)[235:irq/30-mt6370_p]mt6370_pmu 5-0034: mt6370_pmu_irq_handler: handler irq_domain = (0, 6)
+&lt;6&gt;[ 2776.924295]  (5)[235:irq/30-mt6370_p]mt6370_pmu_charger mt6370_pmu_charger: mt6370_enable_irq: (chg_mivr) en = 0
+&lt;5&gt;[ 2776.924355]  (7)[99:pmic_thread][PMIC] [PMIC_INT] Reg[0x91a]=0x40
+&lt;7&gt;[ 2776.924575] -(5)[235:irq/30-mt6370_p]mt6370_pmu 5-0034: mt6370_pmu_irq_disable: hwirq = 6, chg_mivr
+&lt;6&gt;[ 2776.935315]  (6)[61:pd_dbg_info]///PD dbg info 85d
+&lt;4&gt;[ 2776.935384]  (6)[61:pd_dbg_info]&lt; 2776.909&gt;TCPC-TYPEC:Attached-&gt; CUSTOM_SRC
+&lt;4&gt;[ 2776.935384] &lt; 2776.909&gt;TCPC-TCPC:usb_port_attached
+&lt;6&gt;[ 2776.973774]  (7)[15638:kworker/7:1]android_work: sent uevent USB_STATE=CONNECTED
+&lt;6&gt;[ 2776.996760] -(4)[961:OomAdjuster]configfs-gadget gadget: high-speed config #1: b
+&lt;5&gt;[ 2776.996943] -(4)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2776.997005] -(4)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 512, epnum 1,hwepnum 1
+&lt;5&gt;[ 2776.997048] -(4)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 631&gt;, enable RQ(1)
+&lt;5&gt;[ 2776.997103] -(4)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep1out for bulk OUT, maxpacket 512
+&lt;5&gt;[ 2776.997154] -(4)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2776.997202] -(4)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 1024, epnum 1,hwepnum 1
+&lt;5&gt;[ 2776.997242] -(4)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 709&gt;, enable TQ(1)
+&lt;5&gt;[ 2776.997297] -(4)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep1in for bulk IN, maxpacket 512
+&lt;5&gt;[ 2776.997353] -(4)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=INT
+&lt;5&gt;[ 2776.997400] -(4)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 1536, epnum 3,hwepnum 3
+&lt;5&gt;[ 2776.997438] -(4)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 709&gt;, enable TQ(3)
+&lt;5&gt;[ 2776.997491] -(4)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep3in for int IN, maxpacket 10
+&lt;5&gt;[ 2776.997540] -(4)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2776.997588] -(4)[961:OomAdjuster][MUSB]check_musb_dbuffer_avail 1299: &lt;check_musb_dbuffer_avail, 1299&gt;, got bulk ep:82 in function :acm
+&lt;5&gt;[ 2776.997627] -(4)[961:OomAdjuster][MUSB]is_saving_mode 993: 1
+&lt;5&gt;[ 2776.997664] -(4)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=Function FS Gadget
+&lt;5&gt;[ 2776.997701] -(4)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=acm
+&lt;5&gt;[ 2776.997742] -(4)[961:OomAdjuster][MUSB]is_db_ok 1188: acm IN desc-addr=82, addr=82
+&lt;5&gt;[ 2776.997783] -(4)[961:OomAdjuster][MUSB]is_db_ok 1202: [acm] EP2-IN as double buffer
+&lt;5&gt;[ 2776.997822] -(4)[961:OomAdjuster][MUSB]fifo_setup 1373: Saving mode, but EP2 supports DBBUF
+&lt;5&gt;[ 2776.997867] -(4)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 22 after 512, fifo address is 2048, epnum 2,hwepnum 2
+&lt;5&gt;[ 2776.997907] -(4)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 709&gt;, enable TQ(2)
+&lt;5&gt;[ 2776.997959] -(4)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep2in for bulk IN, maxpacket 512
+&lt;5&gt;[ 2776.998000] -(4)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2776.998046] -(4)[961:OomAdjuster][MUSB]check_musb_dbuffer_avail 1299: &lt;check_musb_dbuffer_avail, 1299&gt;, got bulk ep:2 in function :acm
+&lt;5&gt;[ 2776.998083] -(4)[961:OomAdjuster][MUSB]is_saving_mode 993: 1
+&lt;5&gt;[ 2776.998119] -(4)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=Function FS Gadget
+&lt;5&gt;[ 2776.998155] -(4)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=acm
+&lt;5&gt;[ 2776.998195] -(4)[961:OomAdjuster][MUSB]is_db_ok 1188: acm OUT desc-addr=2, addr=2
+&lt;5&gt;[ 2776.998235] -(4)[961:OomAdjuster][MUSB]is_db_ok 1198: [acm] EP2-OUT as signle buffer
+&lt;5&gt;[ 2776.998281] -(4)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 3072, epnum 2,hwepnum 2
+&lt;5&gt;[ 2776.998319] -(4)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 631&gt;, enable RQ(2)
+&lt;5&gt;[ 2776.998370] -(4)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep2out for bulk OUT, maxpacket 512
+&lt;5&gt;[ 2776.998459] -(4)[961:OomAdjuster]BATTERY_SetUSBState Success! Set 2
+&lt;6&gt;[ 2777.002888]  (4)[15102:kworker/4:1]android_work: sent uevent USB_STATE=CONFIGURED
+&lt;5&gt;[ 2777.006365] -(4)[957:android.bg][MUSB]service_zero_data_request 339: no more req, clr RXPKTRDY to avoid err RX FIFO/DMA read!! csr:0x2000
+&lt;6&gt;[ 2777.007422]  (1)[9248:kworker/1:1]usb_state&lt;CONFIGURED&gt;
+&lt;7&gt;[ 2777.059817]  (5)[3739:hif_thread]FPSGO_COMPfpsgo_ctrl2comp_dequeue_start xgf_ret:3
+&lt;6&gt;[ 2777.060090]  (5)[3739:hif_thread][wlan][3739]halSetDriverOwn:(INIT INFO) DRIVER OWN Done[7547 us]
+&lt;7&gt;[ 2777.060237]  (5)[612:adbd]FPSGO_COMPfpsgo_ctrl2comp_dequeue_end xgf_ret:3
+&lt;6&gt;[ 2777.063353]  (5)[612:adbd]unregister_gadget
+&lt;6&gt;[ 2777.063797]  (7)[3738:main_thread][wlan][3738]nicUpdateLinkQuality:(RLM INFO) Rssi=-36, NewRssi=-36
+&lt;5&gt;[ 2777.063848]  (5)[612:adbd][MUSB]musb_gadget_pullup 2382: is_on=0, softconnect=1 ++
+&lt;5&gt;[ 2777.063882] -(5)[612:adbd][MUSB]musb_gadget_pullup 2395: is_on=0, softconnect=1 ++
+&lt;5&gt;[ 2777.063895] -(5)[612:adbd][MUSB]musb_pullup 2325: MUSB: gadget pull up 0 start, musb-&gt;power:1
+&lt;5&gt;[ 2777.063906] -(5)[612:adbd][MUSB]musb_pullup 2334: MUSB: gadget pull up 0 end
+&lt;6&gt;[ 2777.063944]  (5)[612:adbd]android_disconnect
+&lt;6&gt;[ 2777.064021] -(5)[612:adbd]configfs-gadget gadget: acm ttyGS0 deactivated
+&lt;6&gt;[ 2777.064051]  (5)[612:adbd]configfs_composite_unbind
+&lt;6&gt;[ 2777.064061]  (5)[612:adbd]purge_configs_funcs
+&lt;5&gt;[ 2777.064109]  (5)[612:adbd][MUSB]musb_gadget_stop 2700: musb_gadget_stop
+&lt;5&gt;[ 2777.064128] -(5)[612:adbd][MUSB]mt_usb_try_idle 288: (null) inactive, for idle timer for 4 ms
+&lt;6&gt;[ 2777.064817]  (7)[636:usb ffs open]read descriptors
+&lt;5&gt;[ 2777.064861]  (7)[636:usb ffs open]skip os descriptor, os_descs_count:1, len:35 all to 0
+&lt;6&gt;[ 2777.064877]  (7)[636:usb ffs open]read strings
+&lt;6&gt;[ 2777.065158]  (5)[15974:kworker/5:1]android_work: sent uevent USB_STATE=DISCONNECTED
+&lt;6&gt;[ 2777.065929]  (7)[15638:kworker/7:1][connlog] irq counter=995 module=0x0001
+&lt;7&gt;[ 2777.068712]  (3)[114:kworker/u16:1][FSTB]fstb_get_queue_fps  13308 0
+&lt;7&gt;[ 2777.068775]  (3)[114:kworker/u16:1]FPSGO_COMPfpsgo_ctrl2comp_enqueue_start xgf_ret:3
+&lt;7&gt;[ 2777.068851]  (3)[114:kworker/u16:1]FPSGO_COMPfpsgo_ctrl2comp_enqueue_end xgf_ret:5
+&lt;5&gt;[ 2777.068967]  (3)[114:kworker/u16:1][Power/PPM] (0xa0)(8683)(0)(0-7)(15)(14)(4)(4) (15)(8)(4)(4) 
+&lt;6&gt;[ 2777.070844]  (7)[661:wificond][wlan][661]mtk_cfg80211_get_station:(REQ INFO) link speed=650, rssi=-36, BSSID:[c4:9f:4c:b3:3b:52], TxFail=0, TxTimeOut=0, TxOK=26578, RxOK=44049
+&lt;5&gt;[ 2777.074272] -(5)[1004:kworker/u16:19][MUSB]do_idle_work 241: otg_state (null) to (null), is_active&lt;0&gt;
+&lt;5&gt;[ 2777.076974]  (7)[374:init][MUSB]mt_usb_store_saving_mode 984: old=1 new=1
+&lt;6&gt;[ 2777.083423]  (5)[374:init]gadget_dev_desc_UDC_store write musb-hdrc
+&lt;6&gt;[ 2777.083466]  (5)[374:init]usb_gadget_probe_driver musb-hdrc musb-hdrc
+&lt;6&gt;[ 2777.083478]  (5)[374:init]configfs_composite_bind
+&lt;6&gt;[ 2777.083538]  (5)[374:init]configfs-gadget gadget: adding &#39;Function FS Gadget&#39;/000000001d6099fa to config &#39;b&#39;/000000002777d2e2
+&lt;6&gt;[ 2777.083660]  (5)[374:init]configfs-gadget gadget: adding &#39;acm&#39;/000000006cf508a2 to config &#39;b&#39;/000000002777d2e2
+&lt;5&gt;[ 2777.083687]  (5)[374:init][XLOG_INFO][USB_ACM]acm_bind: ttyGS0: dual speed IN/ep2in OUT/ep2out NOTIFY/ep3in
+&lt;5&gt;[ 2777.083701]  (5)[374:init][MUSB]musb_gadget_start 2599: musb_gadget_start
+&lt;5&gt;[ 2777.083814]  (5)[374:init][MUSB]musb_gadget_pullup 2382: is_on=1, softconnect=0 ++
+&lt;5&gt;[ 2777.083827] -(5)[374:init][MUSB]musb_gadget_pullup 2395: is_on=1, softconnect=0 ++
+&lt;5&gt;[ 2777.083839] -(5)[374:init][MUSB]musb_pullup 2325: MUSB: gadget pull up 1 start, musb-&gt;power:1
+&lt;5&gt;[ 2777.083850] -(5)[374:init][MUSB]musb_pullup 2334: MUSB: gadget pull up 1 end
+&lt;5&gt;[ 2777.086159]  (3)[246:kworker/3:2][Power/PPM] (0xa0)(14332)(0)(0-7)(15)(0)(4)(4) (15)(0)(4)(4) 
+&lt;6&gt;[ 2777.160080]  (6)[3739:hif_thread][wlan][3739]halSetFWOwn:(INIT INFO) FW OWN:1
+&lt;5&gt;[ 2777.175371]  (6)[252:chgdet_thread][MUSB]Charger_Detect_Init 798: Charger_Detect_Init
+&lt;5&gt;[ 2777.351998]  (5)[252:chgdet_thread][MUSB]Charger_Detect_Release 818: Charger_Detect_Release
+&lt;6&gt;[ 2777.352051]  (5)[252:chgdet_thread]charger type: 1, Standard USB Host
+&lt;6&gt;[ 2777.352076]  (5)[252:chgdet_thread]charger type: chrdet_inform_psy_changed: online = 1, type = 1
+&lt;6&gt;[ 2777.352101]  (5)[252:chgdet_thread]mt_charger_set_property
+&lt;6&gt;[ 2777.352120]  (5)[252:chgdet_thread]mt_charger_set_property
+&lt;6&gt;[ 2777.352162]  (5)[252:chgdet_thread]dump_charger_name: charger type: 1, Standard USB Host
+&lt;5&gt;[ 2777.352192]  (5)[252:chgdet_thread][MUSB]mt_usb_connect 679: [MUSB] USB connect
+&lt;5&gt;[ 2777.352220]  (5)[252:chgdet_thread][MUSB]issue_connection_work 673: issue work, ops&lt;2&gt;
+&lt;5&gt;[ 2777.352409]  (7)[1004:kworker/u16:19][MUSB]do_connection_work 578: is_host&lt;0&gt;, power&lt;1&gt;, ops&lt;2&gt;
+&lt;5&gt;[ 2777.352456]  (7)[1004:kworker/u16:19][MUSB]usb_cable_connected 545: connected=1 vbus_exist=1 type=1
+&lt;5&gt;[ 2777.352493]  (7)[1004:kworker/u16:19][MUSB]cmode_effect_on 565: cable_mode=1, effect=0
+&lt;5&gt;[ 2777.352520] -(7)[1004:kworker/u16:19][MUSB]do_connection_work 639: do nothing, usb_on:1, power:1
+&lt;5&gt;[ 2777.352557]  (7)[1004:kworker/u16:19]mtk_charger_int_handler
+&lt;5&gt;[ 2777.352591]  (7)[1004:kworker/u16:19]battery_callback:1
+&lt;5&gt;[ 2777.353302]  (7)[1004:kworker/u16:19][fg_sw_bat_cycle_accu]car[o:0 n:-16],diff_car:-16,ncar[o:1412 n:1428 hw:0] thr 31061
+&lt;6&gt;[ 2777.355515]  (7)[1004:kworker/u16:19]mt635x-auxadc mt-pmic:mt635x-auxadc: name:ISENSE, channel=0, adc_out=0x656d, adc_result=4278
+&lt;5&gt;[ 2777.355805]  (7)[1004:kworker/u16:19][CH3_DBG] bat_cur = -875
+&lt;12&gt;[ 2777.356009]  (6)[528:health@2.0-serv]healthd: battery l=100 v=4261 t=29.7 h=2 st=2 c=-74 fc=3013000 cc=0 chg=u
+&lt;5&gt;[ 2777.356770] -(6)[528:health@2.0-serv]alarmtimer_enqueue, 2837353675164
+&lt;6&gt;[ 2777.356815]  (5)[1004:kworker/u16:19]mt635x-auxadc mt-pmic:mt635x-auxadc: name:BAT_TEMP, channel=3, adc_out=0x54f, adc_result=597
+&lt;5&gt;[ 2777.358163]  (5)[1004:kworker/u16:19]wake_up_charger
+&lt;6&gt;[ 2777.360336]  (4)[61:pd_dbg_info]///PD dbg info 126d
+&lt;4&gt;[ 2777.360388]  (4)[61:pd_dbg_info]&lt; 2777.358&gt;TCPC-TCPC:bat_update_work_func battery update soc = 100
+&lt;4&gt;[ 2777.360388] &lt; 2777.358&gt;TCPC-TCPC:bat_update_work_func Battery Charging
+&lt;12&gt;[ 2777.361338]  (6)[528:health@2.0-serv]healthd: battery l=100 v=4278 t=29.7 h=2 st=2 c=-97 fc=3013000 cc=0 chg=u
+&lt;6&gt;[ 2777.361612]  (5)[306:charger_thread]mt635x-auxadc mt-pmic:mt635x-auxadc: name:ISENSE, channel=0, adc_out=0x6560, adc_result=4276
+&lt;6&gt;[ 2777.363318]  (5)[306:charger_thread]mt635x-auxadc mt-pmic:mt635x-auxadc: name:VCDT, channel=2, adc_out=0x4c6, adc_result=537
+&lt;5&gt;[ 2777.363682]  (5)[306:charger_thread][CH3_DBG] bat_cur = -1186
+&lt;6&gt;[ 2777.364219]  (5)[306:charger_thread]mt635x-auxadc mt-pmic:mt635x-auxadc: name:BAT_TEMP, channel=3, adc_out=0x54e, adc_result=596
+&lt;12&gt;[ 2777.365464]  (6)[528:health@2.0-serv]healthd: battery l=100 v=4278 t=29.7 h=2 st=2 c=-118 fc=3013000 cc=0 chg=u
+&lt;5&gt;[ 2777.388508]  (5)[306:charger_thread]Vbat=4276,Ibat=-1056,I=0,VChr=5080,T=29,Soc=100:100,CT:1:0 hv:1 pd:0:0
+&lt;5&gt;[ 2777.388561]  (5)[306:charger_thread]mtk_is_charger_on plug in, type:1
+&lt;5&gt;[ 2777.389192]  (4)[559:fuelgauged][CH3_DBG] bat_cur = -1948
+&lt;5&gt;[ 2777.390664]  (6)[559:fuelgauged]MTK_FG: [FGADC_info] tmp:29 29 31 rdnafg:0 vc:1 disable_fg:0:0 fg_v:3:9997:43830:-471:31061:154:9846:9846 low_temp:0 0 0
+&lt;5&gt;[ 2777.390846]  (6)[559:fuelgauged]MTK_FG: [FGADC_intr_end][FG_INTR_CHARGER_IN]soc:9998 fg_c_soc:9998 fg_v_soc:9846 ui_soc:10000 vc_diff:152 vc_mode 1 VBAT 42730 T:[29 V 29 C 29 avg:29] D0_C 10000 D0_V 9997 CAR[c:-9 v:-471] Q:[31061 31061 31061 31061] aging 10000 bat_cycle 0 Trk[0(-186):0:0] UI[1:1] Chr[0:10000:9477] pseudo1 0  DC_ratio 100 dodinit[3][0],ag[0 0 0 1 0 0]I:-780
+&lt;5&gt;[ 2777.394607]  (7)[559:fuelgauged][CH3_DBG] bat_cur = -1548
+&lt;6&gt;[ 2777.397259]  (4)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_plug_in
+&lt;6&gt;[ 2777.397337]  (4)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_enable_wdt: en = 1
+&lt;5&gt;[ 2777.401381] -(7)[559:fuelgauged]mtk_rtc_hal_common: hal_rtc_get_spare_register: cmd[0], get rg[0x5aa, 0xff , 8] = 0xe4
+&lt;5&gt;[ 2777.401461] -(7)[559:fuelgauged]mtk_rtc_hal_common: hal_rtc_set_spare_register: cmd[0], set rg[0x5aa, 0xff , 8] = 0xe4
+&lt;5&gt;[ 2777.401728]  (7)[559:fuelgauged][fg_res] FG_DAEMON_CMD_SET_CON0_SOC = 10048
+&lt;5&gt;[ 2777.403910]  (7)[559:fuelgauged][MUSB]usb20_check_vbus_on 137: vbus_on&lt;0&gt;
+&lt;7&gt;[ 2777.404151] -(4)[534:vibrator@1.0-se][vibrator]cancel hrtimer, cust:25ms, value:640, shutdown:0
+&lt;5&gt;[ 2777.404569]  (5)[306:charger_thread]mtk_charger_start_timer: alarm timer start:0, 2787 401468010
+&lt;5&gt;[ 2777.404621] -(5)[306:charger_thread]alarmtimer_enqueue, 2787401468010
+&lt;5&gt;[ 2777.404940]  (5)[306:charger_thread][CH3_DBG] bat_cur = 2561
+&lt;12&gt;[ 2777.405504]  (6)[528:health@2.0-serv]healthd: battery l=100 v=4262 t=29.4 h=2 st=2 c=256 fc=3013000 cc=0 chg=u
+&lt;5&gt;[ 2777.405922]  (7)[559:fuelgauged]get_shutdown_cond ret:0 0 0 0 vbat:4349
+&lt;6&gt;[ 2777.406724]  (6)[61:pd_dbg_info]///PD dbg info 126d
+&lt;4&gt;[ 2777.406773]  (6)[61:pd_dbg_info]&lt; 2777.400&gt;TCPC-TCPC:bat_update_work_func battery update soc = 100
+&lt;4&gt;[ 2777.406773] &lt; 2777.401&gt;TCPC-TCPC:bat_update_work_func Battery Charging
+&lt;5&gt;[ 2777.407885]  (5)[306:charger_thread][CH3_DBG] bat_cur = 2472
+&lt;6&gt;[ 2777.411324]  (5)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: __mt6370_set_mivr: mivr = 4500000 (0x06)
+&lt;5&gt;[ 2777.415648]  (5)[306:charger_thread]check_dynamic_mivr vbat = 4350 
+&lt;6&gt;[ 2777.439293]  (5)[15974:kworker/5:1]mt6370_pmu_charger mt6370_pmu_charger: mt6370_enable_irq: (chg_mivr) en = 1
+&lt;7&gt;[ 2777.440676] -(5)[15974:kworker/5:1]mt6370_pmu 5-0034: mt6370_pmu_irq_enable: hwirq = 6, chg_mivr
+&lt;7&gt;[ 2777.442206] -(7)[534:vibrator@1.0-se][vibrator]cancel hrtimer, cust:25ms, value:640, shutdown:0
+&lt;7&gt;[ 2777.443037]  (7)[12308:kworker/u16:3]FPSGO_COMPfpsgo_ctrl2comp_enqueue_start xgf_ret:3
+&lt;7&gt;[ 2777.444850]  (7)[12308:kworker/u16:3]FPSGO_COMPfpsgo_ctrl2comp_enqueue_end xgf_ret:5
+&lt;5&gt;[ 2777.454226] -(6)[1004:kworker/u16:19][MUSB]musb_stage0_irq 1208: musb_stage0_irq:1208 MUSB_INTR_RESET (b_idle)
+&lt;5&gt;[ 2777.454271] -(6)[1004:kworker/u16:19]QMU_WARN,&lt;musb_disable_q_all 333&gt;, disable_q_all
+&lt;5&gt;[ 2777.454288] -(6)[1004:kworker/u16:19]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable RQ(1)
+&lt;5&gt;[ 2777.454329] -(6)[1004:kworker/u16:19]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable RQ(2)
+&lt;5&gt;[ 2777.454354] -(6)[1004:kworker/u16:19]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable TQ(1)
+&lt;5&gt;[ 2777.454395] -(6)[1004:kworker/u16:19]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable TQ(2)
+&lt;5&gt;[ 2777.454417] -(6)[1004:kworker/u16:19]QMU_WARN,&lt;mtk_qmu_disable 847&gt;, disable TQ(3)
+&lt;5&gt;[ 2777.454444] -(6)[1004:kworker/u16:19]BATTERY_SetUSBState Success! Set 1
+&lt;6&gt;[ 2777.454458] -(6)[1004:kworker/u16:19]android_disconnect
+&lt;6&gt;[ 2777.454776]  (6)[14509:kworker/6:1]android_work: did not send uevent (0 0           (null))
+&lt;5&gt;[ 2777.456575]  (7)[1004:kworker/u16:19][Power/PPM] (0xa0)(8684)(0)(0-7)(15)(14)(4)(4) (15)(8)(4)(4) 
+&lt;5&gt;[ 2777.473505]  (7)[15638:kworker/7:1][Power/PPM] (0xa0)(9020)(0)(0-7)(15)(0)(4)(4) (15)(0)(4)(4) 
+&lt;5&gt;[ 2777.477504]  (5)[114:kworker/u16:1][Power/PPM] (0xa0)(9126)(0)(0-7)(15)(13)(4)(4) (15)(8)(4)(4) 
+&lt;6&gt;[ 2777.477718]  (4)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_get_tchg: tchg = 30
+&lt;5&gt;[ 2777.479187]  (4)[306:charger_thread]tmp:29 (jeita:0 sm:0 cv:0 en:0) (sm:1) en:1 c:0 s:0 ov:0 1 1
+&lt;5&gt;[ 2777.479214]  (4)[306:charger_thread]mtk_switch_charging_run [1 0], timer=0
+&lt;5&gt;[ 2777.479654]  (4)[306:charger_thread][CH3_DBG] bat_cur = 1291
+&lt;5&gt;[ 2777.486827]  (7)[12308:kworker/u16:3][Power/PPM] (0xa0)(9319)(0)(0-7)(15)(14)(4)(4) (15)(8)(4)(4) 
+&lt;5&gt;[ 2777.504437]  (7)[15638:kworker/7:1][Power/PPM] (0xa0)(14526)(0)(0-7)(15)(0)(4)(4) (15)(0)(4)(4) 
+&lt;6&gt;[ 2777.528390]  (4)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_get_ibus: ibus = 450mA
+&lt;5&gt;[ 2777.528439]  (4)[306:charger_thread]pe40_ready:0 hv:1 thermal:-1,-1 tmp:29,39,16 pps:0 en:0 ibus:0 80
+&lt;5&gt;[ 2777.528602]  (6)[306:charger_thread] charger_dev_run_aicl input_current_limit_by_aicl = -1
+&lt;5&gt;[ 2777.528641]  (6)[306:charger_thread]force:0 thermal:-1,-1 pe4:-1,-1,0 setting:500 500 type:1 usb_unlimited:0 usbif:0 usbsm:1 aicl:-1 atm:0 ichg1_min:300
+&lt;6&gt;[ 2777.529669]  (4)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: __mt6370_set_cv: bat voreg = 4350000 (0x2D)
+&lt;6&gt;[ 2777.541709]  (4)[15102:kworker/4:1]android_work: sent uevent USB_STATE=CONNECTED
+&lt;6&gt;[ 2777.562269] -(5)[961:OomAdjuster]configfs-gadget gadget: high-speed config #1: b
+&lt;5&gt;[ 2777.562362] -(5)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2777.562382] -(5)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 512, epnum 1,hwepnum 1
+&lt;5&gt;[ 2777.562395] -(5)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 631&gt;, enable RQ(1)
+&lt;5&gt;[ 2777.562414] -(5)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep1out for bulk OUT, maxpacket 512
+&lt;5&gt;[ 2777.562433] -(5)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2777.562445] -(5)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 1024, epnum 1,hwepnum 1
+&lt;5&gt;[ 2777.562457] -(5)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 709&gt;, enable TQ(1)
+&lt;5&gt;[ 2777.562475] -(5)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep1in for bulk IN, maxpacket 512
+&lt;5&gt;[ 2777.562535] -(5)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=INT
+&lt;5&gt;[ 2777.562550] -(5)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 1536, epnum 3,hwepnum 3
+&lt;5&gt;[ 2777.562561] -(5)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 709&gt;, enable TQ(3)
+&lt;5&gt;[ 2777.562579] -(5)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep3in for int IN, maxpacket 10
+&lt;5&gt;[ 2777.562596] -(5)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2777.562609] -(5)[961:OomAdjuster][MUSB]check_musb_dbuffer_avail 1299: &lt;check_musb_dbuffer_avail, 1299&gt;, got bulk ep:82 in function :acm
+&lt;5&gt;[ 2777.562620] -(5)[961:OomAdjuster][MUSB]is_saving_mode 993: 1
+&lt;5&gt;[ 2777.562631] -(5)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=Function FS Gadget
+&lt;5&gt;[ 2777.562640] -(5)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=acm
+&lt;5&gt;[ 2777.562651] -(5)[961:OomAdjuster][MUSB]is_db_ok 1188: acm IN desc-addr=82, addr=82
+&lt;5&gt;[ 2777.562663] -(5)[961:OomAdjuster][MUSB]is_db_ok 1202: [acm] EP2-IN as double buffer
+&lt;5&gt;[ 2777.562673] -(5)[961:OomAdjuster][MUSB]fifo_setup 1373: Saving mode, but EP2 supports DBBUF
+&lt;5&gt;[ 2777.562685] -(5)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 22 after 512, fifo address is 2048, epnum 2,hwepnum 2
+&lt;5&gt;[ 2777.562696] -(5)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 709&gt;, enable TQ(2)
+&lt;5&gt;[ 2777.562714] -(5)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep2in for bulk IN, maxpacket 512
+&lt;5&gt;[ 2777.562726] -(5)[961:OomAdjuster][MUSB]fifo_setup 1347: musb type=BULK
+&lt;5&gt;[ 2777.562738] -(5)[961:OomAdjuster][MUSB]check_musb_dbuffer_avail 1299: &lt;check_musb_dbuffer_avail, 1299&gt;, got bulk ep:2 in function :acm
+&lt;5&gt;[ 2777.562748] -(5)[961:OomAdjuster][MUSB]is_saving_mode 993: 1
+&lt;5&gt;[ 2777.562758] -(5)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=Function FS Gadget
+&lt;5&gt;[ 2777.562767] -(5)[961:OomAdjuster][MUSB]is_db_ok 1144: Ifc name=acm
+&lt;5&gt;[ 2777.562778] -(5)[961:OomAdjuster][MUSB]is_db_ok 1188: acm OUT desc-addr=2, addr=2
+&lt;5&gt;[ 2777.562789] -(5)[961:OomAdjuster][MUSB]is_db_ok 1198: [acm] EP2-OUT as signle buffer
+&lt;5&gt;[ 2777.562801] -(5)[961:OomAdjuster][MUSB]fifo_setup 1393: fifo size is 6 after 512, fifo address is 3072, epnum 2,hwepnum 2
+&lt;5&gt;[ 2777.562812] -(5)[961:OomAdjuster]QMU_WARN,&lt;mtk_qmu_enable 631&gt;, enable RQ(2)
+&lt;5&gt;[ 2777.562828] -(5)[961:OomAdjuster][MUSB]musb_gadget_enable 1596: musb-hdrc periph: enabled ep2out for bulk OUT, maxpacket 512
+&lt;5&gt;[ 2777.562878] -(5)[961:OomAdjuster]BATTERY_SetUSBState Success! Set 2
+&lt;6&gt;[ 2777.564575]  (5)[15974:kworker/5:1]android_work: sent uevent USB_STATE=CONFIGURED
+&lt;5&gt;[ 2777.569632] -(6)[950:android.ui][MUSB]service_zero_data_request 339: no more req, clr RXPKTRDY to avoid err RX FIFO/DMA read!! csr:0x2000
+&lt;5&gt;[ 2777.613202]  (7)[1004:kworker/u16:19][Power/PPM] (0xa0)(10954)(0)(0-7)(15)(12)(4)(4) (15)(6)(4)(4) 
+&lt;5&gt;[ 2777.633825]  (7)[15638:kworker/7:1][Power/PPM] (0xa0)(13556)(0)(0-7)(15)(0)(4)(4) (15)(0)(4)(4) 
+&lt;7&gt;[ 2777.677784]  
+&lt;7&gt;[ 2777.679054]  
+&lt;6&gt;[ 2777.765166]  (7)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_dump_register: ICHG = 500mA, AICR = 500mA, MIVR = 4500mV, IEOC = 150mA, CV = 4350mV
+&lt;6&gt;[ 2777.765208]  (7)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_dump_register: VSYS = 4345mV, VBAT = 4325mV, IBAT = 80mA, IBUS = 450mA, VBUS = 4900mV
+&lt;6&gt;[ 2777.765224]  (7)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_dump_register: CHG_EN = 1, CHG_STATUS = progress, CHG_STAT = 0xA0
+&lt;6&gt;[ 2777.765239]  (7)[306:charger_thread]mt6370_pmu_charger mt6370_pmu_charger: mt6370_dump_register: CHG_CTRL1 = 0x10, CHG_CTRL2 = 0x1B
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
