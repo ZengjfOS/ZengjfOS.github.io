@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>README &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">README</a></li>
+<li><a class="reference internal" href="#docs">docs</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>README</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Permalink to this headline"></a></h1>
+<p>理解Android Sensor体系架构</p>
+</section>
+<section id="docs">
+<h1>docs<a class="headerlink" href="#docs" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>NO.</p></th>
+<th class="text-left head"><p>文件名称</p></th>
+<th class="text-left head"><p>摘要</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>0014</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0014_visible_ir_diode.html"><span class="doc std std-doc">visible_ir_diode</span></a></p></td>
+<td class="text-left"><p>可见光、红外二极管融合数据才是光感，驱动获取数据之后会做ratio融合</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0013</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0013_i2c_dma.html"><span class="doc std std-doc">i2c_dma</span></a></p></td>
+<td class="text-left"><p>当需要连续发送大量数据，考虑采用DMA进行数据传输，fifo最大才8 byte</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0012</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0012_scp_log_buffer.html"><span class="doc std std-doc">scp_log_buffer</span></a></p></td>
+<td class="text-left"><p>修改scp log buffer，MTK debuglogger UI抓log要等一段时间，如果log太多会被覆盖，注意裁减log</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0011</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0011_scp_debug_log.html"><span class="doc std std-doc">scp_debug_log</span></a></p></td>
+<td class="text-left"><p>打印更多的scp调试log，注意CFG_OVERLAY_INIT_SUPPORT</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0010</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0010_Android_SensorHub_APP.html"><span class="doc std std-doc">Android_SensorHub_APP</span></a></p></td>
+<td class="text-left"><p>Sensor应用层校正操作</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0009</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0009_Android_alsps_Sensor.html"><span class="doc std std-doc">Android_alsps_Sensor</span></a></p></td>
+<td class="text-left"><p>快速获取近距、光感传感器数值</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0008</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0008_Android_Sensor_Power.html"><span class="doc std std-doc">Android_Sensor_Power</span></a></p></td>
+<td class="text-left"><p>在PL阶段访问PMIC，配置Sensor电源输出</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0007</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0007_Android_SCP_IPI.html"><span class="doc std std-doc">Android_SCP_IPI</span></a></p></td>
+<td class="text-left"><p>Inter-Processor Communication (IPC) and Inter-Processor Interrupt (IPI)</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0006</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0006_Android_SCP.html"><span class="doc std std-doc">Android_SCP</span></a></p></td>
+<td class="text-left"><p>SCP(Sensor-hub Control Processor)，CHRE(Context Hub Runtime Environment), System Companion Processor (SCP)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0005</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0005_Android_Sensors.html"><span class="doc std std-doc">Android_Sensors</span></a></p></td>
+<td class="text-left"><p>Android传感器架构</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0004</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0004_Android_BitTube.html"><span class="doc std std-doc">Android_BitTube</span></a></p></td>
+<td class="text-left"><p>BitTube本质是socketpair，Binder实现了sendmsg传递fd的功能</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0003</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0003_Android_C%2B%2B_CallStack.html"><span class="doc std std-doc">Android_C++_CallStack</span></a></p></td>
+<td class="text-left"><p>Android C++ backtrace</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0002</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0002_Android_g_Sensor.html"><span class="doc std std-doc">Android_g_Sensor</span></a></p></td>
+<td class="text-left"><p>理解加速度计是如何校准的</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0001</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0001_Sensor_xyz_Direction.html"><span class="doc std std-doc">Sensor_xyz_Direction</span></a></p></td>
+<td class="text-left"><p>PCBA板传感器贴片位置不同，怎么确定及调整xyz</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scp log buffer &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">scp log buffer</a></li>
+<li><a class="reference internal" href="#last-log">last log</a></li>
+<li><a class="reference internal" href="#scp">scp</a></li>
+<li><a class="reference internal" href="#kernel">kernel</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>scp log buffer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scp-log-buffer">
+<h1>scp log buffer<a class="headerlink" href="#scp-log-buffer" title="Permalink to this headline"></a></h1>
+<p>修改scp log buffer，MTK debuglogger UI抓log要等一段时间，如果log太多会被覆盖，注意裁减log</p>
+</section>
+<section id="last-log">
+<h1>last log<a class="headerlink" href="#last-log" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>cat /sys/class/misc/scp/scp_A_get_last_log</p></li>
+<li><p>adb wait-for-device  &amp;&amp; adb root &amp;&amp; adb shell “while true; do cat /sys/class/misc/scp/scp_A_get_last_log; sleep 1; done”</p></li>
+</ul>
+</section>
+<section id="scp">
+<h1>scp<a class="headerlink" href="#scp" title="Permalink to this headline"></a></h1>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/mediatek/proprietary/tinysys/freertos/source/drivers/common/logger/v01/src/scp_logger.c b/mediatek/proprietary/tinysys/freertos/source/drivers/common/logger/v01/src/scp_logger.c</span><span class="w"></span>
+<span class="gh">index 266039a09..4853d2086 100644</span><span class="w"></span>
+<span class="gd">--- a/mediatek/proprietary/tinysys/freertos/source/drivers/common/logger/v01/src/scp_logger.c</span><span class="w"></span>
+<span class="gi">+++ b/mediatek/proprietary/tinysys/freertos/source/drivers/common/logger/v01/src/scp_logger.c</span><span class="w"></span>
+<span class="gu">@@ -56,7 +56,7 @@</span><span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>#define SHARESEC __attribute__ ((section (&quot;.share&quot;)))<span class="w"></span>
+<span class="w"> </span>#define PLT_LOG_ENABLE      0x504C5402 /*magic*/<span class="w"></span>
+<span class="gd">-#define BUF_LEN             1024       /*1KB*/</span><span class="w"></span>
+<span class="gi">+#define BUF_LEN             (1024 * 20)       /*1KB*/</span><span class="w"></span>
+<span class="w"> </span>#define DRAM_BUF_LEN        0x200000   /*2MB*/<span class="w"></span>
+<span class="w"> </span>#define LOGGER_MAX_QUEUE    2          /*maximum timer queue number*/<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="kernel">
+<h1>kernel<a class="headerlink" href="#kernel" title="Permalink to this headline"></a></h1>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/drivers/misc/mediatek/scp/cm4/v01/scp_logger.c b/drivers/misc/mediatek/scp/cm4/v01/scp_logger.c</span><span class="w"></span>
+<span class="gh">index a5be682a2..ac506e551 100644</span><span class="w"></span>
+<span class="gd">--- a/drivers/misc/mediatek/scp/cm4/v01/scp_logger.c</span><span class="w"></span>
+<span class="gi">+++ b/drivers/misc/mediatek/scp/cm4/v01/scp_logger.c</span><span class="w"></span>
+<span class="gu">@@ -77,7 +77,7 @@ static DEFINE_SPINLOCK(scp_A_log_buf_spinlock);</span><span class="w"></span>
+<span class="w"> </span>static struct scp_work_struct scp_logger_notify_work[SCP_CORE_TOTAL];<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>/*scp last log info*/<span class="w"></span>
+<span class="gd">-#define LAST_LOG_BUF_SIZE  4095</span><span class="w"></span>
+<span class="gi">+#define LAST_LOG_BUF_SIZE  8192</span><span class="w"></span>
+<span class="w"> </span>static struct SCP_LOG_INFO last_log_info;<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>static char *scp_A_last_log;<span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android SensorHub APP &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android SensorHub APP</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#sensorhub">SensorHub工具</a></li>
+<li><a class="reference internal" href="#engineer-mode">Engineer Mode校正报错</a></li>
+<li><a class="reference internal" href="#sensorhub-app">SensorHub APP调用关系</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android SensorHub APP</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-sensorhub-app">
+<h1>Android SensorHub APP<a class="headerlink" href="#android-sensorhub-app" title="Permalink to this headline"></a></h1>
+<p>Sensor应用层校正操作</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0005_Android_Sensors.html"><span class="doc std std-doc">0005_Android_Sensors.md</span></a></p></li>
+</ul>
+</section>
+<section id="sensorhub">
+<h1>SensorHub工具<a class="headerlink" href="#sensorhub" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>vendor/mediatek/proprietary</p>
+<ul>
+<li><p>packages/apps/SensorHub</p>
+<ul>
+<li><p>Android APP</p></li>
+</ul>
+</li>
+<li><p>external/sensor-tools/calibration_tool</p>
+<ul>
+<li><p>命令行工具</p></li>
+</ul>
+</li>
+<li><p>external/sensor-tools/libhwm.c</p>
+<ul>
+<li><p>共享库</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="engineer-mode">
+<h1>Engineer Mode校正报错<a class="headerlink" href="#engineer-mode" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.639</span>  <span class="mi">3417</span>  <span class="mi">3417</span> <span class="n">D</span> <span class="n">SH</span><span class="o">/</span><span class="n">CalibrationN</span><span class="p">:</span> <span class="n">start</span> <span class="n">static</span> <span class="n">calibration</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.639</span>  <span class="mi">1111</span>  <span class="mi">1238</span> <span class="n">V</span> <span class="n">PlayerBase</span><span class="p">:</span> <span class="n">baseStart</span><span class="p">()</span> <span class="n">piid</span><span class="o">=</span><span class="mi">15</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.639</span>  <span class="mi">1111</span>  <span class="mi">1238</span> <span class="n">V</span> <span class="n">AudioService</span><span class="o">.</span><span class="n">PlaybackActivityMonitor</span><span class="p">:</span> <span class="n">playerEvent</span><span class="p">(</span><span class="n">piid</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.640</span>  <span class="mi">3417</span>  <span class="mi">3508</span> <span class="n">D</span> <span class="n">SH</span><span class="o">/</span><span class="n">CalibrationN</span><span class="p">:</span> <span class="n">startCalibration</span><span class="p">(),</span> <span class="n">operation</span> <span class="mi">2</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.640</span>  <span class="mi">3417</span>  <span class="mi">3508</span> <span class="n">D</span> <span class="n">SENSOR</span><span class="o">-</span><span class="n">JNI</span><span class="p">:</span> <span class="n">Enter</span> <span class="n">gyroscope_start_static_calibration</span><span class="p">()</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.640</span>  <span class="mi">3417</span>  <span class="mi">3508</span> <span class="n">E</span> <span class="n">HWMLIB</span>  <span class="p">:</span> <span class="n">gyroscope_start_static_calibration</span><span class="p">:</span> <span class="n">Couldn</span><span class="s1">&#39;t find or open file sensor (Permission denied)</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.640</span>  <span class="mi">3417</span>  <span class="mi">3508</span> <span class="n">D</span> <span class="n">SENSOR</span><span class="o">-</span><span class="n">JNI</span><span class="p">:</span> <span class="n">gyroscope_start_static_calibration</span><span class="p">()</span> <span class="n">returned</span> <span class="o">-</span><span class="mi">13</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.641</span>  <span class="mi">3417</span>  <span class="mi">3508</span> <span class="n">D</span> <span class="n">SH</span><span class="o">/</span><span class="n">CalibrationN</span><span class="p">:</span> <span class="n">startCalibration</span><span class="p">(),</span> <span class="n">ret</span> <span class="o">-</span><span class="mi">13</span>
+<span class="mi">07</span><span class="o">-</span><span class="mi">26</span> <span class="mi">20</span><span class="p">:</span><span class="mi">27</span><span class="p">:</span><span class="mf">00.641</span>  <span class="mi">3417</span>  <span class="mi">3417</span> <span class="n">D</span> <span class="n">SH</span><span class="o">/</span><span class="n">CalibrationN</span><span class="p">:</span> <span class="nb">set</span> <span class="n">fail</span>
+</pre></div>
+</div>
+<ul>
+<li><p>gyroscope_start_static_calibration: Couldn’t find or open file sensor (Permission denied)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="n">sensor</span><span class="o">-</span><span class="n">tools</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">libhwm</span><span class="o">.</span><span class="n">h</span>
+  <span class="o">*</span> <span class="c1">#define GYROSCOPE_NAME                  &quot;/dev/gyroscope&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>adb root</p></li>
+<li><p>adb shell chmod 777 /dev/gyroscope</p></li>
+</ul>
+</section>
+<section id="sensorhub-app">
+<h1>SensorHub APP调用关系<a class="headerlink" href="#sensorhub-app" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/packages/apps/SensorHub
+  * vendor/mediatek/proprietary/packages/apps/SensorHub/src/com/mediatek/sensorhub/sensor/SensorCalibrationNew.java
+    * public class SensorCalibrationNew extends Activity implements OnClickListener
+      * private SensorEventListener mSensorEventListener = new SensorEventListener()
+        * public void onSensorChanged(SensorEvent event)
+          * mCurrentData.setText(String.format(Locale.ENGLISH, &quot;%+8.4f,%+8.4f,%+8.4f&quot;, event.values[0], event.values[1], event.values[2]));
+          * status = status + &quot;Medium&quot;;
+      * public void onCreate(Bundle savedInstanceState)
+        * mStartCalibration = (Button) findViewById(R.id.button_sensor_calibration_start);
+        * mStartCalibration.setOnClickListener(this);
+        * mHandler = new Handler(mHandlerThread.getLooper())
+          * MSG_START_CALIBRARION == msg.what
+            * startCalibration(msg.what);
+              * mType == GSENSOR
+                * result = EmSensor.startGsensorCalibration();
+                  * vendor/mediatek/proprietary/packages/apps/SensorHub/src/com/mediatek/sensorhub/sensor/EmSensor.java
+                    * public static native int startGsensorCalibration();
+                      * vendor/mediatek/proprietary/packages/apps/SensorHub/jni/sensor/com_mediatek_sensorhub_sensor.cpp
+                        * JNIEXPORT jint JNICALL Java_com_mediatek_sensorhub_sensor_EmSensor_startGsensorCalibration(JNIEnv *, jclass)
+                          * int ret = gsensor_start_static_calibration();
+                            * vendor/mediatek/proprietary/external/sensor-tools/libhwm.c
+                                * int gsensor_start_static_calibration(void)
+                                  * 下面介绍
+      * public void onClick(View arg0)
+        * mHandler.sendEmptyMessage(MSG_START_CALIBRARION);
+* vendor/mediatek/proprietary/packages/apps/SensorHub/jni/sensor/Android.mk
+  * LOCAL_C_INCLUDES += $(MTK_PATH_SOURCE)/external/sensor-tools
+* vendor/mediatek/proprietary/external/sensor-tools
+  * vendor/mediatek/proprietary/external/sensor-tools/libhwm.c
+    * int gsensor_start_static_calibration(void)
+      * fd = open(GSENSOR_NAME, O_RDONLY);
+        * vendor/mediatek/proprietary/external/sensor-tools/include/libhwm.h
+          * #define GSENSOR_NAME                    &quot;/dev/gsensor&quot;
+          * #define GYROSCOPE_NAME                  &quot;/dev/gyroscope&quot;
+          * #define ALSPS_NAME                      &quot;/dev/als_ps&quot;
+          * #define MSENSOR_NAME                    &quot;/dev/msensor&quot;
+        * adb shell ls -al /dev/gsensor
+          * crw-rw---- 1 radio system 10,  12 2010-01-01 00:00 gsensor
+     * if (fd &lt; 0) {
+        * HWMLOGE(&quot;Couldn&#39;t find or open file sensor (%s)&quot;, strerror(errno));
+          * HWMLIB  : gsensor_start_static_calibration: Couldn&#39;t find or open file sensor (Permission denied)
+            * adb shell chmod 666 /dev/gsensor
+* vendor/app/SensorHub/SensorHub.apk
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

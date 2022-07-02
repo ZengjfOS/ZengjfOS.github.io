@@ -1,0 +1,743 @@
+----- timezone:GMT
+, 0.000000
+[33.748]ERR: contextHubIpiRx!
+[33.748]sync time scp:33748974618, ap:37852728078, offset:4105494767
+[43.988]ERR: contextHubIpiRx!
+[43.988]sync time scp:43988840797, ap:48092384694, offset:4105494897
+[54.231]ERR: contextHubIpiRx!
+[54.231]sync time scp:54231433744, ap:58335070540, offset:4105494719
+[64.468]ERR: contextHubIpiRx!
+[64.468]sync time scp:64468593692, ap:68572318695, offset:4105494772
+[64.468]sleep: cnt=9, total=25
+[74.708]ERR: contextHubIpiRx!
+[74.708]sync time scp:74708911793, ap:78813446926, offset:4105494748
+[84.948]ERR: contextHubIpiRx!
+[84.948]sync time scp:84948139202, ap:89052907465, offset:4105494724
+[95.191]ERR: contextHubIpiRx!
+[95.191]sync time scp:95191941996, ap:99296626389, offset:4105494623
+[95.192]sleep: cnt=3, total=28
+[105.432]ERR: contextHubIpiRx!
+[105.432]sync time scp:105432701482, ap:109533405697, offset:4105494599
+[115.668]ERR: contextHubIpiRx!
+[115.668]sync time scp:115668564198, ap:119773138698, offset:4105494576
+[125.908]ERR: contextHubIpiRx!
+[125.908]sync time scp:125908340530, ap:130012900083, offset:4105494553
+[125.908]sleep: cnt=3, total=31
+[136.149]ERR: contextHubIpiRx!
+[136.149]sync time scp:136149038939, ap:140253116468, offset:4105494529
+[146.388]ERR: contextHubIpiRx!
+[146.388]sync time scp:146388362502, ap:150492571315, offset:4105494505
+[156.628]ERR: contextHubIpiRx!
+[156.628]sync time scp:156628841758, ap:160733164162, offset:4105494480
+[156.629]sleep: cnt=3, total=34
+[166.868]ERR: contextHubIpiRx!
+[166.868]sync time scp:166868431705, ap:170972887624, offset:4105494457
+[177.108]ERR: contextHubIpiRx!
+[177.108]sync time scp:177108391499, ap:181213258317, offset:4105494433
+[187.349]ERR: contextHubIpiRx!
+[187.349]sync time scp:187349293985, ap:191452923702, offset:4105494409
+[187.350]sleep: cnt=3, total=37
+[197.587]ERR: contextHubIpiRx!
+[197.587]sync time scp:197587758932, ap:201692535472, offset:4105494386
+[207.827]ERR: contextHubIpiRx!
+[207.827]sync time scp:207827985110, ap:211932575857, offset:4105494516
+[218.067]ERR: contextHubIpiRx!
+[218.067]sync time scp:218067638058, ap:222172383243, offset:4105494338
+[218.068]sleep: cnt=3, total=40
+[228.307]ERR: contextHubIpiRx!
+[228.307]sync time scp:228307848313, ap:232412550320, offset:4105494699
+[238.548]ERR: contextHubIpiRx!
+[238.548]sync time scp:238548299799, ap:242652914859, offset:4105494367
+[248.787]ERR: contextHubIpiRx!
+[248.787]sync time scp:248787825439, ap:252892499167, offset:4105494343
+[248.788]sleep: cnt=3, total=43
+[259.028]ERR: contextHubIpiRx!
+[259.028]sync time scp:259028250156, ap:263132868630, offset:4105494243
+[269.268]ERR: contextHubIpiRx!
+[269.268]sync time scp:269268788026, ap:273372968399, offset:4105494219
+[279.508]ERR: contextHubIpiRx!
+[279.508]sync time scp:279508816051, ap:283613288631, offset:4105494195
+[279.509]sleep: cnt=3, total=46
+[289.748]ERR: contextHubIpiRx!
+[289.748]sync time scp:289748555767, ap:293852592631, offset:4105494171
+[299.988]ERR: contextHubIpiRx!
+[299.988]sync time scp:299988460715, ap:304092909170, offset:4105494147
+[310.228]ERR: contextHubIpiRx!
+[310.228]sync time scp:310228533355, ap:314333144248, offset:4105494123
+[310.229]sleep: cnt=3, total=49
+[320.471]ERR: contextHubIpiRx!
+[320.471]sync time scp:320471506764, ap:324576369326, offset:4105494485
+[330.712]ERR: contextHubIpiRx!
+[330.712]sync time scp:330712873096, ap:334816981788, offset:4105494230
+[335.156]hostintf: 335156769722, chreType:8, rate:15359, latency:0, cmd:0!
+[335.161]hostintf: 335161255414, chreType:8, rate:15359, latency:0, cmd:1!
+[335.161]sensorPowerMag on:1, nowOn:0
+[335.161]mmc5603Enable :  MMC5603 enable mag
+[335.161]mag: enable done
+[335.161]sensorRateMag, rate:16384, latency:66670592
+[335.161]mag intrMode: MU, timerDelay:62500000
+[335.161]mag: ratechg done
+[335.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:96
+[2]:124, [3]:227
+[4]:127, [5]:1
+[335.225]mag timestamp in sensor hub 335224951568 delta time 335224951568
+[335.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:99
+[2]:124, [3]:222
+[4]:126, [5]:244
+[335.287]mag timestamp in sensor hub 335287482030 delta time 62530462
+[335.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:92
+[2]:124, [3]:229
+[4]:127, [5]:15
+[335.350]mag timestamp in sensor hub 335349997261 delta time 62515231
+[335.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:86
+[2]:124, [3]:234
+[4]:127, [5]:19
+[335.412]mag timestamp in sensor hub 335412507415 delta time 62510154
+[335.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:99
+[2]:124, [3]:221
+[4]:126, [5]:249
+[335.475]mag timestamp in sensor hub 335475015030 delta time 62507615
+[335.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:102
+[2]:124, [3]:224
+[4]:126, [5]:254
+[335.537]mag timestamp in sensor hub 335537515030 delta time 62500000
+[335.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:101
+[2]:124, [3]:229
+[4]:127, [5]:4
+[335.600]mag timestamp in sensor hub 335600015030 delta time 62500000
+[335.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:102
+[2]:124, [3]:229
+[4]:127, [5]:1
+[335.662]mag timestamp in sensor hub 335662515030 delta time 62500000
+[335.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:99
+[2]:124, [3]:227
+[4]:127, [5]:4
+[335.725]mag timestamp in sensor hub 335725015030 delta time 62500000
+[335.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:95
+[2]:124, [3]:230
+[4]:127, [5]:20
+[335.787]mag timestamp in sensor hub 335787515030 delta time 62500000
+[335.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:97
+[2]:124, [3]:225
+[4]:127, [5]:3
+[335.850]mag timestamp in sensor hub 335850015030 delta time 62500000
+[335.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:99
+[2]:124, [3]:219
+[4]:126, [5]:245
+[335.912]mag timestamp in sensor hub 335912515030 delta time 62500000
+[335.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:97
+[2]:124, [3]:219
+[4]:126, [5]:246
+[335.975]mag timestamp in sensor hub 335975015030 delta time 62500000
+[336.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:97
+[2]:124, [3]:219
+[4]:126, [5]:244
+[336.037]mag timestamp in sensor hub 336037515030 delta time 62500000
+[336.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:94
+[2]:124, [3]:219
+[4]:126, [5]:241
+[336.100]mag timestamp in sensor hub 336100015030 delta time 62500000
+[336.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:95
+[2]:124, [3]:215
+[4]:126, [5]:238
+[336.162]mag timestamp in sensor hub 336162515030 delta time 62500000
+[336.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:98
+[2]:124, [3]:225
+[4]:126, [5]:253
+[336.225]mag timestamp in sensor hub 336225015030 delta time 62500000
+[336.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:102
+[2]:124, [3]:217
+[4]:126, [5]:245
+[336.287]mag timestamp in sensor hub 336287515030 delta time 62500000
+[336.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:104
+[2]:124, [3]:218
+[4]:126, [5]:243
+[336.350]mag timestamp in sensor hub 336350015030 delta time 62500000
+[336.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:136
+[2]:124, [3]:231
+[4]:127, [5]:6
+[336.412]mag timestamp in sensor hub 336412515030 delta time 62500000
+[336.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:179
+[2]:125, [3]:6
+[4]:127, [5]:21
+[336.475]mag timestamp in sensor hub 336475015030 delta time 62500000
+[336.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:227
+[2]:125, [3]:41
+[4]:127, [5]:45
+[336.537]mag timestamp in sensor hub 336537515030 delta time 62500000
+[336.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:254
+[2]:125, [3]:81
+[4]:127, [5]:58
+[336.600]mag timestamp in sensor hub 336600015030 delta time 62500000
+[336.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:129, [1]:5
+[2]:125, [3]:108
+[4]:127, [5]:59
+[336.662]mag timestamp in sensor hub 336662515030 delta time 62500000
+[336.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:129, [1]:18
+[2]:125, [3]:117
+[4]:127, [5]:39
+[336.725]mag timestamp in sensor hub 336725015030 delta time 62500000
+[336.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:129, [1]:21
+[2]:125, [3]:104
+[4]:126, [5]:252
+[336.787]mag timestamp in sensor hub 336787515030 delta time 62500000
+[336.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:129, [1]:22
+[2]:125, [3]:107
+[4]:126, [5]:235
+[336.850]mag timestamp in sensor hub 336850015030 delta time 62500000
+[336.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:129, [1]:7
+[2]:125, [3]:88
+[4]:126, [5]:205
+[336.912]mag timestamp in sensor hub 336912515030 delta time 62500000
+[336.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:243
+[2]:125, [3]:73
+[4]:126, [5]:150
+[336.975]mag timestamp in sensor hub 336975015030 delta time 62500000
+[337.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:214
+[2]:125, [3]:64
+[4]:126, [5]:127
+[337.037]mag timestamp in sensor hub 337037515030 delta time 62500000
+[337.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:193
+[2]:125, [3]:55
+[4]:126, [5]:100
+[337.100]mag timestamp in sensor hub 337100015030 delta time 62500000
+[337.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:184
+[2]:125, [3]:39
+[4]:126, [5]:88
+[337.162]mag timestamp in sensor hub 337162515030 delta time 62500000
+[337.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:184
+[2]:125, [3]:37
+[4]:126, [5]:97
+[337.225]mag timestamp in sensor hub 337225015030 delta time 62500000
+[337.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:187
+[2]:125, [3]:36
+[4]:126, [5]:82
+[337.287]mag timestamp in sensor hub 337287515030 delta time 62500000
+[337.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:180
+[2]:125, [3]:35
+[4]:126, [5]:91
+[337.350]mag timestamp in sensor hub 337350015030 delta time 62500000
+[337.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:181
+[2]:125, [3]:41
+[4]:126, [5]:107
+[337.412]mag timestamp in sensor hub 337412515030 delta time 62500000
+[337.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:183
+[2]:125, [3]:33
+[4]:126, [5]:92
+[337.475]mag timestamp in sensor hub 337475015030 delta time 62500000
+[337.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:172
+[2]:125, [3]:36
+[4]:126, [5]:102
+[337.537]mag timestamp in sensor hub 337537515030 delta time 62500000
+[337.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:178
+[2]:125, [3]:31
+[4]:126, [5]:105
+[337.600]mag timestamp in sensor hub 337600015030 delta time 62500000
+[337.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:179
+[2]:125, [3]:21
+[4]:126, [5]:137
+[337.662]mag timestamp in sensor hub 337662515030 delta time 62500000
+[337.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:180
+[2]:125, [3]:12
+[4]:126, [5]:163
+[337.725]mag timestamp in sensor hub 337725015030 delta time 62500000
+[337.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:189
+[2]:125, [3]:5
+[4]:126, [5]:193
+[337.787]mag timestamp in sensor hub 337787515030 delta time 62500000
+[337.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:196
+[2]:125, [3]:10
+[4]:126, [5]:234
+[337.850]mag timestamp in sensor hub 337850015030 delta time 62500000
+[337.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:197
+[2]:125, [3]:23
+[4]:127, [5]:11
+[337.912]mag timestamp in sensor hub 337912515030 delta time 62500000
+[337.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:201
+[2]:125, [3]:24
+[4]:127, [5]:32
+[337.975]mag timestamp in sensor hub 337975015030 delta time 62500000
+[338.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:215
+[2]:125, [3]:38
+[4]:127, [5]:61
+[338.037]mag timestamp in sensor hub 338037515030 delta time 62500000
+[338.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:213
+[2]:125, [3]:46
+[4]:127, [5]:75
+[338.100]mag timestamp in sensor hub 338100015030 delta time 62500000
+[338.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:202
+[2]:125, [3]:42
+[4]:127, [5]:86
+[338.162]mag timestamp in sensor hub 338162515030 delta time 62500000
+[338.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:208
+[2]:125, [3]:51
+[4]:127, [5]:85
+[338.225]mag timestamp in sensor hub 338225015030 delta time 62500000
+[338.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:197
+[2]:125, [3]:42
+[4]:127, [5]:82
+[338.287]mag timestamp in sensor hub 338287515030 delta time 62500000
+[338.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:194
+[2]:125, [3]:36
+[4]:127, [5]:81
+[338.350]mag timestamp in sensor hub 338350015030 delta time 62500000
+[338.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:196
+[2]:125, [3]:36
+[4]:127, [5]:87
+[338.412]mag timestamp in sensor hub 338412515030 delta time 62500000
+[338.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:181
+[2]:125, [3]:29
+[4]:127, [5]:83
+[338.475]mag timestamp in sensor hub 338475015030 delta time 62500000
+[338.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:172
+[2]:125, [3]:28
+[4]:127, [5]:98
+[338.537]mag timestamp in sensor hub 338537515030 delta time 62500000
+[338.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:154
+[2]:125, [3]:18
+[4]:127, [5]:84
+[338.600]mag timestamp in sensor hub 338600015030 delta time 62500000
+[338.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:139
+[2]:125, [3]:12
+[4]:127, [5]:82
+[338.662]mag timestamp in sensor hub 338662515030 delta time 62500000
+[338.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:128
+[2]:125, [3]:8
+[4]:127, [5]:82
+[338.725]mag timestamp in sensor hub 338725015030 delta time 62500000
+[338.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:105
+[2]:124, [3]:250
+[4]:127, [5]:64
+[338.787]mag timestamp in sensor hub 338787515030 delta time 62500000
+[338.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:92
+[2]:124, [3]:250
+[4]:127, [5]:65
+[338.850]mag timestamp in sensor hub 338850015030 delta time 62500000
+[338.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:86
+[2]:125, [3]:2
+[4]:127, [5]:74
+[338.912]mag timestamp in sensor hub 338912515030 delta time 62500000
+[338.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:81
+[2]:124, [3]:245
+[4]:127, [5]:51
+[338.975]mag timestamp in sensor hub 338975015030 delta time 62500000
+[339.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:74
+[2]:124, [3]:243
+[4]:127, [5]:44
+[339.037]mag timestamp in sensor hub 339037515030 delta time 62500000
+[339.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:76
+[2]:124, [3]:237
+[4]:127, [5]:33
+[339.100]mag timestamp in sensor hub 339100015030 delta time 62500000
+[339.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:77
+[2]:124, [3]:232
+[4]:127, [5]:24
+[339.162]mag timestamp in sensor hub 339162515030 delta time 62500000
+[339.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:94
+[2]:124, [3]:240
+[4]:127, [5]:22
+[339.225]mag timestamp in sensor hub 339225015030 delta time 62500000
+[339.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:106
+[2]:124, [3]:238
+[4]:127, [5]:10
+[339.287]mag timestamp in sensor hub 339287515030 delta time 62500000
+[339.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:126
+[2]:124, [3]:240
+[4]:126, [5]:255
+[339.350]mag timestamp in sensor hub 339350015030 delta time 62500000
+[339.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:154
+[2]:125, [3]:1
+[4]:126, [5]:251
+[339.412]mag timestamp in sensor hub 339412515030 delta time 62500000
+[339.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:167
+[2]:124, [3]:255
+[4]:126, [5]:223
+[339.475]mag timestamp in sensor hub 339475015030 delta time 62500000
+[339.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:175
+[2]:125, [3]:2
+[4]:126, [5]:200
+[339.537]mag timestamp in sensor hub 339537515030 delta time 62500000
+[339.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:169
+[2]:125, [3]:6
+[4]:126, [5]:196
+[339.600]mag timestamp in sensor hub 339600015030 delta time 62500000
+[339.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:174
+[2]:125, [3]:7
+[4]:126, [5]:181
+[339.662]mag timestamp in sensor hub 339662515030 delta time 62500000
+[339.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:174
+[2]:125, [3]:12
+[4]:126, [5]:190
+[339.725]mag timestamp in sensor hub 339725015030 delta time 62500000
+[339.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:168
+[2]:125, [3]:10
+[4]:126, [5]:185
+[339.787]mag timestamp in sensor hub 339787515030 delta time 62500000
+[339.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:170
+[2]:125, [3]:10
+[4]:126, [5]:188
+[339.850]mag timestamp in sensor hub 339850015030 delta time 62500000
+[339.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:173
+[2]:125, [3]:7
+[4]:126, [5]:196
+[339.912]mag timestamp in sensor hub 339912515030 delta time 62500000
+[339.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:174
+[2]:124, [3]:253
+[4]:126, [5]:198
+[339.975]mag timestamp in sensor hub 339975015030 delta time 62500000
+[340.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:177
+[2]:125, [3]:5
+[4]:126, [5]:237
+[340.037]mag timestamp in sensor hub 340037515030 delta time 62500000
+[340.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:179
+[2]:125, [3]:3
+[4]:126, [5]:238
+[340.100]mag timestamp in sensor hub 340100015030 delta time 62500000
+[340.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:174
+[2]:125, [3]:1
+[4]:127, [5]:10
+[340.162]mag timestamp in sensor hub 340162515030 delta time 62500000
+[340.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:170
+[2]:125, [3]:8
+[4]:127, [5]:36
+[340.225]mag timestamp in sensor hub 340225015030 delta time 62500000
+[340.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:159
+[2]:125, [3]:6
+[4]:127, [5]:40
+[340.287]mag timestamp in sensor hub 340287515030 delta time 62500000
+[340.289]sleep: cnt=89, total=138
+[340.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:146
+[2]:125, [3]:5
+[4]:127, [5]:64
+[340.350]mag timestamp in sensor hub 340350015030 delta time 62500000
+[340.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:137
+[2]:125, [3]:17
+[4]:127, [5]:79
+[340.412]mag timestamp in sensor hub 340412515030 delta time 62500000
+[340.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:127
+[2]:125, [3]:20
+[4]:127, [5]:90
+[340.475]mag timestamp in sensor hub 340475015030 delta time 62500000
+[340.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:131
+[2]:125, [3]:40
+[4]:127, [5]:118
+[340.537]mag timestamp in sensor hub 340537515030 delta time 62500000
+[340.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:164
+[2]:125, [3]:51
+[4]:127, [5]:115
+[340.600]mag timestamp in sensor hub 340600015030 delta time 62500000
+[340.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:190
+[2]:125, [3]:44
+[4]:127, [5]:83
+[340.662]mag timestamp in sensor hub 340662515030 delta time 62500000
+[340.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:193
+[2]:125, [3]:54
+[4]:127, [5]:82
+[340.725]mag timestamp in sensor hub 340725015030 delta time 62500000
+[340.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:216
+[2]:125, [3]:52
+[4]:127, [5]:51
+[340.787]mag timestamp in sensor hub 340787515030 delta time 62500000
+[340.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:244
+[2]:125, [3]:56
+[4]:127, [5]:16
+[340.850]mag timestamp in sensor hub 340850015030 delta time 62500000
+[340.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:252
+[2]:125, [3]:61
+[4]:126, [5]:255
+[340.912]mag timestamp in sensor hub 340912515030 delta time 62500000
+[340.948]ERR: contextHubIpiRx!
+[340.948]sync time scp:340948436889, ap:345053093481, offset:4105494207
+[340.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:129, [1]:4
+[2]:125, [3]:59
+[4]:126, [5]:239
+[340.975]mag timestamp in sensor hub 340975015030 delta time 62500000
+[341.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:242
+[2]:125, [3]:54
+[4]:126, [5]:254
+[341.037]mag timestamp in sensor hub 341037515030 delta time 62500000
+[341.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:191
+[2]:125, [3]:28
+[4]:127, [5]:25
+[341.100]mag timestamp in sensor hub 341100015030 delta time 62500000
+[341.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:136
+[2]:124, [3]:255
+[4]:127, [5]:26
+[341.162]mag timestamp in sensor hub 341162515030 delta time 62500000
+[341.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:106
+[2]:124, [3]:243
+[4]:127, [5]:3
+[341.225]mag timestamp in sensor hub 341225015030 delta time 62500000
+[341.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:101
+[2]:124, [3]:235
+[4]:126, [5]:230
+[341.287]mag timestamp in sensor hub 341287515030 delta time 62500000
+[341.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:99
+[2]:124, [3]:237
+[4]:126, [5]:221
+[341.350]mag timestamp in sensor hub 341350015030 delta time 62500000
+[341.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:108
+[2]:124, [3]:245
+[4]:126, [5]:217
+[341.412]mag timestamp in sensor hub 341412515030 delta time 62500000
+[341.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:109
+[2]:124, [3]:240
+[4]:126, [5]:214
+[341.475]mag timestamp in sensor hub 341475015030 delta time 62500000
+[341.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:114
+[2]:124, [3]:243
+[4]:126, [5]:212
+[341.537]mag timestamp in sensor hub 341537515030 delta time 62500000
+[341.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:123
+[2]:124, [3]:245
+[4]:126, [5]:204
+[341.600]mag timestamp in sensor hub 341600015030 delta time 62500000
+[341.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:131
+[2]:124, [3]:243
+[4]:126, [5]:211
+[341.662]mag timestamp in sensor hub 341662515030 delta time 62500000
+[341.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:144
+[2]:125, [3]:0
+[4]:126, [5]:214
+[341.725]mag timestamp in sensor hub 341725015030 delta time 62500000
+[341.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:149
+[2]:124, [3]:252
+[4]:126, [5]:210
+[341.787]mag timestamp in sensor hub 341787515030 delta time 62500000
+[341.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:168
+[2]:124, [3]:255
+[4]:126, [5]:214
+[341.850]mag timestamp in sensor hub 341850015030 delta time 62500000
+[341.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:173
+[2]:125, [3]:10
+[4]:126, [5]:219
+[341.912]mag timestamp in sensor hub 341912515030 delta time 62500000
+[341.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:169
+[2]:125, [3]:1
+[4]:126, [5]:216
+[341.975]mag timestamp in sensor hub 341975015030 delta time 62500000
+[342.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:175
+[2]:125, [3]:6
+[4]:126, [5]:216
+[342.037]mag timestamp in sensor hub 342037515030 delta time 62500000
+[342.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:169
+[2]:125, [3]:3
+[4]:126, [5]:221
+[342.100]mag timestamp in sensor hub 342100015030 delta time 62500000
+[342.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:172
+[2]:124, [3]:254
+[4]:126, [5]:221
+[342.162]mag timestamp in sensor hub 342162515030 delta time 62500000
+[342.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:164
+[2]:124, [3]:249
+[4]:126, [5]:226
+[342.225]mag timestamp in sensor hub 342225015030 delta time 62500000
+[342.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:174
+[2]:124, [3]:248
+[4]:126, [5]:226
+[342.287]mag timestamp in sensor hub 342287515030 delta time 62500000
+[342.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:181
+[2]:125, [3]:0
+[4]:126, [5]:235
+[342.350]mag timestamp in sensor hub 342350015030 delta time 62500000
+[342.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:191
+[2]:125, [3]:11
+[4]:126, [5]:247
+[342.412]mag timestamp in sensor hub 342412515030 delta time 62500000
+[342.475]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:197
+[2]:125, [3]:6
+[4]:126, [5]:241
+[342.475]mag timestamp in sensor hub 342475015030 delta time 62500000
+[342.537]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:201
+[2]:125, [3]:7
+[4]:126, [5]:250
+[342.537]mag timestamp in sensor hub 342537515030 delta time 62500000
+[342.600]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:186
+[2]:125, [3]:7
+[4]:126, [5]:253
+[342.600]mag timestamp in sensor hub 342600015030 delta time 62500000
+[342.662]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:185
+[2]:125, [3]:6
+[4]:127, [5]:0
+[342.662]mag timestamp in sensor hub 342662515030 delta time 62500000
+[342.725]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:181
+[2]:125, [3]:0
+[4]:127, [5]:3
+[342.725]mag timestamp in sensor hub 342725015030 delta time 62500000
+[342.787]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:168
+[2]:125, [3]:1
+[4]:127, [5]:0
+[342.787]mag timestamp in sensor hub 342787515030 delta time 62500000
+[342.850]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:169
+[2]:124, [3]:249
+[4]:126, [5]:250
+[342.850]mag timestamp in sensor hub 342850015030 delta time 62500000
+[342.912]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:156
+[2]:124, [3]:251
+[4]:126, [5]:252
+[342.912]mag timestamp in sensor hub 342912515030 delta time 62500000
+[342.975]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:152
+[2]:124, [3]:245
+[4]:126, [5]:230
+[342.975]mag timestamp in sensor hub 342975015030 delta time 62500000
+[343.037]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:155
+[2]:124, [3]:248
+[4]:126, [5]:234
+[343.037]mag timestamp in sensor hub 343037515030 delta time 62500000
+[343.100]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:153
+[2]:124, [3]:247
+[4]:126, [5]:218
+[343.100]mag timestamp in sensor hub 343100015030 delta time 62500000
+[343.162]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:148
+[2]:124, [3]:243
+[4]:126, [5]:215
+[343.162]mag timestamp in sensor hub 343162515030 delta time 62500000
+[343.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:152
+[2]:124, [3]:242
+[4]:126, [5]:202
+[343.225]mag timestamp in sensor hub 343225015030 delta time 62500000
+[343.287]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:150
+[2]:124, [3]:239
+[4]:126, [5]:202
+[343.287]mag timestamp in sensor hub 343287515030 delta time 62500000
+[343.350]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:150
+[2]:124, [3]:242
+[4]:126, [5]:206
+[343.350]mag timestamp in sensor hub 343350015030 delta time 62500000
+[343.412]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:147
+[2]:124, [3]:251
+[4]:126, [5]:212
+[343.412]mag timestamp in sensor hub 343412515030 delta time 62500000
+

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android alsps &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android alsps</a></li>
+<li><a class="reference internal" href="#p-sensor">p sensor 阈值如何设置</a></li>
+<li><a class="reference internal" href="#light-sensor-levelvalue">Light sensor level和value的设置</a></li>
+<li><a class="reference internal" href="#i2ctools">i2ctools</a></li>
+<li><a class="reference internal" href="#id1">寄存器读取</a></li>
+<li><a class="reference internal" href="#ps">ps</a><ul>
+<li><a class="reference internal" href="#id2">静态配置</a></li>
+<li><a class="reference internal" href="#id3">动态校正</a></li>
+<li><a class="reference internal" href="#id4">中断校正</a></li>
+<li><a class="reference internal" href="#id5">调试方法</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#als">als</a><ul>
+<li><a class="reference internal" href="#gain">gain</a></li>
+<li><a class="reference internal" href="#id6">传感器注册</a></li>
+<li><a class="reference internal" href="#framework">Framework调试</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">背光</a></li>
+<li><a class="reference internal" href="#id8">调光时间</a></li>
+<li><a class="reference internal" href="#id9">传感器数据</a></li>
+<li><a class="reference internal" href="#id10">自动调光多次强制最大</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android alsps</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-alsps">
+<h1>Android alsps<a class="headerlink" href="#android-alsps" title="Permalink to this headline"></a></h1>
+<p>快速获取近距、光感传感器数值</p>
+</section>
+<section id="p-sensor">
+<h1>p sensor 阈值如何设置<a class="headerlink" href="#p-sensor" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>PS一般都支持中断模式</p></li>
+<li><p>通过过程中，当靠近psensor时，屏幕灭屏，靠近的距离主要和psensor设定的阈值有关。</p></li>
+<li><p>阈值的设定方法如下，可以在工厂模式下，进入alsps测试选项，可观察到psensor的数值变化，此即为从p sensor寄存器读出来的数值，靠近和远离的时候观察对应数值，取对应距离下的数值作为阈值即可，一般为3cm或者4cm。</p></li>
+<li><p>阈值可在cust_alsps.c内设定，high的阈值为靠近时灭屏的阈值，low阈值为远离时亮屏的阈值。</p></li>
+<li><p>阈值不一定是固定的，采用的是自动校正，过一段时间校正一次，因为譬如在红外线充足的地方和在红外线少的情况下是不一样的，譬如夜间、太阳底下；</p></li>
+</ul>
+</section>
+<section id="light-sensor-levelvalue">
+<h1>Light sensor level和value的设置<a class="headerlink" href="#light-sensor-levelvalue" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>在cust_alsps.c中，Als_level是从sensor读到的raw data，als_value是由als_level转换为上报android的值</p></li>
+<li><p>这个对照关系暂时不知道怎么处理的</p></li>
+</ul>
+</section>
+<section id="i2ctools">
+<h1>i2ctools<a class="headerlink" href="#i2ctools" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>i2cget -f -y 1 0x23 0x87</p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>寄存器读取<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>adb shell</p></li>
+<li><p>cd /sys/bus/i2c/drivers/ltr559</p></li>
+<li><p>cat ps</p></li>
+<li><p>cat als</p></li>
+<li><p>cat reg</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">reg</span><span class="p">:</span><span class="mh">0x0080</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0081</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0003</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0082</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x007F</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0083</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0004</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0084</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0002</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0085</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0003</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0086</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0092</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0087</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0005</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0088</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0089</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x008A</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x008B</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x008C</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0001</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x008D</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0070</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x008E</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0001</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x008F</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0001</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0090</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0003</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0091</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0002</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0092</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0093</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0094</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0095</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0097</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x00FF</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0098</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x00FF</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x0099</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x009A</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0000</span>
+<span class="n">reg</span><span class="p">:</span><span class="mh">0x009E</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x0020</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="ps">
+<h1>ps<a class="headerlink" href="#ps" title="Permalink to this headline"></a></h1>
+<p>近距传感器主要是玻璃的折射率和透光性影响比较大，自动校正解决噪声问题</p>
+<section id="id2">
+<h2>静态配置<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/kernel-4.9/arch/arm64/boot/dts/mediatek/k62v1_64_bsp.dts b/kernel-4.9/arch/arm64/boot/dts/mediatek/k62v1_64_bsp.dts</span><span class="w"></span>
+<span class="gh">index d227eed1240..fd67378e5cc 100755</span><span class="w"></span>
+<span class="gd">--- a/kernel-4.9/arch/arm64/boot/dts/mediatek/k62v1_64_bsp.dts</span><span class="w"></span>
+<span class="gi">+++ b/kernel-4.9/arch/arm64/boot/dts/mediatek/k62v1_64_bsp.dts</span><span class="w"></span>
+<span class="gu">@@ -119,8 +119,8 @@</span><span class="w"></span>
+<span class="w"> </span>               power_vol                               = &lt;0&gt;;<span class="w"></span>
+<span class="w"> </span>               als_level = &lt;0 328 861 1377 3125 7721 7767 12621 23062 28430 33274 47116 57694 57694 65535&gt;;<span class="w"></span>
+<span class="w"> </span>               als_value = &lt;0 133 304 502 1004 2005 3058 5005 8008 10010 12000 16000 20000 20000 20000 20000&gt;;<span class="w"></span>
+<span class="gd">-               ps_threshold_high               =  &lt;70&gt;;</span><span class="w"></span>
+<span class="gd">-               ps_threshold_low                =  &lt;40&gt;;</span><span class="w"></span>
+<span class="gi">+               ps_threshold_high               =  &lt;300&gt;;</span><span class="w"></span>
+<span class="gi">+               ps_threshold_low                =  &lt;245&gt;;</span><span class="w"></span>
+<span class="w"> </span>               is_batch_supported_ps   = &lt;0&gt;;<span class="w"></span>
+<span class="w"> </span>               is_batch_supported_als  = &lt;0&gt;;<span class="w"></span>
+<span class="w"> </span>};<span class="w"></span>
+<span class="gh">diff --git a/kernel-4.9/drivers/misc/mediatek/sensors-1.0/alsps/ltr559/ltr559.c b/kernel-4.9/drivers/misc/mediatek/sensors-1.0/alsps/ltr559/ltr559.c</span><span class="w"></span>
+<span class="gh">index 0b3c8003990..5c3f7afb0c9 100755</span><span class="w"></span>
+<span class="gd">--- a/kernel-4.9/drivers/misc/mediatek/sensors-1.0/alsps/ltr559/ltr559.c</span><span class="w"></span>
+<span class="gi">+++ b/kernel-4.9/drivers/misc/mediatek/sensors-1.0/alsps/ltr559/ltr559.c</span><span class="w"></span>
+<span class="gu">@@ -20,7 +20,7 @@</span><span class="w"></span>
+<span class="w"> </span>#include &quot;ltr559.h&quot;<span class="w"></span>
+<span class="w"> </span>#include &quot;alsps.h&quot;<span class="w"></span>
+
+<span class="gd">-#define GN_MTK_BSP_PS_DYNAMIC_CALI</span><span class="w"></span>
+<span class="gi">+// #define GN_MTK_BSP_PS_DYNAMIC_CALI^M</span><span class="w"></span>
+<span class="w"> </span> //#define DELAYED_PS_CALI<span class="w"></span>
+<span class="w"> </span>//#define DEMO_BOARD<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>动态校正<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>kernel-4.9/drivers/misc/mediatek/sensors-1.0/alsps/ltr559/ltr559.c</p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef GN_MTK_BSP_PS_DYNAMIC_CALI</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">ltr559_dynamic_calibrate</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//int ret = 0;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">data_total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//ssize_t len = 0;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//int max = 0;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">ps_thd_val_high</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">ltr559_priv</span><span class="w"> </span><span class="o">*</span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_obj</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ltr559_obj</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">APS_ERR</span><span class="p">(</span><span class="s">&quot;ltr559_obj is null!!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="c1">//len = sprintf(buf, &quot;ltr559_obj is null\n&quot;);</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// wait for ps value be stable</span>
+<span class="w">                </span><span class="n">msleep</span><span class="p">(</span><span class="mi">120</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_ps_read</span><span class="p">(</span><span class="n">ltr559_obj</span><span class="o">-&gt;</span><span class="n">client</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ltr559_obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">i</span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+<span class="w">                        </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x8000</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">                </span><span class="n">data_total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">noise</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data_total</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">dynamic_calibrate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">50</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">150</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">300</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">150</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">400</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">150</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">600</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">180</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">90</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">300</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">180</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">noise</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1250</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">400</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">300</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1600</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ps_thd_val_low</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">1400</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">APS_ERR</span><span class="p">(</span><span class="s">&quot;dynamic calibrate fails!!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w"> </span><span class="n">ps_thd_val_high</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">ps_thd_val_low</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">APS_LOG</span><span class="p">(</span><span class="s">&quot;%s:noise = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">noise</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">APS_LOG</span><span class="p">(</span><span class="s">&quot;%s:obj-&gt;ps_thd_val_high = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">ps_thd_val_high</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">APS_LOG</span><span class="p">(</span><span class="s">&quot;%s:obj-&gt;ps_thd_val_low = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">ps_thd_val_low</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h2>中断校正<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dynamic_calibrate</span> <span class="pre">-</span> <span class="pre">50</span></code>测量值比噪声小这么多才会重新校准</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ltr559_eint_work</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">work_struct</span><span class="w"> </span><span class="o">*</span><span class="n">work</span><span class="p">)</span><span class="w"> </span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// ...省略</span>
+<span class="cp">#ifndef DELAYED_PS_CALI</span>
+<span class="cp">#ifdef GN_MTK_BSP_PS_DYNAMIC_CALI</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">dynamic_calibrate</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">50</span><span class="p">)){</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">100</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">35</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">200</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">35</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">300</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">35</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">400</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">35</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">600</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">100</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">70</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">280</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">140</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1250</span><span class="p">){</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">400</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="o">+</span><span class="mi">240</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">                </span><span class="k">else</span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_high</span><span class="p">,</span><span class="w">  </span><span class="mi">1400</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="n">atomic_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps_thd_val_low</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">                </span><span class="n">dynamic_calibrate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="o">-&gt;</span><span class="n">ps</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h2>调试方法<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>adb shell</p></li>
+<li><p>cd /sdcard/debuglogger/mobilelog</p></li>
+<li><p>grep ltr559_dynamic_calibrate * -R</p></li>
+<li><p>grep ltr559_eint_work * -R</p></li>
+</ul>
+</section>
+</section>
+<section id="als">
+<h1>als<a class="headerlink" href="#als" title="Permalink to this headline"></a></h1>
+<p>光感适配主要是要设置好光感的采集的数据和实际数据的mapper值，上层不用修改</p>
+<section id="gain">
+<h2>gain<a class="headerlink" href="#gain" title="Permalink to this headline"></a></h2>
+<p>将这里的64K量程修改成8K量程</p>
+<p><code class="docutils literal notranslate"><span class="pre">kernel-4.9/drivers/misc/mediatek/sensors-1.0/alsps/ltr559/ltr559.c</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">ltr559_init_client</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// ...省略</span>
+
+<span class="w">        </span><span class="c1">// Enable ALS to Full Range at startup</span>
+<span class="w">        </span><span class="n">als_gainrange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ALS_RANGE_64K</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">init_als_gain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">als_gainrange</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">APS_ERR</span><span class="p">(</span><span class="s">&quot;ALS sensor gainrange %d!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">init_als_gain</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">init_als_gain</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">ALS_RANGE_64K</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range1</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">ALS_RANGE_32K</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range2</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">ALS_RANGE_16K</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range3</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">ALS_RANGE_8K</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range4</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">ALS_RANGE_1300</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range5</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">ALS_RANGE_600</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range6</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">                </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ltr559_i2c_write_reg</span><span class="p">(</span><span class="n">LTR559_ALS_CONTR</span><span class="p">,</span><span class="w"> </span><span class="n">MODE_ALS_Range1</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h2>传感器注册<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/services/core/java/com/android/server/display/DisplayPowerController.java
+  * public DisplayPowerController(Context context, DisplayPowerCallbacks callbacks, Handler handler, SensorManager sensorManager, DisplayBlanker blanker)
+    * String lightSensorType = resources.getString(com.android.internal.R.string.config_displayLightSensorType);
+    * Sensor lightSensor = findDisplayLightSensor(lightSensorType);
+    * mBrightnessMapper = BrightnessMappingStrategy.create(resources);
+      * frameworks/base/services/core/java/com/android/server/display/BrightnessMappingStrategy.java
+        * public static BrightnessMappingStrategy create(Resources resources)
+          * isValidMapping(luxLevels, brightnessLevelsBacklight)
+            * return new SimpleMappingStrategy(luxLevels, brightnessLevelsBacklight, autoBrightnessAdjustmentMaxGamma);
+              * float[] luxLevels = getLuxLevels(resources.getIntArray(com.android.internal.R.array.config_autoBrightnessLevels));
+                * mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/brightness_adaptive_support/res/values/config.xml
+                  ```
+                  &lt;integer-array name=&quot;config_autoBrightnessLevels&quot;&gt;
+                      &lt;item&gt;128&lt;/item&gt;
+                      &lt;item&gt;256&lt;/item&gt;
+                      &lt;item&gt;384&lt;/item&gt;
+                      &lt;item&gt;512&lt;/item&gt;
+                      &lt;item&gt;640&lt;/item&gt;
+                      &lt;item&gt;768&lt;/item&gt;
+                      &lt;item&gt;896&lt;/item&gt;
+                      &lt;item&gt;1024&lt;/item&gt;
+                      &lt;item&gt;2048&lt;/item&gt;
+                      &lt;item&gt;4096&lt;/item&gt;
+                      &lt;item&gt;6144&lt;/item&gt;
+                      &lt;item&gt;8192&lt;/item&gt;
+                      &lt;item&gt;10240&lt;/item&gt;
+                      &lt;item&gt;12288&lt;/item&gt;
+                      &lt;item&gt;14336&lt;/item&gt;
+                      &lt;item&gt;16384&lt;/item&gt;
+                      &lt;item&gt;18432&lt;/item&gt;
+                  &lt;/integer-array&gt;
+                  ```
+              * int[] brightnessLevelsBacklight = resources.getIntArray(com.android.internal.R.array.config_autoBrightnessLcdBacklightValues);
+                * mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/brightness_adaptive_support/res/values/config.xml
+                  ```
+                  &lt;integer-array name=&quot;config_autoBrightnessLcdBacklightValues&quot;&gt;
+                      &lt;item&gt;8&lt;/item&gt;
+                      &lt;item&gt;64&lt;/item&gt;
+                      &lt;item&gt;98&lt;/item&gt;
+                      &lt;item&gt;104&lt;/item&gt;
+                      &lt;item&gt;110&lt;/item&gt;
+                      &lt;item&gt;116&lt;/item&gt;
+                      &lt;item&gt;122&lt;/item&gt;
+                      &lt;item&gt;128&lt;/item&gt;
+                      &lt;item&gt;134&lt;/item&gt;
+                      &lt;item&gt;182&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                      &lt;item&gt;255&lt;/item&gt;
+                  &lt;/integer-array&gt;
+                  ```
+    * mAutomaticBrightnessController = new AutomaticBrightnessController(this, handler.getLooper(), sensorManager, lightSensor, mBrightnessMapper, lightSensorWarmUpTimeConfig, mScreenBrightnessRangeMinimum, mScreenBrightnessRangeMaximum, dozeScaleFactor, lightSensorRate, initialLightSensorRate, brighteningLightDebounce, darkeningLightDebounce, autoBrightnessResetAmbientLuxAfterWarmUp, ambientBrightnessThresholds, screenBrightnessThresholds, shortTermModelTimeout, context.getPackageManager());
+      * frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java
+        * public AutomaticBrightnessController(Callbacks callbacks, Looper looper, SensorManager sensorManager, Sensor lightSensor, BrightnessMappingStrategy mapper, int lightSensorWarmUpTime, int brightnessMin, int brightnessMax, float dozeScaleFactor, int lightSensorRate, int initialLightSensorRate, long brighteningLightDebounceConfig, long darkeningLightDebounceConfig, boolean resetAmbientLuxAfterWarmUpConfig, HysteresisLevels ambientBrightnessThresholds, HysteresisLevels screenBrightnessThresholds, long shortTermModelTimeout, PackageManager packageManager)
+          * mHandler = new AutomaticBrightnessHandler(looper);
+            * frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java
+              * private final class AutomaticBrightnessHandler extends Handler
+                * public void handleMessage(Message msg)
+                  * case MSG_UPDATE_AMBIENT_LUX:
+                    * updateAmbientLux();
+                      * updateAmbientLux(time);
+          * mLightSensor = lightSensor;
+          * private boolean setLightSensorEnabled(boolean enable)
+            * mSensorManager.registerListener(mLightSensorListener, mLightSensor, mCurrentLightSensorRate * 1000, mHandler);
+              * private final SensorEventListener mLightSensorListener = new SensorEventListener() {}
+                * final float lux = event.values[0];
+                * handleLightSensorEvent(time, lux);
+                  * applyLightSensorMeasurement(time, lux);
+                  * updateAmbientLux(time);
+                    * updateAutoBrightness(true /* sendUpdate */, false /* isManuallySet */);
+                      * float value = mBrightnessMapper.getBrightness(mAmbientLux, mForegroundAppPackageName, mForegroundAppCategory);
+                        * int newScreenAutoBrightness = clampScreenBrightness(Math.round(value * PowerManager.BRIGHTNESS_ON));
+                        * mScreenAutoBrightness = newScreenAutoBrightness;
+                        * mCallbacks.updateBrightness();
+              * mHandler是前面的定义的
+</pre></div>
+</div>
+</section>
+<section id="framework">
+<h2>Framework调试<a class="headerlink" href="#framework" title="Permalink to this headline"></a></h2>
+<p>git diff frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java frameworks/base/services/core/java/com/android/server/display/BrightnessMappingStrategy.java</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java b/frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java</span><span class="w"></span>
+<span class="gh">index 31632dc007a..7f80e9de34e 100644</span><span class="w"></span>
+<span class="gd">--- a/frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java</span><span class="w"></span>
+<span class="gi">+++ b/frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java</span><span class="w"></span>
+<span class="gu">@@ -128,7 +128,7 @@ class AutomaticBrightnessController {</span><span class="w"></span>
+<span class="w"> </span>    private final HysteresisLevels mAmbientBrightnessThresholds;<span class="w"></span>
+<span class="w"> </span>    private final HysteresisLevels mScreenBrightnessThresholds;<span class="w"></span>
+
+<span class="gd">-    private boolean mLoggingEnabled;</span><span class="w"></span>
+<span class="gi">+    private boolean mLoggingEnabled = true;</span><span class="w"></span>
+
+<span class="w"> </span>    // Timeout after which we remove the effects any user interactions might&#39;ve had on the<span class="w"></span>
+<span class="w"> </span>    // brightness mapping. This timeout doesn&#39;t start until we transition to a non-interactive<span class="w"></span>
+<span class="gu">@@ -920,6 +920,7 @@ class AutomaticBrightnessController {</span><span class="w"></span>
+<span class="w"> </span>            if (mLightSensorEnabled) {<span class="w"></span>
+<span class="w"> </span>                final long time = SystemClock.uptimeMillis();<span class="w"></span>
+<span class="w"> </span>                final float lux = event.values[0];<span class="w"></span>
+<span class="gi">+               Slog.d(TAG, &quot;zengjf SensorEventListener lux: &quot; + lux);</span><span class="w"></span>
+<span class="w"> </span>                handleLightSensorEvent(time, lux);<span class="w"></span>
+<span class="w"> </span>            }<span class="w"></span>
+<span class="w"> </span>        }<span class="w"></span>
+<span class="gh">diff --git a/frameworks/base/services/core/java/com/android/server/display/BrightnessMappingStrategy.java b/frameworks/base/services/core/java/com/android/server/display/BrightnessMappingStrategy.java</span><span class="w"></span>
+<span class="gh">index 171cc5abdb9..02f52d99855 100644</span><span class="w"></span>
+<span class="gd">--- a/frameworks/base/services/core/java/com/android/server/display/BrightnessMappingStrategy.java</span><span class="w"></span>
+<span class="gi">+++ b/frameworks/base/services/core/java/com/android/server/display/BrightnessMappingStrategy.java</span><span class="w"></span>
+<span class="gu">@@ -82,9 +82,13 @@ public abstract class BrightnessMappingStrategy {</span><span class="w"></span>
+<span class="w"> </span>            }<span class="w"></span>
+<span class="w"> </span>            BrightnessConfiguration.Builder builder = new BrightnessConfiguration.Builder(<span class="w"></span>
+<span class="w"> </span>                    luxLevels, brightnessLevelsNits);<span class="w"></span>
+<span class="gi">+            Slog.w(TAG, &quot;PhysicalMappingStrategy&quot;);</span><span class="w"></span>
+<span class="w"> </span>            return new PhysicalMappingStrategy(builder.build(), nitsRange, backlightRange,<span class="w"></span>
+<span class="w"> </span>                    autoBrightnessAdjustmentMaxGamma);<span class="w"></span>
+<span class="w"> </span>        } else if (isValidMapping(luxLevels, brightnessLevelsBacklight)) {<span class="w"></span>
+<span class="gi">+            Slog.w(TAG, &quot;SimpleMappingStrategy&quot;);</span><span class="w"></span>
+<span class="gi">+            Slog.w(TAG, &quot;luxLevels: &quot; + Arrays.toString(luxLevels));</span><span class="w"></span>
+<span class="gi">+            Slog.w(TAG, &quot;brightnessLevelsBacklight: &quot; + Arrays.toString(brightnessLevelsBacklight));</span><span class="w"></span>
+<span class="w"> </span>            return new SimpleMappingStrategy(luxLevels, brightnessLevelsBacklight,<span class="w"></span>
+<span class="w"> </span>                    autoBrightnessAdjustmentMaxGamma);<span class="w"></span>
+<span class="w"> </span>        } else {<span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id7">
+<h1>背光<a class="headerlink" href="#id7" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/sys/devices/platform/leds-mt65xx/leds/lcd-backlight</p></li>
+<li><p>cat max_brightness</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">255</span>
+</pre></div>
+</div>
+</li>
+<li><p>echo 128 &gt; brightness</p></li>
+<li><p>cat brightness</p></li>
+<li><p>使用手机手电筒照着光感传感器，经过一定时间，能过达到255的亮度等级</p></li>
+<li><p>通过settings调节背光发现百分比不是线性百分比：</p>
+<ul class="simple">
+<li><p>adb shell settings put system screen_brightness 130</p></li>
+<li><p>130的时候亮度达到了85%</p></li>
+<li><p>参考文档</p>
+<ul>
+<li><p><a class="reference external" href="https://blog.csdn.net/su749520/article/details/84585672?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.channel_param">Android 9.0 (P版本) 亮度进度条变化等级更新</a></p></li>
+<li><p>新的关系由 GAMMA_SPACE_MAX、经过 convertGammaToLinear 和 convertLinearToGamma 共同决定</p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/wangjicong_215/article/details/103066698">android P 亮度调解修改为线性变化</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/sinat_30545941/article/details/72874775">MTK 平台 CABC 背光控制机制</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>adb shell</p>
+<ul class="simple">
+<li><p>cd /sdcard/debuglogger/mobilelog</p></li>
+<li><p>grep updateAutoBrightness * -R</p></li>
+<li><p>grep calculateAmbientLux * -R</p></li>
+<li><p>grep newScreenAutoBrightness * -R</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id8">
+<h1>调光时间<a class="headerlink" href="#id8" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/FightFightFight/article/details/83626332">Android 8.1 DisplayPowerController(四) 自动调节亮度(1)——流程</a></p></li>
+</ul>
+<p>创建自动调光对象</p>
+<p><code class="docutils literal notranslate"><span class="pre">frameworks/base/services/core/java/com/android/server/display/DisplayPowerController.java</span></code></p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="nf">DisplayPowerController</span><span class="p">(</span><span class="n">Context</span> <span class="n">context</span><span class="p">,</span>
+            <span class="n">DisplayPowerCallbacks</span> <span class="n">callbacks</span><span class="p">,</span> <span class="n">Handler</span> <span class="n">handler</span><span class="p">,</span>
+            <span class="n">SensorManager</span> <span class="n">sensorManager</span><span class="p">,</span> <span class="n">DisplayBlanker</span> <span class="n">blanker</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ...省略</span>
+
+    <span class="kt">long</span> <span class="n">brighteningLightDebounce</span> <span class="o">=</span> <span class="n">resources</span><span class="p">.</span><span class="na">getInteger</span><span class="p">(</span>
+            <span class="n">com</span><span class="p">.</span><span class="na">android</span><span class="p">.</span><span class="na">internal</span><span class="p">.</span><span class="na">R</span><span class="p">.</span><span class="na">integer</span><span class="p">.</span><span class="na">config_autoBrightnessBrighteningLightDebounce</span><span class="p">);</span>
+    <span class="kt">long</span> <span class="n">darkeningLightDebounce</span> <span class="o">=</span> <span class="n">resources</span><span class="p">.</span><span class="na">getInteger</span><span class="p">(</span>
+            <span class="n">com</span><span class="p">.</span><span class="na">android</span><span class="p">.</span><span class="na">internal</span><span class="p">.</span><span class="na">R</span><span class="p">.</span><span class="na">integer</span><span class="p">.</span><span class="na">config_autoBrightnessDarkeningLightDebounce</span><span class="p">);</span>
+
+    <span class="c1">// ...省略</span>
+
+    <span class="n">mBrightnessMapper</span> <span class="o">=</span> <span class="n">BrightnessMappingStrategy</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">resources</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mBrightnessMapper</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mAutomaticBrightnessController</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AutomaticBrightnessController</span><span class="p">(</span><span class="k">this</span><span class="p">,</span>
+                <span class="n">handler</span><span class="p">.</span><span class="na">getLooper</span><span class="p">(),</span> <span class="n">sensorManager</span><span class="p">,</span> <span class="n">lightSensor</span><span class="p">,</span> <span class="n">mBrightnessMapper</span><span class="p">,</span>
+                <span class="n">lightSensorWarmUpTimeConfig</span><span class="p">,</span> <span class="n">mScreenBrightnessRangeMinimum</span><span class="p">,</span>
+                <span class="n">mScreenBrightnessRangeMaximum</span><span class="p">,</span> <span class="n">dozeScaleFactor</span><span class="p">,</span> <span class="n">lightSensorRate</span><span class="p">,</span>
+                <span class="n">initialLightSensorRate</span><span class="p">,</span> <span class="n">brighteningLightDebounce</span><span class="p">,</span> <span class="n">darkeningLightDebounce</span><span class="p">,</span>
+                <span class="n">autoBrightnessResetAmbientLuxAfterWarmUp</span><span class="p">,</span> <span class="n">ambientBrightnessThresholds</span><span class="p">,</span>
+                <span class="n">screenBrightnessThresholds</span><span class="p">,</span> <span class="n">shortTermModelTimeout</span><span class="p">,</span>
+                <span class="n">context</span><span class="p">.</span><span class="na">getPackageManager</span><span class="p">());</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">mUseSoftwareAutoBrightnessConfig</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// ...省略</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>查看调光延时实际配置</p>
+<p><code class="docutils literal notranslate"><span class="pre">frameworks/base/core/res/res/values/config.xml</span></code></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>    <span class="cm">&lt;!-- Stability requirements in milliseconds for accepting a new brightness level.  This is used</span>
+<span class="cm">         for debouncing the light sensor.  Different constants are used to debounce the light sensor</span>
+<span class="cm">         when adapting to brighter or darker environments.  This parameter controls how quickly</span>
+<span class="cm">         brightness changes occur in response to an observed change in light level that exceeds the</span>
+<span class="cm">         hysteresis threshold. --&gt;</span>
+    <span class="nt">&lt;integer</span> <span class="na">name=</span><span class="s">&quot;config_autoBrightnessBrighteningLightDebounce&quot;</span><span class="nt">&gt;</span>4000<span class="nt">&lt;/integer&gt;</span>
+    <span class="nt">&lt;integer</span> <span class="na">name=</span><span class="s">&quot;config_autoBrightnessDarkeningLightDebounce&quot;</span><span class="nt">&gt;</span>8000<span class="nt">&lt;/integer&gt;</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://blog.csdn.net/FightFightFight/article/details/85797336">Android 9.0 自动背光机制分析</a></p>
+<p>lux亮度等级映射调节</p>
+<p><code class="docutils literal notranslate"><span class="pre">frameworks/base/core/res/res/values/config.xml</span></code></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>    <span class="cm">&lt;!-- Array of light sensor lux values to define our levels for auto backlight brightness support.</span>
+<span class="cm">         The N entries of this array define N + 1 control points as follows:</span>
+<span class="cm">         (1-based arrays)</span>
+
+<span class="cm">         Point 1:            (0, value[1]):             lux &lt;= 0</span>
+<span class="cm">         Point 2:     (level[1], value[2]):  0        &lt; lux &lt;= level[1]</span>
+<span class="cm">         Point 3:     (level[2], value[3]):  level[2] &lt; lux &lt;= level[3]</span>
+<span class="cm">         ...</span>
+<span class="cm">         Point N+1: (level[N], value[N+1]):  level[N] &lt; lux</span>
+
+<span class="cm">         The control points must be strictly increasing.  Each control point</span>
+<span class="cm">         corresponds to an entry in the brightness backlight values arrays.</span>
+<span class="cm">         For example, if lux == level[1] (first element of the levels array)</span>
+<span class="cm">         then the brightness will be determined by value[2] (second element</span>
+<span class="cm">         of the brightness values array).</span>
+
+<span class="cm">         Spline interpolation is used to determine the auto-brightness</span>
+<span class="cm">         backlight values for lux levels between these control points.</span>
+
+<span class="cm">         Must be overridden in platform specific overlays --&gt;</span>
+    <span class="nt">&lt;integer-array</span> <span class="na">name=</span><span class="s">&quot;config_autoBrightnessLevels&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/integer-array&gt;</span>
+</pre></div>
+</div>
+<p>上面文件修改无效，MTK存放的文件是该文件<code class="docutils literal notranslate"><span class="pre">mediatek/proprietary/packages/overlay/vendor/FrameworkResOverlay/brightness_adaptive_support/res/values/config.xml</span></code></p>
+</section>
+<section id="id9">
+<h1>传感器数据<a class="headerlink" href="#id9" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/services/core/java/com/android/server/display/DisplayPowerController.java
+  └── public DisplayPowerController(Context context, DisplayPowerCallbacks callbacks, Handler handler, SensorManager sensorManager, DisplayBlanker blanker)
+      ├── String lightSensorType = resources.getString(com.android.internal.R.string.config_displayLightSensorType);
+      ├── Sensor lightSensor = findDisplayLightSensor(lightSensorType);
+      └── mAutomaticBrightnessController = new AutomaticBrightnessController(this, handler.getLooper(), sensorManager, lightSensor, mBrightnessMapper, lightSensorWarmUpTimeConfig, mScreenBrightnessRangeMinimum, mScreenBrightnessRangeMaximum, dozeScaleFactor, lightSensorRate, initialLightSensorRate, brighteningLightDebounce, darkeningLightDebounce, autoBrightnessResetAmbientLuxAfterWarmUp, ambientBrightnessThresholds, screenBrightnessThresholds, shortTermModelTimeout, context.getPackageManager());
+          └── frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java
+              ├── mLightSensor = lightSensor;
+              └── private boolean setLightSensorEnabled(boolean enable)
+                  └── mSensorManager.registerListener(mLightSensorListener, mLightSensor, mCurrentLightSensorRate * 1000, mHandler);
+                      └── private final SensorEventListener mLightSensorListener = new SensorEventListener()
+                          └── public void onSensorChanged(SensorEvent event) 
+                              └── final float lux = event.values[0];
+                                  └── handleLightSensorEvent(time, lux);
+                                      └── updateAmbientLux(time);
+</pre></div>
+</div>
+</section>
+<section id="id10">
+<h1>自动调光多次强制最大<a class="headerlink" href="#id10" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/services/core/java/com/android/server/display/AutomaticBrightnessController.java
+  └── private void updateAmbientLux(long time)
+      ├── long nextBrightenTransition = nextAmbientLightBrighteningTransition(time);
+      └── long nextDarkenTransition = nextAmbientLightDarkeningTransition(time);
+          └── mAmbientLightRingBuffer.getLux(i) &lt;= mAmbientBrighteningThreshold
+              └── mAmbientBrighteningThreshold
+                  └── private void setAmbientLux(float lux)
+                      └── mAmbientBrighteningThreshold = mAmbientBrightnessThresholds.getBrighteningThreshold(lux);
+                          └── frameworks/base/services/core/java/com/android/server/display/HysteresisLevels.java
+                              └── float darkConstant = getReferenceLevel(value, mDarkeningThresholds);
+                                  └── float darkThreshold = value * (1.0f - darkConstant);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

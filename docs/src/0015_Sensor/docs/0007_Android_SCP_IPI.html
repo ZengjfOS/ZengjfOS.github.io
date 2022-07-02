@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android SCP IPI &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android SCP IPI</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#scp">SCP使能传感器流程</a></li>
+<li><a class="reference internal" href="#nanohubipi">nanohub处理IPI中断</a></li>
+<li><a class="reference internal" href="#ap-sensorhubipi">AP sensorHub发送IPI请求</a></li>
+<li><a class="reference internal" href="#scp-contexthubipi">SCP contexthub处理IPI请求</a></li>
+<li><a class="reference internal" href="#sensorhub-nanohub-ipi">sensorhub nanohub IPI通信验证</a></li>
+<li><a class="reference internal" href="#linux-driver-i2c-bus">Linux Driver I2C bus是否可访问</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android SCP IPI</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-scp-ipi">
+<h1>Android SCP IPI<a class="headerlink" href="#android-scp-ipi" title="Permalink to this headline"></a></h1>
+<p>Inter-Processor Communication (IPC) and Inter-Processor Interrupt (IPI)</p>
+<ul class="simple">
+<li><p>IPC is a communication bridge between AP and SCP.  AP/SCP sends an IPC interrupt to SCP/AP to inform to collect the commmunication mesesages in the shared buffer.</p></li>
+<li><p>sensorhub和nanohub可以不同，也可以相同，nanohub接口可以是I2C/SPI/IPI，sensorhub貌似只能是IPI；</p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0006_Android_SCP.html"><span class="doc std std-doc">0006_Android_SCP.md</span></a></p></li>
+</ul>
+</section>
+<section id="scp">
+<h1>SCP使能传感器流程<a class="headerlink" href="#scp" title="Permalink to this headline"></a></h1>
+<p>暂时找不到AP如何发信息过来的，主要是目前我们的系统没有配置开启SensorHub，所以没法跟踪分析</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/magnetometer.c
+  └── static void handleEvent(uint32_t evtType, const void* evtData)
+      └── case EVT_SENSOR_EVENT
+          └── handleSensorEvent(evtData);
+              └── case CHIP_SAMPLING_DONE:
+                  └── processPendingEvt();
+                      └── if (mTask.pendingConfig)
+                          └── else if (mTask.pendConfig.enable == 1 &amp;&amp; !mTask.magNowOn)
+                              └── sensorOpsMag.sensorPower(true, NULL);
+                                  └── static const struct SensorOps sensorOpsMag
+                                      └── DEC_OPS_CFG_SELFTEST(sensorPowerMag, sensorFirmwareMag, sensorRateMag, sensorFlushMag, sensorCfgMag, sensorSelfTestMag),
+                                          └── static bool sensorPowerMag(bool on, void *cookie)
+                                              └── magPowerCalculate(on);
+                                                  └── setMagHwEnable(on);
+                                                      └── sensorFsmRunState(&amp;dataInfo, &amp;mTask.fsm, (const void *)CHIP_ENABLE, &amp;i2cCallback, &amp;spiCallback);
+                                                          └── vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/sensorFsm.c
+                                                              └── int sensorFsmRunState(struct transferDataInfo *dataInfo, struct fsmCurrInfo *fsmInfo, const void *state, I2cCallbackF i2cCallBack, SpiCbkF spiCallBack)
+                                                                  └── cmd = sensorFsmFindCmd(fsmInfo-&gt;mSensorFsm, fsmInfo-&gt;mSensorFsmSize, state);
+                                                                      └── vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/mmc5603.c
+                                                                          └── static struct sensorFsm mmc5603Fsm[]
+                                                                              └── sensorFsmCmd(STATE_ENABLE, STATE_ENABLE_DONE, mmc5603Enable)
+                                                                                  └── osLog(LOG_INFO, &quot;%s :  MMC5603 enable mag\n&quot;, __func__);
+</pre></div>
+</div>
+</section>
+<section id="nanohubipi">
+<h1>nanohub处理IPI中断<a class="headerlink" href="#nanohubipi" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>kernel-4.9/drivers/misc/mediatek/sensors-1.0/sensorHub/SCP_nanoHub/SCP_nanoHub.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SCP_sensorHub_Cmd</span><span class="w"> </span><span class="n">SCP_sensorHub_Cmds</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_ACTIVATE</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_enable_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_SET_DELAY</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_set_delay_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_GET_DATA</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_get_data_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_BATCH</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_batch_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_SET_CONFIG</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_set_cfg_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_SET_CUST</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_set_cust_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_BATCH_TIMEOUT</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_batch_timeout_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_SET_TIMESTAMP</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_set_timestamp_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSORHUB_CMD</span><span class="p">(</span><span class="n">SENSOR_HUB_NOTIFY</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_notify_cmd</span><span class="p">),</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SCP_sensorHub_Cmd</span><span class="w"> </span><span class="o">*</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_sensorHub_find_cmd</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">packetReason</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SCP_sensorHub_Cmd</span><span class="w"> </span><span class="o">*</span><span class="n">cmd</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">SCP_sensorHub_Cmds</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">SCP_sensorHub_Cmds</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cmd</span><span class="o">-&gt;</span><span class="n">reason</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">packetReason</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">cmd</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">SCP_sensorHub_IPI_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">SCP_SENSOR_HUB_DATA_P</span><span class="w"> </span><span class="n">rsp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">SCP_SENSOR_HUB_DATA_P</span><span class="p">)</span><span class="w"> </span><span class="n">data</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SCP_sensorHub_Cmd</span><span class="w"> </span><span class="o">*</span><span class="n">cmd</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">len</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">SENSOR_IPI_SIZE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">pr_err</span><span class="p">(</span><span class="s">&quot;SCP_sensorHub_IPI_handler len=%d error</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*pr_err(&quot;sensorType:%d, action=%d event:%d len:%d\n&quot;,</span>
+<span class="cm">     * rsp-&gt;rsp.sensorType, rsp-&gt;rsp.action, rsp-&gt;notify_rsp.event, len);</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SCP_sensorHub_find_cmd</span><span class="p">(</span><span class="n">rsp</span><span class="o">-&gt;</span><span class="n">rsp</span><span class="p">.</span><span class="n">action</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cmd</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">cmd</span><span class="o">-&gt;</span><span class="n">handler</span><span class="p">(</span><span class="n">rsp</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">pr_err</span><span class="p">(</span><span class="s">&quot;cannot find cmd!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">sensorHub_probe</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">pdev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="w">    </span><span class="cm">/* register ipi interrupt handler */</span><span class="w"></span>
+<span class="w">    </span><span class="n">scp_ipi_registration</span><span class="p">(</span><span class="n">IPI_SENSOR</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SCP_sensorHub_IPI_handler</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;SCP_sensorHub&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>kernel-4.9/drivers/misc/mediatek/scp/v01/scp_ipi.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * API let apps can register an ipi handler to receive IPI</span>
+<span class="cm"> * @param id:      IPI ID</span>
+<span class="cm"> * @param handler:  IPI handler</span>
+<span class="cm"> * @param name:  IPI name</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">enum</span><span class="w"> </span><span class="nc">scp_ipi_status</span><span class="w"> </span><span class="n">scp_ipi_registration</span><span class="p">(</span><span class="k">enum</span><span class="w"> </span><span class="nc">ipi_id</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">ipi_handler</span><span class="p">)(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">SCP_NR_IPI</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">scp_ipi_desc</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ipi_handler</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">SCP_IPI_ERROR</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">scp_ipi_desc</span><span class="p">[</span><span class="n">id</span><span class="p">].</span><span class="n">handler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ipi_handler</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">SCP_IPI_DONE</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">SCP_IPI_ERROR</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">EXPORT_SYMBOL_GPL</span><span class="p">(</span><span class="n">scp_ipi_registration</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="ap-sensorhubipi">
+<h1>AP sensorHub发送IPI请求<a class="headerlink" href="#ap-sensorhubipi" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* kernel-4.9/drivers/misc/mediatek/sensors-1.0/sensorHub/SCP_nanoHub/SCP_nanoHub.c
+  ├── int sensor_set_cmd_to_hub(uint8_t sensorType, CUST_ACTION action, void *data)
+  │   └── err = scp_sensorHub_req_send(&amp;req, &amp;len, 1);
+  │       └── ret = SCP_sensorHub_ipi_txrx((unsigned char *)data);
+  │           └── return scp_ipi_txrx(txrxbuf, SENSOR_IPI_SIZE, txrxbuf, SENSOR_IPI_SIZE);
+  │               ├── ipi_message_init(&amp;m);
+  │               ├── ipi_message_add_tail(&amp;t, &amp;m);
+  │               │   └── list_add_tail(&amp;t-&gt;transfer_list, &amp;m-&gt;transfers);
+  │               └── status =  __ipi_xfer(&amp;m);
+  └── static int __init SCP_sensorHub_init(void)
+      └── INIT_WORK(&amp;master.work, ipi_work);
+          └── static void ipi_work(struct work_struct *work)
+              └── list_for_each_entry(t, &amp;m-&gt;transfers, transfer_list)
+                  └── status = ipi_txrx_bufs(t);
+                      └── status = scp_ipi_send(IPI_SENSOR, (unsigned char *)hw-&gt;tx, hw-&gt;len, 0, SCP_A_ID);
+                          └── kernel-4.9/drivers/misc/mediatek/scp/v01/scp_ipi.c
+                              └── enum scp_ipi_status scp_ipi_send(enum ipi_id id, void *buf, unsigned int  len, unsigned int wait, enum scp_core_id scp_id)
+</pre></div>
+</div>
+</section>
+<section id="scp-contexthubipi">
+<h1>SCP contexthub处理IPI请求<a class="headerlink" href="#scp-contexthubipi" title="Permalink to this headline"></a></h1>
+<p>在SCP这边，不管是nanohub，还是sensorhub，都是contexthub</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/contexthub_fw.c
+  └── INTERNAL_APP_INIT(APP_ID_MAKE(APP_ID_VENDOR_MTK, MTK_APP_ID_WRAP(SENS_TYPE_INVALID, 0, 0)), 0, contextHubFwStart, contextHubFwEnd, contextHubFwHandleEvent);
+      └── static bool contextHubFwStart(uint32_t tid)
+          └── ipi_ret = scp_ipi_registration(IPI_SENSOR, contextHubIpiHandler, &quot;chre_fw_ipi&quot;);
+              └── static void contextHubIpiHandler(int id, void *data, unsigned int len)
+                  └── osEnqueuePrivateEvt(EVT_IPI_RX, NULL, NULL, mTask.id);
+                      └── 进入OS系统消息处理，最终传到下面这个函数
+                          └── static void contextHubFwHandleEvent(uint32_t evtType, const void* evtData)
+                              └── case EVT_IPI_RX:
+                                  └── contextHubHandleIpiRxEvent();
+                                      ├── cmd = contextHubFindCmd(mTask.ipi_req.action);
+                                      │   └── const static struct ContextHubCmd mContextHubCmds[]
+                                      │       └── CONTEXTHUB_CMD(SENSOR_HUB_SET_CUST, contextHubFwSetCust, contextHubFwSetCustAck),
+                                      │           └── static int contextHubFwSetCust(SCP_SENSOR_HUB_REQ *req, struct data_unit_t *data)
+                                      │               ├── set_cust_req = (SCP_SENSOR_HUB_SET_CUST_REQ *)req;
+                                      │               ├── mtkType = apIdToMtkType(set_cust_req-&gt;sensorType);
+                                      │               └── ret = contextHubDispatchCust(mtkTypeToChreType(mtkType), set_cust_req);
+                                      ├── ret = cmd-&gt;handler(&amp;mTask.ipi_req, &amp;data);
+                                      └── ret = contextHubIpiRxAck(cmd, &amp;mTask.ipi_req, &amp;data, ret);
+</pre></div>
+</div>
+</section>
+<section id="sensorhub-nanohub-ipi">
+<h1>sensorhub nanohub IPI通信验证<a class="headerlink" href="#sensorhub-nanohub-ipi" title="Permalink to this headline"></a></h1>
+<p>开启内核相关配置</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/kernel-4.9/arch/arm64/configs/k62v1_64_bsp_debug_defconfig b/kernel-4.9/arch/arm64/configs/k62v1_64_bsp_debug_defconfig</span><span class="w"></span>
+<span class="gh">index 382f89e769c..a359e8ac81b 100755</span><span class="w"></span>
+<span class="gd">--- a/kernel-4.9/arch/arm64/configs/k62v1_64_bsp_debug_defconfig</span><span class="w"></span>
+<span class="gi">+++ b/kernel-4.9/arch/arm64/configs/k62v1_64_bsp_debug_defconfig</span><span class="w"></span>
+<span class="gu">@@ -152,8 +152,8 @@ CONFIG_CUSTOM_KERNEL_GYROSCOPE=y</span><span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_BMI160GY_NEW=y<span class="w"></span>
+<span class="w"> </span># CONFIG_MTK_GYROHUB is not set<span class="w"></span>
+<span class="w"> </span>CONFIG_CUSTOM_KERNEL_MAGNETOMETER=y<span class="w"></span>
+<span class="gd">-CONFIG_MTK_MMC5603X=y</span><span class="w"></span>
+<span class="gd">-# CONFIG_MTK_MAGHUB is not set</span><span class="w"></span>
+<span class="gi">+#CONFIG_MTK_MMC5603X=y</span><span class="w"></span>
+<span class="gi">+CONFIG_MTK_MAGHUB=y</span><span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_HWMON=y<span class="w"></span>
+<span class="w"> </span># CONFIG_CUSTOM_KERNEL_BAROMETER is not set<span class="w"></span>
+<span class="w"> </span># CONFIG_MTK_BAROHUB is not set<span class="w"></span>
+<span class="gu">@@ -173,7 +173,7 @@ CONFIG_MTK_HWMON=y</span><span class="w"></span>
+<span class="w"> </span># CONFIG_MTK_DEVICE_ORIENTATION_HUB is not set<span class="w"></span>
+<span class="w"> </span># CONFIG_MTK_MOTION_DETECT_HUB is not set<span class="w"></span>
+<span class="w"> </span># CONFIG_MTK_TILTDETECTHUB is not set<span class="w"></span>
+<span class="gd">-# CONFIG_CUSTOM_KERNEL_SENSORHUB is not set</span><span class="w"></span>
+<span class="gi">+CONFIG_CUSTOM_KERNEL_SENSORHUB=y</span><span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_MD1_SUPPORT=9<span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_C2K_LTE_MODE=0<span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_COMBO=y<span class="w"></span>
+<span class="gu">@@ -312,6 +312,7 @@ CONFIG_SERIAL_8250_RUNTIME_UARTS=2</span><span class="w"></span>
+<span class="w"> </span>CONFIG_SERIAL_8250_MT6577=y<span class="w"></span>
+<span class="w"> </span># CONFIG_HW_RANDOM is not set<span class="w"></span>
+<span class="w"> </span>CONFIG_I2C_MTK=y<span class="w"></span>
+<span class="gi">+CONFIG_I2C_CHARDEV=y</span><span class="w"></span>
+<span class="w"> </span>CONFIG_SPI=y<span class="w"></span>
+<span class="w"> </span>CONFIG_SPI_MT65XX=y<span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_GAUGE_VERSION=30<span class="w"></span>
+<span class="gu">@@ -417,8 +418,8 @@ CONFIG_ANDROID_LOW_MEMORY_KILLER=y</span><span class="w"></span>
+<span class="w"> </span>CONFIG_ANDROID_INTF_ALARM_DEV=y<span class="w"></span>
+<span class="w"> </span>CONFIG_ION=y<span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_ION=y<span class="w"></span>
+<span class="gd">-# CONFIG_NANOHUB is not set</span><span class="w"></span>
+<span class="gd">-# CONFIG_NANOHUB_MTK_IPI is not set</span><span class="w"></span>
+<span class="gi">+CONFIG_NANOHUB=y</span><span class="w"></span>
+<span class="gi">+CONFIG_NANOHUB_MTK_IPI=y</span><span class="w"></span>
+<span class="w"> </span>CONFIG_MAILBOX=y<span class="w"></span>
+<span class="w"> </span>CONFIG_MTK_CMDQ_MBOX=y<span class="w"></span>
+<span class="w"> </span>CONFIG_IIO=y<span class="w"></span>
+</pre></div>
+</div>
+<p>替换系统默认的mmc5603代码</p>
+<ul class="simple">
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/</p>
+<ul>
+<li><p>mmc5603.c</p></li>
+<li><p>mmc5603.h</p></li>
+</ul>
+</li>
+</ul>
+<p>添加接收中断，并输出打印，配置mmc5603驱动</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/contexthub_fw.c b/vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/contexthub_fw.c</span><span class="w"></span>
+<span class="gh">index 437cc525e9d..7999ffe446a 100644</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/contexthub_fw.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/contexthub_fw.c</span><span class="w"></span>
+<span class="gu">@@ -1693,6 +1693,7 @@ static void contextHubHandleIpiRxEvent(void)</span><span class="w"></span>
+<span class="w"> </span>    struct data_unit_t data;<span class="w"></span>
+<span class="w"> </span>    const struct ContextHubCmd *cmd;<span class="w"></span>
+<span class="w"> </span>
+<span class="gi">+    osLog(LOG_ERROR, &quot;ERR: contextHubIpiRx!\n&quot;);</span><span class="w"></span>
+<span class="w"> </span>    cmd = contextHubFindCmd(mTask.ipi_req.action);<span class="w"></span>
+<span class="w"> </span>    if (cmd == NULL) {<span class="w"></span>
+<span class="w"> </span>        osLog(LOG_ERROR, &quot;contextHubHandleIpiRxEvent cannot find cmd\n&quot;);<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gh">index 54182fc04a5..48b8f7e332c 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gu">@@ -18,7 +18,8 @@ CFG_ALSPS_SUPPORT = yes</span><span class="w"></span>
+<span class="w"> </span>CFG_CM36558_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_MAGNETOMETER_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_MAG_CALIBRATION_IN_AP = yes<span class="w"></span>
+<span class="gd">-CFG_AKM09918_SUPPORT = yes</span><span class="w"></span>
+<span class="gi">+# CFG_AKM09918_SUPPORT = yes</span><span class="w"></span>
+<span class="gi">+CFG_MMC5603_SUPPORT = yes</span><span class="w"></span>
+<span class="w"> </span>CFG_BAROMETER_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_BMP280_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_ACCGYRO_SUPPORT = yes<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/magnetometer/cust_mag.c b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/magnetometer/cust_mag.c</span><span class="w"></span>
+<span class="gh">index 4fa23bd1756..1b62d50dfba 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/magnetometer/cust_mag.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/magnetometer/cust_mag.c</span><span class="w"></span>
+<span class="gu">@@ -9,4 +9,13 @@ struct mag_hw cust_mag_hw[] __attribute__((section(&quot;.cust_mag&quot;))) = {</span><span class="w"></span>
+<span class="w"> </span>        .i2c_addr = {0x0c, 0},<span class="w"></span>
+<span class="w"> </span>    },<span class="w"></span>
+<span class="w"> </span>#endif<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+#ifdef CFG_MMC5603_SUPPORT</span><span class="w"></span>
+<span class="gi">+    {</span><span class="w"></span>
+<span class="gi">+        .name = &quot;mmc5603&quot;,</span><span class="w"></span>
+<span class="gi">+        .i2c_num = 0,</span><span class="w"></span>
+<span class="gi">+        .direction = 4,</span><span class="w"></span>
+<span class="gi">+        .i2c_addr = {0x30, 0},</span><span class="w"></span>
+<span class="gi">+    },</span><span class="w"></span>
+<span class="gi">+#endif</span><span class="w"></span>
+<span class="w"> </span>};<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</span><span class="w"></span>
+<span class="gh">index 37ea139ab77..710872d8ef3 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</span><span class="w"></span>
+<span class="gu">@@ -102,7 +102,7 @@ ACC_GYRO_OVERLAY_REMAP_END</span><span class="w"></span>
+<span class="w"> </span>void magOverlayRemap(void)<span class="w"></span>
+<span class="w"> </span>{<span class="w"></span>
+<span class="w"> </span>MAG_OVERLAY_REMAP_START<span class="w"></span>
+<span class="gd">-    MAG_OVERLAY_REMAP(akm09918);</span><span class="w"></span>
+<span class="gi">+    MAG_OVERLAY_REMAP(mmc5603);</span><span class="w"></span>
+<span class="w"> </span>MAG_OVERLAY_REMAP_END<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>    return;<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/feature_config/chre.mk b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/feature_config/chre.mk</span><span class="w"></span>
+<span class="gh">index 5f028392eaf..9e7bd22cd0e 100644</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/feature_config/chre.mk</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/feature_config/chre.mk</span><span class="w"></span>
+<span class="gu">@@ -194,6 +194,10 @@ endif</span><span class="w"></span>
+<span class="w"> </span>ifeq ($(CFG_AKM09915_SUPPORT),yes)<span class="w"></span>
+<span class="w"> </span>C_FILES  += $(SENDRV_DIR)/magnetometer/akm09915.c<span class="w"></span>
+<span class="w"> </span>endif<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+ifeq ($(CFG_MMC5603_SUPPORT),yes)</span><span class="w"></span>
+<span class="gi">+C_FILES  += $(SENDRV_DIR)/magnetometer/mmc5603.c</span><span class="w"></span>
+<span class="gi">+endif</span><span class="w"></span>
+<span class="w"> </span>endif<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>######## accgyro support ########<span class="w"></span>
+</pre></div>
+</div>
+<p>使用磁感传感器APP获取磁感数据，查看SCP log是否有对应的log，log如下，可以看到SCP地磁传感器工作了</p>
+<ul>
+<li><p><a class="reference internal" href="refers/0007_scp_log_boot_normal.html"><span class="doc std std-doc">0007_scp_log_boot_normal.txt</span></a></p>
+<ul class="simple">
+<li><p>scp启动的时候的log</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="refers/0007_scp_log_mag.html"><span class="doc std std-doc">0007_scp_log_mag.txt</span></a></p>
+<ul>
+<li><p>scp和AP通信时候的log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[330.712]ERR: contextHubIpiRx!
+[330.712]sync time scp:330712873096, ap:334816981788, offset:4105494230
+[335.156]hostintf: 335156769722, chreType:8, rate:15359, latency:0, cmd:0!
+[335.161]hostintf: 335161255414, chreType:8, rate:15359, latency:0, cmd:1!
+[335.161]sensorPowerMag on:1, nowOn:0
+[335.161]mmc5603Enable :  MMC5603 enable mag
+[335.161]mag: enable done
+[335.161]sensorRateMag, rate:16384, latency:66670592
+[335.161]mag intrMode: MU, timerDelay:62500000
+[335.161]mag: ratechg done
+[335.225]mmc5603Convert mmc5603 raw reg data: 
+[0]:128, [1]:96
+[2]:124, [3]:227
+[4]:127, [5]:1
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>[335.156]hostintf: 335156769722, chreType:8, rate:15359, latency:0, cmd:0!</p>
+<ul>
+<li><p>话说这个hostintf又是另外一个接口</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>hostintf分析，使用IPI通道进行数据通信，而是不是使用I2C或者SPI通信作为数据通道</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/hardware/contexthub/firmware/src/hostIntf.c
+  └── INTERNAL_APP_INIT(APP_ID_MAKE(APP_ID_VENDOR_GOOGLE, 0), 0, hostIntfRequest, hostIntfRelease, hostIntfHandleEvent);
+      └── static bool hostIntfRequest(uint32_t tid)
+          └── mComm = platHostIntfInit();
+              ├── vendor/mediatek/proprietary/hardware/contexthub/firmware/links/plat/src/hostIntf.c
+              │   └── const struct HostIntfComm *platHostIntfInit() 
+              │       └── return hostIntfIPIInit();
+              │           └── vendor/mediatek/proprietary/hardware/contexthub/firmware/links/plat/src/hostIntfIPI.c
+              │               └── const struct HostIntfComm *hostIntfIPIInit(void)
+              │                   └── return &amp;gIPIComm;
+              └── vendor/mediatek/proprietary/hardware/contexthub/firmware/links/variant/inc/variant.h
+                  └── #define PLATFORM_HOST_INTF_IPI_BUS
+</pre></div>
+</div>
+</li>
+<li><p>对应的Linux dmesg</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="mi">7</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">339.334272</span><span class="p">]</span>  <span class="p">(</span><span class="mi">5</span><span class="p">)[</span><span class="mi">665</span><span class="p">:</span><span class="n">sensors</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">ser</span><span class="p">]</span><span class="o">&lt;</span><span class="n">MAG</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">name</span><span class="p">:</span><span class="n">mag</span><span class="o">&amp;</span><span class="p">]</span><span class="n">mag_store_batch</span> <span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">66667000</span><span class="p">,</span><span class="mi">0</span>
+<span class="o">&lt;</span><span class="mi">7</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">339.335941</span><span class="p">]</span>  <span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">665</span><span class="p">:</span><span class="n">sensors</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">ser</span><span class="p">]</span><span class="o">&lt;</span><span class="n">MAG</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">name</span><span class="p">:</span><span class="n">mag</span><span class="o">&amp;</span><span class="p">]</span><span class="n">mag_store_batch</span> <span class="n">done</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">&lt;</span><span class="mi">7</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">339.338219</span><span class="p">]</span>  <span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">665</span><span class="p">:</span><span class="n">sensors</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">ser</span><span class="p">]</span><span class="o">&lt;</span><span class="n">MAG</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">name</span><span class="p">:</span><span class="n">mag</span><span class="o">&amp;</span><span class="p">]</span><span class="n">mag_store_active</span> <span class="n">buf</span><span class="o">=</span><span class="mi">1</span>
+<span class="o">&lt;</span><span class="mi">7</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">339.338252</span><span class="p">]</span>  <span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">665</span><span class="p">:</span><span class="n">sensors</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">ser</span><span class="p">][</span><span class="n">Msensor</span><span class="p">]</span> <span class="p">[</span><span class="n">name</span><span class="p">:</span><span class="n">maghub</span><span class="o">&amp;</span><span class="p">]</span><span class="n">magnetic</span> <span class="n">enable</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">&lt;</span><span class="mi">7</span><span class="o">&gt;</span><span class="p">[</span>  <span class="mf">339.340416</span><span class="p">]</span>  <span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">665</span><span class="p">:</span><span class="n">sensors</span><span class="o">@</span><span class="mf">2.0</span><span class="o">-</span><span class="n">ser</span><span class="p">]</span><span class="o">&lt;</span><span class="n">MAG</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">name</span><span class="p">:</span><span class="n">mag</span><span class="o">&amp;</span><span class="p">]</span><span class="n">mag_store_active</span> <span class="n">done</span>
+</pre></div>
+</div>
+<ul>
+<li><p>&lt;7&gt;[  339.338252]  (0)[665:sensors&#64;2.0-ser][Msensor] [name:maghub&amp;]magnetic enable value = 1</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">sensors</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">magnetometer</span><span class="o">/</span><span class="n">maghub</span><span class="o">/</span><span class="n">maghub</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">static</span> <span class="nb">int</span> <span class="n">maghub_m_setPowerMode</span><span class="p">(</span><span class="nb">bool</span> <span class="n">enable</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">pr_debug</span><span class="p">(</span><span class="s2">&quot;magnetic enable value = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">enable</span><span class="p">);</span>
+    <span class="o">*</span> <span class="n">res</span> <span class="o">=</span> <span class="n">sensor_enable_to_hub</span><span class="p">(</span><span class="n">ID_MAGNETIC</span><span class="p">,</span> <span class="n">enable</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">sensors</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">sensorHub</span><span class="o">/</span><span class="n">SCP_nanoHub</span><span class="o">/</span><span class="n">SCP_nanoHub</span><span class="o">.</span><span class="n">c</span>
+        <span class="o">*</span> <span class="nb">int</span> <span class="n">sensor_enable_to_hub</span><span class="p">(</span><span class="n">uint8_t</span> <span class="n">handle</span><span class="p">,</span> <span class="nb">int</span> <span class="n">enabledisable</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">nanohub_external_write</span><span class="p">((</span><span class="n">const</span> <span class="n">uint8_t</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">cmd</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">struct</span> <span class="n">ConfigCmd</span><span class="p">));</span>
+            <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">staging</span><span class="o">/</span><span class="n">nanohub</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">c</span>
+              <span class="o">*</span> <span class="n">ssize_t</span> <span class="n">nanohub_external_write</span><span class="p">(</span><span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">buffer</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">length</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">nanohub_comms_tx_rx_retrans</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">CMD_COMMS_WRITE</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ret_data</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">ret_data</span><span class="p">),</span> <span class="n">false</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">staging</span><span class="o">/</span><span class="n">nanohub</span><span class="o">/</span><span class="n">comms</span><span class="o">.</span><span class="n">c</span>
+                    <span class="o">*</span> <span class="nb">int</span> <span class="n">nanohub_comms_tx_rx_retrans</span><span class="p">(</span><span class="n">struct</span> <span class="n">nanohub_data</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">u32</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">const</span> <span class="n">u8</span> <span class="o">*</span><span class="n">tx</span><span class="p">,</span> <span class="n">u8</span> <span class="n">tx_len</span><span class="p">,</span> <span class="n">u8</span> <span class="o">*</span><span class="n">rx</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">rx_len</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">user</span><span class="p">,</span> <span class="nb">int</span> <span class="n">retrans_cnt</span><span class="p">,</span> <span class="nb">int</span> <span class="n">retrans_delay</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">comms</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+                      <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">nanohub_comms_tx_rx</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">packet_size</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">rx_len</span><span class="p">);</span>
+                      <span class="o">*</span> <span class="n">data</span><span class="o">-&gt;</span><span class="n">comms</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<span class="o">*</span> <span class="n">kernel</span><span class="o">-</span><span class="mf">4.9</span><span class="o">/</span><span class="n">drivers</span><span class="o">/</span><span class="n">staging</span><span class="o">/</span><span class="n">nanohub</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">c</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  static int __init nanohub_init(void)</span>
+<span class="sd">  {</span>
+<span class="sd">      int ret = 0;</span>
+
+<span class="sd">      sensor_class = class_create(THIS_MODULE, &quot;nanohub&quot;);</span>
+<span class="sd">      if (IS_ERR(sensor_class)) {</span>
+<span class="sd">          ret = PTR_ERR(sensor_class);</span>
+<span class="sd">          pr_err(&quot;nanohub: class_create failed; err=%d\n&quot;, ret);</span>
+<span class="sd">      }</span>
+<span class="sd">      if (!ret)</span>
+<span class="sd">          major = __register_chrdev(0, 0, ID_NANOHUB_MAX, &quot;nanohub&quot;,</span>
+<span class="sd">                        &amp;nanohub_fileops);</span>
+
+<span class="sd">      if (major &lt; 0) {</span>
+<span class="sd">          ret = major;</span>
+<span class="sd">          major = 0;</span>
+<span class="sd">          pr_err(&quot;nanohub: can&#39;t register; err=%d\n&quot;, ret);</span>
+<span class="sd">      }</span>
+
+<span class="sd">  #ifdef CONFIG_NANOHUB_I2C</span>
+<span class="sd">      if (ret == 0)</span>
+<span class="sd">          ret = nanohub_i2c_init();</span>
+<span class="sd">  #endif</span>
+<span class="sd">  #ifdef CONFIG_NANOHUB_SPI</span>
+<span class="sd">      if (ret == 0)</span>
+<span class="sd">          ret = nanohub_spi_init();</span>
+<span class="sd">  #endif</span>
+<span class="sd">  #ifdef CONFIG_NANOHUB_MTK_IPI</span>
+<span class="sd">          ret = nanohub_ipi_init();</span>
+<span class="sd">  #endif</span>
+<span class="sd">      pr_info(&quot;nanohub: loaded; ret=%d\n&quot;, ret);</span>
+<span class="sd">      return ret;</span>
+<span class="sd">  }</span>
+
+<span class="sd">  &#39;&#39;&#39;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>CONFIG_NANOHUB_I2C</p></li>
+<li><p>CONFIG_NANOHUB_SPI</p></li>
+<li><p>CONFIG_NANOHUB_MTK_IPI</p>
+<ul>
+<li><p>kernel-4.9/arch/arm64/configs/k62v1_64_bsp_debug_defconfig</p>
+<ul>
+<li><p>CONFIG_NANOHUB_MTK_IPI=y</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="linux-driver-i2c-bus">
+<h1>Linux Driver I2C bus是否可访问<a class="headerlink" href="#linux-driver-i2c-bus" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>i2cdetect -y 1</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>     <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">9</span>  <span class="n">a</span>  <span class="n">b</span>  <span class="n">c</span>  <span class="n">d</span>  <span class="n">e</span>  <span class="n">f</span>
+<span class="mi">00</span><span class="p">:</span>          <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">10</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">20</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="n">UU</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">30</span><span class="p">:</span> <span class="mi">30</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">40</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">50</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">60</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="n">UU</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+<span class="mi">70</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span>
+</pre></div>
+</div>
+</li>
+<li><p>不管是否打开地磁APP访问，还是不打开，都能检测道0x30(MMC5603)设备节点，那么表示是I2C bus是共用的，没有做隔离</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

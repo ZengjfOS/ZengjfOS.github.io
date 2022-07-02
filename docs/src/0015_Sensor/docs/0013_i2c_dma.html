@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>i2c dma &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">i2c dma</a></li>
+<li><a class="reference internal" href="#diff">diff</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>i2c dma</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="i2c-dma">
+<h1>i2c dma<a class="headerlink" href="#i2c-dma" title="Permalink to this headline"></a></h1>
+<p>当需要连续发送大量数据，考虑采用DMA进行数据传输，fifo最大才8 byte</p>
+</section>
+<section id="diff">
+<h1>diff<a class="headerlink" href="#diff" title="Permalink to this headline"></a></h1>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/i2c/src/i2cchre-plat.c b/vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/i2c/src/i2cchre-plat.c</span><span class="w"></span>
+<span class="gh">index 7af98b9..7eb9030 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/i2c/src/i2cchre-plat.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/i2c/src/i2cchre-plat.c</span><span class="w"></span>
+<span class="gu">@@ -54,8 +54,8 @@</span><span class="w"></span>
+<span class="w"> </span>#include &lt;plat/inc/rtc.h&gt;<span class="w"></span>
+<span class="w"> </span>#include &lt;wakelock.h&gt;<span class="w"></span>
+<span class="w"> </span>
+<span class="gd">-#define I2C_MAX_QUEUE_DEPTH     24</span><span class="w"></span>
+<span class="gd">-#define I2C_MAX_TXBUF_SIZE      8</span><span class="w"></span>
+<span class="gi">+#define I2C_MAX_QUEUE_DEPTH     32</span><span class="w"></span>
+<span class="gi">+#define I2C_MAX_TXBUF_SIZE      128</span><span class="w"></span>
+<span class="w"> </span>#define I2C_RECORD_LEN          2<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>static struct i2c_info_buf rec_info_buf;<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/platform.mk b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/platform.mk</span><span class="w"></span>
+<span class="w">old mode 100644</span>
+<span class="w">new mode 100755</span>
+<span class="gh">index e14b91a..ffaf6ec</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/platform.mk</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/platform.mk</span><span class="w"></span>
+<span class="gu">@@ -83,8 +83,8 @@</span><span class="w"></span>
+<span class="w"> </span>CFG_TEST_PROGRAM_SUPPORT = no<span class="w"></span>
+<span class="w"> </span>CFG_CACHE_2WAY_SUPPORT = no<span class="w"></span>
+<span class="w"> </span>CFG_CM4_MODIFICATION = yes<span class="w"></span>
+<span class="gd">-CFG_I2C_CH0_DMA_SUPPORT = no</span><span class="w"></span>
+<span class="gd">-CFG_I2C_CH1_DMA_SUPPORT = no</span><span class="w"></span>
+<span class="gi">+CFG_I2C_CH0_DMA_SUPPORT = yes</span><span class="w"></span>
+<span class="gi">+CFG_I2C_CH1_DMA_SUPPORT = yes</span><span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>CFG_CNN_TO_SCP_BUF_SIZE = 0x0<span class="w"></span>
+<span class="w"> </span>CFG_SCP_TO_CNN_BUF_SIZE = 0x0<span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

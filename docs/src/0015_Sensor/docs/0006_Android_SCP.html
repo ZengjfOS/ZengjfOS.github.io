@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android SCP &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android SCP</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">代码</a></li>
+<li><a class="reference internal" href="#module">Module驱动分析</a><ul>
+<li><a class="reference internal" href="#acc-module">ACC Module驱动</a></li>
+<li><a class="reference internal" href="#id3">Module驱动初始化调用</a></li>
+<li><a class="reference internal" href="#app">启动APP线程</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#overlay">Overlay驱动分析</a></li>
+<li><a class="reference internal" href="#id4">Overlay调用分析</a></li>
+<li><a class="reference internal" href="#overlay-code">Overlay Code存储分析</a><ul>
+<li><a class="reference internal" href="#id5">Overlay代码超出限制</a></li>
+<li><a class="reference internal" href="#overlay-bmi160-spi-log">Overlay bmi160 spi log</a></li>
+<li><a class="reference internal" href="#bmi160-spi">修改添加bmi160 SPI驱动</a></li>
+<li><a class="reference internal" href="#mmc5603">mmc5603调试</a></li>
+<li><a class="reference internal" href="#scp">SCP使能传感器流程</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scp-log">默认scp log分析</a></li>
+<li><a class="reference internal" href="#linux-driver">Linux Driver调试</a></li>
+<li><a class="reference internal" href="#scp-i2c-master">SCP I2C Master</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Android SCP</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-scp">
+<h1>Android SCP<a class="headerlink" href="#android-scp" title="Permalink to this headline"></a></h1>
+<p>SCP(Sensor-hub Control Processor)，CHRE(Context Hub Runtime Environment), System Companion Processor (SCP)</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0007_Android_SCP_IPI.html"><span class="doc std std-doc">0007_Android_SCP_IPI.md</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>代码<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source</p></li>
+</ul>
+</section>
+<section id="module">
+<h1>Module驱动分析<a class="headerlink" href="#module" title="Permalink to this headline"></a></h1>
+<section id="acc-module">
+<h2>ACC Module驱动<a class="headerlink" href="#acc-module" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>一个传感器就是一个Module，一般用Overlay的形式，因为支持兼容多种厂家的芯片，Module只能是一种传感器设备</p></li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source</p>
+<ul>
+<li><p>project/CM4_A/mt6765/k62v1_64_bsp/cust/accGyro/cust_accGyro.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;cust_accGyro.h&quot;</span><span class="cp"></span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">accGyro_hw</span><span class="w"> </span><span class="n">cust_accGyro_hw</span><span class="p">[]</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">section</span><span class="p">(</span><span class="s">&quot;.cust_accGyro&quot;</span><span class="p">)))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="cp">#ifdef CFG_LIS2HH12_SUPPORT</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;lis2hh12&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">i2c_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">i2c_addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mh">0x68</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">eint_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>middleware/contexthub/MEMS_Driver/accGyro/lis2hh12.c</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="nb">int</span> <span class="n">lis2hh12Init</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+  <span class="o">*</span> <span class="n">mTask</span><span class="o">.</span><span class="n">hw</span> <span class="o">=</span> <span class="n">get_cust_accGyro</span><span class="p">(</span><span class="s2">&quot;lis2hh12&quot;</span><span class="p">);</span>
+<span class="o">*</span> <span class="n">MODULE_DECLARE</span><span class="p">(</span><span class="n">lis2hh12</span><span class="p">,</span> <span class="n">SENS_TYPE_ACCEL</span><span class="p">,</span> <span class="n">lis2hh12Init</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>project/CM4_A/mt6765/platform/feature_config/chre.mk</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="cp">ifeq ($(CFG_LIS2HH12_SUPPORT),yes)</span>
+<span class="nv">C_FILES</span>  <span class="o">+=</span> <span class="k">$(</span>SENDRV_DIR<span class="k">)</span>/accGyro/lis2hh12.c
+<span class="cp">endif</span>
+</pre></div>
+</div>
+</li>
+<li><p>project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</p>
+<ul class="simple">
+<li><p>CFG_LIS2HH12_SUPPORT = yes</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h2>Module驱动初始化调用<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>一个线程就是一个APP，一个APP会检查所有同类的Module，讲道理，最终只有一个Module工作</p></li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/kernel/service/common/include/module_init.h</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef _MODULE_INIT_H_</span>
+<span class="cp">#define _MODULE_INIT_H_</span>
+<span class="cp">#ifdef CFG_MODULE_INIT_SUPPORT</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">module_init_s</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">tags</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">init_func</span><span class="p">)(</span><span class="kt">void</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cp">#define MODULE_DECLARE(name, tag, func) \</span>
+<span class="cp">    struct module_init_s module_init_##name __attribute__((section(&quot;.module_init&quot;))) = { \</span>
+<span class="cp">        .tags = tag, \</span>
+<span class="cp">        .init_func = func, \</span>
+<span class="cp">    }</span>
+
+<span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">module_init</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">tag</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/kernel/service/common/src/module_init.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;module.h&quot;</span><span class="cp"></span>
+
+<span class="k">extern</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">module_init_s</span><span class="w"> </span><span class="n">__module_start</span><span class="p">[];</span><span class="w"></span>
+<span class="k">extern</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">module_init_s</span><span class="w"> </span><span class="n">__module_end</span><span class="p">[];</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">module_init</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">tag</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">module_init_s</span><span class="w"> </span><span class="o">*</span><span class="n">mod</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">mod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__module_start</span><span class="p">;</span><span class="w"> </span><span class="n">mod</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">__module_end</span><span class="p">;</span><span class="w"> </span><span class="n">mod</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mod</span><span class="o">-&gt;</span><span class="n">tags</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">tag</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">mod</span><span class="o">-&gt;</span><span class="n">init_func</span><span class="p">())</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/accGyro/accGyro.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">startTask</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="c1">// ...省略</span>
+
+<span class="cp">#ifndef CFG_OVERLAY_INIT_SUPPORT</span>
+<span class="w">    </span><span class="cm">/* Register sensor fsm last */</span><span class="w"></span>
+<span class="w">    </span><span class="n">module_init</span><span class="p">(</span><span class="n">SENS_TYPE_ACCEL</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">accGyroOverlayRemap</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">accGyroOverlayRemap</span><span class="p">();</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">INTERNAL_APP_INIT</span><span class="p">(</span><span class="n">APP_ID_MAKE</span><span class="p">(</span><span class="n">APP_ID_VENDOR_MTK</span><span class="p">,</span><span class="w"> </span><span class="n">MTK_APP_ID_WRAP</span><span class="p">(</span><span class="n">SENS_TYPE_ACCEL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">startTask</span><span class="p">,</span><span class="w"> </span><span class="n">endTask</span><span class="p">,</span><span class="w"> </span><span class="n">handleEvent</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>vendor/mediatek/proprietary/hardware/contexthub/firmware/inc/seos.h</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef INTERNAL_APP_INIT</span>
+<span class="cp">#define INTERNAL_APP_INIT(_id, _ver, _init, _end, _event)                               \</span>
+<span class="cp">static const struct AppHdr         \</span>
+<span class="cp">__attribute__((used,section (&quot;.internal_app_init&quot;))) mAppHdr = {      \</span>
+<span class="cp">    .hdr.magic   = APP_HDR_MAGIC,                                                       \</span>
+<span class="cp">    .hdr.fwVer   = APP_HDR_VER_CUR,                                                     \</span>
+<span class="cp">    .hdr.fwFlags = FL_APP_HDR_INTERNAL | FL_APP_HDR_APPLICATION,                        \</span>
+<span class="cp">    .hdr.appId   = (_id),                                                               \</span>
+<span class="cp">    .hdr.appVer  = (_ver),                                                              \</span>
+<span class="cp">    .hdr.payInfoType = LAYOUT_APP,                                                      \</span>
+<span class="cp">    .vec.init    = (uint32_t)(_init),                                                   \</span>
+<span class="cp">    .vec.end     = (uint32_t)(_end),                                                    \</span>
+<span class="cp">    .vec.handle  = (uint32_t)(_event)                                                   \</span>
+<span class="cp">}</span>
+
+
+<span class="cp">#endif</span>
+<span class="cp">#ifndef APP_INIT</span>
+<span class="cp">#define APP_INIT(_ver, _init, _end, _event)                                             \</span>
+<span class="cp">extern const struct AppFuncs _mAppFuncs;                                                \</span>
+<span class="cp">const struct AppFuncs SET_EXTERNAL_APP_ATTRIBUTES(used, section (&quot;.app_init&quot;),          \</span>
+<span class="cp">visibility(&quot;default&quot;)) _mAppFuncs = {                                                   \</span>
+<span class="cp">    .init   = (_init),                                                                  \</span>
+<span class="cp">    .end    = (_end),                                                                   \</span>
+<span class="cp">    .handle = (_event)                                                                  \</span>
+<span class="cp">};                                                                                      \</span>
+<span class="cp">const uint32_t SET_EXTERNAL_APP_VERSION(used, section (&quot;.app_version&quot;),                 \</span>
+<span class="cp">visibility(&quot;default&quot;)) _mAppVer = _ver</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="app">
+<h2>启动APP线程<a class="headerlink" href="#app" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/system.ld.template</p>
+<div class="highlight-ld notranslate"><div class="highlight"><pre><span></span>.text :
+    {
+
+        . = ALIGN(4);
+        *(.text)           /* .text sections (code) */
+        *(.text*)          /* .text* sections (code) */
+        @@Keep_Symbols@@
+        *(.rodata)         /* .rodata sections (constants, strings, etc.) */
+        *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
+        . = ALIGN(8);
+        __internal_app_start = ABSOLUTE(.);
+        KEEP(*(.internal_app_init)) ;
+        __internal_app_end = ABSOLUTE(.);
+        . = ALIGN(4);
+        KEEP(*(.scp_exported_funcs))
+        *(.glue_7)         /* glue arm to thumb code */
+        *(.glue_7t)        /* glue thumb to arm code */
+        *(.eh_frame)
+        __commands_start = .;
+        KEEP(*(.commands))
+        __commands_end = .;
+
+
+        KEEP(*(.init))
+        KEEP(*(.fini))
+
+        . = ALIGN(4);
+        _etext = .;        /* define a global symbols at end of code */
+        _exit = .;
+    } &gt; RTOS
+</pre></div>
+</div>
+</li>
+<li><p>操作系统创建APP流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">hardware</span><span class="o">/</span><span class="n">contexthub</span><span class="o">/</span><span class="n">firmware</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">seos</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">void</span> <span class="n">osMainInit</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">osStartTasks</span><span class="p">();</span>
+      <span class="o">*</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">app</span> <span class="o">=</span> <span class="n">platGetInternalAppList</span><span class="p">(</span><span class="o">&amp;</span><span class="n">nApps</span><span class="p">);</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nApps</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">,</span> <span class="n">app</span><span class="o">++</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">app</span> <span class="o">=</span> <span class="n">platGetInternalAppList</span><span class="p">(</span><span class="o">&amp;</span><span class="n">nApps</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">hardware</span><span class="o">/</span><span class="n">contexthub</span><span class="o">/</span><span class="n">firmware</span><span class="o">/</span><span class="n">links</span><span class="o">/</span><span class="n">plat</span><span class="o">/</span><span class="n">inc</span><span class="o">/</span><span class="n">plat</span><span class="o">.</span><span class="n">h</span>
+            <span class="o">*</span> <span class="k">return</span> <span class="o">&amp;</span><span class="n">__internal_app_start</span><span class="p">;</span>                 <span class="o">&lt;--</span> <span class="n">所有任务APP开始的地方</span>
+        <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">osStartApp</span><span class="p">(</span><span class="n">app</span><span class="p">))</span>
+      <span class="o">*</span> <span class="n">status</span> <span class="o">=</span> <span class="n">osExtAppStartApps</span><span class="p">(</span><span class="n">APP_ID_ANY</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="overlay">
+<h1>Overlay驱动分析<a class="headerlink" href="#overlay" title="Permalink to this headline"></a></h1>
+<p>参考MTK SCP体系架构</p>
+</section>
+<section id="id4">
+<h1>Overlay调用分析<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Purpose: customers need two materials. One type sensor may come from two different vendor. If putting these two driver in SCP SRAM to do auto detect, it consumes SRAM. So MTK solution locates two drivers in the DRAM and one driver is loaded when SCP boots.</p>
+<ul class="simple">
+<li><p>意思就是为了兼容多种同类型的芯片，最好采用这种模式；</p></li>
+</ul>
+</li>
+<li><p>Overlay驱动加载流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/accGyro/accGyro.c
+  * static bool startTask(uint32_t taskId)
+    * accGyroOverlayRemap();
+      * vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k61v1_64_bsp/cust/overlay/overlay.c
+        * void accGyroOverlayRemap(void)
+          * ACC_GYRO_OVERLAY_REMAP(lis2hh12);
+            * #define ACC_GYRO_OVERLAY_REMAP(name) SENSOR_OVERLAY_REMAP(name, accGyroEnd)
+              * #define SENSOR_OVERLAY_REMAP(name, label)
+                * ptr = TINYSYS_OVERLAY_SELECT(name);
+                 * vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/overlay/inc/mtk_overlay_init.h
+                   * #define TINYSYS_OVERLAY_SELECT(ovl_name)
+                     * overlay_select_ret = tinysys_overlay_select(#ovl_name);
+                       * vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/overlay/src/mtk_overlay_init.c
+                         * void * tinysys_overlay_select(char* name)
+                           * for (mod = __overlay_struct_start; mod &lt; __overlay_struct_end; mod++)
+                             * PRINTF_E(&quot;mod=%p\n&quot;,mod);
+                             * PRINTF_E(&quot;mod-&gt;name=%s\n&quot;,mod-&gt;name);
+                             * if (!strcmp(mod-&gt;name,name))
+                               * ret = scp_copy_overlay(mod);
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>每种APP是一个线程（task），每个线程要跑一种传感器，但是整个系统包含多个传感器驱动，需要一个一个检查，直到可以运行的那个</p></li>
+</ul>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/system.ld.template</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="o">/*</span> <span class="n">Initialized</span> <span class="n">data</span> <span class="n">sections</span> <span class="n">goes</span> <span class="n">into</span> <span class="n">RAM</span><span class="p">,</span> <span class="n">load</span> <span class="n">LMA</span> <span class="n">copy</span> <span class="n">after</span> <span class="n">code</span> <span class="o">*/</span>
+<span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+    <span class="p">{</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">__data_start</span> <span class="o">=</span> <span class="n">ABSOLUTE</span><span class="p">(</span><span class="o">.</span><span class="p">);</span>
+        <span class="n">_sdata</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>        <span class="o">/*</span> <span class="n">create</span> <span class="n">a</span> <span class="k">global</span> <span class="n">symbol</span> <span class="n">at</span> <span class="n">data</span> <span class="n">start</span> <span class="o">*/</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>           <span class="o">/*</span> <span class="o">.</span><span class="n">data</span> <span class="n">sections</span> <span class="o">*/</span>
+        <span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">data</span><span class="o">*</span><span class="p">)</span>          <span class="o">/*</span> <span class="o">.</span><span class="n">data</span><span class="o">*</span> <span class="n">sections</span> <span class="o">*/</span>
+
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">__module_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">module_init</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__module_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="c1">#ifdef CFG_OVERLAY_INIT_SUPPORT</span>
+        <span class="n">__overlay_struct_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">overlay_init</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__overlay_struct_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="c1">#endif</span>
+        <span class="n">__cust_alsps_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">cust_alsps</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__cust_alsps_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">__cust_accGyro_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">cust_accGyro</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__cust_accGyro_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">__cust_baro_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">cust_baro</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__cust_baro_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">__cust_mag_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">cust_mag</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__cust_mag_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">__cust_sar_start</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="n">KEEP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">.</span><span class="n">cust_sar</span><span class="o">*</span><span class="p">))</span>
+        <span class="n">__cust_sar_end</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+        <span class="o">.</span> <span class="o">=</span> <span class="n">ALIGN</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="n">_edata</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>        <span class="o">/*</span> <span class="n">define</span> <span class="n">a</span> <span class="k">global</span> <span class="n">symbol</span> <span class="n">at</span> <span class="n">data</span> <span class="n">end</span> <span class="o">*/</span>
+        <span class="n">__data_end</span> <span class="o">=</span> <span class="n">ABSOLUTE</span><span class="p">(</span><span class="o">.</span><span class="p">);</span>
+    <span class="p">}</span> <span class="o">&gt;</span> <span class="n">RTOS</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>KEEP(*(.overlay_init*))</p></li>
+</ul>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/overlay/inc/mtk_overlay_init.h</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#define OVERLAY_DECLARE(ovl_name, ovl_section, ovl_data) \</span>
+<span class="cp">    struct overlay_init_s overlay_init_##ovl_name __attribute__((section(&quot;.overlay_init&quot;))) = { \</span>
+<span class="cp">        .overlay_section = ovl_section, \</span>
+<span class="cp">        .data = ovl_data, \</span>
+<span class="cp">    }</span>
+
+<span class="cp">#define OVERLAY_INIT(ovl_name) do { \</span>
+<span class="cp">    extern char __load_start_##ovl_name; \</span>
+<span class="cp">    extern char __load_stop_##ovl_name; \</span>
+<span class="cp">    extern struct overlay_init_s overlay_init_##ovl_name; \</span>
+<span class="cp">    overlay_init_##ovl_name.name = #ovl_name; \</span>
+<span class="cp">    overlay_init_##ovl_name.overlay_load_start = &amp;__load_start_##ovl_name; \</span>
+<span class="cp">    overlay_init_##ovl_name.overlay_load_end = &amp;__load_stop_##ovl_name; \</span>
+<span class="cp">    } while(0)</span>
+</pre></div>
+</div>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/accGyro/lis2hh12.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef CFG_OVERLAY_INIT_SUPPORT</span>
+<span class="n">MODULE_DECLARE</span><span class="p">(</span><span class="n">lis2hh12</span><span class="p">,</span><span class="w"> </span><span class="n">SENS_TYPE_ACCEL</span><span class="p">,</span><span class="w"> </span><span class="n">lis2hh12Init</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;mtk_overlay_init.h&quot;</span><span class="cp"></span>
+<span class="n">OVERLAY_DECLARE</span><span class="p">(</span><span class="n">lis2hh12</span><span class="p">,</span><span class="w"> </span><span class="n">OVERLAY_ID_ACCGYRO</span><span class="p">,</span><span class="w"> </span><span class="n">lis2hh12Init</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CFG_MTK_VOW_SUPPORT</span> <span class="o">=</span> <span class="n">no</span>
+
+<span class="n">CFG_CHRE_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_CONTEXTHUB_FW_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_ALSPS_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_CM36558_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_MAGNETOMETER_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_MAG_CALIBRATION_IN_AP</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_AKM09918_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_BAROMETER_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_BMP280_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_ACCGYRO_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_LIS2HH12_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_STEP_COUNTER_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_STEP_DETECTOR_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_SIGNIFICANT_MOTION_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_WAKEUP_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_LIFT_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_LIFT_PUTDOWN_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_MOTION_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_WIN_ORIENTATION_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_OVERLAY_INIT_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">CFG_OVERLAY_DEBUG_SUPPORT</span> <span class="o">=</span> <span class="n">yes</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>CFG_OVERLAY_INIT_SUPPORT = yes</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="overlay-code">
+<h1>Overlay Code存储分析<a class="headerlink" href="#overlay-code" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>ld配置：vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/project.ld</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span><span class="n">SCP</span> <span class="n">sram</span> <span class="n">size</span><span class="o">*/</span>
+<span class="n">_SCP_SRAM_SIZE</span> <span class="o">=</span> <span class="mh">0x40000</span><span class="p">;</span>
+<span class="n">_SCP_RTOS_START</span> <span class="o">=</span> <span class="mh">0x800</span><span class="p">;</span>
+<span class="o">/*</span> <span class="n">reserved</span> <span class="n">memory</span> <span class="n">areas</span><span class="o">*/</span>
+<span class="n">_SCP_IPC_SHARE_BUFFER_ADDR</span> <span class="o">=</span> <span class="n">_SCP_RTOS_START</span> <span class="o">-</span> <span class="mh">0x240</span><span class="p">;</span>
+<span class="n">_CNN_TO_SCP_SHARE_BUFFER_ADDR</span> <span class="o">=</span> <span class="n">_SCP_IPC_SHARE_BUFFER_ADDR</span> <span class="o">-</span> <span class="o">@</span><span class="nd">@CFG_CNN_TO_SCP_BUF_SIZE</span><span class="o">@@</span><span class="p">;</span>
+<span class="n">_SCP_TO_CNN_SHARE_BUFFER_ADDR</span> <span class="o">=</span> <span class="n">_CNN_TO_SCP_SHARE_BUFFER_ADDR</span> <span class="o">-</span> <span class="o">@</span><span class="nd">@CFG_SCP_TO_CNN_BUF_SIZE</span><span class="o">@@</span><span class="p">;</span>
+
+<span class="o">/*</span> <span class="n">Specify</span> <span class="n">the</span> <span class="n">memory</span> <span class="n">areas</span> <span class="o">*/</span>
+<span class="n">MEMORY</span> <span class="p">{</span>
+        <span class="n">LOADER</span><span class="p">(</span><span class="n">rwx</span><span class="p">)</span>     <span class="p">:</span> <span class="n">ORIGIN</span> <span class="o">=</span> <span class="mh">0x00000000</span><span class="p">,</span> <span class="n">LENGTH</span> <span class="o">=</span>    <span class="mi">2</span><span class="n">K</span>   <span class="o">/*</span><span class="n">loader</span> <span class="k">for</span> <span class="n">recovery</span> <span class="n">use</span><span class="o">*/</span>
+<span class="c1">#ifdef CFG_CACHE_SUPPORT</span>
+        <span class="n">RTOS</span><span class="p">(</span><span class="n">rwx</span><span class="p">)</span>       <span class="p">:</span> <span class="n">ORIGIN</span> <span class="o">=</span> <span class="mh">0x00000800</span><span class="p">,</span> <span class="n">LENGTH</span> <span class="o">=</span>  <span class="mi">238</span><span class="n">K</span>   <span class="o">/*</span> <span class="mi">256</span><span class="n">k</span> <span class="o">-</span> <span class="n">loader</span><span class="p">(</span><span class="mi">2</span><span class="n">K</span><span class="p">)</span> <span class="o">-</span> <span class="n">cache</span><span class="p">(</span><span class="mi">8</span><span class="n">K</span><span class="o">+</span><span class="mi">8</span><span class="n">K</span><span class="p">)</span> <span class="o">*/</span>
+        <span class="n">DRAM</span><span class="p">(</span><span class="n">rwx</span><span class="p">)</span>       <span class="p">:</span> <span class="n">ORIGIN</span> <span class="o">=</span> <span class="mh">0x00080000</span><span class="p">,</span> <span class="n">LENGTH</span> <span class="o">=</span> <span class="mi">1024</span><span class="n">K</span>   <span class="o">/*</span> <span class="n">shift</span> <span class="n">overlay</span> <span class="n">section</span> <span class="k">if</span> <span class="n">enlarge</span> <span class="n">cache</span> <span class="n">region</span> <span class="ow">is</span> <span class="n">required</span> <span class="o">*/</span>
+<span class="c1">#else</span>
+        <span class="n">RTOS</span><span class="p">(</span><span class="n">rwx</span><span class="p">)</span>       <span class="p">:</span> <span class="n">ORIGIN</span> <span class="o">=</span> <span class="mh">0x00000800</span><span class="p">,</span> <span class="n">LENGTH</span> <span class="o">=</span>  <span class="mi">254</span><span class="n">K</span>   <span class="o">/*</span> <span class="mi">256</span><span class="n">k</span> <span class="o">-</span> <span class="n">loader</span><span class="p">(</span><span class="mi">2</span><span class="n">K</span><span class="p">)</span> <span class="o">*/</span>
+<span class="c1">#endif</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/system.ld.template</p>
+<div class="highlight-ld notranslate"><div class="highlight"><pre><span></span>#include &quot;tinysys_config.h&quot;
+#include &quot;overlay_sensor.h&quot;
+#ifdef CFG_CACHE_SUPPORT
+#include &quot;cache_ld.h&quot;
+#endif
+
+// # ...省略
+
+#ifdef CFG_OVERLAY_INIT_SUPPORT
+    __overlay_ws_01_start_lda = __next_start;
+    /* overlay image define */
+OVERLAY __overlay_ws_01_start :
+    NOCROSSREFS AT(__overlay_ws_01_start_lda)
+    {
+        OVERLAY0
+    }
+    __overlay_ws_01_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_01_end :
+    NOCROSSREFS
+    {
+        OVERLAY1
+    }
+    __overlay_ws_02_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_02_end :
+    NOCROSSREFS
+    {
+        OVERLAY2
+    }
+    __overlay_ws_03_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_03_end :
+    NOCROSSREFS
+    {
+        OVERLAY3
+    }
+    __overlay_ws_04_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_04_end :
+    NOCROSSREFS
+    {
+        OVERLAY4
+    }
+    __overlay_ws_05_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_05_end :
+    NOCROSSREFS
+    {
+        OVERLAY5
+    }
+    __overlay_ws_06_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_06_end :
+    NOCROSSREFS
+    {
+        OVERLAY6
+    }
+    __overlay_ws_07_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_07_end :
+    NOCROSSREFS
+    {
+        OVERLAY7
+    }
+    __overlay_ws_08_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_08_end :
+    NOCROSSREFS
+    {
+        OVERLAY8
+    }
+    __overlay_ws_09_end = ABSOLUTE(.);
+OVERLAY __overlay_ws_09_end :
+    NOCROSSREFS
+    {
+        OVERLAY9
+    }
+    __overlay_ws_10_end = ABSOLUTE(.);
+    /*overlay image end */
+#endif
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>OVERLAY0</p></li>
+</ul>
+</li>
+<li><p>OVERLAY0解析: vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/inc/overlay_sensor.h</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#define OVERLAY_SECTION_TEXT (.text* .data* .rodata* .bss*)</span>
+<span class="cp">#define OVERLAY_ONE_OBJECT(tag, file) .tag { *file.o OVERLAY_SECTION_TEXT }</span>
+<span class="cp">#define OVERLAY_LIB_OBJECT(tag, lib, file) .tag { lib.a: file.o OVERLAY_SECTION_TEXT }</span>
+<span class="cp">#define OVERLAY_THREE_OBJECT(tag, file1, file2, file3) \</span>
+<span class="cp">        .tag { *file1.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file2.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file3.o OVERLAY_SECTION_TEXT }</span>
+<span class="cp">#define OVERLAY_SIX_OBJECT(tag, file1, file2, file3, file4, file5, file6, file7) \</span>
+<span class="cp">        .tag { *file1.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file2.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file3.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file4.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file5.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file6.o OVERLAY_SECTION_TEXT } \</span>
+<span class="cp">        .tag { *file7.o OVERLAY_SECTION_TEXT }</span>
+
+
+<span class="cm">/*****************************************************************************</span>
+<span class="cm">* Overlay0: ACCGYRO</span>
+<span class="cm">*****************************************************************************/</span><span class="w"></span>
+<span class="cp">#define OVERLAY_SECTION_ACCGYRO                    \</span>
+<span class="cp">    OVERLAY_ONE_OBJECT(lis2hh12, lis2hh12)         \</span>
+<span class="cp">    OVERLAY_ONE_OBJECT(bmi160, bmi160)</span>
+
+<span class="cp">#ifdef OVERLAY_SECTION_ACCGYRO</span>
+<span class="cp">#define OVERLAY0 OVERLAY_SECTION_ACCGYRO</span>
+<span class="cp">#else</span>
+<span class="cp">#define OVERLAY0</span>
+<span class="cp">#endif  </span><span class="c1">// OVERLAY_SECTION_ACCGYRO</span>
+</pre></div>
+</div>
+</li>
+<li><p>未添加代码区error</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>out/target/product/k62v1_64_bsp/obj/TINYSYS_OBJ/tinysys-scp_intermediates/freertos/source/CM4_A/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.o: In function `accGyroOverlayRemap&#39;:
+vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c:94: undefined reference to `__load_start_bmi160&#39;
+vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c:94: undefined reference to `__load_stop_bmi160&#39;
+collect2: error: ld returned 1 exit status
+make: *** [build/config_cm4.mk:155: out/target/product/k62v1_64_bsp/obj/TINYSYS_OBJ/tinysys-scp_intermediates/freertos/source/CM4_A/tinysys-scp-CM4_A.elf] Error 1
+make: Leaving directory &#39;vendor/mediatek/proprietary/tinysys/freertos/source&#39;
+[ 97% 1037/1063] //vendor/mediatek/proprietary/frameworks/ml/nn/runtime:libneuropilot strip libneuropilot.so
+[ 97% 1038/1063] //vendor/mediatek/proprietary/frameworks/ml/nn/runtime:libneuropilot strip libneuropilot.so [arm]
+ninja: build stopped: subcommand failed.
+17:47:40 ninja failed with: exit status 1
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>OVERLAY_ONE_OBJECT(bmi160, bmi160)</p></li>
+</ul>
+</li>
+<li><p>Overlay声明：vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">void</span> <span class="n">accGyroOverlayRemap</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">ACC_GYRO_OVERLAY_REMAP_START</span>
+    <span class="n">ACC_GYRO_OVERLAY_REMAP</span><span class="p">(</span><span class="n">lis2hh12</span><span class="p">);</span>
+    <span class="n">ACC_GYRO_OVERLAY_REMAP</span><span class="p">(</span><span class="n">bmi160</span><span class="p">);</span>
+<span class="n">ACC_GYRO_OVERLAY_REMAP_END</span>
+
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>前面是将代码放到Overlay代码区，这里是声明代码引用的地方</p></li>
+</ul>
+</li>
+</ul>
+<section id="id5">
+<h2>Overlay代码超出限制<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>error</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SCP</span><span class="p">:</span> <span class="n">accGyro</span><span class="p">(</span><span class="mi">27347</span><span class="o">&gt;</span><span class="mi">27000</span><span class="p">)</span> <span class="ow">is</span> <span class="n">out</span> <span class="n">of</span> <span class="n">memory</span> <span class="n">limitation</span>
+</pre></div>
+</div>
+<ul>
+<li><p>代码块大小限制: vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/Setting.ini</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">accGyro</span><span class="p">:</span><span class="mi">27000</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>accGyro:28000</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>上面accGyro只是一个bmi160就超出了默认代码大小，如果有很多个，这里需要另外调整；</p></li>
+</ul>
+</section>
+<section id="overlay-bmi160-spi-log">
+<h2>Overlay bmi160 spi log<a class="headerlink" href="#overlay-bmi160-spi-log" title="Permalink to this headline"></a></h2>
+<p>本来以为是I2C驱动，结果一跑，是SPI驱动，尴尬，不过算是验证了跑通整个修改流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">mod</span><span class="o">=</span><span class="mh">0x259b4</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">mod</span><span class="o">-&gt;</span><span class="n">name</span><span class="o">=</span><span class="n">bmi160</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">ovl</span> <span class="n">select</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="o">&amp;</span><span class="n">__overlay_struct_start</span><span class="o">=</span><span class="mh">0x259b4</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="o">&amp;</span><span class="n">__overlay_struct_end</span><span class="o">=</span><span class="mh">0x25a2c</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">name</span> <span class="o">=</span><span class="n">bmi160</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">start</span><span class="o">=</span><span class="mh">0x80000</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">stop</span> <span class="o">=</span><span class="mh">0x83718</span>
+<span class="p">[</span><span class="mf">0.005</span><span class="p">]</span><span class="n">size</span> <span class="o">=</span><span class="mi">14104</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">section</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">data</span><span class="o">=</span><span class="mh">0x36df5</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">scp_region_info</span><span class="p">:</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">ap_loader_start</span><span class="o">=</span><span class="mi">9</span><span class="n">f900000</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">ap_loader_size</span><span class="o">=</span><span class="mi">438</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">ap_firmware_start</span><span class="o">=</span><span class="mi">9</span><span class="n">f900800</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">ap_firmware_size</span><span class="o">=</span><span class="mi">3</span><span class="n">b800</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">load</span> <span class="kn">from</span> <span class="nn">dram</span> <span class="n">addr</span><span class="o">=</span><span class="n">ff980000</span>
+<span class="p">[</span><span class="mf">0.006</span><span class="p">]</span><span class="n">load</span> <span class="n">to</span> <span class="n">sec01</span> <span class="n">addr</span><span class="o">=</span><span class="mh">0x366e0</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">ovl</span> <span class="n">select</span> <span class="n">done</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">_ovly_table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vma</span> <span class="o">=</span> <span class="mf">366e0</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">_ovly_table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">3718</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">_ovly_table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lma</span> <span class="o">=</span> <span class="mi">80000</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">_ovly_table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mapped</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">bmi160Init</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">acc</span> <span class="n">spi_num</span><span class="p">:</span> <span class="mi">0</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">acc</span> <span class="nb">map</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="mi">1</span><span class="p">,</span> <span class="nb">map</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="mi">0</span><span class="p">,</span> <span class="nb">map</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="mi">2</span><span class="p">,</span> <span class="n">sign</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sign</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sign</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="o">-</span><span class="mi">1</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">ipi</span><span class="o">-</span><span class="mi">31</span> <span class="n">dump</span> <span class="n">spm</span> <span class="n">state</span><span class="p">,</span> <span class="mh">0x1</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">ipi</span> <span class="n">busy</span><span class="p">,</span><span class="n">owner</span><span class="p">:</span><span class="mi">31</span>
+<span class="p">[</span><span class="mf">0.011</span><span class="p">]</span><span class="n">bmi160</span> <span class="n">overlay</span> <span class="n">remap</span> <span class="n">fail</span>
+</pre></div>
+</div>
+</section>
+<section id="bmi160-spi">
+<h2>修改添加bmi160 SPI驱动<a class="headerlink" href="#bmi160-spi" title="Permalink to this headline"></a></h2>
+<p>驱动已经存在，需要添加驱动操作：</p>
+<ul class="simple">
+<li><p>打开驱动宏；</p></li>
+<li><p>配置驱动参数；</p></li>
+<li><p>声明Overlay检索代码；</p></li>
+<li><p>将代码放入Overlay代码区；</p></li>
+<li><p>Overlay代码代码限制修改，没有超出就不用修改；</p></li>
+</ul>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gh">index 54182fc04a5..0a472b505ba 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gu">@@ -22,7 +22,8 @@ CFG_AKM09918_SUPPORT = yes</span><span class="w"></span>
+<span class="w"> </span>CFG_BAROMETER_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_BMP280_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_ACCGYRO_SUPPORT = yes<span class="w"></span>
+<span class="gd">-CFG_LIS2HH12_SUPPORT = yes</span><span class="w"></span>
+<span class="gi">+#CFG_LIS2HH12_SUPPORT = yes</span><span class="w"></span>
+<span class="gi">+CFG_BMI160_SUPPORT = yes</span><span class="w"></span>
+<span class="w"> </span>CFG_STEP_COUNTER_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_STEP_DETECTOR_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>CFG_SIGNIFICANT_MOTION_SUPPORT = yes<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/accGyro/cust_accGyro.c b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/accGyro/cust_accGyro.c</span><span class="w"></span>
+<span class="gh">index ad054e666d8..c78ffdb01a3 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/accGyro/cust_accGyro.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/accGyro/cust_accGyro.c</span><span class="w"></span>
+<span class="gu">@@ -11,4 +11,14 @@ struct accGyro_hw cust_accGyro_hw[] __attribute__((section(&quot;.cust_accGyro&quot;))) =</span><span class="w"></span>
+<span class="w"> </span>    },<span class="w"></span>
+<span class="w"> </span>#endif<span class="w"></span>
+
+<span class="gi">+#ifdef CFG_BMI160_SUPPORT</span><span class="w"></span>
+<span class="gi">+    {</span><span class="w"></span>
+<span class="gi">+        .name = &quot;bmi160&quot;,</span><span class="w"></span>
+<span class="gi">+        .i2c_num = 0,</span><span class="w"></span>
+<span class="gi">+        .direction = 7,</span><span class="w"></span>
+<span class="gi">+        .i2c_addr = {0x68, 0},</span><span class="w"></span>
+<span class="gi">+        .eint_num = 12,</span><span class="w"></span>
+<span class="gi">+    },</span><span class="w"></span>
+<span class="gi">+#endif</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>};<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</span><span class="w"></span>
+<span class="gh">index 37ea139ab77..498030479f3 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/cust/overlay/overlay.c</span><span class="w"></span>
+<span class="gu">@@ -90,7 +90,7 @@ do {                                                           \</span><span class="w"></span>
+<span class="w"> </span>void accGyroOverlayRemap(void)<span class="w"></span>
+<span class="w"> </span>{<span class="w"></span>
+<span class="w"> </span>ACC_GYRO_OVERLAY_REMAP_START<span class="w"></span>
+<span class="gd">-    ACC_GYRO_OVERLAY_REMAP(lis2hh12);</span><span class="w"></span>
+<span class="gi">+    ACC_GYRO_OVERLAY_REMAP(bmi160);</span><span class="w"></span>
+<span class="w"> </span>ACC_GYRO_OVERLAY_REMAP_END<span class="w"></span>
+
+<span class="w"> </span>    return;<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/inc/overlay_sensor.h b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/inc/overlay_sensor.h</span><span class="w"></span>
+<span class="gh">index bfffcfc54fb..c28891cedc6 100755</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/inc/overlay_sensor.h</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/k62v1_64_bsp/inc/overlay_sensor.h</span><span class="w"></span>
+<span class="gu">@@ -24,7 +24,7 @@</span><span class="w"></span>
+<span class="w"> </span>* Overlay0: ACCGYRO<span class="w"></span>
+<span class="w"> </span>*****************************************************************************/<span class="w"></span>
+<span class="w"> </span>#define OVERLAY_SECTION_ACCGYRO                    \<span class="w"></span>
+<span class="gd">-    OVERLAY_ONE_OBJECT(lis2hh12, lis2hh12)</span><span class="w"></span>
+<span class="gi">+    OVERLAY_ONE_OBJECT(bmi160, bmi160)</span><span class="w"></span>
+
+<span class="w"> </span>#ifdef OVERLAY_SECTION_ACCGYRO<span class="w"></span>
+<span class="w"> </span>#define OVERLAY0 OVERLAY_SECTION_ACCGYRO<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/Setting.ini b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/Setting.ini</span><span class="w"></span>
+<span class="gh">index 26955e1723b..0ca74476807 100644</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/Setting.ini</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/Setting.ini</span><span class="w"></span>
+<span class="gu">@@ -106,7 +106,7 @@ SPI:7470</span><span class="w"></span>
+<span class="w"> </span>Timer:2000<span class="w"></span>
+<span class="w"> </span>UART:400<span class="w"></span>
+<span class="w"> </span>WDT:450<span class="w"></span>
+<span class="gd">-accGyro:27000</span><span class="w"></span>
+<span class="gi">+accGyro:28000</span><span class="w"></span>
+<span class="w"> </span>activity:31000<span class="w"></span>
+<span class="w"> </span>activity-no-baro:10<span class="w"></span>
+<span class="w"> </span>alsps:18000<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="mmc5603">
+<h2>mmc5603调试<a class="headerlink" href="#mmc5603" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>步骤和上面bmi160是一样的；</p></li>
+<li><p>系统默认有mmc5603，但是貌似比较复杂，默认MT6762没有配置好，没有FAE协助，配置环境复杂；</p>
+<ul class="simple">
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/mmc5603.c</p></li>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/mmc5603.h</p></li>
+</ul>
+</li>
+<li><p>问FAE要了驱动，貌似校正库不在SCP这边，所以配置编译环境比较容易，如下是运行log；</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[0.022]mod=0x25a04
+[0.022]mod-&gt;name=bmi160
+[0.022]mod=0x25a18
+[0.022]mod-&gt;name=cm36558
+[0.022]mod=0x25a2c
+[0.022]mod-&gt;name=fakeAls
+[0.022]mod=0x25a40
+[0.022]mod-&gt;name=fakePs
+[0.022]mod=0x25a54
+[0.022]mod-&gt;name=bmp280
+[0.022]mod=0x25a68
+[0.022]mod-&gt;name=mmc5603
+[0.022]ovl select
+[0.022]&amp;__overlay_struct_start=0x25a04
+[0.022]&amp;__overlay_struct_end=0x25a7c
+[0.022]name =mmc5603
+[0.022]start=0x83718
+[0.022]stop =0x845c5
+[0.022]size =3757
+[0.023]section=1
+[0.023]data=0x39e95
+[0.023]scp_region_info:
+[0.023]ap_loader_start=9f900000
+[0.023]ap_loader_size=438
+[0.023]ap_firmware_start=9f900800
+[0.023]ap_firmware_size=3b800
+[0.023]load from dram addr=ff983718
+[0.024]load to sec02 addr=0x39e48
+[0.024]ovl select done
+[0.025]_ovly_table[1].vma = 39e48
+[0.025]_ovly_table[1].size = ead
+[0.025]_ovly_table[1].lma = 83718
+[0.025]_ovly_table[1].mapped = 1
+[0.025]driver version : 1.00.20176, mag i2c_num: 0, i2c_addr: 0x30
+[0.025]mag map[0]:0, map[1]:1, map[2]:2, sign[0]:-1, sign[1]:1, sign[2]:-1
+[0.025][I2C-SCP] 809: best_mul 12 sample_div 2 step_div 6 min_div 11
+[0.025][I2C-SCP] 809: best_mul 13 sample_div 1 step_div 13 min_div 13
+[0.025]mmc5603Init read id:0x10 suceess!!!
+[0.025]mmc5603: auto detect success
+[0.025]mmc5603 overlay remap success
+</pre></div>
+</div>
+</li>
+<li><p>不过内核阶段也可以注册成功，讲道理不应该，kernel log：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;7&gt;[    8.512926] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag_init
+&lt;7&gt;[    8.512978] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag_probe ++++!!
+&lt;7&gt;[    8.513077] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag_context_alloc_object start
+&lt;7&gt;[    8.519145] .(1)[262:dc_trim_thread][name:mtk_soc_codec_6357&amp;]open_trim_bufferhardware_withspk(), enable 1, buffer_on 1
+&lt;7&gt;[    8.519159] .(1)[262:dc_trim_thread][name:mtk_soc_codec_6357&amp;]TurnOnDacPower()
+&lt;7&gt;[    8.519194] .(1)[262:dc_trim_thread][name:mtk_soc_codec_6357&amp;]-PMIC DCXO XO_AUDIO_EN_M enable, DCXO_CW14 = 0xa2b5
+&lt;7&gt;[    8.519929] .(1)[262:dc_trim_thread][name:mtk_soc_codec_6357&amp;]setDlMtkifSrc(), enable = 1, freq = 48000
+&lt;7&gt;[    8.522723] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag_context_alloc_object end
+&lt;7&gt;[    8.522782] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag_real_driver_init start
+&lt;7&gt;[    8.522833] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;] i=0
+&lt;7&gt;[    8.522885] .(4)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;] mag try to init driver mmc5603x
+&lt;4&gt;[    8.525022] .(4)[1:swapper/0][name:mmc5603x&amp;]&lt;&lt;-MMC5603X INFO-&gt;&gt; mmc5603x_i2c_probe: enter probe,driver version=V80.97.00.10
+&lt;4&gt;[    8.527271] .(4)[1:swapper/0][name:mmc5603x&amp;]&lt;&lt;-MMC5603X INFO-&gt;&gt; direction =0
+&lt;4&gt;[    8.548931] .(5)[1:swapper/0][name:mmc5603x&amp;]&lt;&lt;-MMC5603X INFO-&gt;&gt; [mmc5603x] product_id[0] = 16
+&lt;7&gt;[    8.565476] .(5)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag register data path div: 1024
+&lt;4&gt;[    8.565544] .(5)[1:swapper/0][name:mmc5603x&amp;]&lt;&lt;-MMC5603X INFO-&gt;&gt; mmc5603X IIC probe successful !
+&lt;6&gt;[    8.566963] .(5)[1:swapper/0][name:bootprof&amp;][name:bootprof&amp;]BOOTPROF:      8566.945635:probe: probe=i2c_device_probe drv=mmc5603x(mmc5603x_i2c_driver)    42.043539ms
+&lt;7&gt;[    8.571671] .(5)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;] mag real driver mmc5603x probe ok
+&lt;7&gt;[    8.571686] .(5)[1:swapper/0]&lt;MAG&gt; [name:mag&amp;]mag_probe OK !!
+&lt;7&gt;[    8.571708] .(5)[1:swapper/0]initcall mag_init+0x0/0x674 returned 0 after 57408 usecs
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="scp">
+<h2>SCP使能传感器流程<a class="headerlink" href="#scp" title="Permalink to this headline"></a></h2>
+<p>暂时找不到AP如何发信息过来的，主要是目前我们的系统没有配置开启SensorHub，所以没法跟踪分析</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/magnetometer.c
+  * static void handleEvent(uint32_t evtType, const void* evtData)
+    * case EVT_SENSOR_EVENT
+      * handleSensorEvent(evtData);
+        * case CHIP_SAMPLING_DONE:
+          * processPendingEvt();
+            * if (mTask.pendingConfig)
+              * else if (mTask.pendConfig.enable == 1 &amp;&amp; !mTask.magNowOn)
+                * sensorOpsMag.sensorPower(true, NULL);
+                  * static const struct SensorOps sensorOpsMag
+                    * DEC_OPS_CFG_SELFTEST(sensorPowerMag, sensorFirmwareMag, sensorRateMag, sensorFlushMag, sensorCfgMag, sensorSelfTestMag),
+                      * static bool sensorPowerMag(bool on, void *cookie)
+                        * magPowerCalculate(on);
+                          * setMagHwEnable(on);
+                            * sensorFsmRunState(&amp;dataInfo, &amp;mTask.fsm, (const void *)CHIP_ENABLE, &amp;i2cCallback, &amp;spiCallback);
+                              * vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/sensorFsm.c
+                                * int sensorFsmRunState(struct transferDataInfo *dataInfo, struct fsmCurrInfo *fsmInfo, const void *state, I2cCallbackF i2cCallBack, SpiCbkF spiCallBack)
+                                  * cmd = sensorFsmFindCmd(fsmInfo-&gt;mSensorFsm, fsmInfo-&gt;mSensorFsmSize, state);
+                                    * vendor/mediatek/proprietary/tinysys/freertos/source/middleware/contexthub/MEMS_Driver/magnetometer/mmc5603.c
+                                      * static struct sensorFsm mmc5603Fsm[]
+                                        * sensorFsmCmd(STATE_ENABLE, STATE_ENABLE_DONE, mmc5603Enable)
+                                          * osLog(LOG_INFO, &quot;%s :  MMC5603 enable mag\n&quot;, __func__);
+</pre></div>
+</div>
+</section>
+</section>
+<section id="scp-log">
+<h1>默认scp log分析<a class="headerlink" href="#scp-log" title="Permalink to this headline"></a></h1>
+<p>驱动基本上都是采用overlay的形式，需要用的时候才拷贝到单片机SRAM中运行，每次都要轮询所有的驱动，直到找到设备驱动</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>----- timezone:GMT
+isable	no	inactive
+[0.005]62		8(8)		0	0	disable	no	inactive
+[0.005]63		8(8)		0	0	disable	no	inactive
+[0.005]in project_init
+[0.005]ram dump: 0x369bc
+[0.005]send ready IPI
+[0.005]log_info dram=36598 buf=365bc start=365b8 end=365b4 maxlen=400
+[0.006]Logger init done
+[0.006]SCP mtk_wdt_init: WDT_CFGREG=0x800fffff!!
+[0.006]Scheduler start...
+[0.006]task:IDLE was created(traceTASK_CREATE()) 
+[0.006] task:Tmr S was created(traceTASK_CREATE()) 
+[0.006]SEOS Initializing
+[0.006][MPEKlib]: MPE_CAL_A_VER_18082801
+[0.006]mod=0x25c8c
+[0.006]mod-&gt;name=lis2hh12
+[0.006]ovl select
+[0.006]&amp;__overlay_struct_start=0x25c8c
+[0.006]&amp;__overlay_struct_end=0x25d04
+[0.006]name =lis2hh12
+[0.006]start=0x80000
+[0.006]stop =0x82291
+[0.006]size =8849
+[0.006]section=0
+[0.006]data=0x36d31
+[0.006]scp_region_info:
+[0.006]ap_loader_start=9f900000
+[0.006]ap_loader_size=438
+[0.006]ap_firmware_start=9f900800
+[0.006]ap_firmware_size=3b800
+[0.006]load from dram addr=ff980000
+[0.007]load to sec01 addr=0x36a10
+[0.010]ovl select done
+[0.010]_ovly_table[0].vma = 36a10
+[0.010]_ovly_table[0].size = 2291
+[0.010]_ovly_table[0].lma = 80000
+[0.010]_ovly_table[0].mapped = 1
+[0.010]acc spi_num: 0
+[0.010]acc map[0]:1, map[1]:0, map[2]:2, sign[0]:-1, sign[1]:-1, sign[2]:-1
+[0.010]lis2hh12 overlay remap fail
+[0.010]mod=0x25c8c
+[0.010]mod-&gt;name=lis2hh12
+[0.010]mod=0x25ca0
+[0.010]mod-&gt;name=cm36558
+[0.010]ovl select
+[0.010]&amp;__overlay_struct_start=0x25c8c
+[0.010]&amp;__ov
+[0.013][I2C-SCP] 645: i2c0: err = -121
+[0.013][I2C-SCP] 735: i2c0:addr=0x51,ACK error=0x2,retry=0
+[0.013][I2C-SCP] 680: I2c0:a2,0,1,3a,1
+[I2C-SCrt=9f900800
+[0.015]ap_firmware_size=3b800
+[0.015]load from dram addr=ff985718
+[0.015]load to sec05 addr=0x3b00c
+[0.015]ovl select done
+[0.015]_ovly_table[4].vma = 3b00c
+[0.015]_ovly_table[4].size = 5c
+[0.015]_ovly_table[4].lma = 85718
+[0.015]_ovly_table[4].mapped = 1
+[0.015]fakePs: auto detect success!
+[0.015]fakePs overlay remap success
+[0.015]mod=0x25c8c
+[0.015]mod-&gt;name=lis2hh12
+[0.015]mod=0x25ca0
+[0.015]mod-&gt;name=cm36558
+[0.015]mod=0x25cb4
+[0.015]mod-&gt;name=fakeAls
+[0.015]mod=0x25cc8
+[0.015]mod-&gt;name=fakePs
+[0.015]mod=0x25cdc
+[0.015]mod-&gt;name=bmp280
+[0.015]ovl select
+[0.015]&amp;__overlay_struct_start=0x25c8c
+[0.015]&amp;__overlay_struct_end=0x25d04
+[0.015]name =bmp280
+[0.015]start=0x84d70
+[0.015]stop =0x85718
+[0.015]size =2472
+[0.015]section=3
+[0.015]data=0x3a689
+[0.015]scp_region_info:
+[0.015]ap_loader_start=9f900000
+[0.015]ap_loader_size=438
+[0.015]ap_firmware_start=9f900800
+[0.015]ap_firmware_size=3b800
+[0.015]load from dram addr=ff984d70
+[0.015]load to sec04 addr=0x3a664
+1
+[I2C-SCP] 2,a,5,d,0,1
+[I2C-SCP] 3,0,0,0,1,1
+[I2C-SCP] 6
+[0.017][I2C-SCP] 645: i2c0: err = -121
+[0.017][I2C-SCP] 735: i2c0:addr=0x77,ACK error=0x2,retry=0
+[0.017][I2C-SCP] 680: I2c0:ee,0,1,3a,1
+[I2C-SCP] 2,a,5,d,0,1
+[I2C-SCP] 3,0,0,0,1,1
+[I2C-SCP] 6
+[0.017][I2C-SCP] 645: i2c0: err = -121
+[0.017]bmp280 overlay remap fail
+[0.017]mod=0x25c8c
+[0.017]mod-&gt;name=lis2hh12
+[0.017]mod=0x25ca0
+[0.017]mod-&gt;name=cm36558
+[0.017]mod=0x25cb4
+[0.017]mod-&gt;name=fakeAls
+[0.017]mod=0x25cc8
+[0.017]mod-&gt;name=fakePs
+[0.017]mod=0x25cdc
+[0.017]mod-&gt;name=bmp280
+[0.017]mod=0x25cf0
+[0.017]mod-&gt;name=akm09918
+[0.017]ovl select
+[0.017]&amp;__overlay_struct_start=0x25c8c
+[0.017]&amp;__overlay_struct_end=0x25d04
+[0.017]name =akm09918
+[0.017]start=0x82291
+[0.017]stop =0x82b38
+[0.0_info:
+[0.017]ap_loader_start=9f900000
+[0.017]ap_loader_size=438
+[0.017]ap_firmware_start=9f900800
+[0.017]ap_firmware_size=3b800
+[0.017]load from dram addr=ff982291
+[0.018]load to sec02 addr=0x38ca1
+[0.019]ovl select done
+[0.019]_ovly_table[1].vma = 38ca1
+[0.019]_ovly_table[1].size = 8a7
+[0.019]_ovly_table[1].lma = 82291
+[0.019]_ovly_table[1].mapped = 1
+[0.019]mag i2c_num: 0, i2c_addr: 0xc
+[0.019]mag map[0]:0, map[1]:1, map[2]:2, sign[0]:-1, sign[1]:1, sign[2]:-1
+[0.019][I2C-SCP] 809: best_mul 12 sample_div 2 step_div 6 min_div 11
+[0.019][I2C-SCP] 809: best_mul 13 sample_div 1 step_div 13 min_div 13
+[0.019][I2C-SCP] 735: i2c0:addr=0xc,ACK error=0x2,retry=0
+[0.019][I2C-SCP] 680: I2c0:18,0,1,3a,1
+[I2C-SCP] 2,a,5,d,0,1
+[I2C-SCP] a3,0,0,0,1,2
+[I2C-SCP] 6
+[0.019][I2C-SCP] 645: i2c0: err = -121
+[0.019][I2C-SCP] 735: i2c0:addr=0xc,ACK error=0x2,retry=0
+[0.019][I2C-SCP] 680: I2c0:18,0,1,3a,1
+[I2C-SCP] 2,a,5,d,0,1
+[I2C-SCP] 3,0,0,0,1,2
+[I2C-SCP] 6
+[0.019][I2C-SCP] 645: i2c0: err = -121
+[0.019][I2C-SCP] 735: i2c0:addr=0xc,ACK error=0x3,retry=0
+[0.019][I2C-SCP] 680: I2c0:18,0,0,3a,1
+[I2C-SCP] 2,a,5,d,0,1
+[I2C-SCP] 3,0,0,0,1,2
+[I2C-SCP] 6
+[0.020][I2C-SCP] 645: i2c0: err = -121
+[0.020]akm09918 overlay remap fail
+[0.020]contexthub_fw_start tid: 268
+[0.021]alsps: app start
+[0.021]initSensors: Proximity not ready!
+[0.021]LIFT EVT_APP_START
+[0.021]TILT EVT_APP_START
+[0.021]STEP_RECOGNITION EVT_APP_START
+[0.021]alsPs: init done
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>[0.013][I2C-SCP] 735: i2c0:addr=0x51,ACK error=0x2,retry=0</p></li>
+<li><p>[0.017][I2C-SCP] 735: i2c0:addr=0x77,ACK error=0x2,retry=0</p></li>
+<li><p>[0.019][I2C-SCP] 735: i2c0:addr=0xc,ACK error=0x3,retry=0</p></li>
+<li><p>用逻辑分析仪看I2C1数据，可以抓到上面的通信数据，也就是说这个bus，Linux系统和单片机系统都可以使用，因为目前我们传感器驱动在Linux系统这边；</p></li>
+</ul>
+</section>
+<section id="linux-driver">
+<h1>Linux Driver调试<a class="headerlink" href="#linux-driver" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>menuconfig</p>
+<ul>
+<li><p>CONFIG_I2C_CHARDEV=y</p></li>
+</ul>
+</li>
+<li><p>https://github.com/ZengjfOS/Android/tree/i2c-tools</p>
+<ul>
+<li><p>i2cdetect -y 1</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="scp-i2c-master">
+<h1>SCP I2C Master<a class="headerlink" href="#scp-i2c-master" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>vendor/mediatek/proprietary/tinysys/freertos/source/drivers/CM4_A/mt6765/i2c/src/i2cchre-plat.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">i2cMasterRequest</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">busId</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">speedInHz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">busId</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">mMtI2cDevs</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">MtI2cDev</span><span class="w"> </span><span class="o">*</span><span class="n">pdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mMtI2cDevs</span><span class="p">[</span><span class="n">busId</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">I2cMtState</span><span class="w"> </span><span class="o">*</span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">I2CDBG</span><span class="p">(</span><span class="s">&quot;%s: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">__LINE__</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">state</span><span class="o">-&gt;</span><span class="n">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MT_I2C_DISABLED</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">state</span><span class="o">-&gt;</span><span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MT_I2C_MASTER</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">state</span><span class="o">-&gt;</span><span class="n">timerHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">state</span><span class="o">-&gt;</span><span class="n">timeOut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2000000000</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">atomicBitsetInit</span><span class="p">(</span><span class="n">mXfersValid</span><span class="p">,</span><span class="w"> </span><span class="n">I2C_MAX_QUEUE_DEPTH</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">atomicWriteByte</span><span class="p">(</span><span class="o">&amp;</span><span class="n">state</span><span class="o">-&gt;</span><span class="n">masterState</span><span class="p">,</span><span class="w"> </span><span class="n">MT_I2C_MASTER_IDLE</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">speedInHz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">speedInHz</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Need enable clock */</span><span class="w"></span>
+<span class="w">        </span><span class="n">i2c_clock_enable</span><span class="p">(</span><span class="n">pdev</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">mtI2cSpeedSet</span><span class="p">(</span><span class="n">pdev</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">request_irq</span><span class="p">(</span><span class="n">I2C0_IRQn</span><span class="p">,</span><span class="w"> </span><span class="n">i2c0_irq_handler</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;I2C0&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#ifdef CFG_VCORE_DVFS_SUPPORT</span>
+<span class="w">        </span><span class="n">scp_wakeup_src_setup</span><span class="p">(</span><span class="n">I2C0_WAKE_CLK_CTRL</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="n">i2c_clock_disable</span><span class="p">(</span><span class="n">pdev</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EBUSY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* LOG here */</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

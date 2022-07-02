@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scp debug log &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">scp debug log</a></li>
+<li><a class="reference internal" href="#android-mk-build-type">android.mk BUILD_TYPE</a></li>
+<li><a class="reference internal" href="#cm4-tinysys-debug-build">cm4 TINYSYS_DEBUG_BUILD</a></li>
+<li><a class="reference internal" href="#debuglevel">DEBUGLEVEL</a></li>
+<li><a class="reference internal" href="#printf">PRINTF</a></li>
+<li><a class="reference internal" href="#last-log">last log</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>scp debug log</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scp-debug-log">
+<h1>scp debug log<a class="headerlink" href="#scp-debug-log" title="Permalink to this headline"></a></h1>
+<p>打印更多的scp调试log，注意CFG_OVERLAY_INIT_SUPPORT</p>
+<p><strong>Debuglogger UI中的scp log可能开机等一段时间才有，譬如两分钟</strong></p>
+</section>
+<section id="android-mk-build-type">
+<h1>android.mk BUILD_TYPE<a class="headerlink" href="#android-mk-build-type" title="Permalink to this headline"></a></h1>
+<p>vendor/mediatek/proprietary/tinysys/freertos/source/Android.mk</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">TINYSYS_SCP_BUILD_CMD</span> <span class="o">:=</span> <span class="se">\</span>
+    <span class="nv">PROJECT</span><span class="o">=</span><span class="k">$(</span>TINYSYS_SCP_PROJECT<span class="k">)</span> <span class="se">\</span>
+    <span class="nv">TARGET_BOARD_PLATFORM</span><span class="o">=</span><span class="k">$(</span>TARGET_BOARD_PLATFORM<span class="k">)</span> <span class="se">\</span>
+    <span class="nv">O</span><span class="o">=</span><span class="k">$(</span>abspath <span class="k">$(</span>TINYSYS_SCP_BUILT_INTERMEDIATES<span class="k">))</span> <span class="se">\</span>
+    <span class="k">$(if</span> <span class="k">$(</span>filter showcommands,<span class="k">$(</span>MAKECMDGOALS<span class="k">))</span>,V<span class="o">=</span><span class="m">1</span><span class="k">)</span> <span class="se">\</span>
+    <span class="nv">BUILD_TYPE</span><span class="o">=</span><span class="k">$(if</span> <span class="k">$(</span>filter-out user,<span class="k">$(</span>TARGET_BUILD_VARIANT<span class="k">))</span>,debug,release<span class="k">)</span> <span class="se">\</span>
+    <span class="nv">ROOT_DIR</span><span class="o">=</span><span class="nv">$$</span><span class="o">(</span><span class="nb">pwd</span><span class="o">)</span> <span class="se">\</span>
+    -C <span class="k">$(</span>LOCAL_PATH<span class="k">)</span>
+</pre></div>
+</div>
+</section>
+<section id="cm4-tinysys-debug-build">
+<h1>cm4 TINYSYS_DEBUG_BUILD<a class="headerlink" href="#cm4-tinysys-debug-build" title="Permalink to this headline"></a></h1>
+<p>vendor/mediatek/proprietary/tinysys/freertos/source/build/env_cm4.mk</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="cp">ifeq (1,$(V))</span>
+  <span class="k">$(</span>info <span class="k">$(</span>TINYSYS_SCP<span class="k">)</span>: <span class="nv">BUILD_TYPE</span><span class="o">=</span><span class="k">$(</span>BUILD_TYPE<span class="k">))</span>
+<span class="cp">endif</span>
+
+<span class="cp">ifeq (debug,$(strip $(BUILD_TYPE)))</span>
+  <span class="nv">CFLAGS</span> <span class="o">+=</span> -DTINYSYS_DEBUG_BUILD
+<span class="cp">endif</span>
+</pre></div>
+</div>
+</section>
+<section id="debuglevel">
+<h1>DEBUGLEVEL<a class="headerlink" href="#debuglevel" title="Permalink to this headline"></a></h1>
+<p>vendor/mediatek/proprietary/tinysys/freertos/source/project/CM4_A/mt6765/platform/inc/FreeRTOSConfig.h</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef TINYSYS_DEBUG_BUILD</span>
+<span class="cp">#define DEBUGLEVEL 3</span>
+<span class="cp">#else</span>
+<span class="cp">#define DEBUGLEVEL 1</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</section>
+<section id="printf">
+<h1>PRINTF<a class="headerlink" href="#printf" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/******************************************************************************</span>
+<span class="cm">******************************************************************************/</span><span class="w"></span>
+<span class="cp">#ifndef CFG_LOG_FILTER</span>
+<span class="cm">/* DEBUG LEVEL definition*/</span><span class="w"></span>
+<span class="cp">#define LOG_DEBUG       3</span>
+<span class="cp">#define LOG_INFO        2</span>
+<span class="cp">#define LOG_WARN        1</span>
+<span class="cp">#define LOG_ERROR       0</span>
+<span class="cp">#define PRINTF(x...)    PRINTF_D(x)</span>
+
+<span class="cp">#define PRINTF_D(x...)            \</span>
+<span class="cp">({                                \</span>
+<span class="cp">    if (LOG_DEBUG &lt;= DEBUGLEVEL)  \</span>
+<span class="cp">        printf(x);                \</span>
+<span class="cp">})</span>
+
+<span class="cp">#define PRINTF_I(x...)            \</span>
+<span class="cp">({                                \</span>
+<span class="cp">    if (LOG_INFO &lt;= DEBUGLEVEL)   \</span>
+<span class="cp">        printf(x);                \</span>
+<span class="cp">})</span>
+
+<span class="cp">#define PRINTF_W(x...)            \</span>
+<span class="cp">({                                \</span>
+<span class="cp">    if (LOG_WARN &lt;= DEBUGLEVEL)   \</span>
+<span class="cp">        printf(x);                \</span>
+<span class="cp">})</span>
+
+
+<span class="cp">#define PRINTF_E(x...)            \</span>
+<span class="cp">({                                \</span>
+<span class="cp">    if (LOG_ERROR &lt;= DEBUGLEVEL)  \</span>
+<span class="cp">        printf(x);                \</span>
+<span class="cp">})</span>
+
+<span class="cp">#define PRINTF_ONCE(x...)                                       \</span>
+<span class="cp">({                                                              \</span>
+<span class="cp">    static char __print_once;                                   \</span>
+<span class="cp">                                                                \</span>
+<span class="cp">    if (!__print_once) {                                        \</span>
+<span class="cp">        __print_once = 1;                                       \</span>
+<span class="cp">        printf(x);                                              \</span>
+<span class="cp">    }                                                           \</span>
+<span class="cp">})</span>
+</pre></div>
+</div>
+</section>
+<section id="last-log">
+<h1>last log<a class="headerlink" href="#last-log" title="Permalink to this headline"></a></h1>
+<p>cat /sys/class/misc/scp/scp_A_get_last_log</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

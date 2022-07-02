@@ -25,6 +25,8 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0015| [Sensor](src/0015_Sensor/README.md) | 理解Android Sensor体系架构
+0014| [MediaWiki](src/0014_MediaWiki/README.md) | 使用MediaWiki作为周报系统
 0013| [Linux](src/0013_Linux/README.md) | 记录一些零散的Linux方面的使用文档
 0012| [BatteryPower](src/0012_BatteryPower/README.md) | Android休眠功耗分析，休眠原理
 0011| [Terminal_UI](src/0011_Terminal_UI/README.md) | 终端cmd下图形界面
