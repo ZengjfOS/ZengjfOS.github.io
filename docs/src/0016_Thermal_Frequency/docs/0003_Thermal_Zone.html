@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thermal Zone &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Thermal Zone</a></li>
+<li><a class="reference internal" href="#id1">温控参考文档</a></li>
+<li><a class="reference internal" href="#thermal">Thermal原理</a></li>
+<li><a class="reference internal" href="#thermal-cooling-devices">Thermal Cooling Devices</a></li>
+<li><a class="reference internal" href="#id2">文件系统查看</a></li>
+<li><a class="reference internal" href="#dts-thermal-zone">DTS Thermal Zone</a></li>
+<li><a class="reference internal" href="#driver">driver</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Thermal Zone</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thermal-zone">
+<h1>Thermal Zone<a class="headerlink" href="#thermal-zone" title="Permalink to this headline"></a></h1>
+<p>温控管理框架</p>
+</section>
+<section id="id1">
+<h1>温控参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cnblogs.com/arnoldlu/p/11207142.html">Linux Thermal Framework分析及实施</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/tiantao2012/article/details/78286083?utm_source=blogxgwz4">thermal的cpu cool device</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_33160790/article/details/84931408">如何使用CPU cooling API</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/zhouhuacai/article/details/78172267">Linux电源管理（五）thermal</a></p></li>
+</ul>
+</section>
+<section id="thermal">
+<h1>Thermal原理<a class="headerlink" href="#thermal" title="Permalink to this headline"></a></h1>
+<p>thermal子系统是内核提供的温控管理框架，一套软件温度解决方案，配合ic内部温度传感器，对ic温度进行管控，保证系统稳定性。thermal系统多用于对ic内部的重点发热模块的功能管控，如cpu、gpu。<strong>thermal sensor(ts)驱动负责读取硬件温度sensor的温度，并传给thermal 子系统，thermal子系统将根据调控对象的温度，决定是否触发对应的冷却措施，如限制CPU最大工作频率，以及CPU打开的核数等，从而实现对系统的冷却。</strong></p>
+<p>Thermal zone代表一个温控管理区间，可以将其看做一个虚拟意义上的温度Sensor， 需要有对应的物理Sensor与其关联再能发挥作用。一个Thermal Zone最多可以关联一个Sensor，但该Sensor可以是多个硬件Sensor的混合。</p>
+<p>Trip Point即触发点，由Thermal Zone维护。每个thermal zone可以维护多个trip point。Trip Point包含以下信息：</p>
+<ul class="simple">
+<li><p>temp：触发温度，当温度到达触发温度则该trip point被触发。</p></li>
+<li><p>type：trip point类型，沿袭PC散热方式，分为四种类型—passive、active、hot、critical。</p></li>
+<li><p>cooling device绑定信息：记录在thermal_instance结构体中，描述trip point与cooling device的绑定关系，即当trip point触发后由那个cooling device去实施冷却措施。每个trip point必须与一个cooling device绑定，才有实际意义。</p></li>
+</ul>
+<p>cooling device是实际对系统实施冷却措施的驱动，温控的执行者。cooling device 维护一个cooling等级，即state，一般state越高即系统的冷却需求越高。cooling device根据不同等级的冷却需求进行冷却行为。cooling device只根据state进行冷却操作，是实施者，而state的计算由thermal governor完成。</p>
+<p><img alt="0002_Thermal_Core_ARCH.png" src="../../../_images/0002_Thermal_Core_ARCH.png" /></p>
+<ul class="simple">
+<li><p>获取温度的设备：在 Thermal 框架中被抽象为 Thermal Zone Device;</p></li>
+<li><p>控制温度的设备：在 Thermal 框架中被抽象为 Thermal Cooling Device;</p></li>
+<li><p>控制温度策略：在 Thermal 框架中被抽象为 Thermal Governor;</p></li>
+</ul>
+</section>
+<section id="thermal-cooling-devices">
+<h1>Thermal Cooling Devices<a class="headerlink" href="#thermal-cooling-devices" title="Permalink to this headline"></a></h1>
+<p>参考文档：<a class="reference external" href="http://kernel.meizu.com/linux-thermal-framework-intro.html">Linux Thermal 框架解析</a></p>
+<p>Thermal Cooling Device 是可以降温设备的抽象，能降温的设备比如风扇，这些好理解，但是想 CPU,GPU 这些 Cooling devices 怎么理解呢？</p>
+<p>其实降温可以从两方面来理解，一个是加快散热，另外一个就是降低产热量。风扇，散热片这些是用来加快散热，CPU,GPU 这些 Cooling devices 是通过降低产热来降温：</p>
+<ul class="simple">
+<li><p>Thermal Cooling device 抽象的方式是，认为所有的能降温的设备有很多可以单独控制的状态。例如，风扇有不同的风速状态，</p></li>
+<li><p>CPU/GPU Cooling device 有不同最大运行频率状态，这样当温度高了之后通过调整这些状态来降低温度；</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>文件系统查看<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>/proc/device-tree/thermal-zones</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.
+|-- cpu-thermal
+|   |-- coefficients
+|   |-- cooling-maps
+|   |   `-- name
+|   |-- name
+|   |-- phandle
+|   |-- polling-delay
+|   |-- polling-delay-passive
+|   `-- thermal-sensors
+`-- name
+
+2 directories, 8 files
+</pre></div>
+</div>
+</section>
+<section id="dts-thermal-zone">
+<h1>DTS Thermal Zone<a class="headerlink" href="#dts-thermal-zone" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>linux-rpi-5.4.y/arch/arm/boot/dts/bcm283x.dtsi</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thermal-zones</span></code>声明所有的thermal策略</p></li>
+</ul>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="nx">thermal</span><span class="o">-</span><span class="nx">zones</span> <span class="p">{</span>
+    <span class="nx">cpu_thermal</span><span class="o">:</span> <span class="nx">cpu</span><span class="o">-</span><span class="nx">thermal</span> <span class="p">{</span>
+        <span class="nx">polling</span><span class="o">-</span><span class="nx">delay</span><span class="o">-</span><span class="nx">passive</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mf">0</span><span class="o">&gt;</span><span class="p">;</span>
+        <span class="nx">polling</span><span class="o">-</span><span class="nx">delay</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mf">1000</span><span class="o">&gt;</span><span class="p">;</span>
+
+        <span class="nx">trips</span> <span class="p">{</span>
+            <span class="nx">cpu</span><span class="o">-</span><span class="nx">crit</span> <span class="p">{</span>
+                <span class="nx">temperature</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mf">90000</span><span class="o">&gt;</span><span class="p">;</span>
+                <span class="nx">hysteresis</span>  <span class="o">=</span> <span class="o">&lt;</span><span class="mf">0</span><span class="o">&gt;</span><span class="p">;</span>
+                <span class="nx">type</span>        <span class="o">=</span> <span class="s2">&quot;critical&quot;</span><span class="p">;</span>
+            <span class="p">};</span>
+        <span class="p">};</span>
+
+        <span class="nx">cooling</span><span class="o">-</span><span class="nx">maps</span> <span class="p">{</span>
+        <span class="p">};</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>linux-rpi-5.4.y/arch/arm/boot/dts/bcm2711.dtsi</p></li>
+<li><p>采用<code class="docutils literal notranslate"><span class="pre">brcm,bcm2711-thermal</span></code>驱动，采用<code class="docutils literal notranslate"><span class="pre">#thermal-sensor-cells</span> <span class="pre">=</span> <span class="pre">&lt;0&gt;</span></code>中指定的<code class="docutils literal notranslate"><span class="pre">thermal</span> <span class="pre">zones</span></code>(其声明了所有的thermal)第0个thermal策略;</p></li>
+</ul>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span>/ {
+    compatible = &quot;brcm,bcm2711&quot;;
+
+    #address-cells = &lt;2&gt;;
+    #size-cells = &lt;1&gt;;
+
+    interrupt-parent = &lt;&amp;gicv2&gt;;
+
+    soc {
+        // ...省略
+
+        avs_monitor: avs-monitor@7d5d2000 {
+            compatible = &quot;brcm,bcm2711-avs-monitor&quot;,
+                     &quot;syscon&quot;, &quot;simple-mfd&quot;;
+            reg = &lt;0x7d5d2000 0xf00&gt;;
+
+            thermal: thermal {
+                compatible = &quot;brcm,bcm2711-thermal&quot;;
+                #thermal-sensor-cells = &lt;0&gt;;
+            };
+        };
+
+        // ...省略
+    }
+
+    // ...省略
+}
+
+&amp;cpu_thermal {
+    coefficients = &lt;(-487) 410040&gt;;
+    thermal-sensors = &lt;&amp;thermal&gt;;
+};
+</pre></div>
+</div>
+</section>
+<section id="driver">
+<h1>driver<a class="headerlink" href="#driver" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">brcm,bcm2711-thermal</span></code>驱动probe，其通过<code class="docutils literal notranslate"><span class="pre">#thermal-sensor-cells</span></code>指定thermal zones中的索引策略，目前是0</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/thermal/broadcom/bcm2711_thermal.c
+  * module_platform_driver(bcm2711_thermal_driver);
+    * static struct platform_driver bcm2711_thermal_driver
+      * .driver
+        * .of_match_table = bcm2711_thermal_id_table,
+          *  static const struct of_device_id bcm2711_thermal_id_table[]
+            * { .compatible = &quot;brcm,bcm2711-thermal&quot; },
+      * .probe = bcm2711_thermal_probe,
+        * static int bcm2711_thermal_probe(struct platform_device *pdev)
+          * thermal = devm_thermal_zone_of_sensor_register(dev, 0, priv, &amp;bcm2711_thermal_of_ops);
+            * bcm2711_thermal_of_ops
+              * static const struct thermal_zone_of_device_ops bcm2711_thermal_of_ops
+                * .get_temp   = bcm2711_get_temp,
+                  * static int bcm2711_get_temp(void *data, int *temp)
+                    * int slope = thermal_zone_get_slope(priv-&gt;thermal);
+                    * int offset = thermal_zone_get_offset(priv-&gt;thermal);
+                    * ret = regmap_read(priv-&gt;regmap, AVS_RO_TEMP_STATUS, &amp;val);
+                    * t = slope * val + offset;
+                    * *temp = t &lt; 0 ? 0 : t;
+            * devm_thermal_zone_of_sensor_register(...);
+              * drivers/thermal/of-thermal.c
+                * struct thermal_zone_device *devm_thermal_zone_of_sensor_register(struct device *dev, int sensor_id, void *data, const struct thermal_zone_of_device_ops *ops)
+                  * ptr = devres_alloc(devm_thermal_zone_of_sensor_release, sizeof(*ptr), GFP_KERNEL);
+                  * tzd = thermal_zone_of_sensor_register(dev, sensor_id, data, ops);
+                    * np = of_find_node_by_name(NULL, &quot;thermal-zones&quot;);
+                      * 这是隐藏数据
+                    * sensor_np = of_node_get(dev-&gt;of_node);
+                    * for_each_available_child_of_node(np, child)
+                      * ret = of_parse_phandle_with_args(child, &quot;thermal-sensors&quot;, &quot;#thermal-sensor-cells&quot;, 0, &amp;sensor_specs);
+                      * if (sensor_specs.np == sensor_np &amp;&amp; id == sensor_id)
+                        * tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

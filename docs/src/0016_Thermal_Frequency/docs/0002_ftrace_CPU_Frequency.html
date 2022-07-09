@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ftrace CPU Frequency &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ftrace CPU Frequency</a></li>
+<li><a class="reference internal" href="#id1">一、参考文档</a></li>
+<li><a class="reference internal" href="#cpu">二、获取CPU频率内核调用</a></li>
+<li><a class="reference internal" href="#cpufreq">三、cpufreq</a></li>
+<li><a class="reference internal" href="#sys">四、sys节点文件说明</a></li>
+<li><a class="reference internal" href="#governor">五、设置governor方法</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>ftrace CPU Frequency</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ftrace-cpu-frequency">
+<h1>ftrace CPU Frequency<a class="headerlink" href="#ftrace-cpu-frequency" title="Permalink to this headline"></a></h1>
+<p>理解CPU自动调频</p>
+<ul class="simple">
+<li><p><span class="xref myst">一、参考文档</span></p></li>
+<li><p><span class="xref myst">二、获取CPU频率内核调用</span></p></li>
+<li><p><span class="xref myst">三、cpufreq</span></p></li>
+<li><p><span class="xref myst">四、sys节点文件说明</span></p></li>
+<li><p><span class="xref myst">五、设置governor方法</span></p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>一、参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cnblogs.com/armlinux/archive/2011/04/11/2396824.html">Linux内核的cpufreq(变频)机制</a></p></li>
+<li><p><a class="reference external" href="https://www.ibm.com/developerworks/cn/linux/l-cpufreq-1/index.html">CPUfreq 子系统</a></p></li>
+<li><p><a class="reference external" href="https://raspberrypi.stackexchange.com/questions/9034/how-to-change-the-default-governor">How to change the default governor?</a></p></li>
+<li><p><a class="reference external" href="http://www.wowotech.net/pm_subsystem/cpufreq_overview.html">linux cpufreq framework(1)_概述</a></p></li>
+</ul>
+</section>
+<section id="cpu">
+<h1>二、获取CPU频率内核调用<a class="headerlink" href="#cpu" title="Permalink to this headline"></a></h1>
+<p>采用这种方式来反推CPU变频机制是由于目前自己也不知道查什么资料，最后通过<code class="docutils literal notranslate"><span class="pre">cpufreq_notify_transition()</span></code>检索到<code class="docutils literal notranslate"><span class="pre">cpufreq</span></code>子系统，从而完成信息获取</p>
+<p><code class="docutils literal notranslate"><span class="pre">trace-cmd</span> <span class="pre">record</span> <span class="pre">-e</span> <span class="pre">power</span> <span class="pre">-e</span> <span class="pre">regulator</span> <span class="pre">-p</span> <span class="pre">function_graph</span></code></p>
+<ul>
+<li><p>kernelshark查看：<br />
+<img alt="0002_ftrace_CPU_Frequency.png" src="../../../_images/0002_ftrace_CPU_Frequency.png" /></p></li>
+<li><p>文本查看：<code class="docutils literal notranslate"><span class="pre">trace-cmd</span> <span class="pre">report</span></code></p>
+<ul class="simple">
+<li><p>检索：cpu_frequency</p></li>
+</ul>
+</li>
+<li><p>如下是部分调用信息</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574022</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                      <span class="n">kfree</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574022</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">2.166</span> <span class="n">us</span>   <span class="o">|</span>                            <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574023</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">1.074</span> <span class="n">us</span>   <span class="o">|</span>                      <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574023</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                            <span class="n">mem_cgroup_commit_charge</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574024</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">9.277</span> <span class="n">us</span>   <span class="o">|</span>                    <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574024</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                              <span class="n">mem_cgroup_charge_statistics</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574024</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="o">+</span> <span class="mf">11.092</span> <span class="n">us</span>  <span class="o">|</span>                  <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574025</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.778</span> <span class="n">us</span>   <span class="o">|</span>                              <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574025</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="c1"># 1077.389 us |                }</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574025</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>        <span class="mf">0.722</span> <span class="n">us</span>   <span class="o">|</span>                              <span class="n">memcg_check_events</span><span class="p">();</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574026</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                <span class="n">kfree</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574027</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">4.092</span> <span class="n">us</span>   <span class="o">|</span>                            <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574027</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">1.074</span> <span class="n">us</span>   <span class="o">|</span>                <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574028</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="o">+</span> <span class="mf">21.389</span> <span class="n">us</span>  <span class="o">|</span>                          <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574028</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="c1"># 1111.778 us |              }</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574029</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                          <span class="n">lru_cache_add</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574029</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="c1"># 1119.889 us |            }</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574030</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                            <span class="n">__lru_cache_add</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574030</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="c1"># 1123.185 us |          }</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574031</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.926</span> <span class="n">us</span>   <span class="o">|</span>                            <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574031</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>          <span class="n">cpufreq_freq_transition_end</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574031</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">2.722</span> <span class="n">us</span>   <span class="o">|</span>                          <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574032</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>            <span class="n">cpufreq_notify_transition</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574032</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="o">+</span> <span class="mf">26.815</span> <span class="n">us</span>  <span class="o">|</span>                        <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574034</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="o">+</span> <span class="mf">40.796</span> <span class="n">us</span>  <span class="o">|</span>                      <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574035</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>        <span class="mf">0.944</span> <span class="n">us</span>   <span class="o">|</span>                      <span class="n">wait_for_stable_page</span><span class="p">();</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574036</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="o">+</span> <span class="mf">44.926</span> <span class="n">us</span>  <span class="o">|</span>                    <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574037</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                    <span class="n">unlock_page</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574038</span><span class="p">:</span> <span class="n">cpu_frequency</span><span class="p">:</span>        <span class="n">state</span><span class="o">=</span><span class="mi">1500000</span> <span class="n">cpu_id</span><span class="o">=</span><span class="mi">0</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574038</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.945</span> <span class="n">us</span>   <span class="o">|</span>                    <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574039</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                    <span class="n">__ext4_journal_start_sb</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574039</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>              <span class="n">srcu_notifier_call_chain</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574040</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                      <span class="n">ext4_journal_check_start</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574040</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                <span class="n">__srcu_notifier_call_chain</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574041</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                        <span class="n">_cond_resched</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574041</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                  <span class="n">__srcu_read_lock</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574042</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                          <span class="n">rcu_all_qs</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574042</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">1.037</span> <span class="n">us</span>   <span class="o">|</span>                  <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574043</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.945</span> <span class="n">us</span>   <span class="o">|</span>                          <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574043</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                  <span class="n">notifier_call_chain</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574044</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">2.741</span> <span class="n">us</span>   <span class="o">|</span>                        <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574044</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                    <span class="n">cpufreq_callback</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574045</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">4.555</span> <span class="n">us</span>   <span class="o">|</span>                      <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574045</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.962</span> <span class="n">us</span>   <span class="o">|</span>                    <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574046</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                      <span class="n">jbd2__journal_start</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574046</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">2.833</span> <span class="n">us</span>   <span class="o">|</span>                  <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574047</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                        <span class="n">kmem_cache_alloc</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574047</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                  <span class="n">__srcu_read_unlock</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574048</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                          <span class="n">_cond_resched</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574048</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">1.019</span> <span class="n">us</span>   <span class="o">|</span>                  <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574049</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                            <span class="n">rcu_all_qs</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574049</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">8.481</span> <span class="n">us</span>   <span class="o">|</span>                <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574049</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.926</span> <span class="n">us</span>   <span class="o">|</span>                            <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574050</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>       <span class="o">+</span> <span class="mf">10.297</span> <span class="n">us</span>  <span class="o">|</span>              <span class="p">}</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574050</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">2.741</span> <span class="n">us</span>   <span class="o">|</span>                          <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574051</span><span class="p">:</span> <span class="n">cpu_frequency</span><span class="p">:</span>        <span class="n">state</span><span class="o">=</span><span class="mi">1500000</span> <span class="n">cpu_id</span><span class="o">=</span><span class="mi">1</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574051</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                          <span class="n">should_failslab</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574051</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>              <span class="n">srcu_notifier_call_chain</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574052</span><span class="p">:</span> <span class="n">funcgraph_exit</span><span class="p">:</span>         <span class="mf">0.926</span> <span class="n">us</span>   <span class="o">|</span>                          <span class="p">}</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574052</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                <span class="n">__srcu_notifier_call_chain</span><span class="p">()</span> <span class="p">{</span>
+       <span class="n">trace</span><span class="o">-</span><span class="n">cmd</span><span class="o">-</span><span class="mi">6913</span>  <span class="p">[</span><span class="mi">003</span><span class="p">]</span>  <span class="mf">4025.574053</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                          <span class="n">memcg_kmem_put_cache</span><span class="p">()</span> <span class="p">{</span>
+     <span class="n">kworker</span><span class="o">/</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="o">-</span><span class="mi">6211</span>  <span class="p">[</span><span class="mi">001</span><span class="p">]</span>  <span class="mf">4025.574053</span><span class="p">:</span> <span class="n">funcgraph_entry</span><span class="p">:</span>                   <span class="o">|</span>                  <span class="n">__srcu_read_lock</span><span class="p">()</span> <span class="p">{</span>
+</pre></div>
+</div>
+</li>
+<li><p>cpufreq_notify_transition()函数很关键的样子</p></li>
+<li><p>检索发现是属于<code class="docutils literal notranslate"><span class="pre">cpufreq</span></code>子系统</p></li>
+</ul>
+</section>
+<section id="cpufreq">
+<h1>三、cpufreq<a class="headerlink" href="#cpufreq" title="Permalink to this headline"></a></h1>
+<p>cpufreq framework的功能也被称作动态电压/频率调整（Dynamic Voltage/Frequency Scaling）——DVFS：通过调整CPU core的电压和频率，兼顾系统的性能和功耗，在不需要高性能时，降低电压和频率，以降低功耗；在需要高性能时，提高电压和频率，以提高性能。要达到此目的，有两个关键点：</p>
+<ul class="simple">
+<li><p>如何控制CPU core的电压和频率。</p></li>
+<li><p>何时改变CPU core的电压和频率。</p></li>
+</ul>
+<p>实现1：CPU core根据自身的负荷，自动调整电压和频率，不需要OS级别的软件参与。</p>
+<ul class="simple">
+<li><p>由CPU core自行处理；</p></li>
+<li><p>OS需要根据大致的应用场景（例如，是高性能场景，还是低性能场景），设定一个频率范围，改变时机，由CPU core自行决定。</p></li>
+</ul>
+<p>实现2：CPU core不参与任何的逻辑动作，由OS软件根据系统运行情况，调整电压和频率。</p>
+<ul class="simple">
+<li><p>基于clock framework和regulator framework提供的接口，控制CPU core的频率和电压；</p></li>
+<li><p>根据应用场景，手动（用户发起，例如省电模式）或者自动（软件自动调整，例如HMP）的调整。</p></li>
+</ul>
+<p>为了实现上述功能需求，cpufreq framework抽象出cpufreq driver、cpufreq policy（策略）、cpufreq governor等多个软件实体。cpufreq policy负责设定cpu调频的一个大致范围，cpu具体运行频率，需要相应的cpufreq governor决定，最终由cpufreq driver将governor给出的频率设定到硬件上去。</p>
+<p>cpufreq的通知系统使用了内核的标准通知接口。它对外提供了两个通知事件：policy通知和transition通知。</p>
+<p>policy通知用于通知其它模块cpu的policy需要改变，每次policy改变时，该通知链上的回调将会用不同的事件参数被调用3次，分别是：</p>
+<ul class="simple">
+<li><p>CPUFREQ_ADJUST: 只要有需要，所有的被通知者可以在此时修改policy的限制信息，比如温控系统可能会修改在大允许运行的频率。</p></li>
+<li><p>CPUFREQ_INCOMPATIBLE: 只是为了避免硬件错误的情况下，可以在该通知中修改policy的限制信息。</p></li>
+<li><p>CPUFREQ_NOTIFY: 真正切换policy前，该通知会发往所有的被通知者</p></li>
+</ul>
+<p>transition通知链用于在驱动实施调整cpu的频率时，用于通知相关的注册者。每次调整频率时，该通知会发出两次通知事件：</p>
+<ul class="simple">
+<li><p>CPUFREQ_PRECHANGE: 调整前的通知。</p></li>
+<li><p>CPUFREQ_POSTCHANGE: 完成调整后的通知。</p></li>
+</ul>
+<p>当检测到因系统进入suspend而造成频率被改变时，以下通知消息会被发出：</p>
+<ul class="simple">
+<li><p>CPUFREQ_RESUMECHANGE</p></li>
+</ul>
+<p>cpufreq governor的调频思路：</p>
+<ul class="simple">
+<li><p>有两种类型的cpu：一种只需要给定频率范围，cpu会在该范围内自行确定运行频率；另一种需要软件指定具体的运行频率。</p></li>
+<li><p>对于第一种cpu，cpufreq policy中会指定频率范围policy-&gt;{min,max}，之后通过setpolicy接口，使其生效即可。</p></li>
+<li><p>对于第二种cpu，cpufreq policy在指定频率范围的同时，会指明使用的governor。governor在启动后，会动态的活着静态的，设定cpu运行频率。</p></li>
+</ul>
+<p>Linux内部共有五种对频率的governor管理策略userspace，conservative，ondemand，powersave 和 performance:</p>
+<ul class="simple">
+<li><p>performance ：CPU会固定工作在其支持的最高运行频率上；</p></li>
+<li><p>powersave ：CPU会固定工作在其支持的最低运行频率上。因此这两种 governors 都属于静态 governor ，即在使用它们时 CPU 的运行频率不会根据系统运行时负载的变化动态作出调整。这两种 governors 对应的是两种极端的应用场景，使用 performance governor 体现的是对系统高性能的最大追求，而使用 powersave governor 则是对系统低功耗的最大追求。</p></li>
+<li><p>Userspace：最早的 cpufreq 子系统通过 userspace governor 为用户提供了这种灵活性。系统将变频策略的决策权交给了用户态应用程序，并提供了相应的接口供用户态应用程序调节 CPU 运行频率使用。 （可以使用Dominik 等人开发了cpufrequtils 工具包 ）</p></li>
+<li><p>ondemand ：userspace是内核态的检测，效率低。而ondemand正是人们长期以来希望看到的一个完全在内核态下工作并且能够以更加细粒度的时间间隔对系统负载情况进行采样分析的 governor。</p></li>
+<li><p>conservative ： ondemand governor 的最初实现是在可选的频率范围内调低至下一个可用频率。这种降频策略的主导思想是尽量减小对系统性能的负面影响，从而不会使得系统性能在短时间内迅速降低以影响用户体验。但是在 ondemand governor 的这种最初实现版本在社区发布后，大量用户的使用结果表明这种担心实际上是多余的， ondemand governor在降频时对于目标频率的选择完全可以更加激进。因此最新的 ondemand governor 在降频时会在所有可选频率中一次性选择出可以保证 CPU 工作在 80% 以上负荷的频率，当然如果没有任何一个可选频率满足要求的话则会选择 CPU 支持的最低运行频率。大量用户的测试结果表明这种新的算法可以在不影响系统性能的前提下做到更高效的节能。在算法改进后， ondemand governor 的名字并没有改变，而 ondemand governor 最初的实现也保存了下来，并且由于其算法的保守性而得名 conservative 。</p></li>
+</ul>
+<p>Ondemand降频更加激进，conservative降频比较缓慢保守，事实使用ondemand的效果也是比较好的。树莓派默认采用的降频机制：<code class="docutils literal notranslate"><span class="pre">/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor</span></code>是<code class="docutils literal notranslate"><span class="pre">ondemand</span></code></p>
+</section>
+<section id="sys">
+<h1>四、sys节点文件说明<a class="headerlink" href="#sys" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/sys/devices/system/cpu/cpu0/cpufreq</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">affected_cpus</span>     <span class="n">cpuinfo_min_freq</span>            <span class="n">scaling_available_frequencies</span>  <span class="n">scaling_driver</span>    <span class="n">scaling_min_freq</span>
+<span class="n">cpuinfo_cur_freq</span>  <span class="n">cpuinfo_transition_latency</span>  <span class="n">scaling_available_governors</span>    <span class="n">scaling_governor</span>  <span class="n">scaling_setspeed</span>
+<span class="n">cpuinfo_max_freq</span>  <span class="n">related_cpus</span>                <span class="n">scaling_cur_freq</span>               <span class="n">scaling_max_freq</span>  <span class="n">stats</span>
+</pre></div>
+</div>
+</li>
+<li><p>主要内容解释：</p>
+<ul class="simple">
+<li><p>cpuinfo_max_freq、cpuinfo_min_freq：分别给出了 CPU 硬件所支持的最高运行频率及最低运行频率，</p></li>
+<li><p>cpuinfo_cur_freq：则会从 CPU 硬件寄存器中读取 CPU 当前所处的运行频率。</p></li>
+<li><p>Governor在选择合适的运行频率时只会在 scaling_max_freq 和 scaling_min_freq 所确定的频率范围内进行选择</p></li>
+<li><p>scaling_cur_freq：返回的是 cpufreq 模块缓存的 CPU 当前运行频率，而不会对 CPU 硬件寄存器进行检查。</p></li>
+<li><p>scaling_available_governors：会告诉用户当前有哪些 governors 可供用户使用</p></li>
+<li><p>scaling_driver：则会显示该 CPU 所使用的变频驱动程序</p></li>
+<li><p>Scaling_governor：则会显示当前的管理策略，往这个上echo其他类型会有相应的转变。</p></li>
+<li><p>scaling_setspeed：需将governor类型切换为userspace，才会出现，往这个文件echo数值，会切换主频</p></li>
+<li><p>以下是将governor切换为ondemand后生成的ondemand文件夹下出现的配置文件。（conservative就不说了，不准备使用）：</p>
+<ul>
+<li><p>sampling_rate：当前使用的采样间隔 ，单位：微秒</p></li>
+<li><p>sampling_rate_min：允许使用的最短采样间隔</p></li>
+<li><p>sampling_rate_max：允许使用的最长采样间隔</p></li>
+<li><p>up_threshold ：表明了系统负载超过什么百分比时 ondemand governor 会自动提高 CPU 的运行频率</p></li>
+<li><p>ignore_nice_load：ignore_nice_load 文件可以设置为 0 或 1（0 是默认设置）。当这个参数设置为 1 时，任何具有 “nice”值的处理器不计入总处理器利用率。在设置为 0 时，所有处理器都计入利用率。</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="governor">
+<h1>五、设置governor方法<a class="headerlink" href="#governor" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">cpu</span>
+  <span class="o">*</span> <span class="n">cpu0</span><span class="o">/</span><span class="n">cpufreq</span>
+    <span class="o">*</span> <span class="n">scaling_governor</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

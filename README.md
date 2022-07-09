@@ -25,6 +25,7 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0016| [Thermal_Frequency](src/0016_Thermal_Frequency/README.md) | 热电偶（NTC）温控系统与CPU自动调频
 0015| [Sensor](src/0015_Sensor/README.md) | 理解Android Sensor体系架构
 0014| [MediaWiki](src/0014_MediaWiki/README.md) | 使用MediaWiki作为周报系统
 0013| [Linux](src/0013_Linux/README.md) | 记录一些零散的Linux方面的使用文档
