@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>thermal hwmon &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">thermal hwmon</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#driver">driver</a></li>
+<li><a class="reference internal" href="#sysfs">sysfs</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>thermal hwmon</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thermal-hwmon">
+<h1>thermal hwmon<a class="headerlink" href="#thermal-hwmon" title="Permalink to this headline"></a></h1>
+<p>the linux hardware monitoring kernel api</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://blog.foool.net/wp-content/uploads/linuxdocs/hwmon.pdf">Linux Hwmon Documentation</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/scarecrow_byr/article/details/104402354">Linux thermal子系统和lm_sensors用户态工具</a></p></li>
+</ul>
+</section>
+<section id="driver">
+<h1>driver<a class="headerlink" href="#driver" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">brcm,bcm2711-thermal</span></code>驱动probe，其通过<code class="docutils literal notranslate"><span class="pre">#thermal-sensor-cells</span></code>指定thermal zones中的索引策略，目前是0</p></li>
+<li><p>bcm2711_thermal驱动可以认为是传感器驱动，最终会挂在到<code class="docutils literal notranslate"><span class="pre">drivers/thermal/thermal_core.c</span></code>生成的thermal zone框架设备上，相当于绑定的动作</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/thermal/broadcom/bcm2711_thermal.c
+  └── module_platform_driver(bcm2711_thermal_driver);
+      └── static struct platform_driver bcm2711_thermal_driver
+          ├── .driver
+          │   └── .of_match_table = bcm2711_thermal_id_table,
+          │       └──  static const struct of_device_id bcm2711_thermal_id_table[]
+          │           └── { .compatible = &quot;brcm,bcm2711-thermal&quot; },
+          └── .probe = bcm2711_thermal_probe,
+              └── static int bcm2711_thermal_probe(struct platform_device *pdev)
+                  ├── thermal = devm_thermal_zone_of_sensor_register(dev, 0, priv, &amp;bcm2711_thermal_of_ops);
+                  │   ├── bcm2711_thermal_of_ops
+                  │   │   └── static const struct thermal_zone_of_device_ops bcm2711_thermal_of_ops
+                  │   │       └── .get_temp   = bcm2711_get_temp,
+                  │   │           └── static int bcm2711_get_temp(void *data, int *temp)
+                  │   │               ├── int slope = thermal_zone_get_slope(priv-&gt;thermal);
+                  │   │               ├── int offset = thermal_zone_get_offset(priv-&gt;thermal);
+                  │   │               ├── ret = regmap_read(priv-&gt;regmap, AVS_RO_TEMP_STATUS, &amp;val);
+                  │   │               ├── t = slope * val + offset;
+                  │   │               └── *temp = t &lt; 0 ? 0 : t;
+                  │   └── devm_thermal_zone_of_sensor_register(...);
+                  │       └── drivers/thermal/of-thermal.c
+                  │           └── struct thermal_zone_device *devm_thermal_zone_of_sensor_register(struct device *dev, int sensor_id, void *data, const struct thermal_zone_of_device_ops *ops)
+                  │               ├── ptr = devres_alloc(devm_thermal_zone_of_sensor_release, sizeof(*ptr), GFP_KERNEL);
+                  │               └── tzd = thermal_zone_of_sensor_register(dev, sensor_id, data, ops);
+                  │                   ├── np = of_find_node_by_name(NULL, &quot;thermal-zones&quot;);
+                  │                   │   └── 这是隐藏数据
+                  │                   ├── sensor_np = of_node_get(dev-&gt;of_node);
+                  │                   └── for_each_available_child_of_node(np, child)
+                  │                       ├── ret = of_parse_phandle_with_args(child, &quot;thermal-sensors&quot;, &quot;#thermal-sensor-cells&quot;, 0, &amp;sensor_specs);
+                  │                       └── if (sensor_specs.np == sensor_np &amp;&amp; id == sensor_id)
+                  │                           └── tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+                  │                               └── drivers/thermal/of-thermal.c
+                  │                                   └── static struct thermal_zone_device *thermal_zone_of_add_sensor(struct device_node *zone, struct device_node *sensor, void *data, const struct thermal_zone_of_device_ops *ops)
+                  │                                       ├── tzd = thermal_zone_get_zone_by_name(zone-&gt;name);
+                  │                                       │   └── drivers/thermal/thermal_core.c
+                  │                                       │       └── list_for_each_entry(pos, &amp;thermal_tz_list, node)
+                  │                                       │           └── if (!strncasecmp(name, pos-&gt;type, THERMAL_NAME_LENGTH))
+                  │                                       │               ├── found++;
+                  │                                       │               └── ref = pos;
+                  │                                       └── for_each_available_child_of_node(np, child)
+                  │                                           └── if (sensor_specs.np == sensor_np &amp;&amp; id == sensor_id)
+                  │                                               └── tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+                  │                                                   ├── tzd = thermal_zone_get_zone_by_name(zone-&gt;name);
+                  │                                                   ├── tzd-&gt;ops-&gt;get_temp = of_thermal_get_temp;
+                  │                                                   └── tzd-&gt;ops-&gt;get_trend = of_thermal_get_trend;
+                  └── ret = thermal_add_hwmon_sysfs(thermal);
+                      ├── hwmon = thermal_hwmon_lookup_by_type(tz);
+                      ├── hwmon = kzalloc(sizeof(*hwmon), GFP_KERNEL);
+                      ├── hwmon-&gt;device = hwmon_device_register_with_info(&amp;tz-&gt;device, hwmon-&gt;type, hwmon, NULL, NULL);
+                      ├── temp = kzalloc(sizeof(*temp), GFP_KERNEL);
+                      ├── snprintf(temp-&gt;temp_input.name, sizeof(temp-&gt;temp_input.name), &quot;temp%d_input&quot;, hwmon-&gt;count);
+                      ├── sysfs_attr_init(&amp;temp-&gt;temp_input.attr.attr);
+                      └── result = device_create_file(hwmon-&gt;device, &amp;temp-&gt;temp_input.attr);
+</pre></div>
+</div>
+</section>
+<section id="sysfs">
+<h1>sysfs<a class="headerlink" href="#sysfs" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>cd /sys/class/hwmon</p>
+<ul>
+<li><p>ls</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hwmon0</span>  <span class="n">hwmon1</span>
+</pre></div>
+</div>
+</li>
+<li><p>cd hwmon0</p></li>
+<li><p>cat name</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cpu_thermal</span>
+</pre></div>
+</div>
+</li>
+<li><p>cat temp1_input</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">45277</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

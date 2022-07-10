@@ -124,7 +124,8 @@ thermal-zones {
 
 # driver
 
-`brcm,bcm2711-thermal`驱动probe，其通过`#thermal-sensor-cells`指定thermal zones中的索引策略，目前是0
+* `brcm,bcm2711-thermal`驱动probe，其通过`#thermal-sensor-cells`指定thermal zones中的索引策略，目前是0
+* bcm2711_thermal驱动可以认为是传感器驱动，最终会挂在到`drivers/thermal/thermal_core.c`生成的thermal zone框架设备上，相当于绑定的动作
 
 ```
 * drivers/thermal/broadcom/bcm2711_thermal.c
@@ -158,4 +159,12 @@ thermal-zones {
                       * ret = of_parse_phandle_with_args(child, "thermal-sensors", "#thermal-sensor-cells", 0, &sensor_specs);
                       * if (sensor_specs.np == sensor_np && id == sensor_id)
                         * tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+                          * drivers/thermal/of-thermal.c
+                            * static struct thermal_zone_device *thermal_zone_of_add_sensor(struct device_node *zone, struct device_node *sensor, void *data, const struct thermal_zone_of_device_ops *ops)
+                              * tzd = thermal_zone_get_zone_by_name(zone->name);
+                                * drivers/thermal/thermal_core.c
+                                  * list_for_each_entry(pos, &thermal_tz_list, node)
+                                    * if (!strncasecmp(name, pos->type, THERMAL_NAME_LENGTH))
+                                      * found++;
+                                      * ref = pos;
 ```

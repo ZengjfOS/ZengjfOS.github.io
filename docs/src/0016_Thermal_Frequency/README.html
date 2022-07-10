@@ -39,6 +39,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">README</a></li>
+<li><a class="reference internal" href="#mtk-kernel">MTK kernel</a></li>
 <li><a class="reference internal" href="#docs">docs</a></li>
 </ul>
 </div>
@@ -69,6 +70,14 @@
 <h1>README<a class="headerlink" href="#readme" title="Permalink to this headline"></a></h1>
 <p>热电偶（NTC）温控系统与CPU自动调频</p>
 </section>
+<section id="mtk-kernel">
+<h1>MTK kernel<a class="headerlink" href="#mtk-kernel" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/MediaTek-Labs/common-kernel-4.19</p></li>
+<li><p>https://github.com/xiaomi-mt6765/android_kernel_xiaomi_mt6765</p></li>
+<li><p>https://github.com/mediatek-android-development/android_kernel_mediatek_mt6761-62-4.9</p></li>
+</ul>
+</section>
 <section id="docs">
 <h1>docs<a class="headerlink" href="#docs" title="Permalink to this headline"></a></h1>
 <table class="colwidths-auto docutils align-default">
@@ -79,6 +88,46 @@
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td class="text-center"><p>0013</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0013_thermal_core.html"><span class="doc std std-doc">thermal_core</span></a></p></td>
+<td class="text-left"><p>理解struct thermal_zone_device(framework)和struct __thermal_zone(NTC)的差异</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0012</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0012_thermal_hwmon.html"><span class="doc std std-doc">thermal_hwmon</span></a></p></td>
+<td class="text-left"><p>the linux hardware monitoring kernel api</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0011</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0011_btscharger%E6%B8%A9%E6%8E%A7%E5%A4%84%E7%90%86.html"><span class="doc std std-doc">btscharger温控处理</span></a></p></td>
+<td class="text-left"><p>触发thermal温度设置，cool设备进行温控处理</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0010</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0010_thermal_config.html"><span class="doc std std-doc">thermal_config</span></a></p></td>
+<td class="text-left"><p>温控配置</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0009</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0009_thermal%E9%87%87%E6%A0%B7%E5%91%A8%E6%9C%9F%E8%B0%83%E8%8A%82.html"><span class="doc std std-doc">thermal采样周期调节</span></a></p></td>
+<td class="text-left"><p>通过当前温度调节采样周期</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0008</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0008_thermal_manager.html"><span class="doc std std-doc">thermal_manager</span></a></p></td>
+<td class="text-left"><p>mtk thermal manager加载MTK温控策略</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0007</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0007_thermal_monitor.html"><span class="doc std std-doc">thermal_monitor</span></a></p></td>
+<td class="text-left"><p>thermal monitor注册thermal zone设备、thermal cooling设备</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0006</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0006_DELAYED_WORK.html"><span class="doc std std-doc">DELAYED_WORK</span></a></p></td>
+<td class="text-left"><p>每一个work对应一个处理函数，一个workqueue可以挂在多个work</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0005</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0005_thermal_zones_btscharger.html"><span class="doc std std-doc">thermal_zones_btscharger</span></a></p></td>
+<td class="text-left"><p>btscharger温度控制系统工作原理</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0004</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0004_NTC%E6%B8%A9%E5%BA%A6%E8%AE%A1%E7%AE%97.html"><span class="doc std std-doc">NTC温度计算</span></a></p></td>
+<td class="text-left"><p>NTC温度方法</p></td>
+</tr>
 <tr class="row-even"><td class="text-center"><p>0003</p></td>
 <td class="text-left"><p><a class="reference internal" href="docs/0003_Thermal_Zone.html"><span class="doc std std-doc">Thermal_Zone</span></a></p></td>
 <td class="text-left"><p>温控管理框架</p></td>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>thermal 采用周期调节 &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">thermal 采用周期调节</a></li>
+<li><a class="reference internal" href="#id1">采样周期调节</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>thermal 采用周期调节</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thermal">
+<h1>thermal 采用周期调节<a class="headerlink" href="#thermal" title="Permalink to this headline"></a></h1>
+<p>通过当前温度调节采样周期</p>
+</section>
+<section id="id1">
+<h1>采样周期调节<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p>kernel-4.19/drivers/misc/mediatek/thermal/common/thermal_zones/mtk_ts_btscharger.c</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* This is to preserve last temperature readings from charger driver.</span>
+<span class="cm"> * In case mtk_ts_charger.c fails to read temperature.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cm">/**</span>
+<span class="cm"> * If curr_temp &gt;= polling_trip_temp1, use interval</span>
+<span class="cm"> * else if cur_temp &gt;= polling_trip_temp2 &amp;&amp; curr_temp &lt; polling_trip_temp1,</span>
+<span class="cm"> *  use interval*polling_factor1</span>
+<span class="cm"> * else, use interval*polling_factor2</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">polling_trip_temp1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40000</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">polling_trip_temp2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20000</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">polling_factor1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5000</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">polling_factor2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10000</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// ...省略</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">mtktscharger_get_temp</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_zone_device</span><span class="w"> </span><span class="o">*</span><span class="n">thermal</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="o">*</span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mtktscharger_get_hw_temp</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">mtktscharger_dprintk</span><span class="p">(</span><span class="s">&quot;%s %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">t</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">85000</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">mtktscharger_dprintk_always</span><span class="p">(</span><span class="s">&quot;HT %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">t</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">polling_trip_temp1</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">thermal</span><span class="o">-&gt;</span><span class="n">polling_delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">polling_trip_temp2</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">thermal</span><span class="o">-&gt;</span><span class="n">polling_delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">polling_factor2</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">thermal</span><span class="o">-&gt;</span><span class="n">polling_delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">polling_factor1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p>interval是在系统启动的，由thermal manager加载emmc中的vendor/etc/.tp/thermal.conf，写入驱动的参数</p>
+<ul>
+<li><p><a class="reference internal" href="refers/0010_thermal.html"><span class="doc std std-doc">0010_thermal.txt</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">driver</span><span class="o">/</span><span class="n">thermal</span><span class="o">/</span><span class="n">tzcharger</span>
+<span class="mi">1</span> <span class="mi">120000</span> <span class="mi">0</span> <span class="n">mtktscharger</span><span class="o">-</span><span class="n">sysrst</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">0</span> <span class="mi">0</span> <span class="n">no</span><span class="o">-</span><span class="n">cooler</span> <span class="mi">2000</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Polling interval: 2000</p>
+<ul>
+<li><p>kernel-4.19/drivers/misc/mediatek/thermal/common/thermal_zones/mtk_ts_charger.c</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">interval;</span> <span class="pre">/*</span> <span class="pre">seconds,</span> <span class="pre">0</span> <span class="pre">:</span> <span class="pre">no</span> <span class="pre">auto</span> <span class="pre">polling</span> <span class="pre">*/</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

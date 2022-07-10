@@ -196,7 +196,10 @@
 </section>
 <section id="driver">
 <h1>driver<a class="headerlink" href="#driver" title="Permalink to this headline"></a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">brcm,bcm2711-thermal</span></code>驱动probe，其通过<code class="docutils literal notranslate"><span class="pre">#thermal-sensor-cells</span></code>指定thermal zones中的索引策略，目前是0</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">brcm,bcm2711-thermal</span></code>驱动probe，其通过<code class="docutils literal notranslate"><span class="pre">#thermal-sensor-cells</span></code>指定thermal zones中的索引策略，目前是0</p></li>
+<li><p>bcm2711_thermal驱动可以认为是传感器驱动，最终会挂在到<code class="docutils literal notranslate"><span class="pre">drivers/thermal/thermal_core.c</span></code>生成的thermal zone框架设备上，相当于绑定的动作</p></li>
+</ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/thermal/broadcom/bcm2711_thermal.c
   * module_platform_driver(bcm2711_thermal_driver);
     * static struct platform_driver bcm2711_thermal_driver
@@ -228,6 +231,14 @@
                       * ret = of_parse_phandle_with_args(child, &quot;thermal-sensors&quot;, &quot;#thermal-sensor-cells&quot;, 0, &amp;sensor_specs);
                       * if (sensor_specs.np == sensor_np &amp;&amp; id == sensor_id)
                         * tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+                          * drivers/thermal/of-thermal.c
+                            * static struct thermal_zone_device *thermal_zone_of_add_sensor(struct device_node *zone, struct device_node *sensor, void *data, const struct thermal_zone_of_device_ops *ops)
+                              * tzd = thermal_zone_get_zone_by_name(zone-&gt;name);
+                                * drivers/thermal/thermal_core.c
+                                  * list_for_each_entry(pos, &amp;thermal_tz_list, node)
+                                    * if (!strncasecmp(name, pos-&gt;type, THERMAL_NAME_LENGTH))
+                                      * found++;
+                                      * ref = pos;
 </pre></div>
 </div>
 </section>

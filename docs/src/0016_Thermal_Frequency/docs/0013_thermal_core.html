@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>thermal core &mdash; zengjf</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">thermal core</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#struct-thermal-zone-device">struct thermal_zone_device</a></li>
+<li><a class="reference internal" href="#struct-thermal-zone">struct __thermal_zone</a></li>
+<li><a class="reference internal" href="#thermal-zone-device">thermal zone device</a></li>
+<li><a class="reference internal" href="#thermal-zone">thermal zone</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>thermal core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thermal-core">
+<h1>thermal core<a class="headerlink" href="#thermal-core" title="Permalink to this headline"></a></h1>
+<p>理解struct thermal_zone_device(framework)和struct __thermal_zone(NTC)的差异</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://blog.foool.net/wp-content/uploads/linuxdocs/hwmon.pdf">Linux Hwmon Documentation</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/scarecrow_byr/article/details/104402354">Linux thermal子系统和lm_sensors用户态工具</a></p></li>
+</ul>
+</section>
+<section id="struct-thermal-zone-device">
+<h1>struct thermal_zone_device<a class="headerlink" href="#struct-thermal-zone-device" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>这部分与设备树中的thermal_zones的每个节点对应，由thermal_core初始化，其代表的是所有thermal的thermal_zone的框架</p></li>
+<li><p>其中的devdata会指向struct __thermal_zone，struct __thermal_zone表示一个实际的thermal设备，struct thermal_zone_device是框架，devdata来做到差异化，以及做到分离注册机制</p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="c1">// include/linux/thermal.h</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * struct thermal_zone_device - structure for a thermal zone</span>
+<span class="cm"> * @id:     unique id number for each thermal zone</span>
+<span class="cm"> * @type:   the thermal zone device type</span>
+<span class="cm"> * @device: &amp;struct device for this thermal zone</span>
+<span class="cm"> * @trip_temp_attrs:    attributes for trip points for sysfs: trip temperature</span>
+<span class="cm"> * @trip_type_attrs:    attributes for trip points for sysfs: trip type</span>
+<span class="cm"> * @trip_hyst_attrs:    attributes for trip points for sysfs: trip hysteresis</span>
+<span class="cm"> * @devdata:    private pointer for device private data</span>
+<span class="cm"> * @trips:  number of trip points the thermal zone supports</span>
+<span class="cm"> * @trips_disabled; bitmap for disabled trips</span>
+<span class="cm"> * @passive_delay:  number of milliseconds to wait between polls when</span>
+<span class="cm"> *          performing passive cooling.</span>
+<span class="cm"> * @polling_delay:  number of milliseconds to wait between polls when</span>
+<span class="cm"> *          checking whether trip points have been crossed (0 for</span>
+<span class="cm"> *          interrupt driven systems)</span>
+<span class="cm"> * @temperature:    current temperature.  This is only for core code,</span>
+<span class="cm"> *          drivers should use thermal_zone_get_temp() to get the</span>
+<span class="cm"> *          current temperature</span>
+<span class="cm"> * @last_temperature:   previous temperature read</span>
+<span class="cm"> * @emul_temperature:   emulated temperature when using CONFIG_THERMAL_EMULATION</span>
+<span class="cm"> * @passive:        1 if you&#39;ve crossed a passive trip point, 0 otherwise.</span>
+<span class="cm"> * @prev_low_trip:  the low current temperature if you&#39;ve crossed a passive</span>
+<span class="cm">            trip point.</span>
+<span class="cm"> * @prev_high_trip: the above current temperature if you&#39;ve crossed a</span>
+<span class="cm">            passive trip point.</span>
+<span class="cm"> * @forced_passive: If &gt; 0, temperature at which to switch on all ACPI</span>
+<span class="cm"> *          processor cooling devices.  Currently only used by the</span>
+<span class="cm"> *          step-wise governor.</span>
+<span class="cm"> * @need_update:    if equals 1, thermal_zone_device_update needs to be invoked.</span>
+<span class="cm"> * @ops:    operations this &amp;thermal_zone_device supports</span>
+<span class="cm"> * @tzp:    thermal zone parameters</span>
+<span class="cm"> * @governor:   pointer to the governor for this thermal zone</span>
+<span class="cm"> * @governor_data:  private pointer for governor data</span>
+<span class="cm"> * @thermal_instances:  list of &amp;struct thermal_instance of this thermal zone</span>
+<span class="cm"> * @ida:    &amp;struct ida to generate unique id for this zone&#39;s cooling</span>
+<span class="cm"> *      devices</span>
+<span class="cm"> * @lock:   lock to protect thermal_instances list</span>
+<span class="cm"> * @node:   node in thermal_tz_list (in thermal_core.c)</span>
+<span class="cm"> * @poll_queue: delayed work for polling</span>
+<span class="cm"> * @notify_event: Last notification event</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">thermal_zone_device</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">type</span><span class="p">[</span><span class="n">THERMAL_NAME_LENGTH</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="n">device</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">attribute_group</span><span class="w"> </span><span class="n">trips_attribute_group</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_attr</span><span class="w"> </span><span class="o">*</span><span class="n">trip_temp_attrs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_attr</span><span class="w"> </span><span class="o">*</span><span class="n">trip_type_attrs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_attr</span><span class="w"> </span><span class="o">*</span><span class="n">trip_hyst_attrs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">devdata</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">trips</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">trips_disabled</span><span class="p">;</span><span class="w">   </span><span class="cm">/* bitmap for disabled trips */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">passive_delay</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">polling_delay</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">temperature</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">last_temperature</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">emul_temperature</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">passive</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">prev_low_trip</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">prev_high_trip</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">forced_passive</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">atomic_t</span><span class="w"> </span><span class="n">need_update</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_zone_device_ops</span><span class="w"> </span><span class="o">*</span><span class="n">ops</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_zone_params</span><span class="w"> </span><span class="o">*</span><span class="n">tzp</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_governor</span><span class="w"> </span><span class="o">*</span><span class="n">governor</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">governor_data</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">list_head</span><span class="w"> </span><span class="n">thermal_instances</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">ida</span><span class="w"> </span><span class="n">ida</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">mutex</span><span class="w"> </span><span class="n">lock</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">list_head</span><span class="w"> </span><span class="n">node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">delayed_work</span><span class="w"> </span><span class="n">poll_queue</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">enum</span><span class="w"> </span><span class="n">thermal_notify_event</span><span class="w"> </span><span class="n">notify_event</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="struct-thermal-zone">
+<h1>struct __thermal_zone<a class="headerlink" href="#struct-thermal-zone" title="Permalink to this headline"></a></h1>
+<p>实际thermal设备，对应struct thermal_zone_device中的devdata，一般我们写的驱动是这个，他会和上面的thermal_zone框架中的设备对应、绑定</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="c1">// drivers/thermal/of-thermal.c</span>
+
+<span class="cm">/** </span>
+<span class="cm"> * struct __thermal_zone - internal representation of a thermal zone</span>
+<span class="cm"> * @mode: current thermal zone device mode (enabled/disabled)</span>
+<span class="cm"> * @passive_delay: polling interval while passive cooling is activated</span>
+<span class="cm"> * @polling_delay: zone polling interval</span>
+<span class="cm"> * @slope: slope of the temperature adjustment curve</span>
+<span class="cm"> * @offset: offset of the temperature adjustment curve</span>
+<span class="cm"> * @ntrips: number of trip points</span>
+<span class="cm"> * @trips: an array of trip points (0..ntrips - 1)</span>
+<span class="cm"> * @num_tbps: number of thermal bind params</span>
+<span class="cm"> * @tbps: an array of thermal bind params (0..num_tbps - 1)</span>
+<span class="cm"> * @sensor_data: sensor private data used while reading temperature and trend</span>
+<span class="cm"> * @ops: set of callbacks to handle the thermal zone based on DT</span>
+<span class="cm"> */</span><span class="w">            </span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">__thermal_zone</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">enum</span><span class="w"> </span><span class="n">thermal_device_mode</span><span class="w"> </span><span class="n">mode</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">passive_delay</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">polling_delay</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">slope</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">offset</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="cm">/* trip data */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ntrips</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_trip</span><span class="w"> </span><span class="o">*</span><span class="n">trips</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span>
+<span class="w">    </span><span class="cm">/* cooling binding data */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">num_tbps</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">__thermal_bind_params</span><span class="w"> </span><span class="o">*</span><span class="n">tbps</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="cm">/* sensor interface */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">sensor_data</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">thermal_zone_of_device_ops</span><span class="w"> </span><span class="o">*</span><span class="n">ops</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"> </span>
+</pre></div>
+</div>
+</section>
+<section id="thermal-zone-device">
+<h1>thermal zone device<a class="headerlink" href="#thermal-zone-device" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>一个thermal zone device和设备树中的thermal_zones中的一个配置对应，默认其devdata(struct __thermal_zone)是没有处理函数的，需要对应的devdata设备注册才会填充，也就是thermal zone device只是一个系统性的框架，不同的devdata通过其自身驱动注册绑定到对应的thermal zone device上；</p></li>
+<li><p>thermal zone device有自己操作函数，devdata也有自己的操作函数，对于像温度获取，一般是thermal zone device通过devdata来最终获取温度；</p></li>
+<li><p>这里的thermal zone device和devdata需要好好理解，devdata的驱动更多偏向于注册其处理函数；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/thermal/thermal_core.c
+  └── fs_initcall(thermal_init);
+      └── static int __init thermal_init(void)
+          ├── result = thermal_register_governors();
+          ├── result = of_parse_thermal_zones();
+          │   └── drivers/thermal/of-thermal.c
+          │       └── int __init of_parse_thermal_zones(void)
+          │           ├── np = of_find_node_by_name(NULL, &quot;thermal-zones&quot;);
+          │           └── for_each_available_child_of_node(np, child)
+          │               ├── tz = thermal_of_build_thermal_zone(child);
+          │               │   ├── tz = kzalloc(sizeof(*tz), GFP_KERNEL);
+          │               │   ├── ret = of_property_read_u32(np, &quot;polling-delay-passive&quot;, &amp;prop);
+          │               │   ├── ret = of_property_read_u32(np, &quot;polling-delay&quot;, &amp;prop);
+          │               │   ├── ret = of_property_read_u32_array(np, &quot;coefficients&quot;, coef, 2);
+          │               │   ├── child = of_get_child_by_name(np, &quot;trips&quot;);
+          │               │   └── zone = thermal_zone_device_register(child-&gt;name, tz-&gt;ntrips, mask, tz, ops, tzp, tz-&gt;passive_delay, tz-&gt;polling_delay);
+          │               └── ops = kmemdup(&amp;of_thermal_ops, sizeof(*ops), GFP_KERNEL);
+          │                   └── of_thermal_ops
+          │                       └── static struct thermal_zone_device_ops of_thermal_ops
+          │                           ├── .get_mode = of_thermal_get_mode,
+          │                           ├── .set_mode = of_thermal_set_mode,
+          │                           ├── .get_trip_type = of_thermal_get_trip_type,
+          │                           ├── .get_trip_temp = of_thermal_get_trip_temp,
+          │                           ├── .set_trip_temp = of_thermal_set_trip_temp,
+          │                           ├── .get_trip_hyst = of_thermal_get_trip_hyst,
+          │                           ├── .set_trip_hyst = of_thermal_set_trip_hyst,
+          │                           ├── .get_crit_temp = of_thermal_get_crit_temp,
+          │                           ├── .bind = of_thermal_bind,
+          │                           └── .unbind = of_thermal_unbind,
+          └── result = register_pm_notifier(&amp;thermal_pm_nb);
+              └── static struct notifier_block thermal_pm_nb
+                  └── .notifier_call = thermal_pm_notify,
+                      └── static int thermal_pm_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
+                          └── list_for_each_entry(tz, &amp;thermal_tz_list, node)
+                              └── thermal_zone_device_update(tz, THERMAL_EVENT_UNSPECIFIED);
+                                  ├── update_temperature(tz);
+                                  │   └── ret = thermal_zone_get_temp(tz, &amp;temp);
+                                  │       └── drivers/thermal/thermal_helpers.c
+                                  │           └── ret = tz-&gt;ops-&gt;get_temp(tz, temp);
+                                  │               └── drivers/thermal/of-thermal.c
+                                  │                   └── static int of_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
+                                  │                       └── struct __thermal_zone *data = tz-&gt;devdata;
+                                  │                           └── return data-&gt;ops-&gt;get_temp(data-&gt;sensor_data, temp);
+                                  ├── thermal_zone_set_trips(tz);
+                                  │   └── drivers/thermal/thermal_helpers.c
+                                  │       └── void thermal_zone_set_trips(struct thermal_zone_device *tz)
+                                  │           ├── for (i = 0; i &lt; tz-&gt;trips; i++)
+                                  │           │   ├── tz-&gt;ops-&gt;get_trip_temp(tz, i, &amp;trip_temp);
+                                  │           │   └── tz-&gt;ops-&gt;get_trip_hyst(tz, i, &amp;hysteresis);
+                                  │           └── ret = tz-&gt;ops-&gt;set_trips(tz, low, high);
+                                  └── for (count = 0; count &lt; tz-&gt;trips; count++)
+                                      └── handle_thermal_trip(tz, count);
+                                          ├── tz-&gt;ops-&gt;get_trip_type(tz, trip, &amp;type);
+                                          ├── if (type == THERMAL_TRIP_CRITICAL || type == THERMAL_TRIP_HOT)
+                                          │   └── handle_critical_trips(tz, trip, type);
+                                          │       ├── tz-&gt;ops-&gt;get_trip_temp(tz, trip, &amp;trip_temp);
+                                          │       ├── trace_thermal_zone_trip(tz, trip, trip_type);
+                                          │       └── if (trip_type == THERMAL_TRIP_CRITICAL)
+                                          │           ├── dev_emerg(&amp;tz-&gt;device, &quot;critical temperature reached (%d C), shutting down\n&quot;, tz-&gt;temperature / 1000);
+                                          │           └── if (!power_off_triggered)
+                                          │               ├── thermal_emergency_poweroff();
+                                          │               ├── orderly_poweroff(true);
+                                          │               └── power_off_triggered = true;
+                                          └── monitor_thermal_zone(tz);
+                                              └── thermal_zone_device_set_polling(tz, 0);
+</pre></div>
+</div>
+</section>
+<section id="thermal-zone">
+<h1>thermal zone<a class="headerlink" href="#thermal-zone" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>其实这里叫thermal貌似更合适，表示一个thermal设备</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">brcm,bcm2711-thermal</span></code>驱动probe，其通过<code class="docutils literal notranslate"><span class="pre">#thermal-sensor-cells</span></code>指定thermal zones中的索引，目前是0</p></li>
+<li><p>bcm2711_thermal驱动可以认为是传感器驱动，最终会挂在到<code class="docutils literal notranslate"><span class="pre">drivers/thermal/thermal_core.c</span></code>生成的thermal zone框架设备上，相当于绑定的动作</p></li>
+<li><p>主要是向thermal zone device的devdata注册实际NTC传感器调用函数，例如温度获取函数；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/thermal/broadcom/bcm2711_thermal.c
+  └── module_platform_driver(bcm2711_thermal_driver);
+      └── static struct platform_driver bcm2711_thermal_driver
+          ├── .driver
+          │   └── .of_match_table = bcm2711_thermal_id_table,
+          │       └──  static const struct of_device_id bcm2711_thermal_id_table[]
+          │           └── { .compatible = &quot;brcm,bcm2711-thermal&quot; },
+          └── .probe = bcm2711_thermal_probe,
+              └── static int bcm2711_thermal_probe(struct platform_device *pdev)
+                  ├── thermal = devm_thermal_zone_of_sensor_register(dev, 0, priv, &amp;bcm2711_thermal_of_ops);
+                  │   ├── bcm2711_thermal_of_ops
+                  │   │   └── static const struct thermal_zone_of_device_ops bcm2711_thermal_of_ops
+                  │   │       └── .get_temp   = bcm2711_get_temp,
+                  │   │           └── static int bcm2711_get_temp(void *data, int *temp)
+                  │   │               ├── int slope = thermal_zone_get_slope(priv-&gt;thermal);
+                  │   │               ├── int offset = thermal_zone_get_offset(priv-&gt;thermal);
+                  │   │               ├── ret = regmap_read(priv-&gt;regmap, AVS_RO_TEMP_STATUS, &amp;val);
+                  │   │               ├── t = slope * val + offset;
+                  │   │               └── *temp = t &lt; 0 ? 0 : t;
+                  │   └── devm_thermal_zone_of_sensor_register(...);
+                  │       └── drivers/thermal/of-thermal.c
+                  │           └── struct thermal_zone_device *devm_thermal_zone_of_sensor_register(struct device *dev, int sensor_id, void *data, const struct thermal_zone_of_device_ops *ops)
+                  │               ├── ptr = devres_alloc(devm_thermal_zone_of_sensor_release, sizeof(*ptr), GFP_KERNEL);
+                  │               └── tzd = thermal_zone_of_sensor_register(dev, sensor_id, data, ops);
+                  │                   ├── np = of_find_node_by_name(NULL, &quot;thermal-zones&quot;);
+                  │                   │   └── 这是隐藏数据
+                  │                   ├── sensor_np = of_node_get(dev-&gt;of_node);
+                  │                   └── for_each_available_child_of_node(np, child)
+                  │                       ├── ret = of_parse_phandle_with_args(child, &quot;thermal-sensors&quot;, &quot;#thermal-sensor-cells&quot;, 0, &amp;sensor_specs);
+                  │                       └── if (sensor_specs.np == sensor_np &amp;&amp; id == sensor_id)
+                  │                           └── tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+                  │                               └── drivers/thermal/of-thermal.c
+                  │                                   └── static struct thermal_zone_device *thermal_zone_of_add_sensor(struct device_node *zone, struct device_node *sensor, void *data, const struct thermal_zone_of_device_ops *ops)
+                  │                                       ├── tzd = thermal_zone_get_zone_by_name(zone-&gt;name);
+                  │                                       │   └── drivers/thermal/thermal_core.c
+                  │                                       │       └── list_for_each_entry(pos, &amp;thermal_tz_list, node)
+                  │                                       │           └── if (!strncasecmp(name, pos-&gt;type, THERMAL_NAME_LENGTH))
+                  │                                       │               ├── found++;
+                  │                                       │               └── ref = pos;
+                  │                                       └── for_each_available_child_of_node(np, child)
+                  │                                           └── if (sensor_specs.np == sensor_np &amp;&amp; id == sensor_id)
+                  │                                               └── tzd = thermal_zone_of_add_sensor(child, sensor_np, data, ops);
+                  │                                                   ├── tzd = thermal_zone_get_zone_by_name(zone-&gt;name);
+                  │                                                   ├── tzd-&gt;ops-&gt;get_temp = of_thermal_get_temp;
+                  │                                                   └── tzd-&gt;ops-&gt;get_trend = of_thermal_get_trend;
+                  └── ret = thermal_add_hwmon_sysfs(thermal);
+                      ├── hwmon = kzalloc(sizeof(*hwmon), GFP_KERNEL);
+                      ├── hwmon-&gt;device = hwmon_device_register_with_info(&amp;tz-&gt;device, hwmon-&gt;type, hwmon, NULL, NULL);
+                      ├── temp = kzalloc(sizeof(*temp), GFP_KERNEL);
+                      ├── snprintf(temp-&gt;temp_input.name, sizeof(temp-&gt;temp_input.name), &quot;temp%d_input&quot;, hwmon-&gt;count);
+                      ├── sysfs_attr_init(&amp;temp-&gt;temp_input.attr.attr);
+                      └── result = device_create_file(hwmon-&gt;device, &amp;temp-&gt;temp_input.attr);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
