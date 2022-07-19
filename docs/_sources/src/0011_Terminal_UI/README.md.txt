@@ -6,6 +6,7 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0005| [终端字符宽度](docs/0005_终端字符宽度.md) | 终端中一个中文占两个字符宽度
 0004| [curses_window](docs/0004_curses_window.md) | curses简单处理基本的绘制窗口、键盘事件、重绘界面
 0003| [curses](docs/0003_curses.md) | 使用curses制作的命令行界面示例
 0002| [urwid_graph](docs/0002_urwid_graph.md) | 分析graph example工作原理，便于入门
