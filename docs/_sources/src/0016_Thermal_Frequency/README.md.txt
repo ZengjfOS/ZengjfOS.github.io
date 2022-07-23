@@ -12,6 +12,8 @@
 
 NO.|文件名称|摘要
 :--:|:--|:--
+0015| [CPUFreq_schedutil](docs/0015_CPUFreq_schedutil.md) | scheduler和调频建立起更加紧密的联系，同时提升了性能和功耗表现
+0014| [CPUFreq](docs/0014_CPUFreq.md) | 理解CPU自动调频
 0013| [thermal_core](docs/0013_thermal_core.md) | 理解struct thermal_zone_device(framework)和struct __thermal_zone(NTC)的差异
 0012| [thermal_hwmon](docs/0012_thermal_hwmon.md) | the linux hardware monitoring kernel api
 0011| [btscharger温控处理](docs/0011_btscharger温控处理.md) | 触发thermal温度设置，cool设备进行温控处理
