@@ -2,22 +2,13 @@
 
 使用Sphinx，配合myst_parser插件，将Markdown文档生成GitHub Pages
 
-# 发行PyPi处理流程
+# 使用方法
 
-* pip3 install twine
-* https://pypi.org/
-  * 注册帐号
-* python3 setup.py sdist bdist_wheel
-* twine upload dist/*
-  ```
-  Uploading distributions to https://upload.pypi.org/legacy/
-  Enter your username: zengjf
-  Enter your password:
-  Uploading VisualLog-0.0.0-py3-none-any.whl
-  100% ---------------------------------------- 8.4/8.4 kB • 00:00 • ?
-  Uploading VisualLog-0.0.0.tar.gz
-  100% ---------------------------------------- 6.6/6.6 kB • 00:00 • ?
-  
-  View at:
-  https://pypi.org/project/VisualLog/0.0.0/
-  ```
+* pip3 install SphinxPages
+* 命令行中执行：SphinxPages
+* `make html`
+  * 生成网页
+* `make server`
+  * http://127.0.0.1:8080/
+* `make docs`
+  * 将`make html`生成的网页拷贝到`docs`目录

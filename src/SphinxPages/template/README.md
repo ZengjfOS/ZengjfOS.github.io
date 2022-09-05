@@ -4,6 +4,8 @@
 
 # 使用方法
 
+* pip3 install SphinxPages
+* 命令行中执行：SphinxPages
 * `make html`
   * 生成网页
 * `make server`

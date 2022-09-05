@@ -10,25 +10,28 @@ def main():
     currentFolder = os.getcwd()
     templateFolder = os.path.join(folder, 'template')
 
-    dirArray = ["_static"]
-    fileArray = ["make.bat", "Makefile", "conf.py"]
+    dirArray = ["_static", "_templates"]
+    fileArray = ["make.bat", "Makefile"]
 
     for info in dirArray:
         if path.exists(os.path.join(currentFolder, info)):
             shutil.rmtree(os.path.join(currentFolder, info))
+
+        shutil.copytree(os.path.join(templateFolder, info), os.path.join(currentFolder, info))
+
     for info in fileArray:
         if path.exists(os.path.join(currentFolder, info)):
             os.remove(os.path.join(currentFolder, info))
+
+        shutil.copy(os.path.join(templateFolder, info), currentFolder)
     
-    shutil.copytree(os.path.join(templateFolder, '_static'), os.path.join(currentFolder, '_static'))
-    shutil.copy(os.path.join(templateFolder, 'make.bat'), currentFolder)
-    shutil.copy(os.path.join(templateFolder, 'Makefile'), currentFolder)
     if not path.exists(os.path.join(currentFolder, "docs")):
         os.mkdir(os.path.join(currentFolder, 'docs'))
     if not path.exists(os.path.join(currentFolder, "README.md")):
         shutil.copy(os.path.join(templateFolder, 'README.md'), currentFolder)
 
 
+    author = ""
     with open(os.path.join(templateFolder, 'conf.py'), "r") as inputFd:
         with open(os.path.join(currentFolder, 'conf.py'), "w") as outputFd:
             for line in inputFd:
@@ -42,6 +45,13 @@ def main():
                     continue
                 
                 outputFd.write(line)
+
+    with open(os.path.join(currentFolder, '_templates/layout.html'), "w") as outputFd:
+        outputFd.write("{% extends '!layout.html' %}\n")
+        outputFd.write("\n")
+        outputFd.write("{% block htmltitle %}\n")
+        outputFd.write("<title>" + author + "</title>\n")
+        outputFd.write("{% endblock -%}\n")
 
     if not path.exists(os.path.join(currentFolder, "CNAME")):
         with open(os.path.join(currentFolder, 'CNAME'), "w") as outputFd:

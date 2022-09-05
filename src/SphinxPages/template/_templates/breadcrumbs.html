@@ -1,0 +1,12 @@
+{% extends '!breadcrumbs.html' %}
+
+{% block breadcrumbs %} 
+<li><a href="{{ pathto(master_doc) }}" class="icon icon-home"></a> &raquo;</li>
+  {%- for doc in parents %}
+    <li><a href="{{ doc.link|e }}">{{ doc.title }}</a> &raquo;</li>
+  {%- endfor %}
+<li>{{ title }}</li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+{% endblock %} 
