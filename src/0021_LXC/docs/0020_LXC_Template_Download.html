@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">LXC Template Download</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">文件系统路径</a></li>
+<li><a class="reference internal" href="#steps">Steps</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lxc-template-download">
+<h1>LXC Template Download<a class="headerlink" href="#lxc-template-download" title="Permalink to this headline"></a></h1>
+<p>Busybox系统用于LXC原理分析，Ubuntu用于容器性能分析</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.bonsaiframework.com/wiki/display/bonsai/Download+Additional+LXC+Image+Templates">Download Additional LXC Image Templates</a></p></li>
+<li><p><a class="reference external" href="https://uk.images.linuxcontainers.org/">Image server for LXC and LXD</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>文件系统路径<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>/var/lib/lxc/</p></li>
+</ul>
+</section>
+<section id="steps">
+<h1>Steps<a class="headerlink" href="#steps" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo su</p></li>
+<li><p>export PATH=/home/pi/zengjf/lxc/src/lxc:$PATH</p></li>
+<li><p>chmod +x /usr/local/share/lxc/templates/lxc-download</p></li>
+<li><p>mkdir /usr/local/share/lxc/config/</p></li>
+<li><p>sudo cp config/templates/* /usr/local/share/lxc/config/ -r</p></li>
+<li><p>lxc-create –template download –name ubuntu</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nd">@raspberrypi</span><span class="p">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">templates</span><span class="c1"># lxc-create --template download --name ubuntu</span>
+<span class="n">Setting</span> <span class="n">up</span> <span class="n">the</span> <span class="n">GPG</span> <span class="n">keyring</span>
+<span class="n">Downloading</span> <span class="n">the</span> <span class="n">image</span> <span class="n">index</span>
+
+<span class="o">---</span>
+<span class="n">DIST</span>    <span class="n">RELEASE</span> <span class="n">ARCH</span>    <span class="n">VARIANT</span> <span class="n">BUILD</span>
+<span class="o">---</span>
+<span class="n">alpine</span>  <span class="mf">3.10</span>    <span class="n">amd64</span>   <span class="n">default</span> <span class="mi">20210416_13</span><span class="p">:</span><span class="mi">00</span>
+<span class="n">alpine</span>  <span class="mf">3.10</span>    <span class="n">arm64</span>   <span class="n">default</span> <span class="mi">20210416_13</span><span class="p">:</span><span class="mi">00</span>
+<span class="n">alpine</span>  <span class="mf">3.10</span>    <span class="n">armhf</span>   <span class="n">default</span> <span class="mi">20210416_13</span><span class="p">:</span><span class="mi">02</span>
+<span class="n">alpine</span>  <span class="mf">3.10</span>    <span class="n">i386</span>    <span class="n">default</span> <span class="mi">20210416_13</span><span class="p">:</span><span class="mi">00</span>
+<span class="n">alpine</span>  <span class="mf">3.10</span>    <span class="n">ppc64el</span> <span class="n">default</span> <span class="mi">20210416_13</span><span class="p">:</span><span class="mi">00</span>
+<span class="o">...</span><span class="n">省略</span>
+<span class="n">ubuntu</span>  <span class="n">trusty</span>  <span class="n">i386</span>    <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="n">ubuntu</span>  <span class="n">trusty</span>  <span class="n">ppc64el</span> <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">57</span>
+<span class="n">ubuntu</span>  <span class="n">xenial</span>  <span class="n">amd64</span>   <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="n">ubuntu</span>  <span class="n">xenial</span>  <span class="n">arm64</span>   <span class="n">default</span> <span class="mi">20210416_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="n">ubuntu</span>  <span class="n">xenial</span>  <span class="n">armhf</span>   <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="n">ubuntu</span>  <span class="n">xenial</span>  <span class="n">i386</span>    <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="n">ubuntu</span>  <span class="n">xenial</span>  <span class="n">ppc64el</span> <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="n">ubuntu</span>  <span class="n">xenial</span>  <span class="n">s390x</span>   <span class="n">default</span> <span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span>
+<span class="o">...</span><span class="n">省略</span>
+<span class="o">---</span>
+
+<span class="n">Distribution</span><span class="p">:</span>
+<span class="n">ubuntu</span>
+<span class="n">Release</span><span class="p">:</span>
+<span class="n">xenial</span>
+<span class="n">Architecture</span><span class="p">:</span>
+<span class="n">armhf</span>
+
+<span class="n">Downloading</span> <span class="n">the</span> <span class="n">image</span> <span class="n">index</span>
+<span class="n">Downloading</span> <span class="n">the</span> <span class="n">rootfs</span>
+<span class="n">Downloading</span> <span class="n">the</span> <span class="n">metadata</span>
+<span class="n">The</span> <span class="n">image</span> <span class="n">cache</span> <span class="ow">is</span> <span class="n">now</span> <span class="n">ready</span>
+<span class="n">Unpacking</span> <span class="n">the</span> <span class="n">rootfs</span>
+
+<span class="o">---</span>
+<span class="n">You</span> <span class="n">just</span> <span class="n">created</span> <span class="n">an</span> <span class="n">Ubuntu</span> <span class="n">xenial</span> <span class="n">armhf</span> <span class="p">(</span><span class="mi">20210417_07</span><span class="p">:</span><span class="mi">42</span><span class="p">)</span> <span class="n">container</span><span class="o">.</span>
+
+<span class="n">To</span> <span class="n">enable</span> <span class="n">SSH</span><span class="p">,</span> <span class="n">run</span><span class="p">:</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">openssh</span><span class="o">-</span><span class="n">server</span>
+<span class="n">No</span> <span class="n">default</span> <span class="n">root</span> <span class="ow">or</span> <span class="n">user</span> <span class="n">password</span> <span class="n">are</span> <span class="nb">set</span> <span class="n">by</span> <span class="n">LXC</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-start ubuntu</p></li>
+<li><p>lxc-attach -n ubuntu</p>
+<ul class="simple">
+<li><p>passwd</p></li>
+</ul>
+</li>
+<li><p>lxc-console -n ubuntu -t 0</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

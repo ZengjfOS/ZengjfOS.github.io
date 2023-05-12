@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/login.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">USB</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">开发工具、示例</a></li>
+<li><a class="reference internal" href="#schematic">Schematic</a></li>
+<li><a class="reference internal" href="#docs">docs</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usb">
+<h1>USB<a class="headerlink" href="#usb" title="Permalink to this headline"></a></h1>
+<p>之前有看过几次USB方面的书，也移植过USB驱动，不过一直也没什么时间投入来研究USB底层通信里面的东西，这次打算花点时间系统性刨根究底的分析一次</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://item.taobao.com/item.htm?spm=a230r.1.14.34.36aa2429c1z3Fr&amp;id=522553287560&amp;ns=1&amp;abbucket=6#detail">EZ-USB FX2LP CY7C68013A USB 开发板 逻辑分析仪YourCee</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/part/cy7c68013a-56pvxc">CY7C68013A-56PVXC</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/documentation/application-notes/an65209-getting-started-fx2lp">AN65209 - Getting Started with FX2LP™</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/file/44946/download">AN65209 Getting Started with FX2LP(Chinese).pdf</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/documentation/development-kitsboards/cy3684-ez-usb-fx2lp-development-kit">CY3684 EZ-USB FX2LP Development Kit</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/documentation/technical-reference-manuals/ez-usb-technical-reference-manual">EZ-USB® Technical Reference Manual</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/documentation/software-and-drivers/suiteusb-34-usb-development-tools-visual-studio">SuiteUSB 3.4 - USB Development tools for Visual Studio</a></p></li>
+<li><p><a class="reference external" href="https://community.cypress.com/docs/DOC-12366">Drivers for EZ-USB® FX1™, FX2LP™ , and FX3 - KBA94413</a></p></li>
+<li><p><a class="reference external" href="http://www.cypress.com/documentation/code-examples/usb-hi-speed-code-examples">USB Hi-Speed Code Examples</a></p></li>
+<li><p><a class="reference external" href="http://www.ti.com/tool/TIDA-01243?tdsourcetag=s_pcqq_aiomsg">USB Type-C™ and Power Delivery Minidock With Video and Charging Support Reference Design</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>开发工具、示例<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><a class="reference external" href="http://www.cypress.com/file/135301">CY3684 EZ-USB FX2LP DVK Setup (Kit Design Files, Kiel IDE,GPIF Designer, Host applications, Documentation, Examples)</a></p>
+</section>
+<section id="schematic">
+<h1>Schematic<a class="headerlink" href="#schematic" title="Permalink to this headline"></a></h1>
+<p><img alt="0000_CY7C68013A_Schematic.png" src="../../_images/0000_CY7C68013A_Schematic.png" /></p>
+</section>
+<section id="docs">
+<h1>docs<a class="headerlink" href="#docs" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>NO.</p></th>
+<th class="text-left head"><p>文件名称</p></th>
+<th class="text-left head"><p>摘要</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>0024</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0024_USB_Keyboard.html"><span class="doc std std-doc">USB_Keyboard</span></a></p></td>
+<td class="text-left"><p>USB键盘驱动分析</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0023</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0023_USB_Camera_UVC.html"><span class="doc std std-doc">USB_Camera_UVC</span></a></p></td>
+<td class="text-left"><p>USB Camera数据通信原理</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0022</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0022_Vendor_Command.html"><span class="doc std std-doc">Vendor_Command</span></a></p></td>
+<td class="text-left"><p>如何定义Vendor命令</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0021</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0021_GPIF.html"><span class="doc std std-doc">GPIF</span></a></p></td>
+<td class="text-left"><p>GPIF接口使用</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0020</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0020_Keil.html"><span class="doc std std-doc">Keil</span></a></p></td>
+<td class="text-left"><p>Keil使用方法</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0019</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0019_Linux_Compile.html"><span class="doc std std-doc">Linux_Compile</span></a></p></td>
+<td class="text-left"><p>Linux编译DSLogic-fw</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0018</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0018_CY7C68013A_FPGA.html"><span class="doc std std-doc">CY7C68013A_FPGA</span></a></p></td>
+<td class="text-left"><p>CY7C68013A与FPGA</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0017</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0017_Type-C.html"><span class="doc std std-doc">Type-C</span></a></p></td>
+<td class="text-left"><p>Type-C参考</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0016</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0016_Isochronous_Transfers.html"><span class="doc std std-doc">Isochronous_Transfers</span></a></p></td>
+<td class="text-left"><p>一步传输示例</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0015</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0015_Send_Setup_Packet.html"><span class="doc std std-doc">Send_Setup_Packet</span></a></p></td>
+<td class="text-left"><p>如何发送Setup包</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0014</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0014_Why_StreamExample_Always_Select_Alt6.html"><span class="doc std std-doc">Why_StreamExample_Always_Select_Alt6</span></a></p></td>
+<td class="text-left"><p>流传输如何设置备选项</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0013</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0013_USB_Descriptors_AlternateSetting.html"><span class="doc std std-doc">USB_Descriptors_AlternateSetting</span></a></p></td>
+<td class="text-left"><p>USB描述符备用选择</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0012</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0012_CYStream_Compile.html"><span class="doc std std-doc">CYStream_Compile</span></a></p></td>
+<td class="text-left"><p>USB流模式示例编译</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0011</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0011_HID_Compliant_Device.html"><span class="doc std std-doc">HID_Compliant_Device</span></a></p></td>
+<td class="text-left"><p>HID兼容设备</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0010</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0010_HID_Keyboard_Modify.html"><span class="doc std std-doc">HID_Keyboard_Modify</span></a></p></td>
+<td class="text-left"><p>USB控制器会采用伪中断进行对设备进行轮询，Wireshare只有在有数据传输才会在总线上有Interrupt IN包，也就是说如果设备没有准备好数据，那么USB控制器是不会去轮询的。</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0009</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0009_Wireshark_Filter.html"><span class="doc std std-doc">Wireshark_Filter</span></a></p></td>
+<td class="text-left"><p>Wireshark过滤使用</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0008</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0008_HID_Keyboard.html"><span class="doc std std-doc">HID_Keyboard</span></a></p></td>
+<td class="text-left"><p>HID键盘示例</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0007</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0007_Bulkloop_Example.html"><span class="doc std std-doc">Bulkloop_Example</span></a></p></td>
+<td class="text-left"><p>USB Bulk传输示例</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0006</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0006_CY3684_EZ-USB_FX2LP_DVK.html"><span class="doc std std-doc">CY3684_EZ-USB_FX2LP_DVK</span></a></p></td>
+<td class="text-left"><p>配置Firmware开发环境，使用Keil UV2进行开发，不过需要配置环境才能使用，而不是安装完成了直接能够使用，目前是在Windows 10上进行配置环境是OK，说明在Windows 10上可以正常工作。</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0005</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0005_Wireshark_GET_DESCRIPTOR_Analyzer.html"><span class="doc std std-doc">Wireshark_GET_DESCRIPTOR_Analyzer</span></a></p></td>
+<td class="text-left"><p>使用Wireshark分析USB协议</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0004</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0004_Capturing_USB_Traffic.html"><span class="doc std std-doc">Capturing_USB_Traffic</span></a></p></td>
+<td class="text-left"><p>USB抓包工具</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0003</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0003_Quick_Start.html"><span class="doc std std-doc">Quick_Start</span></a></p></td>
+<td class="text-left"><p>开发板快速入门</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0002</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0002_EZ-USB_Integrated_Microprocessor.html"><span class="doc std std-doc">EZ-USB_Integrated_Microprocessor</span></a></p></td>
+<td class="text-left"><p>EZ-USB一些参考文档</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0001</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0001_USB_Specification.html"><span class="doc std std-doc">USB_Specification</span></a></p></td>
+<td class="text-left"><p>了解USB一些基本标准概念</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

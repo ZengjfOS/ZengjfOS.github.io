@@ -1,0 +1,27 @@
+# V2Ray
+
+主要解决下载google的代码问题
+
+## 参考文档
+
+* https://store.holytech.tech/
+  * V2Ray服务
+* https://github.com/Cenmrev/V2RayX/releases
+  * MAC V2Ray软件
+* [V2ray 终端代理](https://www.luojiego.com/2020/07/01/v2ray-proxy-setting/)
+
+## Subscription
+
+[V2RayX] -> [Configure...] -> [Advanced...] -> [Subscription] -> [+] -> 填入订阅url
+
+## Shell Proxy
+
+[V2RayX] -> [Copy HTTP Proxy Shell Export Line] -> paste to shell
+
+```sh
+export http_proxy="http://127.0.0.1:8001"; export HTTP_PROXY="http://127.0.0.1:8001"; export https_proxy="http://127.0.0.1:8001"; export HTTPS_PROXY="http://127.0.0.1:8001"
+```
+
+## 连不上服务器
+
+**注意：有时候订阅地址会无效，注意到服务器那边重置一下后，重新填入地址就可以使用**

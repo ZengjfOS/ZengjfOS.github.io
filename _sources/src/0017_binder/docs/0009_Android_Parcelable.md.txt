@@ -1,0 +1,93 @@
+# Android Parcelable
+
+理解Parcelable类实现原因
+
+# 参考文档
+
+* [Android Parcelable 源码解析](https://blog.csdn.net/weixin_30339969/article/details/99769394)
+* [详细介绍Android中Parcelable的原理和使用方法](https://www.jianshu.com/p/32a2ec8f35ae)
+
+# Framework参考示例
+
+* frameworks/base
+  * telecomm/java/android/telecom/ParcelableCall.aidl
+  * telecomm/java/android/telecom/ParcelableCall.java
+* 之前以为aidl可以直接替代java的实现，原来不行，理解上有偏差
+
+# Parcelable
+
+* 介绍Parcelable不得不先提一下Serializable接口，Serializable是Java为我们提供的一个标准化的序列化接口，那什么是序列化呢? 简单来说就是将对象转换为可以传输的二进制流(二进制序列)的过程，这样我们就可以通过序列化，转化为可以在网络传输或者保存到本地的流(序列)，从而进行传输数据，那反序列化就是从二进制流(序列)转化为对象的过程；
+* Parcelable是Android为我们提供的序列化的接口，Parcelable相对于Serializable的使用相对复杂一些，但Parcelable的效率相对Serializable也高很多，这一直是Google工程师引以为傲的，有时间的可以看一下Parcelable和Serializable的效率对比Parcelable vs Serializable号称快10倍的效率；
+* Parcelable接口的实现类是可以通过Parcel写入和恢复数据的，并且必须要有一个非空的静态变量CREATOR；
+* writeToParcel()将当前你需要保存的数据，写进Parcel 里；
+* Creator, 用来恢复对象，如果没有实现这个Creator,那么恢复的时候，会报错；
+
+```java
+package com.droid.os;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
+
+public final class WifiAccountInfo implements Parcelable {
+    public int networkId;
+    public String SSID;
+    public String password;
+    public int securityType;
+    public static final Creator<WifiAccountInfo> CREATOR = new Creator<WifiAccountInfo>() {
+        public WifiAccountInfo[] newArray(int size) {
+            return new WifiAccountInfo[size];
+        }
+
+        public WifiAccountInfo createFromParcel(Parcel source) {
+            WifiAccountInfo wifi_account_info = new WifiAccountInfo();
+            wifi_account_info.networkId = source.readInt();
+            wifi_account_info.SSID = source.readString();
+            wifi_account_info.password = source.readString();
+            wifi_account_info.securityType = source.readInt();
+            return wifi_account_info;
+        }
+    };
+
+    public WifiAccountInfo() {
+    }
+
+    public WifiAccountInfo(int networkId,String ssid, String password, int security) {
+        this.networkId = networkId;
+        this.SSID = ssid;
+        this.password = password;
+        this.securityType = security;
+    }
+
+    public int getNetworkId(){
+        return networkId;
+    }
+
+    public String getSsid(){
+        return SSID;
+    }
+
+    public String getPassword(){
+        return password;
+    }
+
+    public int getSecurityType(){
+        return securityType;
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.networkId);
+        dest.writeString(this.SSID);
+        dest.writeString(this.password);
+        dest.writeInt(this.securityType);
+    }
+
+    public static Creator<WifiAccountInfo> getCreator() {
+        return CREATOR;
+    }
+}
+```

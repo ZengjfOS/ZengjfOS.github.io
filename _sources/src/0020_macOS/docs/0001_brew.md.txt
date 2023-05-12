@@ -1,0 +1,15 @@
+# brew
+
+Homebrew安装
+
+# 参考文档
+
+* [mac安装homebrew失败怎么办？](https://www.zhihu.com/question/35928898)
+
+# 执行脚本
+
+`/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"`
+
+# install ack
+
+* `brew install ack`

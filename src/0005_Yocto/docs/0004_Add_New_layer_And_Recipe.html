@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Add New Layer And Recipe</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">操作方法：</a></li>
+<li><a class="reference internal" href="#fsl-setup-release-sh"><code class="docutils literal notranslate"><span class="pre">fsl-setup-release.sh</span></code>配置过程跟踪</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="add-new-layer-and-recipe">
+<h1>Add New Layer And Recipe<a class="headerlink" href="#add-new-layer-and-recipe" title="Permalink to this headline"></a></h1>
+<p>Yocto添加新的Layer和Recipe</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://community.nxp.com/docs/DOC-331917">How to add a new layer and a new recipe in Yocto</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>操作方法：<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">&lt;BSP_DIR&gt;/sources</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./poky/scripts/yocto-layer</span> <span class="pre">create</span> <span class="pre">&lt;NEW_LAYER_NAME&gt;</span></code></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>zengjf@zengjf:~/fsl-release-bsp/sources$ ./poky/scripts/yocto-layer create zengjf
+Please enter the layer priority you<span class="s1">&#39;d like to use for the layer: [default: 6]</span>
+<span class="s1">Would you like to have an example recipe created? (y/n) [default: n] y</span>
+<span class="s1">Please enter the name you&#39;</span>d like to use <span class="k">for</span> your example recipe: <span class="o">[</span>default: example<span class="o">]</span>
+Would you like to have an example bbappend file created? <span class="o">(</span>y/n<span class="o">)</span> <span class="o">[</span>default: n<span class="o">]</span> y
+Please enter the name you<span class="s1">&#39;d like to use for your bbappend file: [default: example]</span>
+<span class="s1">Please enter the version number you&#39;</span>d like to use <span class="k">for</span> your bbappend file <span class="o">(</span>this should match the recipe you<span class="s1">&#39;re appending to): [default: 0.1]</span>
+
+<span class="s1">New layer created in meta-zengjf.</span>
+
+<span class="s1">Don&#39;</span>t forget to add it to your BBLAYERS <span class="o">(</span><span class="k">for</span> details see meta-zengjf/README<span class="o">)</span>.
+zengjf@zengjf:~/fsl-release-bsp/sources$ tree -L <span class="m">4</span> meta-zengjf/
+meta-zengjf/
+├── conf
+│   └── layer.conf
+├── COPYING.MIT
+├── README
+├── recipes-example
+│   └── example
+│       ├── example-0.1
+│       │   ├── example.patch
+│       │   └── helloworld.c
+│       └── example_0.1.bb
+└── recipes-example-bbappend
+    └── example-bbappend
+        ├── example-0.1
+        │   └── example.patch
+        └── example_0.1.bbappend
+
+<span class="m">7</span> directories, <span class="m">8</span> files
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-zengjf/conf/layer.conf</span></code> config file</p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># We have a conf and classes directory, add to BBPATH</span>
+BBPATH .<span class="o">=</span> <span class="s2">&quot;:</span><span class="si">${</span><span class="nv">LAYERDIR</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="c1"># We have recipes-* directories, add to BBFILES</span>
+<span class="nv">BBFILES</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">LAYERDIR</span><span class="si">}</span><span class="s2">/recipes-*/*/*.bb \</span>
+<span class="s2">        </span><span class="si">${</span><span class="nv">LAYERDIR</span><span class="si">}</span><span class="s2">/recipes-*/*/*.bbappend&quot;</span>
+
+<span class="nv">BBFILE_COLLECTIONS</span> <span class="o">+=</span> <span class="s2">&quot;zengjf&quot;</span>
+<span class="nv">BBFILE_PATTERN_zengjf</span> <span class="o">=</span> <span class="s2">&quot;^</span><span class="si">${</span><span class="nv">LAYERDIR</span><span class="si">}</span><span class="s2">/&quot;</span>
+<span class="nv">BBFILE_PRIORITY_zengjf</span> <span class="o">=</span> <span class="s2">&quot;6&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Adding the layer to our BSP</p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>zengjf@zengjf:~/fsl-release-bsp/sources$ find * -iname bblayers.conf
+base/conf/bblayers.conf
+zengjf@zengjf:~/fsl-release-bsp/sources$ cat base/conf/bblayers.conf
+<span class="nv">LCONF_VERSION</span> <span class="o">=</span> <span class="s2">&quot;6&quot;</span>
+
+<span class="nv">BBPATH</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TOPDIR</span><span class="si">}</span><span class="s2">&quot;</span>
+BSPDIR :<span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="p">@os.path.abspath(os.path.dirname(d.getVar(</span><span class="s1">&#39;FILE&#39;</span><span class="p">, True)) + </span><span class="s1">&#39;/../..&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+BBFILES ?<span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">=</span> <span class="s2">&quot; \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/poky/meta \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/poky/meta-yocto \</span>
+<span class="s2">  \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-oe \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-multimedia \</span>
+<span class="s2">  \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-arm \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-arm-extra \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-demos \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-zengjf \</span>
+<span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rm</span> <span class="pre">imx6q-x11/conf/*</span> <span class="pre">-rf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MACHINE=imx6dlsabresd</span> <span class="pre">DISTRO=fsl-imx-x11</span> <span class="pre">source</span> <span class="pre">./fsl-setup-release.sh</span> <span class="pre">-b</span> <span class="pre">imx6q-x11</span></code></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>zengjf@zengjf:~/fsl-release-bsp/imx6q-x11$ cat conf/bblayers.conf
+<span class="nv">POKY_BBLAYERS_CONF_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+
+<span class="nv">BBPATH</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TOPDIR</span><span class="si">}</span><span class="s2">&quot;</span>
+BSPDIR :<span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="p">@os.path.abspath(os.path.dirname(d.getVar(</span><span class="s1">&#39;FILE&#39;</span><span class="p">, True)) + </span><span class="s1">&#39;/../..&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+BBFILES ?<span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">=</span> <span class="s2">&quot; \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/poky/meta \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/poky/meta-poky \</span>
+<span class="s2">  \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-oe \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-multimedia \</span>
+<span class="s2">  \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-arm \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-arm-extra \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-demos \</span>
+<span class="s2">  </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-zengjf \</span>
+<span class="s2">&quot;</span>
+<span class="c1">##Freescale Yocto Project Release layer</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-bsp-release/imx/meta-bsp &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-fsl-bsp-release/imx/meta-sdk &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-browser &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-gnome &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-networking &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-python &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-openembedded/meta-filesystems &quot;</span>
+<span class="nv">BBLAYERS</span> <span class="o">+=</span> <span class="s2">&quot; </span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/sources/meta-qt5 &quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>添加example进入文件系统：</p>
+<ul>
+<li><p>暂时性使用修改<code class="docutils literal notranslate"><span class="pre">conf/local.conf</span></code>：</p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>PACKAGECONFIG_append_pn-qemu-native <span class="o">=</span> <span class="s2">&quot; sdl&quot;</span>
+PACKAGECONFIG_append_pn-nativesdk-qemu <span class="o">=</span> <span class="s2">&quot; sdl&quot;</span>
+<span class="nv">CONF_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+
+DL_DIR ?<span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">BSPDIR</span><span class="si">}</span><span class="s2">/downloads/&quot;</span>
+<span class="nv">ACCEPT_FSL_EULA</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+
+<span class="nv">IMAGE_INSTALL</span> <span class="o">+=</span> <span class="s2">&quot;example&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>永久性使用修改<code class="docutils literal notranslate"><span class="pre">setup-environment</span></code>：</p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="nv">generated_config</span><span class="o">=</span>
+<span class="k">if</span> <span class="o">[</span> ! -e conf/local.conf.sample <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    mv conf/local.conf conf/local.conf.sample
+
+    <span class="c1"># Generate the local.conf based on the Yocto defaults</span>
+    <span class="nv">TEMPLATES</span><span class="o">=</span><span class="nv">$CWD</span>/sources/base/conf
+    grep -v <span class="s1">&#39;^#\|^$&#39;</span> conf/local.conf.sample &gt; conf/local.conf
+    cat &gt;&gt; conf/local.conf <span class="s">&lt;&lt;EOF</span>
+
+<span class="s">DL_DIR ?= &quot;\${BSPDIR}/downloads/&quot;</span>
+
+<span class="s">IMAGE_INSTALL += &quot;example&quot;</span>
+<span class="s">EOF</span>
+    <span class="c1"># Change settings according environment</span>
+    sed -e <span class="s2">&quot;s,MACHINE ??=.*,MACHINE ??= &#39;</span><span class="nv">$MACHINE</span><span class="s2">&#39;,g&quot;</span> <span class="se">\</span>
+        -e <span class="s2">&quot;s,SDKMACHINE ??=.*,SDKMACHINE ??= &#39;</span><span class="nv">$SDKMACHINE</span><span class="s2">&#39;,g&quot;</span> <span class="se">\</span>
+        -e <span class="s2">&quot;s,DISTRO ?=.*,DISTRO ?= &#39;</span><span class="nv">$DISTRO</span><span class="s2">&#39;,g&quot;</span> <span class="se">\</span>
+        -i conf/local.conf
+
+    cp <span class="nv">$TEMPLATES</span>/* conf/
+
+    <span class="k">for</span> s <span class="k">in</span> <span class="nv">$HOME</span>/.oe <span class="nv">$HOME</span>/.yocto<span class="p">;</span> <span class="k">do</span>
+        <span class="k">if</span> <span class="o">[</span> -e <span class="nv">$s</span>/site.conf <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Linking </span><span class="nv">$s</span><span class="s2">/site.conf to conf/site.conf&quot;</span>
+            ln -s <span class="nv">$s</span>/site.conf conf
+        <span class="k">fi</span>
+    <span class="k">done</span>
+
+    <span class="nv">generated_config</span><span class="o">=</span><span class="m">1</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">example</span> <span class="pre">-g</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">example</span> <span class="pre">-c</span> <span class="pre">cleanall</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">example</span></code></p></li>
+<li><p>Compile Over Output:</p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>zengjf@zengjf:~/fsl-release-bsp/imx6q-x11$ find * -iname helloworld <span class="p">|</span> grep <span class="s1">&#39;example/&#39;</span>
+tmp/work/cortexa9hf-neon-poky-linux-gnueabi/example/0.1-r0/package/usr/bin/helloworld
+tmp/work/cortexa9hf-neon-poky-linux-gnueabi/example/0.1-r0/package/usr/bin/.debug/helloworld
+tmp/work/cortexa9hf-neon-poky-linux-gnueabi/example/0.1-r0/image/usr/bin/helloworld
+tmp/work/cortexa9hf-neon-poky-linux-gnueabi/example/0.1-r0/packages-split/example-dbg/usr/bin/.debug/helloworld
+tmp/work/cortexa9hf-neon-poky-linux-gnueabi/example/0.1-r0/packages-split/example/usr/bin/helloworld
+tmp/work/cortexa9hf-neon-poky-linux-gnueabi/example/0.1-r0/helloworld
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="fsl-setup-release-sh">
+<h1><code class="docutils literal notranslate"><span class="pre">fsl-setup-release.sh</span></code>配置过程跟踪<a class="headerlink" href="#fsl-setup-release-sh" title="Permalink to this headline"></a></h1>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>zengjf@zengjf:~/fsl-release-bsp$ ./auto.sh
+++ <span class="nv">MACHINE</span><span class="o">=</span>imx6dlsabresd
+++ <span class="nv">DISTRO</span><span class="o">=</span>fsl-imx-x11
+++ <span class="nb">source</span> ./fsl-setup-release.sh -b imx6q-x11
+++++ <span class="nb">pwd</span>
++++ <span class="nv">CWD</span><span class="o">=</span>/home/zengjf/fsl-release-bsp
++++ <span class="nv">PROGNAME</span><span class="o">=</span>setup-environment
++++ <span class="nv">OLD_OPTIND</span><span class="o">=</span><span class="m">1</span>
++++ <span class="nb">unset</span> FSLDISTRO
++++ <span class="nb">getopts</span> k:r:t:b:e:gh fsl_setup_flag
++++ <span class="k">case</span> <span class="nv">$fsl_setup_flag</span> <span class="k">in</span>
++++ <span class="nv">BUILD_DIR</span><span class="o">=</span>imx6q-x11
++++ <span class="nb">echo</span> -e <span class="s1">&#39;\n Build directory is &#39;</span> imx6q-x11
+
+ Build directory is  imx6q-x11
++++ <span class="nb">getopts</span> k:r:t:b:e:gh fsl_setup_flag
++++ <span class="s1">&#39;[&#39;</span> -z fsl-imx-x11 <span class="s1">&#39;]&#39;</span>
++++ <span class="nv">FSLDISTRO</span><span class="o">=</span>fsl-imx-x11
++++ <span class="nv">OPTIND</span><span class="o">=</span><span class="m">1</span>
++++ <span class="nb">test</span>
++++ <span class="nb">test</span>
++++ <span class="s1">&#39;[&#39;</span> -z imx6q-x11 <span class="s1">&#39;]&#39;</span>
++++ <span class="s1">&#39;[&#39;</span> -z imx6dlsabresd <span class="s1">&#39;]&#39;</span>
++++ <span class="s1">&#39;[&#39;</span> -d ./sources/meta-freescale <span class="s1">&#39;]&#39;</span>
++++ cp -r sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6qdlsolo.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6qpsabresd.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6slevk.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sll_all.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sllevk.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6slllpddr2arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6slllpddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sx14x14arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sx17x17arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sx19x19ddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sx19x19lpddr2arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6sx_all.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ul14x14ddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ul14x14lpddr2arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ul7d.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ul9x9evk.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ulevk.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ull14x14ddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ull14x14evk.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx6ull9x9evk.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx7d12x12ddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx7d12x12lpddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx7d19x19ddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx7d19x19lpddr2arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx7d19x19lpddr3arm2.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx7dsabresd.conf sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/include sources/meta-fsl-arm/conf/machine
++++ <span class="s1">&#39;[&#39;</span> -d ./sources/meta-freescale <span class="s1">&#39;]&#39;</span>
++++ cp sources/meta-fsl-bsp-release/imx/EULA.txt sources/meta-fsl-arm/EULA
++++ cp sources/meta-fsl-bsp-release/imx/classes/fsl-eula-unpack.bbclass sources/meta-fsl-arm/classes
++++ <span class="s1">&#39;[&#39;</span> -z fsl-imx-x11 <span class="s1">&#39;]&#39;</span>
++++ <span class="nv">MACHINE</span><span class="o">=</span>imx6dlsabresd
++++ . ./setup-environment imx6q-x11
++++++ <span class="nb">pwd</span>
+++++ <span class="nv">CWD</span><span class="o">=</span>/home/zengjf/fsl-release-bsp
+++++ <span class="nv">PROGNAME</span><span class="o">=</span>setup-environment
+++++ <span class="nv">SHORTOPTS</span><span class="o">=</span>h
+++++ <span class="nv">LONGOPTS</span><span class="o">=</span><span class="nb">help</span>
++++++ getopt --options h --longoptions <span class="nb">help</span> --name setup-environment -- imx6q-x11
+++++ <span class="nv">ARGS</span><span class="o">=</span><span class="s1">&#39; -- &#39;</span><span class="se">\&#39;</span><span class="s1">&#39;imx6q-x11&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> <span class="m">0</span> <span class="s1">&#39;!=&#39;</span> <span class="m">0</span> -o <span class="m">1</span> -lt <span class="m">1</span> <span class="s1">&#39;]&#39;</span>
+++++ <span class="nb">eval</span> <span class="nb">set</span> -- <span class="s1">&#39; -- &#39;</span><span class="se">\&#39;</span><span class="s1">&#39;imx6q-x11&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;&#39;</span>
++++++ <span class="nb">set</span> -- -- imx6q-x11
+++++ <span class="nb">true</span>
+++++ <span class="k">case</span> <span class="nv">$1</span> <span class="k">in</span>
+++++ <span class="nb">shift</span>
+++++ <span class="nb">break</span>
++++++ whoami
+++++ <span class="s1">&#39;[&#39;</span> <span class="nv">zengjf</span> <span class="o">=</span> root <span class="s1">&#39;]&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> -z imx6dlsabresd <span class="s1">&#39;]&#39;</span>
++++++ ls -1 /home/zengjf/fsl-release-bsp/sources/meta-fsl-arm/conf/machine /home/zengjf/fsl-release-bsp/sources/meta-fsl-arm-extra/conf/machine
+++++ <span class="nv">LIST_MACHINES</span><span class="o">=</span><span class="s1">&#39;/home/zengjf/fsl-release-bsp/sources/meta-fsl-arm/conf/machine:</span>
+<span class="s1">imx23evk.conf</span>
+<span class="s1">imx28evk.conf</span>
+<span class="s1">imx51evk.conf</span>
+<span class="s1">imx53ard.conf</span>
+<span class="s1">imx53qsb.conf</span>
+<span class="s1">imx6dlsabreauto.conf</span>
+<span class="s1">imx6dlsabresd.conf</span>
+<span class="s1">imx6qdlsolo.conf</span>
+<span class="s1">imx6qpsabreauto.conf</span>
+<span class="s1">imx6qpsabresd.conf</span>
+<span class="s1">imx6qsabreauto.conf</span>
+<span class="s1">imx6qsabresd.conf</span>
+<span class="s1">imx6slevk.conf</span>
+<span class="s1">imx6sll_all.conf</span>
+<span class="s1">imx6sllevk.conf</span>
+<span class="s1">imx6slllpddr2arm2.conf</span>
+<span class="s1">imx6slllpddr3arm2.conf</span>
+<span class="s1">imx6solosabreauto.conf</span>
+<span class="s1">imx6solosabresd.conf</span>
+<span class="s1">imx6sx14x14arm2.conf</span>
+<span class="s1">imx6sx17x17arm2.conf</span>
+<span class="s1">imx6sx19x19ddr3arm2.conf</span>
+<span class="s1">imx6sx19x19lpddr2arm2.conf</span>
+<span class="s1">imx6sx_all.conf</span>
+<span class="s1">imx6sxsabreauto.conf</span>
+<span class="s1">imx6sxsabresd.conf</span>
+<span class="s1">imx6ul14x14ddr3arm2.conf</span>
+<span class="s1">imx6ul14x14lpddr2arm2.conf</span>
+<span class="s1">imx6ul7d.conf</span>
+<span class="s1">imx6ul9x9evk.conf</span>
+<span class="s1">imx6ulevk.conf</span>
+<span class="s1">imx6ull14x14ddr3arm2.conf</span>
+<span class="s1">imx6ull14x14evk.conf</span>
+<span class="s1">imx6ull9x9evk.conf</span>
+<span class="s1">imx7d12x12ddr3arm2.conf</span>
+<span class="s1">imx7d12x12lpddr3arm2.conf</span>
+<span class="s1">imx7d19x19ddr3arm2.conf</span>
+<span class="s1">imx7d19x19lpddr2arm2.conf</span>
+<span class="s1">imx7d19x19lpddr3arm2.conf</span>
+<span class="s1">imx7dsabresd.conf</span>
+<span class="s1">include</span>
+<span class="s1">ls1021atwr.conf</span>
+<span class="s1">twr-vf65gs10.conf</span>
+
+<span class="s1">/home/zengjf/fsl-release-bsp/sources/meta-fsl-arm-extra/conf/machine:</span>
+<span class="s1">apalis-imx6.conf</span>
+<span class="s1">cfa10036.conf</span>
+<span class="s1">cfa10037.conf</span>
+<span class="s1">cfa10049.conf</span>
+<span class="s1">cfa10055.conf</span>
+<span class="s1">cfa10056.conf</span>
+<span class="s1">cfa10057.conf</span>
+<span class="s1">cfa10058.conf</span>
+<span class="s1">cgtqmx6.conf</span>
+<span class="s1">cm-fx6.conf</span>
+<span class="s1">colibri-imx6.conf</span>
+<span class="s1">colibri-imx7.conf</span>
+<span class="s1">colibri-vf.conf</span>
+<span class="s1">cubox-i.conf</span>
+<span class="s1">imx233-olinuxino-maxi.conf</span>
+<span class="s1">imx233-olinuxino-micro.conf</span>
+<span class="s1">imx233-olinuxino-mini.conf</span>
+<span class="s1">imx233-olinuxino-nano.conf</span>
+<span class="s1">imx6dl-riotboard.conf</span>
+<span class="s1">imx6qdl-variscite-som.conf</span>
+<span class="s1">imx6q-dms-ba16.conf</span>
+<span class="s1">imx6qsabrelite.conf</span>
+<span class="s1">imx6sl-warp.conf</span>
+<span class="s1">imx6ul-pico-hobbit.conf</span>
+<span class="s1">imx7s-warp.conf</span>
+<span class="s1">include</span>
+<span class="s1">m28evk.conf</span>
+<span class="s1">m53evk.conf</span>
+<span class="s1">nitrogen6sx.conf</span>
+<span class="s1">nitrogen6x.conf</span>
+<span class="s1">nitrogen6x-lite.conf</span>
+<span class="s1">nitrogen7.conf</span>
+<span class="s1">pcm052.conf</span>
+<span class="s1">tx6q-10x0.conf</span>
+<span class="s1">tx6q-11x0.conf</span>
+<span class="s1">tx6s-8034.conf</span>
+<span class="s1">tx6s-8035.conf</span>
+<span class="s1">tx6u-8033.conf</span>
+<span class="s1">tx6u-80x0.conf</span>
+<span class="s1">tx6u-81x0.conf</span>
+<span class="s1">ventana.conf</span>
+<span class="s1">wandboard.conf&#39;</span>
++++++ <span class="nb">echo</span> -e <span class="s1">&#39;/home/zengjf/fsl-release-bsp/sources/meta-fsl-arm/conf/machine:</span>
+<span class="s1">imx23evk.conf</span>
+<span class="s1">imx28evk.conf</span>
+<span class="s1">imx51evk.conf</span>
+<span class="s1">imx53ard.conf</span>
+<span class="s1">imx53qsb.conf</span>
+<span class="s1">imx6dlsabreauto.conf</span>
+<span class="s1">imx6dlsabresd.conf</span>
+<span class="s1">imx6qdlsolo.conf</span>
+<span class="s1">imx6qpsabreauto.conf</span>
+<span class="s1">imx6qpsabresd.conf</span>
+<span class="s1">imx6qsabreauto.conf</span>
+<span class="s1">imx6qsabresd.conf</span>
+<span class="s1">imx6slevk.conf</span>
+<span class="s1">imx6sll_all.conf</span>
+<span class="s1">imx6sllevk.conf</span>
+<span class="s1">imx6slllpddr2arm2.conf</span>
+<span class="s1">imx6slllpddr3arm2.conf</span>
+<span class="s1">imx6solosabreauto.conf</span>
+<span class="s1">imx6solosabresd.conf</span>
+<span class="s1">imx6sx14x14arm2.conf</span>
+<span class="s1">imx6sx17x17arm2.conf</span>
+<span class="s1">imx6sx19x19ddr3arm2.conf</span>
+<span class="s1">imx6sx19x19lpddr2arm2.conf</span>
+<span class="s1">imx6sx_all.conf</span>
+<span class="s1">imx6sxsabreauto.conf</span>
+<span class="s1">imx6sxsabresd.conf</span>
+<span class="s1">imx6ul14x14ddr3arm2.conf</span>
+<span class="s1">imx6ul14x14lpddr2arm2.conf</span>
+<span class="s1">imx6ul7d.conf</span>
+<span class="s1">imx6ul9x9evk.conf</span>
+<span class="s1">imx6ulevk.conf</span>
+<span class="s1">imx6ull14x14ddr3arm2.conf</span>
+<span class="s1">imx6ull14x14evk.conf</span>
+<span class="s1">imx6ull9x9evk.conf</span>
+<span class="s1">imx7d12x12ddr3arm2.conf</span>
+<span class="s1">imx7d12x12lpddr3arm2.conf</span>
+<span class="s1">imx7d19x19ddr3arm2.conf</span>
+<span class="s1">imx7d19x19lpddr2arm2.conf</span>
+<span class="s1">imx7d19x19lpddr3arm2.conf</span>
+<span class="s1">imx7dsabresd.conf</span>
+<span class="s1">include</span>
+<span class="s1">ls1021atwr.conf</span>
+<span class="s1">twr-vf65gs10.conf</span>
+
+<span class="s1">/home/zengjf/fsl-release-bsp/sources/meta-fsl-arm-extra/conf/machine:</span>
+<span class="s1">apalis-imx6.conf</span>
+<span class="s1">cfa10036.conf</span>
+<span class="s1">cfa10037.conf</span>
+<span class="s1">cfa10049.conf</span>
+<span class="s1">+++++ grep &#39;</span>imx6dlsabresd.conf<span class="s1">$&#39;</span>
+<span class="s1">+++++ wc -l</span>
+<span class="s1">cfa10055.conf</span>
+<span class="s1">cfa10056.conf</span>
+<span class="s1">cfa10057.conf</span>
+<span class="s1">cfa10058.conf</span>
+<span class="s1">cgtqmx6.conf</span>
+<span class="s1">cm-fx6.conf</span>
+<span class="s1">colibri-imx6.conf</span>
+<span class="s1">colibri-imx7.conf</span>
+<span class="s1">colibri-vf.conf</span>
+<span class="s1">cubox-i.conf</span>
+<span class="s1">imx233-olinuxino-maxi.conf</span>
+<span class="s1">imx233-olinuxino-micro.conf</span>
+<span class="s1">imx233-olinuxino-mini.conf</span>
+<span class="s1">imx233-olinuxino-nano.conf</span>
+<span class="s1">imx6dl-riotboard.conf</span>
+<span class="s1">imx6qdl-variscite-som.conf</span>
+<span class="s1">imx6q-dms-ba16.conf</span>
+<span class="s1">imx6qsabrelite.conf</span>
+<span class="s1">imx6sl-warp.conf</span>
+<span class="s1">imx6ul-pico-hobbit.conf</span>
+<span class="s1">imx7s-warp.conf</span>
+<span class="s1">include</span>
+<span class="s1">m28evk.conf</span>
+<span class="s1">m53evk.conf</span>
+<span class="s1">nitrogen6sx.conf</span>
+<span class="s1">nitrogen6x.conf</span>
+<span class="s1">nitrogen6x-lite.conf</span>
+<span class="s1">nitrogen7.conf</span>
+<span class="s1">pcm052.conf</span>
+<span class="s1">tx6q-10x0.conf</span>
+<span class="s1">tx6q-11x0.conf</span>
+<span class="s1">tx6s-8034.conf</span>
+<span class="s1">tx6s-8035.conf</span>
+<span class="s1">tx6u-8033.conf</span>
+<span class="s1">tx6u-80x0.conf</span>
+<span class="s1">tx6u-81x0.conf</span>
+<span class="s1">ventana.conf</span>
+<span class="s1">wandboard.conf&#39;</span>
+++++ <span class="nv">VALID_MACHINE</span><span class="o">=</span><span class="m">1</span>
+++++ <span class="s1">&#39;[&#39;</span> <span class="nv">ximx6dlsabresd</span> <span class="o">=</span> x <span class="s1">&#39;]&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> <span class="nv">1</span> <span class="o">=</span> <span class="m">0</span> <span class="s1">&#39;]&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> <span class="s1">&#39;!&#39;</span> -e imx6q-x11/conf/local.conf.sample <span class="s1">&#39;]&#39;</span>
+++++ <span class="nb">echo</span> <span class="s1">&#39;Configuring for imx6dlsabresd&#39;</span>
+Configuring <span class="k">for</span> imx6dlsabresd
+++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++ <span class="nv">SDKMACHINE</span><span class="o">=</span>i686
+++++ <span class="s1">&#39;[&#39;</span> -z fsl-imx-x11 <span class="s1">&#39;]&#39;</span>
+++++ <span class="nv">OEROOT</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky
+++++ <span class="s1">&#39;[&#39;</span> -e /home/zengjf/fsl-release-bsp/sources/oe-core <span class="s1">&#39;]&#39;</span>
+++++ <span class="nv">updated</span><span class="o">=</span>
+++++ <span class="k">for</span> f <span class="k">in</span> <span class="s1">&#39;$CWD/sources/base/*&#39;</span>
++++++ basename /home/zengjf/fsl-release-bsp/sources/base/conf
+++++ <span class="nv">file</span><span class="o">=</span>conf
+++++ <span class="s1">&#39;[&#39;</span> <span class="nv">conf</span> <span class="o">=</span> conf <span class="s1">&#39;]&#39;</span>
+++++ <span class="k">continue</span>
+++++ <span class="k">for</span> f <span class="k">in</span> <span class="s1">&#39;$CWD/sources/base/*&#39;</span>
++++++ basename /home/zengjf/fsl-release-bsp/sources/base/README
+++++ <span class="nv">file</span><span class="o">=</span>README
+++++ <span class="s1">&#39;[&#39;</span> <span class="nv">README</span> <span class="o">=</span> conf <span class="s1">&#39;]&#39;</span>
+++++ <span class="nb">echo</span> README
+++++ grep -q <span class="s1">&#39;~$&#39;</span>
+++++ cmp -s README /home/zengjf/fsl-release-bsp/sources/base/README
+++++ <span class="k">for</span> f <span class="k">in</span> <span class="s1">&#39;$CWD/sources/base/*&#39;</span>
++++++ basename /home/zengjf/fsl-release-bsp/sources/base/setup-environment
+++++ <span class="nv">file</span><span class="o">=</span>setup-environment
+++++ <span class="s1">&#39;[&#39;</span> setup-environment <span class="o">=</span> conf <span class="s1">&#39;]&#39;</span>
+++++ <span class="nb">echo</span> setup-environment
+++++ grep -q <span class="s1">&#39;~$&#39;</span>
+++++ cmp -s setup-environment /home/zengjf/fsl-release-bsp/sources/base/setup-environment
+++++ <span class="s1">&#39;[&#39;</span> <span class="s1">&#39;&#39;</span> <span class="o">=</span> <span class="nb">true</span> <span class="s1">&#39;]&#39;</span>
+++++ . /home/zengjf/fsl-release-bsp/sources/poky/oe-init-build-env /home/zengjf/fsl-release-bsp/imx6q-x11
++++++ <span class="s1">&#39;[&#39;</span> -n /home/zengjf/fsl-release-bsp/sources/poky/oe-init-build-env <span class="s1">&#39;]&#39;</span>
++++++ <span class="nv">THIS_SCRIPT</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/oe-init-build-env
++++++ <span class="s1">&#39;[&#39;</span> -n <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
++++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
++++++ <span class="s1">&#39;[&#39;</span> ./auto.sh <span class="o">=</span> /home/zengjf/fsl-release-bsp/sources/poky/oe-init-build-env <span class="s1">&#39;]&#39;</span>
++++++ <span class="s1">&#39;[&#39;</span> -z /home/zengjf/fsl-release-bsp/sources/poky <span class="s1">&#39;]&#39;</span>
++++++ <span class="nb">unset</span> THIS_SCRIPT
++++++ <span class="nb">export</span> OEROOT
++++++ . /home/zengjf/fsl-release-bsp/sources/poky/scripts/oe-buildenv-internal
+++++++ <span class="s1">&#39;[&#39;</span> -z /home/zengjf/fsl-release-bsp/sources/poky <span class="s1">&#39;]&#39;</span>
+++++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++++ <span class="s1">&#39;[&#39;</span> -n <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
++++++++ /usr/bin/env python --version
++++++++ grep <span class="s1">&#39;Python 3&#39;</span>
+++++++ <span class="nv">py_v3_check</span><span class="o">=</span>
+++++++ <span class="s1">&#39;[&#39;</span> -n <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++++ <span class="nb">unset</span> py_v3_check
++++++++ python -c <span class="s1">&#39;import sys; print sys.version_info &gt;= (2,7,3)&#39;</span>
+++++++ <span class="nv">py_v26_check</span><span class="o">=</span>True
+++++++ <span class="s1">&#39;[&#39;</span> True <span class="s1">&#39;!=&#39;</span> True <span class="s1">&#39;]&#39;</span>
+++++++ <span class="nb">unset</span> py_v26_check
+++++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++++ <span class="s1">&#39;[&#39;</span> -z /home/zengjf/fsl-release-bsp/imx6q-x11 <span class="s1">&#39;]&#39;</span>
+++++++ <span class="nv">BDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/imx6q-x11
+++++++ <span class="s1">&#39;[&#39;</span> /home/zengjf/fsl-release-bsp/imx6q-x11 <span class="o">=</span> / <span class="s1">&#39;]&#39;</span>
++++++++ <span class="nb">echo</span> /home/zengjf/fsl-release-bsp/imx6q-x11
++++++++ sed -re <span class="s1">&#39;s|/+$||&#39;</span>
+++++++ <span class="nv">BDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/imx6q-x11
++++++++ readlink -f /home/zengjf/fsl-release-bsp/imx6q-x11
+++++++ <span class="nv">BDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/imx6q-x11
+++++++ <span class="s1">&#39;[&#39;</span> -z /home/zengjf/fsl-release-bsp/imx6q-x11 <span class="s1">&#39;]&#39;</span>
+++++++ <span class="s1">&#39;[&#39;</span> -n <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++++ <span class="s1">&#39;[&#39;</span> home/zengjf/fsl-release-bsp/imx6q-x11 <span class="s1">&#39;!=&#39;</span> /home/zengjf/fsl-release-bsp/imx6q-x11 <span class="s1">&#39;]&#39;</span>
+++++++ <span class="nv">BUILDDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/imx6q-x11
+++++++ <span class="nb">unset</span> BDIR
+++++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++++ <span class="nv">BITBAKEDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/bitbake
++++++++ readlink -f /home/zengjf/fsl-release-bsp/sources/poky/bitbake
+++++++ <span class="nv">BITBAKEDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/bitbake
++++++++ readlink -f /home/zengjf/fsl-release-bsp/imx6q-x11
+++++++ <span class="nv">BUILDDIR</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/imx6q-x11
+++++++ <span class="s1">&#39;[&#39;</span> <span class="s1">&#39;!&#39;</span> -d /home/zengjf/fsl-release-bsp/sources/poky/bitbake <span class="s1">&#39;]&#39;</span>
+++++++ <span class="k">for</span> newpath <span class="k">in</span> <span class="s1">&#39;&quot;$BITBAKEDIR/bin&quot;&#39;</span> <span class="s1">&#39;&quot;$OEROOT/scripts&quot;&#39;</span>
++++++++ <span class="nb">echo</span> /home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
++++++++ sed -re <span class="s1">&#39;s#(^|:)/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin(:|$)#\2#g;s#^:##&#39;</span>
+++++++ <span class="nv">PATH</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+++++++ <span class="nv">PATH</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+++++++ <span class="k">for</span> newpath <span class="k">in</span> <span class="s1">&#39;&quot;$BITBAKEDIR/bin&quot;&#39;</span> <span class="s1">&#39;&quot;$OEROOT/scripts&quot;&#39;</span>
++++++++ <span class="nb">echo</span> /home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
++++++++ sed -re <span class="s1">&#39;s#(^|:)/home/zengjf/fsl-release-bsp/sources/poky/scripts(:|$)#\2#g;s#^:##&#39;</span>
+++++++ <span class="nv">PATH</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+++++++ <span class="nv">PATH</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+++++++ <span class="nb">unset</span> BITBAKEDIR newpath
+++++++ <span class="nb">export</span> BUILDDIR
+++++++ <span class="nb">export</span> PATH
+++++++ <span class="nv">BB_ENV_EXTRAWHITE_OE</span><span class="o">=</span><span class="s1">&#39;MACHINE DISTRO TCMODE TCLIBC HTTP_PROXY http_proxy HTTPS_PROXY https_proxy FTP_PROXY ftp_proxy FTPS_PROXY ftps_proxy ALL_PROXY all_proxy NO_PROXY no_proxy SSH_AGENT_PID SSH_AUTH_SOCK BB_SRCREV_POLICY SDKMACHINE BB_NUMBER_THREADS BB_NO_NETWORK PARALLEL_MAKE GIT_PROXY_COMMAND SOCKS5_PASSWD SOCKS5_USER SCREENDIR STAMPS_DIR&#39;</span>
++++++++ tr <span class="s1">&#39; &#39;</span> <span class="s1">&#39;\n&#39;</span>
++++++++ <span class="nv">LC_ALL</span><span class="o">=</span>C
++++++++ <span class="nb">echo</span> ALL_PROXY BB_NO_NETWORK BB_NUMBER_THREADS BB_SRCREV_POLICY DISTRO FTPS_PROXY FTP_PROXY GIT_PROXY_COMMAND HTTPS_PROXY HTTP_PROXY MACHINE NO_PROXY PARALLEL_MAKE SCREENDIR SDKMACHINE SOCKS5_PASSWD SOCKS5_USER SSH_AGENT_PID SSH_AUTH_SOCK STAMPS_DIR TCLIBC TCMODE all_proxy ftp_proxy ftps_proxy http_proxy https_proxy no_proxy MACHINE DISTRO TCMODE TCLIBC HTTP_PROXY http_proxy HTTPS_PROXY https_proxy FTP_PROXY ftp_proxy FTPS_PROXY ftps_proxy ALL_PROXY all_proxy NO_PROXY no_proxy SSH_AGENT_PID SSH_AUTH_SOCK BB_SRCREV_POLICY SDKMACHINE BB_NUMBER_THREADS BB_NO_NETWORK PARALLEL_MAKE GIT_PROXY_COMMAND SOCKS5_PASSWD SOCKS5_USER SCREENDIR STAMPS_DIR
++++++++ sort --unique
++++++++ tr <span class="s1">&#39;\n&#39;</span> <span class="s1">&#39; &#39;</span>
+++++++ <span class="nv">BB_ENV_EXTRAWHITE</span><span class="o">=</span><span class="s1">&#39;ALL_PROXY BB_NO_NETWORK BB_NUMBER_THREADS BB_SRCREV_POLICY DISTRO FTPS_PROXY FTP_PROXY GIT_PROXY_COMMAND HTTPS_PROXY HTTP_PROXY MACHINE NO_PROXY PARALLEL_MAKE SCREENDIR SDKMACHINE SOCKS5_PASSWD SOCKS5_USER SSH_AGENT_PID SSH_AUTH_SOCK STAMPS_DIR TCLIBC TCMODE all_proxy ftp_proxy ftps_proxy http_proxy https_proxy no_proxy &#39;</span>
+++++++ <span class="nb">export</span> BB_ENV_EXTRAWHITE
++++++ <span class="nv">TEMPLATECONF</span><span class="o">=</span>
++++++ /home/zengjf/fsl-release-bsp/sources/poky/scripts/oe-setup-builddir
++++++ <span class="nb">unset</span> OEROOT
++++++ <span class="s1">&#39;[&#39;</span> -z /home/zengjf/fsl-release-bsp/imx6q-x11 <span class="s1">&#39;]&#39;</span>
++++++ <span class="nb">cd</span> /home/zengjf/fsl-release-bsp/imx6q-x11
++++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
++++++ <span class="s1">&#39;[&#39;</span> -f bitbake.lock <span class="s1">&#39;]&#39;</span>
++++++ grep : bitbake.lock
++++++ <span class="s1">&#39;[&#39;</span> <span class="nv">1</span> <span class="o">=</span> <span class="m">0</span> <span class="s1">&#39;]&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> <span class="s1">&#39;!&#39;</span> -e conf/local.conf <span class="s1">&#39;]&#39;</span>
++++++ <span class="nb">echo</span> /home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
++++++ sed <span class="s1">&#39;s/\(:.\|:\)*:/:/g;s/^.\?://;s/:.\?$//&#39;</span>
+++++ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+++++ <span class="nv">PATH</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/poky/scripts:/home/zengjf/fsl-release-bsp/sources/poky/bitbake/bin:/home/zengjf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+++++ <span class="nv">generated_config</span><span class="o">=</span>
+++++ <span class="s1">&#39;[&#39;</span> <span class="s1">&#39;!&#39;</span> -e conf/local.conf.sample <span class="s1">&#39;]&#39;</span>
+++++ mv conf/local.conf conf/local.conf.sample
+++++ <span class="nv">TEMPLATES</span><span class="o">=</span>/home/zengjf/fsl-release-bsp/sources/base/conf
+++++ grep -v <span class="s1">&#39;^#\|^$&#39;</span> conf/local.conf.sample
+++++ cat
+++++ sed -e <span class="s1">&#39;s,MACHINE ??=.*,MACHINE ??= &#39;</span><span class="se">\&#39;</span><span class="s1">&#39;imx6dlsabresd&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;,g&#39;</span> -e <span class="s1">&#39;s,SDKMACHINE ??=.*,SDKMACHINE ??= &#39;</span><span class="se">\&#39;</span><span class="s1">&#39;i686&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;,g&#39;</span> -e <span class="s1">&#39;s,DISTRO ?=.*,DISTRO ?= &#39;</span><span class="se">\&#39;</span><span class="s1">&#39;fsl-imx-x11&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;,g&#39;</span> -i conf/local.conf
+++++ cp /home/zengjf/fsl-release-bsp/sources/base/conf/bblayers.conf conf/
+++++ <span class="k">for</span> s <span class="k">in</span> <span class="s1">&#39;$HOME/.oe&#39;</span> <span class="s1">&#39;$HOME/.yocto&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> -e /home/zengjf/.oe/site.conf <span class="s1">&#39;]&#39;</span>
+++++ <span class="k">for</span> s <span class="k">in</span> <span class="s1">&#39;$HOME/.oe&#39;</span> <span class="s1">&#39;$HOME/.yocto&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> -e /home/zengjf/.yocto/site.conf <span class="s1">&#39;]&#39;</span>
+++++ <span class="nv">generated_config</span><span class="o">=</span><span class="m">1</span>
+++++ <span class="nv">EULA_ACCEPTED</span><span class="o">=</span>
+++++ grep -q <span class="s1">&#39;^\s*ACCEPT_FSL_EULA\s*=\s*[&quot;&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;]..*[&quot;&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;]&#39;</span> conf/local.conf
+++++ <span class="s1">&#39;[&#39;</span> -z <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> -n <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++ <span class="s1">&#39;[&#39;</span> -n <span class="s1">&#39;&#39;</span> <span class="s1">&#39;]&#39;</span>
+++++ cat
+
+Some BSPs depend on libraries and packages which are covered by Freescale<span class="s1">&#39;s</span>
+<span class="s1">End User License Agreement (EULA). To have the right to use these binaries in</span>
+<span class="s1">your images, you need to read and accept the following...</span>
+
+<span class="s1">++++ sleep 4</span>
+<span class="s1">++++ more -d /home/zengjf/fsl-release-bsp/sources/meta-fsl-arm/EULA</span>
+<span class="s1">LA_OPT_BASE_LICENSE v16 September 2016</span>
+
+<span class="s1">IMPORTANT.  Read the following NXP Semiconductors Software License Agreement</span>
+<span class="s1">(&quot;Agreement&quot;) completely.    By selecting the &quot;I Accept&quot; button at the end of</span>
+<span class="s1">this page, you indicate that you accept the terms of the Agreement and you</span>
+<span class="s1">acknowledge that you have the authority, for yourself or on behalf of your</span>
+<span class="s1">company, to bind your company to these terms.  You may then download or install</span>
+<span class="s1">the file.</span>
+
+<span class="s1">NXP SEMICONDUCTORS SOFTWARE LICENSE AGREEMENT</span>
+
+<span class="s1">This is a legal agreement between you, as an authorized representative of your</span>
+<span class="s1">employer, or if you have no employer, as an individual (together &quot;you&quot;), and</span>
+<span class="s1">Freescale Semiconductor, Inc., a 100% affiliated company of NXP Semiconductors</span>
+<span class="s1">N.V. (&quot;NXP&quot;).  It concerns your rights to use the software identified in the</span>
+<span class="s1">Software Content Register and provided to you in binary or source code form and</span>
+<span class="s1">any accompanying written materials (the &quot;Licensed Software&quot;). The Licensed</span>
+<span class="s1">Software may include any updates or error corrections or documentation relating</span>
+<span class="s1">to the Licensed Software provided to you by NXP under this License. In</span>
+<span class="s1">consideration for NXP allowing you to access the Licensed Software, you are</span>
+<span class="s1">agreeing to be bound by the terms of this Agreement. If you do not agree to all</span>
+<span class="s1">of the terms of this Agreement, do not download or install the Licensed</span>
+<span class="s1">Software. If you change your mind later, stop using the Licensed Software and</span>
+<span class="s1">delete all copies of the Licensed Software in your possession or control. Any</span>
+<span class="s1">copies of the Licensed Software that you have already distributed, where</span>
+<span class="s1">permitted, and do not destroy will continue to be governed by this Agreement.</span>
+<span class="s1">Your prior use will also continue to be governed by this Agreement.</span>
+
+<span class="s1">1.                 DEFINITIONS</span>
+
+<span class="s1">1.1.                  &quot;Affiliates&quot; means, any corporation, or entity directly</span>
+<span class="s1">or indirectly controlled by, controlling, or under common control with NXP</span>
+<span class="s1">Semiconductors N.V.</span>
+
+<span class="s1">1.2.                  &quot;Essential Patent&quot; means a patent to the limited extent</span>
+<span class="s1">that infringement of such patent cannot be avoided in remaining compliant with</span>
+<span class="s1">the technology standards implicated by the usage of any of the Licensed</span>
+<span class="s1">Software, including optional implementation of the standards, on technical but</span>
+<span class="s1">not commercial grounds, taking into account normal technical practice and the</span>
+<span class="s1">state of the art generally available at the time of standardization.</span>
+
+<span class="s1">1.3.                  &quot;Intellectual Property Rights&quot; means any and all rights</span>
+<span class="s1">under statute, common law or equity in and under copyrights, trade secrets, and</span>
+<span class="s1">patents (including utility models), and analogous rights throughout the world,</span>
+<span class="s1">including any applications for and the right to apply for, any of the</span>
+<span class="s1">foregoing.</span>
+
+<span class="s1">1.4.                  &quot;Software Content Register&quot; means the documentation</span>
+<span class="s1">accompanying the Licensed Software which identifies the contents of the</span>
+<span class="s1">Licensed Software, including but not limited to identification of any Third</span>
+<span class="s1">Party Software.</span>
+
+<span class="s1">1.5.                  &quot;Third Party Software&quot; means, any software included in</span>
+<span class="s1">the Licensed Software that is not NXP Proprietary software, and is not open</span>
+<span class="s1">source software, and to which different license terms may apply.</span>
+
+<span class="s1">2.                 LICENSE GRANT.</span>
+
+<span class="s1">2.1.                  Separate license grants to Third Party Software, or other</span>
+<span class="s1">terms applicable to the Licensed Software if different from those granted in</span>
+<span class="s1">++++ echo</span>
+
+<span class="s1">++++ REPLY=</span>
+<span class="s1">++++ &#39;</span><span class="o">[</span><span class="s1">&#39; -z &#39;&#39; &#39;</span><span class="o">]</span><span class="s1">&#39;</span>
+<span class="s1">++++ echo -n &#39;</span>Do you accept the EULA you just read? <span class="o">(</span>y/n<span class="o">)</span> <span class="s1">&#39;</span>
+<span class="s1">Do you accept the EULA you just read? (y/n) ++++ read REPLY</span>
+<span class="s1">y</span>
+<span class="s1">++++ case &quot;$REPLY&quot; in</span>
+<span class="s1">++++ echo &#39;</span>EULA has been accepted.<span class="s1">&#39;</span>
+<span class="s1">EULA has been accepted.</span>
+<span class="s1">++++ echo &#39;</span><span class="nv">ACCEPT_FSL_EULA</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span><span class="s1">&#39;</span>
+<span class="s1">++++ &#39;</span><span class="o">[</span><span class="s1">&#39; -z y &#39;</span><span class="o">]</span><span class="s1">&#39;</span>
+<span class="s1">++++ cat</span>
+
+<span class="s1">Welcome to Freescale Community BSP</span>
+
+<span class="s1">The Yocto Project has extensive documentation about OE including a</span>
+<span class="s1">reference manual which can be found at:</span>
+<span class="s1">    http://yoctoproject.org/documentation</span>
+
+<span class="s1">For more information about OpenEmbedded see their website:</span>
+<span class="s1">    http://www.openembedded.org/</span>
+
+<span class="s1">You can now run &#39;</span>bitbake &lt;target&gt;<span class="s1">&#39;</span>
+
+<span class="s1">Common targets are:</span>
+<span class="s1">    core-image-minimal</span>
+<span class="s1">    meta-toolchain</span>
+<span class="s1">    meta-toolchain-sdk</span>
+<span class="s1">    adt-installer</span>
+<span class="s1">    meta-ide-support</span>
+
+<span class="s1">++++ &#39;</span><span class="o">[</span><span class="s1">&#39; -n 1 &#39;</span><span class="o">]</span><span class="s1">&#39;</span>
+<span class="s1">++++ cat</span>
+<span class="s1">Your build environment has been configured with:</span>
+
+<span class="s1">    MACHINE=imx6dlsabresd</span>
+<span class="s1">    SDKMACHINE=i686</span>
+<span class="s1">    DISTRO=fsl-imx-x11</span>
+<span class="s1">    EULA=</span>
+<span class="s1">++++ clean_up</span>
+<span class="s1">++++ unset EULA LIST_MACHINES VALID_MACHINE</span>
+<span class="s1">++++ unset CWD TEMPLATES SHORTOPTS LONGOPTS ARGS PROGNAME</span>
+<span class="s1">++++ unset generated_config updated</span>
+<span class="s1">++++ unset MACHINE SDKMACHINE DISTRO OEROOT</span>
+<span class="s1">+++ BUILD_DIR=.</span>
+<span class="s1">+++ &#39;</span><span class="o">[</span><span class="s1">&#39; &#39;</span>!<span class="s1">&#39; -e ./conf/local.conf &#39;</span><span class="o">]</span><span class="s1">&#39;</span>
+<span class="s1">+++ &#39;</span><span class="o">[</span><span class="s1">&#39; &#39;</span>!<span class="s1">&#39; -e ./conf/local.conf.org &#39;</span><span class="o">]</span><span class="s1">&#39;</span>
+<span class="s1">+++ cp ./conf/local.conf ./conf/local.conf.org</span>
+<span class="s1">+++ &#39;</span><span class="o">[</span><span class="s1">&#39; &#39;</span>!<span class="s1">&#39; -e ./conf/bblayers.conf.org &#39;</span><span class="o">]</span><span class="s1">&#39;</span>
+<span class="s1">+++ cp ./conf/bblayers.conf ./conf/bblayers.conf.org</span>
+<span class="s1">+++ META_FSL_BSP_RELEASE=/sources/meta-fsl-bsp-release/imx/meta-bsp</span>
+<span class="s1">+++ echo &#39;</span><span class="c1">##Freescale Yocto Project Release layer&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-bsp &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-sdk &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-browser &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-gnome &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-networking &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-python &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-filesystems &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="s1">&#39;BBLAYERS += &quot; ${BSPDIR}/sources/meta-qt5 &quot;&#39;</span>
++++ <span class="nb">echo</span> <span class="nv">BSPDIR</span><span class="o">=</span>
+<span class="nv">BSPDIR</span><span class="o">=</span>
++++ <span class="nb">echo</span> <span class="nv">BUILD_DIR</span><span class="o">=</span>.
+<span class="nv">BUILD_DIR</span><span class="o">=</span>.
++++ <span class="s1">&#39;[&#39;</span> -d ../sources/meta-freescale <span class="s1">&#39;]&#39;</span>
++++ <span class="nb">cd</span> .
++++ clean_up
++++ <span class="nb">unset</span> EULA LIST_MACHINES VALID_MACHINE
++++ <span class="nb">unset</span> CWD TEMPLATES SHORTOPTS LONGOPTS ARGS PROGNAME
++++ <span class="nb">unset</span> generated_config updated
++++ <span class="nb">unset</span> MACHINE SDKMACHINE DISTRO OEROOT
++++ <span class="nb">unset</span> FSLDISTRO
+++ bitbake fsl-image-qt5 -g
+NOTE: Your conf/bblayers.conf has been automatically updated.
+Loading cache: <span class="m">100</span>% <span class="p">|</span><span class="c1">#########################################################################################################################| ETA:  00:00:00</span>
+Loaded <span class="m">2793</span> entries from dependency cache.
+Parsing recipes: <span class="m">100</span>% <span class="p">|</span><span class="c1">#######################################################################################################################| Time: 00:00:01</span>
+Parsing of <span class="m">2217</span> .bb files <span class="nb">complete</span> <span class="o">(</span><span class="m">2202</span> cached, <span class="m">15</span> parsed<span class="o">)</span>. <span class="m">2792</span> targets, <span class="m">206</span> skipped, <span class="m">5</span> masked, <span class="m">0</span> errors.
+NOTE: Resolving any missing task queue dependencies
+NOTE: Preparing RunQueue
+WARNING: /home/zengjf/fsl-release-bsp/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/u-boot/u-boot-imx_2016.03.bb.do_compile is tainted from a forced run
+NOTE: PN build list saved to <span class="s1">&#39;pn-buildlist&#39;</span>
+NOTE: PN dependencies saved to <span class="s1">&#39;pn-depends.dot&#39;</span>
+NOTE: Package dependencies saved to <span class="s1">&#39;package-depends.dot&#39;</span>
+NOTE: Task dependencies saved to <span class="s1">&#39;task-depends.dot&#39;</span>
+
+Summary: There was <span class="m">1</span> WARNING message shown.
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

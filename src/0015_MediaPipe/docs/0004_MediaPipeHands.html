@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">MediaPipe Hands</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#hand-landmark-model">Hand Landmark Model</a></li>
+<li><a class="reference internal" href="#mediapipe-output">MediaPipe Output</a><ul>
+<li><a class="reference internal" href="#multi-hand-landmarks">MULTI_HAND_LANDMARKS</a></li>
+<li><a class="reference internal" href="#multi-hand-world-landmarks">MULTI_HAND_WORLD_LANDMARKS</a></li>
+<li><a class="reference internal" href="#multi-handedness">MULTI_HANDEDNESS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#android-diff">Android diff</a></li>
+<li><a class="reference internal" href="#id2">可视化示例代码</a></li>
+<li><a class="reference internal" href="#screen-sync">Screen Sync</a></li>
+<li><a class="reference internal" href="#jupyter">jupyter</a></li>
+<li><a class="reference internal" href="#hand-gesture-recognition">hand gesture recognition</a><ul>
+<li><a class="reference internal" href="#google-colab">Google Colab上传、下载训练文件</a></li>
+<li><a class="reference internal" href="#training-model">Training Model</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mediapipe-hands">
+<h1>MediaPipe Hands<a class="headerlink" href="#mediapipe-hands" title="Permalink to this headline"></a></h1>
+<p>可视化MediaPipe Hands导出数据</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://google.github.io/mediapipe/solutions/hands.html#mediapipe-hands">MediaPipe Hands</a></p></li>
+<li><p><a class="reference external" href="https://github.com/kinivi/hand-gesture-recognition-mediapipe">hand-gesture-recognition-using-mediapipe</a></p></li>
+</ul>
+</section>
+<section id="hand-landmark-model">
+<h1>Hand Landmark Model<a class="headerlink" href="#hand-landmark-model" title="Permalink to this headline"></a></h1>
+<p><img alt="0004_hand_landmarks.png" src="../../../_images/0004_hand_landmarks.png" /></p>
+</section>
+<section id="mediapipe-output">
+<h1>MediaPipe Output<a class="headerlink" href="#mediapipe-output" title="Permalink to this headline"></a></h1>
+<section id="multi-hand-landmarks">
+<h2>MULTI_HAND_LANDMARKS<a class="headerlink" href="#multi-hand-landmarks" title="Permalink to this headline"></a></h2>
+<p>Collection of detected/tracked hands, where each hand is represented as a list of 21 hand landmarks and each landmark is composed of x, y and z. x and y are normalized to [0.0, 1.0] by the image width and height respectively. z represents the landmark depth with the depth at the wrist being the origin, and the smaller the value the closer the landmark is to the camera. The magnitude of z uses roughly the same scale as x.</p>
+<p>以屏幕坐标系为基准的数据，z轴越靠近屏幕越小，手掌面面向摄像头为负轴</p>
+</section>
+<section id="multi-hand-world-landmarks">
+<h2>MULTI_HAND_WORLD_LANDMARKS<a class="headerlink" href="#multi-hand-world-landmarks" title="Permalink to this headline"></a></h2>
+<p>Collection of detected/tracked hands, where each hand is represented as a list of 21 hand landmarks in world coordinates. Each landmark is composed of x, y and z: real-world 3D coordinates in meters with the origin at the hand’s approximate geometric center.</p>
+<p>以手的几何中心的坐标系数据</p>
+</section>
+<section id="multi-handedness">
+<h2>MULTI_HANDEDNESS<a class="headerlink" href="#multi-handedness" title="Permalink to this headline"></a></h2>
+<p>Collection of handedness of the detected/tracked hands (i.e. is it a left or right hand). Each hand is composed of label and score. label is a string of value either “Left” or “Right”. score is the estimated probability of the predicted handedness and is always greater than or equal to 0.5 (and the opposite handedness has an estimated probability of 1 - score).</p>
+<p>Note that handedness is determined assuming the input image is mirrored, i.e., taken with a front-facing/selfie camera with images flipped horizontally. If it is not the case, please swap the handedness output in the application.</p>
+<p>判断左右手</p>
+</section>
+</section>
+<section id="android-diff">
+<h1>Android diff<a class="headerlink" href="#android-diff" title="Permalink to this headline"></a></h1>
+<p>multiHandLandmarks</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gh">index d93f9b1..a526fc4 100644</span><span class="w"></span>
+<span class="gd">--- a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gi">+++ b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gu">@@ -369,5 +369,16 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>            &quot;MediaPipe Hand wrist world coordinates (in meters with the origin at the hand&#39;s&quot;<span class="w"></span>
+<span class="w"> </span>                + &quot; approximate geometric center): x=%f m, y=%f m, z=%f m&quot;,<span class="w"></span>
+<span class="w"> </span>            wristWorldLandmark.getX(), wristWorldLandmark.getY(), wristWorldLandmark.getZ()));<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    Log.e( TAG, &quot;----------------------&quot;);</span><span class="w"></span>
+<span class="gi">+    Log.e( TAG, result.multiHandedness().get(0).getLabel());</span><span class="w"></span>
+<span class="gi">+    Log.e( TAG, &quot;&quot; + result.multiHandedness().get(0).getScore());</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    Log.i(&quot;MonitorLandMark&quot;, &quot;start capture data&quot;);</span><span class="w"></span>
+<span class="gi">+    for (NormalizedLandmark landmark : result.multiHandLandmarks().get(0).getLandmarkList()) {</span><span class="w"></span>
+<span class="gi">+      Log.i(&quot;MonitorLandMark&quot;, String.format(&quot;x=%f, y=%f, z=%f&quot;, landmark.getX(), landmark.getY(), landmark.getZ()));</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+    Log.i(&quot;MonitorLandMark&quot;, &quot;end capture data&quot;);</span><span class="w"></span>
+<span class="w"> </span>  }<span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+</pre></div>
+</div>
+<p>multiHandWorldLandmarks</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gh">index d93f9b1..13227ee 100644</span><span class="w"></span>
+<span class="gd">--- a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gi">+++ b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gu">@@ -369,5 +369,19 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>            &quot;MediaPipe Hand wrist world coordinates (in meters with the origin at the hand&#39;s&quot;<span class="w"></span>
+<span class="w"> </span>                + &quot; approximate geometric center): x=%f m, y=%f m, z=%f m&quot;,<span class="w"></span>
+<span class="w"> </span>            wristWorldLandmark.getX(), wristWorldLandmark.getY(), wristWorldLandmark.getZ()));<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    Log.e( TAG, &quot;----------------------&quot;);</span><span class="w"></span>
+<span class="gi">+    Log.e( TAG, result.multiHandedness().get(0).getLabel());</span><span class="w"></span>
+<span class="gi">+    Log.e( TAG, &quot;&quot; + result.multiHandedness().get(0).getScore());</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    Log.i(&quot;MonitorLandMark&quot;, &quot;start capture data&quot;);</span><span class="w"></span>
+<span class="gi">+    //  for (NormalizedLandmark landmark : result.multiHandLandmarks().get(0).getLandmarkList()) {</span><span class="w"></span>
+<span class="gi">+    //    Log.i(&quot;MonitorLandMark&quot;, String.format(&quot;x=%f, y=%f, z=%f&quot;, landmark.getX(), landmark.getY(), landmark.getZ()));</span><span class="w"></span>
+<span class="gi">+    //  }</span><span class="w"></span>
+<span class="gi">+    for (Landmark landmark : result.multiHandWorldLandmarks().get(0).getLandmarkList()) {</span><span class="w"></span>
+<span class="gi">+        Log.i(&quot;MonitorLandMark&quot;, String.format(&quot;x=%f, y=%f, z=%f&quot;, landmark.getX(), landmark.getY(), landmark.getZ()));</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+    Log.i(&quot;MonitorLandMark&quot;, &quot;end capture data&quot;);</span><span class="w"></span>
+<span class="w"> </span>  }<span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>可视化示例代码<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/bef2d667bfdefe5e95c86136df7dc0a4/MediaPipeHands.py"><span class="xref download myst">MediaPipeHands.py</span></a></p>
+<ul>
+<li><p>python3 LogTools.py MediaPipeHands -mode live</p>
+<ul>
+<li><p>keyboard “c” is for data capture start</p></li>
+<li><p>keyboard “p” is for data capture stop</p></li>
+<li><p>defalut data at output/hands.txt</p></li>
+<li><p>绘图帧率比较低，可以调高，这样就不会出现延迟很久绘图的现象</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">ani</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_plot</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1000</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">interval=</span> <span class="pre">1000</span> <span class="pre">/</span> <span class="pre">10</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">interval=</span> <span class="pre">1000</span> <span class="pre">/</span> <span class="pre">25</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img alt="0004_MeidaPipeHands.gif" src="../../../_images/0004_MeidaPipeHands.gif" /></p>
+</section>
+<section id="screen-sync">
+<h1>Screen Sync<a class="headerlink" href="#screen-sync" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://www.vysor.io/</p>
+<ul>
+<li><p>本来担心开了投屏，数据通信会变慢，导致实时性不好，结果一点问题都没有，实时性很好</p></li>
+<li><p>用于录屏</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="jupyter">
+<h1>jupyter<a class="headerlink" href="#jupyter" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>pip3 install jupyter</p></li>
+<li><p>pip3 install ipyparallel</p></li>
+<li><p>jupyter notebook</p>
+<ul>
+<li><p>以当前目录为执行目录</p></li>
+<li><p>ipynb文件是json文件，将所谓的cell内容以json的形式保存</p></li>
+</ul>
+</li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/197ad14db186350f80ee22416463b9f8/jupyter_notebook.ipynb"><span class="xref download myst">jupyter_notebook.ipynb</span></a></p>
+<ul>
+<li><p>发现vscode本身就支持jupyter notebook直接调试</p></li>
+</ul>
+</li>
+<li><p>主要用于理解Google Colab工作原理、环境</p></li>
+</ul>
+</section>
+<section id="hand-gesture-recognition">
+<h1>hand gesture recognition<a class="headerlink" href="#hand-gesture-recognition" title="Permalink to this headline"></a></h1>
+<section id="google-colab">
+<h2>Google Colab上传、下载训练文件<a class="headerlink" href="#google-colab" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>参考文档</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/tensorflow/examples/tree/master/lite/examples/gesture_classification">gesture_classification</a></p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/b556e8931cf0ccbfc88502f901e4d596/tensorflowjs_to_tflite_colab_notebook.ipynb"><span class="xref download myst">tensorflowjs_to_tflite_colab_notebook.ipynb</span></a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>删除之前的文件</p>
+<div class="highlight-jupyter notranslate"><div class="highlight"><pre><span></span>!rm -rf *.h5 *.tflite *.json *.bin
+</pre></div>
+</div>
+<p>上传文件，会自动上传到Google Colab虚拟机的工作目录，下载即从工作目录下载指定文件到本地</p>
+<p><img alt="0004_Google_Colab_Workspace.png" src="../../../_images/0004_Google_Colab_Workspace.png" /></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">files</span>
+
+<span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
+
+<span class="c1"># TODO</span>
+
+<span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_tflite</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="training-model">
+<h2>Training Model<a class="headerlink" href="#training-model" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/kinivi/hand-gesture-recognition-mediapipe">hand-gesture-recognition-using-mediapipe</a></p>
+<ul>
+<li><p>https://github.com/kinivi/hand-gesture-recognition-mediapipe/blob/main/keypoint_classification_EN.ipynb</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/83d13a960068837762aabfb5f7a9655b/keypoint_classification_EN.ipynb"><span class="xref download myst">keypoint_classification_EN.ipynb</span></a></p>
+<ul>
+<li><p>https://colab.research.google.com/</p>
+<ul>
+<li><p>上传</p></li>
+<li><p>上传完就回进入Google提供的模型训练虚拟环境，在里面执行、修改程序</p></li>
+<li><p><span class="xref myst">Training data</span></p></li>
+<li><p>[修改] -&gt; [清除所有输出项]</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

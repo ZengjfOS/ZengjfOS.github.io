@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SD卡自动扩容</a></li>
+<li><a class="reference internal" href="#id1">补充内容</a></li>
+<li><a class="reference internal" href="#steps">steps</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sd">
+<h1>SD卡自动扩容<a class="headerlink" href="#sd" title="Permalink to this headline"></a></h1>
+<p>理解SD卡自动扩容工作原理</p>
+</section>
+<section id="id1">
+<h1>补充内容<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>刚烧录完系统时候，第一次启动时候，init进程执行的是resize的脚本</p></li>
+<li><p>/boot/cmdline.txt</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">console=serial1,115200</span> <span class="pre">console=tty1</span> <span class="pre">root=PARTUUID=1d1c0dec-02</span> <span class="pre">rootfstype=ext4</span> <span class="pre">elevator=deadline</span> <span class="pre">fsck.repair=yes</span> <span class="pre">rootwait</span> <span class="pre">quiet</span> <span class="pre">init=/usr/lib/raspi-config/init_resize.sh</span> <span class="pre">splash</span> <span class="pre">plymouth.ignore-serial-consoles</span></code></p>
+<ul>
+<li><p>init=/usr/lib/raspi-config/init_resize.sh</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="steps">
+<h1>steps<a class="headerlink" href="#steps" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo raspi-config</p>
+<ul class="simple">
+<li><p>Advanced Options</p>
+<ul>
+<li><p>Expand Filesystem</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>/usr/bin/raspi-config</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>do_expand_rootfs<span class="o">()</span> <span class="o">{</span>
+  <span class="c1"># -h : FILE exists and is a symbolic link (same as -L)</span>
+  <span class="k">if</span> ! <span class="o">[</span> -h /dev/root <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    whiptail --msgbox <span class="s2">&quot;/dev/root does not exist or is not a symlink. Don&#39;t know how to expand&quot;</span> <span class="m">20</span> <span class="m">60</span> <span class="m">2</span>
+    <span class="k">return</span> <span class="m">0</span>
+  <span class="k">fi</span>
+
+  <span class="c1"># readlink用来找出符号链接所指向的位置。 </span>
+  <span class="nv">ROOT_PART</span><span class="o">=</span><span class="k">$(</span>readlink /dev/root<span class="k">)</span>
+  <span class="c1"># 从变量$string的开头, 删除最短匹配$substring的子串</span>
+  <span class="nv">PART_NUM</span><span class="o">=</span><span class="si">${</span><span class="nv">ROOT_PART</span><span class="p">#mmcblk0p</span><span class="si">}</span>
+  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$PART_NUM</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$ROOT_PART</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    whiptail --msgbox <span class="s2">&quot;/dev/root is not an SD card. Don&#39;t know how to expand&quot;</span> <span class="m">20</span> <span class="m">60</span> <span class="m">2</span>
+    <span class="k">return</span> <span class="m">0</span>
+  <span class="k">fi</span>
+
+  <span class="c1"># NOTE: the NOOBS partition layout confuses parted. For now, let&#39;s only </span>
+  <span class="c1"># agree to work with a sufficiently simple partition layout</span>
+  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$PART_NUM</span><span class="s2">&quot;</span> -ne <span class="m">2</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    whiptail --msgbox <span class="s2">&quot;Your partition layout is not currently supported by this tool. You are probably using NOOBS, in which case your root filesystem is already expanded anyway.&quot;</span> <span class="m">20</span> <span class="m">60</span> <span class="m">2</span>
+    <span class="k">return</span> <span class="m">0</span>
+  <span class="k">fi</span>
+
+  <span class="c1"># 再次确认分区表和设备节点提取的数值是否一致</span>
+  <span class="c1"># </span>
+  <span class="c1"># shell script:</span>
+  <span class="c1">#   root@zengjf:/home/zengjf/hacking# parted /dev/sdb -ms unit s p </span>
+  <span class="c1">#   BYT;</span>
+  <span class="c1">#   /dev/sdb:1953525168s:scsi:512:4096:gpt:ATA ST1000LM035-1RK1:;</span>
+  <span class="c1">#   1:2048s:943720448s:943718401s:ntfs:Basic data partition:msftdata;</span>
+  <span class="c1">#   2:943722496s:1953523711s:1009801216s:ntfs:Basic data partition:msftdata;</span>
+  <span class="nv">LAST_PART_NUM</span><span class="o">=</span><span class="k">$(</span>parted /dev/mmcblk0 -ms unit s p <span class="p">|</span> tail -n <span class="m">1</span> <span class="p">|</span> cut -f <span class="m">1</span> -d:<span class="k">)</span>
+  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$LAST_PART_NUM</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$PART_NUM</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    whiptail --msgbox <span class="s2">&quot;/dev/root is not the last partition. Don&#39;t know how to expand&quot;</span> <span class="m">20</span> <span class="m">60</span> <span class="m">2</span>
+    <span class="k">return</span> <span class="m">0</span>
+  <span class="k">fi</span>
+
+  <span class="c1"># Get the starting offset of the root partition</span>
+  <span class="c1"># 获取文件系统分区起始位置</span>
+  <span class="nv">PART_START</span><span class="o">=</span><span class="k">$(</span>parted /dev/mmcblk0 -ms unit s p <span class="p">|</span> grep <span class="s2">&quot;^</span><span class="si">${</span><span class="nv">PART_NUM</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">|</span> cut -f <span class="m">2</span> -d:<span class="k">)</span>
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$PART_START</span><span class="s2">&quot;</span> <span class="o">]</span> <span class="o">||</span> <span class="k">return</span> <span class="m">1</span>
+  <span class="c1"># Return value will likely be error for fdisk as it fails to reload the</span>
+  <span class="c1"># partition table because the root fs is mounted</span>
+  fdisk /dev/mmcblk0 <span class="s">&lt;&lt;EOF</span>
+<span class="s">p</span>
+<span class="s">d</span>
+<span class="s">$PART_NUM</span>
+<span class="s">n</span>
+<span class="s">p</span>
+<span class="s">$PART_NUM</span>
+<span class="s">$PART_START</span>
+
+<span class="s">p</span>
+<span class="s">w</span>
+<span class="s">EOF</span>
+  <span class="nv">ASK_TO_REBOOT</span><span class="o">=</span><span class="m">1</span>
+
+  <span class="c1"># now set up an init.d script</span>
+cat <span class="s">&lt;&lt;\EOF &gt; /etc/init.d/resize2fs_once &amp;&amp;</span>
+<span class="s">#!/bin/sh</span>
+<span class="s">### BEGIN INIT INFO</span>
+<span class="s"># Provides:          resize2fs_once</span>
+<span class="s"># Required-Start:</span>
+<span class="s"># Required-Stop:</span>
+<span class="s"># Default-Start: 2 3 4 5 S</span>
+<span class="s"># Default-Stop:</span>
+<span class="s"># Short-Description: Resize the root filesystem to fill partition</span>
+<span class="s"># Description:</span>
+<span class="s">### END INIT INFO</span>
+<span class="s">. /lib/lsb/init-functions</span>
+<span class="s">case &quot;$1&quot; in</span>
+<span class="s">  start)</span>
+<span class="s">    log_daemon_msg &quot;Starting resize2fs_once&quot; &amp;&amp;</span>
+<span class="s">    resize2fs /dev/root &amp;&amp;                       # 真正调整大小的地方</span>
+<span class="s">    rm /etc/init.d/resize2fs_once &amp;&amp;             # 删除文件，表明该文件只能被运行一次</span>
+<span class="s">    update-rc.d resize2fs_once remove &amp;&amp;</span>
+<span class="s">    log_end_msg $?</span>
+<span class="s">    ;;</span>
+<span class="s">  *)</span>
+<span class="s">    echo &quot;Usage: $0 start&quot; &gt;&amp;2</span>
+<span class="s">    exit 3</span>
+<span class="s">    ;;</span>
+<span class="s">esac</span>
+<span class="s">EOF</span>
+  chmod +x /etc/init.d/resize2fs_once <span class="o">&amp;&amp;</span>         <span class="c1"># 给出下次运行的权限</span>
+  update-rc.d resize2fs_once defaults <span class="o">&amp;&amp;</span>         <span class="c1"># 默认运行</span>
+  <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$INTERACTIVE</span><span class="s2">&quot;</span> <span class="o">=</span> True <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    whiptail --msgbox <span class="s2">&quot;Root partition has been resized.\nThe filesystem will be enlarged upon the next reboot&quot;</span> <span class="m">20</span> <span class="m">60</span> <span class="m">2</span>
+  <span class="k">fi</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

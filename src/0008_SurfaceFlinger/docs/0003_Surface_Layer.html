@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Surface Layer</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">Surface Layer</a></li>
+<li><a class="reference internal" href="#vsync-app-vsync-sf">Vsync-app 跟 Vsync-sf</a></li>
+<li><a class="reference internal" href="#example">example</a></li>
+<li><a class="reference internal" href="#surfacecomposerclient">SurfaceComposerClient</a></li>
+<li><a class="reference internal" href="#createsurface">createSurface</a></li>
+<li><a class="reference internal" href="#graphicbuffer">GraphicBuffer</a></li>
+<li><a class="reference internal" href="#getsurface">getSurface</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="surface-layer">
+<h1>Surface Layer<a class="headerlink" href="#surface-layer" title="Permalink to this headline"></a></h1>
+<p>Surface和Layer的概念</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.jianshu.com/p/dcaf1eeddeb1">Android画面显示流程分析(5)</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_34211365/article/details/106503902">AndroidQ 图形系统（2）生产者-消费者模型</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/liuwg1226/article/details/115385299">Android图形显示系统6　图像缓冲区(下)</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_15893929/article/details/102813185">SurfaceFlinger学习之路（三）BufferQueue原理</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>Surface Layer<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Layer是一个图层</p></li>
+<li><p>Surface实际显示在手机上的某一个图像，这个图像可能由多个Layer组成</p></li>
+</ul>
+</section>
+<section id="vsync-app-vsync-sf">
+<h1>Vsync-app 跟 Vsync-sf<a class="headerlink" href="#vsync-app-vsync-sf" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>VSYNC-app用于控制APP绘制UI的节奏，其实就是SF中app-DispSyncSource根据自己需要，转发DispSync的sync信号。</p></li>
+<li><p>VSYNC-sf用于控制SF合成Layer的节奏，可以理解为sf对应的DispSyncSource发出的sync信号，再触发EventThread的回调并转换成事件写入写端，最后触发读端的回调MessageQueue::cb_eventReceiver()，SF开始合成显示图层</p></li>
+</ul>
+</section>
+<section id="example">
+<h1>example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">ProcessState</span><span class="o">&gt;</span><span class="w"> </span><span class="n">proc</span><span class="p">(</span><span class="n">ProcessState</span><span class="o">::</span><span class="n">self</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">ProcessState</span><span class="o">::</span><span class="n">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">startThreadPool</span><span class="p">();</span><span class="c1">//在应用和SurfaceFlinger沟通过程中要使用到binder, 所以这里要先初始化binder线程池</span>
+
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">SurfaceComposerClient</span><span class="o">&gt;</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SurfaceComposerClient</span><span class="p">();</span><span class="c1">//SurfaceComposerClient是SurfaceFlinger在应用侧的代表， SurfaceFlinger的接口通过它来提供</span>
+<span class="w">    </span><span class="n">client</span><span class="o">-&gt;</span><span class="n">initCheck</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//先通过createSurface接口来申请一块画布，参数里包含对画布起的名字，大小，位深信息</span>
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">SurfaceControl</span><span class="o">&gt;</span><span class="w"> </span><span class="n">surfaceControl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="o">-&gt;</span><span class="n">createSurface</span><span class="p">(</span><span class="n">String8</span><span class="p">(</span><span class="s">&quot;Console Surface&quot;</span><span class="p">),</span><span class="mi">800</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="n">PIXEL_FORMAT_RGBA_8888</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">SurfaceComposerClient</span><span class="o">::</span><span class="n">Transaction</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">setLayer</span><span class="p">(</span><span class="n">surfaceControl</span><span class="p">,</span><span class="w"> </span><span class="mh">0x40000000</span><span class="p">).</span><span class="n">apply</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//通过getSurface接口获取到Surface对象</span>
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">Surface</span><span class="o">&gt;</span><span class="w"> </span><span class="n">surface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">surfaceControl</span><span class="o">-&gt;</span><span class="n">getSurface</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">ANativeWindow_Buffer</span><span class="w"> </span><span class="n">buffer</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//通过Surface的lock方法调用到dequeueBuffer，获取到一个BufferQueue可用的Slot</span>
+<span class="w">    </span><span class="n">status_t</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">surface</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="c1">// &amp;clipRegin</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">bits</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">ssize_t</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">stride</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">buffer</span><span class="p">.</span><span class="n">height</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">memset</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="c1">//这里绘图，由于我们没有使用任何图形库，所以这里把内存填成255， 画一个纯色画面</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">surface</span><span class="o">-&gt;</span><span class="n">unlockAndPost</span><span class="p">();</span><span class="c1">//这里会调用到queueBuffer,把我们绘制好的画面提交给SurfaceFlinger</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;sleep...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">usleep</span><span class="p">(</span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">surface</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">surfaceControl</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;complete. CTRL+C to finish.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">IPCThreadState</span><span class="o">::</span><span class="n">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">joinThreadPool</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="surfacecomposerclient">
+<h1>SurfaceComposerClient<a class="headerlink" href="#surfacecomposerclient" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>SurfaceComposerClient对应的SF Server端就是Client实例</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/native/libs/gui/include/gui/SurfaceComposerClient.h
+  * class SurfaceComposerClient : public RefBase
+    * SurfaceComposerClient();
+      * frameworks/native/libs/gui/SurfaceComposerClient.cpp
+        * SurfaceComposerClient::SurfaceComposerClient() : mStatus(NO_INIT) {}
+    * void SurfaceComposerClient::onFirstRef()
+      * sp&lt;ISurfaceComposer&gt; sf(ComposerService::getComposerService());
+      * sp&lt;ISurfaceComposerClient&gt; conn;
+      * conn = sf-&gt;createConnection();
+        * frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+          * sp&lt;ISurfaceComposerClient&gt; SurfaceFlinger::createConnection()
+            * const sp&lt;Client&gt; client = new Client(this);
+              * frameworks/native/services/surfaceflinger/Client.cpp
+                * Client::Client(const sp&lt;SurfaceFlinger&gt;&amp; flinger) : mFlinger(flinger)
+                  * frameworks/native/services/surfaceflinger/Client.h
+                    * class Client : public BnSurfaceComposerClient
+                      * SurfaceComposerClient对应的SF Server端就是Client实例
+            * return client-&gt;initCheck() == NO_ERROR ? client : nullptr;
+</pre></div>
+</div>
+</section>
+<section id="createsurface">
+<h1>createSurface<a class="headerlink" href="#createsurface" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>SurfaceComposerClient通过对应的Client发起createSurface()请求，最终转换成createLayer()处理；</p></li>
+<li><p>默认创建的BufferQueueLayer，当然还有其他的Layer；</p></li>
+<li><p>BufferQueueLayer其内部包含了BufferQueue；</p></li>
+<li><p>BufferQueue其内部包含了BufferQueueCore、BufferQueueProducer、BufferQueueConsumer；</p></li>
+<li><p>返回的SurfaceControl就是BufferQueue控制器；</p></li>
+<li><p>其实这里的本质是创建了BufferQueue；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">Client</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">status_t</span> <span class="n">Client</span><span class="p">::</span><span class="n">createSurface</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">*</span> <span class="k">return</span> <span class="n">mFlinger</span><span class="o">-&gt;</span><span class="n">createLayer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">metadata</span><span class="p">),</span> <span class="n">handle</span><span class="p">,</span> <span class="n">gbp</span><span class="p">,</span> <span class="n">parentHandle</span><span class="p">,</span> <span class="n">outLayerId</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">,</span> <span class="n">outTransformHint</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">SurfaceFlinger</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">status_t</span> <span class="n">SurfaceFlinger</span><span class="p">::</span><span class="n">createLayer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">switch</span> <span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">ISurfaceComposerClient</span><span class="p">::</span><span class="n">eFXSurfaceMask</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">case</span> <span class="n">ISurfaceComposerClient</span><span class="p">::</span><span class="n">eFXSurfaceBufferQueue</span><span class="p">:</span>
+              <span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">createBufferQueueLayer</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">uniqueName</span><span class="p">),</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">metadata</span><span class="p">),</span> <span class="nb">format</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">gbp</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">layer</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">LayerCreationArgs</span> <span class="n">args</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">metadata</span><span class="p">));</span>
+                <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">textureName</span> <span class="o">=</span> <span class="n">getNewTexture</span><span class="p">();</span>
+                <span class="o">*</span> <span class="n">layer</span> <span class="o">=</span> <span class="n">getFactory</span><span class="p">()</span><span class="o">.</span><span class="n">createBufferQueueLayer</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+                  <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">SurfaceFlingerDefaultFactory</span><span class="o">.</span><span class="n">cpp</span>
+                    <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">BufferQueueLayer</span><span class="o">&gt;</span> <span class="n">DefaultFactory</span><span class="p">::</span><span class="n">createBufferQueueLayer</span><span class="p">(</span><span class="n">const</span> <span class="n">LayerCreationArgs</span><span class="o">&amp;</span> <span class="n">args</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="k">return</span> <span class="n">new</span> <span class="n">BufferQueueLayer</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+                        <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">BufferQueueLayer</span><span class="o">.</span><span class="n">h</span>
+                          <span class="o">*</span> <span class="k">class</span> <span class="nc">BufferQueueLayer</span> <span class="p">:</span> <span class="n">public</span> <span class="n">BufferLayer</span>
+                            <span class="o">*</span> <span class="n">BufferQueueLayer</span><span class="p">::</span><span class="n">BufferQueueLayer</span><span class="p">(</span><span class="n">const</span> <span class="n">LayerCreationArgs</span><span class="o">&amp;</span> <span class="n">args</span><span class="p">)</span> <span class="p">:</span> <span class="n">BufferLayer</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> 
+                            <span class="o">*</span> <span class="n">void</span> <span class="n">BufferQueueLayer</span><span class="p">::</span><span class="n">onFirstRef</span><span class="p">()</span>
+                              <span class="o">*</span> <span class="n">BufferLayer</span><span class="p">::</span><span class="n">onFirstRef</span><span class="p">();</span>
+                                <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IGraphicBufferProducer</span><span class="o">&gt;</span> <span class="n">producer</span><span class="p">;</span>
+                                <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IGraphicBufferConsumer</span><span class="o">&gt;</span> <span class="n">consumer</span><span class="p">;</span>
+                                <span class="o">*</span> <span class="n">mFlinger</span><span class="o">-&gt;</span><span class="n">getFactory</span><span class="p">()</span><span class="o">.</span><span class="n">createBufferQueue</span><span class="p">(</span><span class="o">&amp;</span><span class="n">producer</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">consumer</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+                                  <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">SurfaceFlingerDefaultFactory</span><span class="o">.</span><span class="n">cpp</span>
+                                    <span class="o">*</span> <span class="n">void</span> <span class="n">DefaultFactory</span><span class="p">::</span><span class="n">createBufferQueue</span><span class="p">(</span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IGraphicBufferProducer</span><span class="o">&gt;*</span> <span class="n">outProducer</span><span class="p">,</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IGraphicBufferConsumer</span><span class="o">&gt;*</span> <span class="n">outConsumer</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">consumerIsSurfaceFlinger</span><span class="p">)</span>
+                                      <span class="o">*</span> <span class="n">BufferQueue</span><span class="p">::</span><span class="n">createBufferQueue</span><span class="p">(</span><span class="n">outProducer</span><span class="p">,</span> <span class="n">outConsumer</span><span class="p">,</span> <span class="n">consumerIsSurfaceFlinger</span><span class="p">);</span>
+                                        <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferQueue</span><span class="o">.</span><span class="n">cpp</span>
+                                          <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">BufferQueueCore</span><span class="o">&gt;</span> <span class="n">core</span><span class="p">(</span><span class="n">new</span> <span class="n">BufferQueueCore</span><span class="p">());</span>
+                                            <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferQueueCore</span><span class="o">.</span><span class="n">h</span>
+                                              <span class="o">*</span> <span class="n">BufferQueueDefs</span><span class="p">::</span><span class="n">SlotsType</span> <span class="n">mSlots</span><span class="p">;</span>
+                                                <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferQueueDefs</span><span class="o">.</span><span class="n">h</span>
+                                                  <span class="o">*</span> <span class="n">typedef</span> <span class="n">BufferSlot</span> <span class="n">SlotsType</span><span class="p">[</span><span class="n">NUM_BUFFER_SLOTS</span><span class="p">];</span>
+                                                    <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferSlot</span><span class="o">.</span><span class="n">h</span>
+                                                      <span class="o">*</span> <span class="n">struct</span> <span class="n">BufferSlot</span>
+                                                        <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">GraphicBuffer</span><span class="o">&gt;</span> <span class="n">mGraphicBuffer</span><span class="p">;</span>
+                                          <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IGraphicBufferProducer</span><span class="o">&gt;</span> <span class="n">producer</span><span class="p">(</span><span class="n">new</span> <span class="n">BufferQueueProducer</span><span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">consumerIsSurfaceFlinger</span><span class="p">));</span>
+                                            <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferQueueProducer</span><span class="o">.</span><span class="n">h</span>
+                                              <span class="o">*</span> <span class="k">class</span> <span class="nc">BufferQueueProducer</span> <span class="p">:</span> <span class="n">public</span> <span class="n">BnGraphicBufferProducer</span><span class="p">,</span> <span class="n">private</span> <span class="n">IBinder</span><span class="p">::</span><span class="n">DeathRecipient</span>
+                                          <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IGraphicBufferConsumer</span><span class="o">&gt;</span> <span class="n">consumer</span><span class="p">(</span><span class="n">new</span> <span class="n">BufferQueueConsumer</span><span class="p">(</span><span class="n">core</span><span class="p">));</span>
+                                            <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferQueueConsumer</span><span class="o">.</span><span class="n">h</span>
+                                              <span class="o">*</span> <span class="k">class</span> <span class="nc">BufferQueueConsumer</span> <span class="p">:</span> <span class="n">public</span> <span class="n">BnGraphicBufferConsumer</span>
+                                          <span class="o">*</span> <span class="o">*</span><span class="n">outProducer</span> <span class="o">=</span> <span class="n">producer</span><span class="p">;</span>
+                                          <span class="o">*</span> <span class="o">*</span><span class="n">outConsumer</span> <span class="o">=</span> <span class="n">consumer</span><span class="p">;</span>
+                                <span class="o">*</span> <span class="n">mProducer</span> <span class="o">=</span> <span class="n">mFlinger</span><span class="o">-&gt;</span><span class="n">getFactory</span><span class="p">()</span><span class="o">.</span><span class="n">createMonitoredProducer</span><span class="p">(</span><span class="n">producer</span><span class="p">,</span> <span class="n">mFlinger</span><span class="p">,</span> <span class="n">this</span><span class="p">);</span>
+                                <span class="o">*</span> <span class="n">mConsumer</span> <span class="o">=</span> <span class="n">mFlinger</span><span class="o">-&gt;</span><span class="n">getFactory</span><span class="p">()</span><span class="o">.</span><span class="n">createBufferLayerConsumer</span><span class="p">(</span><span class="n">consumer</span><span class="p">,</span> <span class="n">mFlinger</span><span class="o">-&gt;</span><span class="n">getRenderEngine</span><span class="p">(),</span> <span class="n">mTextureName</span><span class="p">,</span> <span class="n">this</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">status_t</span> <span class="n">err</span> <span class="o">=</span> <span class="n">layer</span><span class="o">-&gt;</span><span class="n">setDefaultBufferProperties</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="nb">format</span><span class="p">);</span>
+                <span class="o">*</span> <span class="o">*</span><span class="n">handle</span> <span class="o">=</span> <span class="n">layer</span><span class="o">-&gt;</span><span class="n">getHandle</span><span class="p">();</span>
+                  <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">Layer</span><span class="o">.</span><span class="n">cpp</span>
+                    <span class="o">*</span> <span class="k">return</span> <span class="n">new</span> <span class="n">Handle</span><span class="p">(</span><span class="n">mFlinger</span><span class="p">,</span> <span class="n">this</span><span class="p">);</span>
+                      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">Layer</span><span class="o">.</span><span class="n">h</span>
+                        <span class="o">*</span> <span class="k">class</span> <span class="nc">Handle</span> <span class="p">:</span> <span class="n">public</span> <span class="n">BBinder</span><span class="p">,</span> <span class="n">public</span> <span class="n">LayerCleaner</span>
+                <span class="o">*</span> <span class="o">*</span><span class="n">gbp</span> <span class="o">=</span> <span class="n">layer</span><span class="o">-&gt;</span><span class="n">getProducer</span><span class="p">();</span>
+                <span class="o">*</span> <span class="o">*</span><span class="n">outLayer</span> <span class="o">=</span> <span class="n">layer</span><span class="p">;</span>
+          <span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">addClientLayer</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="o">*</span><span class="n">handle</span><span class="p">,</span> <span class="o">*</span><span class="n">gbp</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">parentHandle</span><span class="p">,</span> <span class="n">parentLayer</span><span class="p">,</span> <span class="n">addToRoot</span><span class="p">,</span> <span class="n">outTransformHint</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">函数addClientLayer将创建的Layer保存到当前State的Z秩序列表</span>
+          <span class="o">*</span> <span class="n">mInterceptor</span><span class="o">-&gt;</span><span class="n">saveSurfaceCreation</span><span class="p">(</span><span class="n">layer</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="graphicbuffer">
+<h1>GraphicBuffer<a class="headerlink" href="#graphicbuffer" title="Permalink to this headline"></a></h1>
+<p>GraphicBuffer 是图像缓冲区的最后一个组成部分，也是最基本最重要的一个单元，在前面讲到 BufferQueueProucer 通过 dequeueBuffer 获取 BufferSlot 时，会判断 BufferSlot 中的 GraphicBuffer 是否为空，如果为空就会创建新的 GraphicBuffer。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">BufferQueueProducer</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">status_t</span> <span class="n">BufferQueueProducer</span><span class="p">::</span><span class="n">dequeueBuffer</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">returnFlags</span> <span class="o">&amp;</span> <span class="n">BUFFER_NEEDS_REALLOCATION</span><span class="p">)</span>
+      <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">GraphicBuffer</span><span class="o">&gt;</span> <span class="n">graphicBuffer</span> <span class="o">=</span> <span class="n">new</span> <span class="n">GraphicBuffer</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">BQ_LAYER_COUNT</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="p">{</span><span class="n">mConsumerName</span><span class="o">.</span><span class="n">string</span><span class="p">(),</span> <span class="n">mConsumerName</span><span class="o">.</span><span class="n">size</span><span class="p">()});</span>
+        <span class="o">*</span> <span class="n">status_t</span> <span class="n">error</span> <span class="o">=</span> <span class="n">graphicBuffer</span><span class="o">-&gt;</span><span class="n">initCheck</span><span class="p">();</span>
+          <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">GraphicBuffer</span><span class="o">.</span><span class="n">cpp</span>
+            <span class="o">*</span> <span class="n">mInitCheck</span> <span class="o">=</span> <span class="n">initWithSize</span><span class="p">(</span><span class="n">inWidth</span><span class="p">,</span> <span class="n">inHeight</span><span class="p">,</span> <span class="n">inFormat</span><span class="p">,</span> <span class="n">inLayerCount</span><span class="p">,</span> <span class="n">inUsage</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">requestorName</span><span class="p">));</span>
+              <span class="o">*</span> <span class="n">GraphicBufferAllocator</span><span class="o">&amp;</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">GraphicBufferAllocator</span><span class="p">::</span><span class="n">get</span><span class="p">();</span>
+              <span class="o">*</span> <span class="n">status_t</span> <span class="n">err</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">inWidth</span><span class="p">,</span> <span class="n">inHeight</span><span class="p">,</span> <span class="n">inFormat</span><span class="p">,</span> <span class="n">inLayerCount</span><span class="p">,</span> <span class="n">inUsage</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">handle</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">outStride</span><span class="p">,</span> <span class="n">mId</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">requestorName</span><span class="p">));</span>
+</pre></div>
+</div>
+</section>
+<section id="getsurface">
+<h1>getSurface<a class="headerlink" href="#getsurface" title="Permalink to this headline"></a></h1>
+<p>从理论上来讲Surface本质是mGraphicBufferProducer，因为它才是提供缓存的本质</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">Surface</span><span class="o">&gt;</span> <span class="n">surface</span> <span class="o">=</span> <span class="n">surfaceControl</span><span class="o">-&gt;</span><span class="n">getSurface</span><span class="p">();</span>
+  <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">gui</span><span class="o">/</span><span class="n">SurfaceControl</span><span class="o">.</span><span class="n">cpp</span>
+    <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">Surface</span><span class="o">&gt;</span> <span class="n">SurfaceControl</span><span class="p">::</span><span class="n">getSurface</span><span class="p">()</span>
+      <span class="o">*</span> <span class="n">mSurfaceData</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Surface</span><span class="p">(</span><span class="n">mGraphicBufferProducer</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

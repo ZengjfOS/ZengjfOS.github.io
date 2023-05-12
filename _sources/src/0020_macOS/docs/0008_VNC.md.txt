@@ -1,0 +1,31 @@
+# VNC
+
+远程桌面连接树莓派
+
+## 参考文档
+
+* [How to have remote desktop on Macbook with Raspberry Pi? [closed]](https://raspberrypi.stackexchange.com/questions/13986/how-to-have-remote-desktop-on-macbook-with-raspberry-pi)
+
+## 树莓派install
+
+* `sudo apt-get install tightvncserver`
+* `tightvncserver`
+  * Would you like to enter a view-only password (y/n)? 
+    * n
+
+## mac
+
+* `open vnc://pi@192.168.3.89:5901`
+
+## apt
+
+* `sudo cat /etc/apt/sources.list`
+  ```
+  deb http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ buster main non-free contrib rpi
+  deb-src http://mirrors.tuna.tsinghua.edu.cn/raspbian/raspbian/ buster main non-free contrib rpi
+  
+  deb http://mirrors.tuna.tsinghua.edu.cn/raspberrypi/ buster main ui
+  ```
+* `sudo apt-get update`
+* `sudo apt-get install libgtk2.0-dev`
+* `sudo pip3 install opencv-python==4.3.0.38`

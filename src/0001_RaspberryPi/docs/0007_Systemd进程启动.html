@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Systemd进程启动</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#init">init真相</a></li>
+<li><a class="reference internal" href="#id2">Systemd应用原理</a></li>
+<li><a class="reference internal" href="#rc-local">rc.local启动分析</a></li>
+<li><a class="reference internal" href="#wifi">Wifi配置启动分析</a></li>
+<li><a class="reference internal" href="#ssh">SSH开启设置分析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="systemd">
+<h1>Systemd进程启动<a class="headerlink" href="#systemd" title="Permalink to this headline"></a></h1>
+<p>分析Linux系统进程何启动起来</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://wiki.archlinux.org/index.php/Systemd_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)">systemd (简体中文)</a></p></li>
+<li><p><a class="reference external" href="https://wiki.archlinux.org/index.php/Udev_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)">udev (简体中文)</a></p></li>
+<li><p>https://www.raspberrypi.org/documentation/linux/usage/systemd.md</p></li>
+<li><p>https://www.raspberrypi.org/documentation/linux/usage/rc-local.md</p></li>
+</ul>
+</section>
+<section id="init">
+<h1>init真相<a class="headerlink" href="#init" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>stat /sbin/init</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">File</span><span class="p">:</span> <span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">init</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">systemd</span>
+  <span class="n">Size</span><span class="p">:</span> <span class="mi">20</span>              <span class="n">Blocks</span><span class="p">:</span> <span class="mi">0</span>          <span class="n">IO</span> <span class="n">Block</span><span class="p">:</span> <span class="mi">4096</span>   <span class="n">symbolic</span> <span class="n">link</span>
+<span class="n">Device</span><span class="p">:</span> <span class="n">b302h</span><span class="o">/</span><span class="mi">45826</span><span class="n">d</span>    <span class="n">Inode</span><span class="p">:</span> <span class="mi">286014</span>      <span class="n">Links</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Access</span><span class="p">:</span> <span class="p">(</span><span class="mi">0777</span><span class="o">/</span><span class="n">lrwxrwxrwx</span><span class="p">)</span>  <span class="n">Uid</span><span class="p">:</span> <span class="p">(</span>    <span class="mi">0</span><span class="o">/</span>    <span class="n">root</span><span class="p">)</span>   <span class="n">Gid</span><span class="p">:</span> <span class="p">(</span>    <span class="mi">0</span><span class="o">/</span>    <span class="n">root</span><span class="p">)</span>
+<span class="n">Access</span><span class="p">:</span> <span class="mi">2021</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">31</span><span class="p">:</span><span class="mf">33.086942487</span> <span class="o">+</span><span class="mi">0000</span>
+<span class="n">Modify</span><span class="p">:</span> <span class="mi">2020</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">10</span> <span class="mi">00</span><span class="p">:</span><span class="mi">18</span><span class="p">:</span><span class="mf">16.000000000</span> <span class="o">+</span><span class="mi">0000</span>
+<span class="n">Change</span><span class="p">:</span> <span class="mi">2021</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">31</span><span class="p">:</span><span class="mf">33.086942487</span> <span class="o">+</span><span class="mi">0000</span>
+ <span class="n">Birth</span><span class="p">:</span> <span class="o">-</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>Systemd应用原理<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>在sysvinit中有明确定义的运行级别（如：0、1、3、5、6）与systemd中特定的 目标 存在一一对应的关系。然而，对于用户自定义运行级别（2、4）却没有。如需要同样功能，建议你以原有运行级别所对应的systemd目标为基础，新建一个/etc/systemd/system/&lt;目标名&gt;.target（可参考/usr/lib/systemd/system/graphical.target）, 然后创建目录/etc/systemd/system/&lt;目标名&gt;.wants，并向其中加入需启用的服务链接（指向/ur/lib/systemd/system/）。</p>
+<p><strong>“SysV 运行级别” 与 “systemd 目标” 对照表</strong></p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SysV 运行级别</p></th>
+<th class="head"><p>Systemd 目标</p></th>
+<th class="head"><p>注释</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>runlevel0.target, poweroff.target</p></td>
+<td><p>中断系统（halt）</p></td>
+</tr>
+<tr class="row-odd"><td><p>1, s, single</p></td>
+<td><p>runlevel1.target, rescue.target</p></td>
+<td><p>单用户模式</p></td>
+</tr>
+<tr class="row-even"><td><p>2, 4</p></td>
+<td><p>runlevel2.target, runlevel4.target, multi-user.target</p></td>
+<td><p>用户自定义运行级别，通常识别为级别3。</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>runlevel3.target, multi-user.target</p></td>
+<td><p>多用户，无图形界面。用户可以通过终端或网络登录。</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>runlevel5.target, graphical.target</p></td>
+<td><p>多用户，图形界面。继承级别3的服务，并启动图形界面服务。</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>runlevel6.target, reboot.target</p></td>
+<td><p>重启</p></td>
+</tr>
+<tr class="row-even"><td><p>emergency</p></td>
+<td><p>emergency.target</p></td>
+<td><p>急救模式（Emergency shell）</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>systemctl get-default</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">graphical</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</li>
+<li><p>cd /etc/systemd</p></li>
+<li><p>find * -iname default.target</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">system</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</li>
+<li><p>ls -al system/default.target</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">36</span> <span class="n">Jan</span> <span class="mi">11</span> <span class="mi">13</span><span class="p">:</span><span class="mi">01</span> <span class="n">system</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">target</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">graphical</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</li>
+<li><p>cat /lib/systemd/system/graphical.target</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...省略</span>
+
+<span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
+<span class="n">Description</span><span class="o">=</span><span class="n">Graphical</span> <span class="n">Interface</span>
+<span class="n">Documentation</span><span class="o">=</span><span class="n">man</span><span class="p">:</span><span class="n">systemd</span><span class="o">.</span><span class="n">special</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">Requires</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
+<span class="n">Wants</span><span class="o">=</span><span class="n">display</span><span class="o">-</span><span class="n">manager</span><span class="o">.</span><span class="n">service</span>
+<span class="n">Conflicts</span><span class="o">=</span><span class="n">rescue</span><span class="o">.</span><span class="n">service</span> <span class="n">rescue</span><span class="o">.</span><span class="n">target</span>
+<span class="n">After</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span> <span class="n">rescue</span><span class="o">.</span><span class="n">service</span> <span class="n">rescue</span><span class="o">.</span><span class="n">target</span> <span class="n">display</span><span class="o">-</span><span class="n">manager</span><span class="o">.</span><span class="n">service</span>
+<span class="n">AllowIsolate</span><span class="o">=</span><span class="n">yes</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Requires=multi-user.target</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="rc-local">
+<h1>rc.local启动分析<a class="headerlink" href="#rc-local" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>systemctl status rc.local</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Warning: The unit file, source configuration file or drop-ins of rc-local.service changed on disk. Run &#39;systemctl daemon-reload&#39; to reload units.
+● rc-local.service - /etc/rc.local Compatibility
+   Loaded: loaded (/lib/systemd/system/rc-local.service; enabled-runtime; vendor preset: enabled)
+  Drop-In: /usr/lib/systemd/system/rc-local.service.d
+           └─debian.conf
+           /etc/systemd/system/rc-local.service.d
+           └─ttyoutput.conf
+   Active: active (exited) since Thu 2021-02-11 08:08:35 GMT; 6h ago
+     Docs: man:systemd-rc-local-generator(8)
+  Process: 461 ExecStart=/etc/rc.local start (code=exited, status=0/SUCCESS)
+
+Feb 11 08:08:35 raspberrypi systemd[1]: Starting /etc/rc.local Compatibility...
+Feb 11 08:08:35 raspberrypi systemd[1]: Started /etc/rc.local Compatibility.
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Loaded: loaded (/lib/systemd/system/rc-local.service; enabled-runtime; vendor preset: enabled)</p>
+<ul>
+<li><p>/lib/systemd/system/rc-local.service</p></li>
+</ul>
+</li>
+<li><p>Active: active (exited) since Thu 2021-02-11 08:08:35 GMT; 6h ago</p></li>
+</ul>
+</li>
+<li><p><img alt="0007_rc-local_call_route.png" src="../../../_images/0007_rc-local_call_route.png" /></p></li>
+</ul>
+</section>
+<section id="wifi">
+<h1>Wifi配置启动分析<a class="headerlink" href="#wifi" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/etc/systemd/system/multi-user.target.wants/raspberrypi-net-mods.service</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
+<span class="n">Description</span><span class="o">=</span><span class="n">Copy</span> <span class="n">user</span> <span class="n">wpa_supplicant</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">ConditionPathExists</span><span class="o">=/</span><span class="n">boot</span><span class="o">/</span><span class="n">wpa_supplicant</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">Before</span><span class="o">=</span><span class="n">dhcpcd</span><span class="o">.</span><span class="n">service</span>
+<span class="n">After</span><span class="o">=</span><span class="n">systemd</span><span class="o">-</span><span class="n">rfkill</span><span class="o">.</span><span class="n">service</span>
+
+<span class="p">[</span><span class="n">Service</span><span class="p">]</span>
+<span class="n">Type</span><span class="o">=</span><span class="n">oneshot</span>
+<span class="n">RemainAfterExit</span><span class="o">=</span><span class="n">yes</span>
+<span class="n">ExecStart</span><span class="o">=/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mv</span> <span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">wpa_supplicant</span><span class="o">.</span><span class="n">conf</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">wpa_supplicant</span><span class="o">/</span><span class="n">wpa_supplicant</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">ExecStartPost</span><span class="o">=/</span><span class="nb">bin</span><span class="o">/</span><span class="n">chmod</span> <span class="mi">600</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">wpa_supplicant</span><span class="o">/</span><span class="n">wpa_supplicant</span><span class="o">.</span><span class="n">conf</span>
+<span class="n">ExecStartPost</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">rfkill</span> <span class="n">unblock</span> <span class="n">wifi</span>
+
+<span class="p">[</span><span class="n">Install</span><span class="p">]</span>
+<span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="ssh">
+<h1>SSH开启设置分析<a class="headerlink" href="#ssh" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/etc/systemd/system/multi-user.target.wants/sshswitch.service</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
+<span class="n">Description</span><span class="o">=</span><span class="n">Turn</span> <span class="n">on</span> <span class="n">SSH</span> <span class="k">if</span> <span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">ssh</span> <span class="ow">is</span> <span class="n">present</span>
+<span class="n">ConditionPathExistsGlob</span><span class="o">=/</span><span class="n">boot</span><span class="o">/</span><span class="n">ssh</span><span class="p">{,</span><span class="o">.</span><span class="n">txt</span><span class="p">}</span>
+<span class="n">After</span><span class="o">=</span><span class="n">regenerate_ssh_host_keys</span><span class="o">.</span><span class="n">service</span>
+
+<span class="p">[</span><span class="n">Service</span><span class="p">]</span>
+<span class="n">Type</span><span class="o">=</span><span class="n">oneshot</span>
+<span class="n">ExecStart</span><span class="o">=/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;systemctl enable --now ssh &amp;&amp; rm -f /boot/ssh ; rm -f /boot/ssh.txt&quot;</span>
+
+<span class="p">[</span><span class="n">Install</span><span class="p">]</span>
+<span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="n">user</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

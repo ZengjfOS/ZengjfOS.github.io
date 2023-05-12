@@ -1,0 +1,44 @@
+# python实时进程输出
+
+实时获取shell命令数据输出，在很多持续数据获取软件处理过程中很有用
+
+# 实时进程处理
+
+```python
+# subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+self.current_process = subprocess.Popen(
+        shell.split(" "),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding='utf-8'
+    )
+while True:
+    realtime_output = self.current_process.stdout.readline()
+    if realtime_output == '' and self.current_process.poll() is not None:
+        self.current_process.stdout.close()
+        break
+
+    if realtime_output:
+        output.append(realtime_output.strip())
+      
+        line_index = 2
+        for line in output:
+            self.rightScreen.addstr(line_index, self.LEFT_START_COL, line)
+
+            line_index += 1
+            if line_index > (rows - 2):
+                break
+
+        self.rightScreen.refresh()
+
+if self.current_process.returncode != 0:
+    current_shell = shell
+    cmd_error = True
+    break
+```
+
+# 终止进程
+
+```python
+self.current_process.terminate()
+```

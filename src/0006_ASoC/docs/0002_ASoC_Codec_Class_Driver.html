@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ASoC Codec Class Driver</a></li>
+<li><a class="reference internal" href="#snd-soc-component">snd_soc_component主要域</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简要说明</a></li>
+<li><a class="reference internal" href="#codec-dai-and-pcm-configuration">Codec DAI and PCM configuration</a></li>
+<li><a class="reference internal" href="#codec-control-io">Codec control IO</a></li>
+<li><a class="reference internal" href="#mixers-and-audio-controls">Mixers and audio controls</a><ul>
+<li><a class="reference internal" href="#controls">controls</a></li>
+<li><a class="reference internal" href="#dapm-widgets">dapm_widgets</a></li>
+<li><a class="reference internal" href="#dapm-routes">dapm_routes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cs42xx8-probe">cs42xx8_probe解析</a></li>
+<li><a class="reference internal" href="#cs42xx8-component">CS42xx8 component注册流程：</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asoc-codec-class-driver">
+<h1>ASoC Codec Class Driver<a class="headerlink" href="#asoc-codec-class-driver" title="Permalink to this headline"></a></h1>
+<p>Codec compnent信息注册</p>
+<p>Codec probe一般来说是获取、填充component、dai driver数据，数据一般都是标准结构，提供这些数据就完成了大部分工作：</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/include/sound/soc.h#L755">struct snd_soc_component_driver</a>：主要定义route和widget</p></li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/include/sound/soc-dai.h#L254">struct snd_soc_dai_driver</a>：主要定义dai</p></li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/include/sound/soc.h#L821">struct snd_soc_component</a></p></li>
+</ul>
+</section>
+<section id="snd-soc-component">
+<h1>snd_soc_component主要域<a class="headerlink" href="#snd-soc-component" title="Permalink to this headline"></a></h1>
+<p>Codec <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">snd_soc_component_driver</span></code> / <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">snd_soc_dai_driver</span></code> 最终生成的component主要是填充以下两个域；</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component_driver</span><span class="w"> </span><span class="o">*</span><span class="n">driver</span><span class="p">;</span><span class="w">      </span><span class="c1">// Codec对应的component的driver</span>
+
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">list_head</span><span class="w"> </span><span class="n">dai_list</span><span class="p">;</span><span class="w">                          </span><span class="c1">// codec对应的component的dai list，一般是一个dai，当然可以有很多个</span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.kernel.org/doc/html/v4.11/sound/soc/codec.html">ASoC Codec Class Driver</a></p></li>
+<li><p><a class="reference external" href="https://github.com/torvalds/linux/blob/master/sound/soc/codecs/cs42xx8-i2c.c">CS42888 Codec Driver</a></p></li>
+<li><p><a class="reference external" href="https://www.cirrus.com/products/cs42888/">CS42888 108 dB, 192 kHz 4-in, 8-out Multi-channel Codec</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/u012719256/article/details/77507479">linux ALSA &amp; ASOC (3) — widget 、route</a></p></li>
+<li><p><a class="reference external" href="https://cloud.tencent.com/developer/article/1078002">ALSA声卡驱动的DAPM（一）-DPAM详解</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简要说明<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>Each codec class driver must provide the following features:-</p>
+<ul class="simple">
+<li><p><span class="xref myst">Codec DAI and PCM configuration</span></p></li>
+<li><p><span class="xref myst">Codec control IO - using RegMap API</span></p></li>
+<li><p><span class="xref myst">Mixers and audio controls</span></p></li>
+<li><p>Codec audio operations</p></li>
+<li><p>DAPM description.</p></li>
+<li><p>DAPM event handler.</p></li>
+</ul>
+<p>Optionally, codec drivers can also provide:-</p>
+<ul class="simple">
+<li><p>DAC Digital mute control.</p></li>
+</ul>
+</section>
+<section id="codec-dai-and-pcm-configuration">
+<h1>Codec DAI and PCM configuration<a class="headerlink" href="#codec-dai-and-pcm-configuration" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_ops</span><span class="w"> </span><span class="n">cs42xx8_dai_ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">set_fmt</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_set_dai_fmt</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">set_sysclk</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_set_dai_sysclk</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">hw_params</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_hw_params</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">digital_mute</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_digital_mute</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_driver</span><span class="w"> </span><span class="n">cs42xx8_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_min</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_max</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">rates</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">formats</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">CS42XX8_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_min</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">rates</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">formats</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">CS42XX8_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">cs42xx8_dai_ops</span><span class="p">,</span><span class="w">                                    </span><span class="c1">// 这里的ops会转移到生成的pcm的ops</span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="codec-control-io">
+<h1>Codec control IO<a class="headerlink" href="#codec-control-io" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">reg_default</span><span class="w"> </span><span class="n">cs42xx8_reg</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Power Control */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x03</span><span class="p">,</span><span class="w"> </span><span class="mh">0xF0</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Functional Mode */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x04</span><span class="p">,</span><span class="w"> </span><span class="mh">0x46</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Interface Formats */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* ADC Control &amp; DAC De-Emphasis */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x06</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Transition Control */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x07</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* DAC Channel Mute */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT1 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x09</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT2 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x0a</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT3 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x0b</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT4 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x0c</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT5 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x0d</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT6 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x0e</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT7 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x0f</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AOUT8 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x10</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* DAC Channel Invert */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x11</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AIN1 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x12</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AIN2 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x13</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AIN3 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x14</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AIN4 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x15</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AIN5 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x16</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Volume Control AIN6 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x17</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* ADC Channel Invert */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x18</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Status Control */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x1a</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* Status Mask */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mh">0x1b</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="w"> </span><span class="p">},</span><span class="w">   </span><span class="cm">/* MUTEC Pin Control */</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">regmap_config</span><span class="w"> </span><span class="n">cs42xx8_regmap_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">reg_bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">val_bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">.</span><span class="n">max_register</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CS42XX8_LASTREG</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">reg_defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_reg</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">num_reg_defaults</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8_reg</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">volatile_reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_volatile_register</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">writeable_reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_writeable_register</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">cache_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">REGCACHE_RBTREE</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">EXPORT_SYMBOL_GPL</span><span class="p">(</span><span class="n">cs42xx8_regmap_config</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="mixers-and-audio-controls">
+<h1>Mixers and audio controls<a class="headerlink" href="#mixers-and-audio-controls" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component_driver</span><span class="w"> </span><span class="n">cs42xx8_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">probe</span><span class="w">              </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_component_probe</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">controls</span><span class="w">           </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_snd_controls</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">num_controls</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8_snd_controls</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">dapm_widgets</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_dapm_widgets</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">num_dapm_widgets</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8_dapm_widgets</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">dapm_routes</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_dapm_routes</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">num_dapm_routes</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8_dapm_routes</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">use_pmdown_time</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">endianness</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">non_legacy_dai_naming</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><span class="xref myst">controls</span></p></li>
+<li><p><span class="xref myst">dapm_widgets</span></p></li>
+<li><p><span class="xref myst">dapm_routes</span></p></li>
+</ul>
+<section id="controls">
+<h2>controls<a class="headerlink" href="#controls" title="Permalink to this headline"></a></h2>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_kcontrol_new</span><span class="w"> </span><span class="n">cs42xx8_snd_controls</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SOC_DOUBLE_R_TLV(xname, reg_left, reg_right, xshift, xmax, xinvert, tlv_array) \</span>
+<span class="cm">     * {    .iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = (xname),\</span>
+<span class="cm">     *     .access = SNDRV_CTL_ELEM_ACCESS_TLV_READ |\</span>
+<span class="cm">     *          SNDRV_CTL_ELEM_ACCESS_READWRITE,\</span>
+<span class="cm">     *     .tlv.p = (tlv_array), \</span>
+<span class="cm">     *     .info = snd_soc_info_volsw, \</span>
+<span class="cm">     *     .get = snd_soc_get_volsw, .put = snd_soc_put_volsw, \</span>
+<span class="cm">     *     .private_value = SOC_DOUBLE_R_VALUE(reg_left, reg_right, xshift, \</span>
+<span class="cm">     *                         xmax, xinvert) }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE_R_TLV</span><span class="p">(</span><span class="s">&quot;DAC1 Playback Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAOUT1</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">CS42XX8_VOLAOUT2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">dac_tlv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE_R_TLV</span><span class="p">(</span><span class="s">&quot;DAC2 Playback Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAOUT3</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">CS42XX8_VOLAOUT4</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">dac_tlv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE_R_TLV</span><span class="p">(</span><span class="s">&quot;DAC3 Playback Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAOUT5</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">CS42XX8_VOLAOUT6</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">dac_tlv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE_R_TLV</span><span class="p">(</span><span class="s">&quot;DAC4 Playback Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAOUT7</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">CS42XX8_VOLAOUT8</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">dac_tlv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE_R_S_TLV</span><span class="p">(</span><span class="s">&quot;ADC1 Capture Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAIN1</span><span class="p">,</span><span class="w"></span>
+<span class="w">               </span><span class="n">CS42XX8_VOLAIN2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">-0x80</span><span class="p">,</span><span class="w"> </span><span class="mh">0x30</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">adc_tlv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE_R_S_TLV</span><span class="p">(</span><span class="s">&quot;ADC2 Capture Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAIN3</span><span class="p">,</span><span class="w"></span>
+<span class="w">               </span><span class="n">CS42XX8_VOLAIN4</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">-0x80</span><span class="p">,</span><span class="w"> </span><span class="mh">0x30</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">adc_tlv</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SOC_DOUBLE(xname, reg, shift_left, shift_right, max, invert) \</span>
+<span class="cm">     * {    .iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = (xname),\</span>
+<span class="cm">     *     .info = snd_soc_info_volsw, .get = snd_soc_get_volsw, \</span>
+<span class="cm">     *     .put = snd_soc_put_volsw, \</span>
+<span class="cm">     *     .private_value = SOC_DOUBLE_VALUE(reg, shift_left, shift_right, \</span>
+<span class="cm">     *                       max, invert, 0) }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE</span><span class="p">(</span><span class="s">&quot;DAC1 Invert Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_DACINV</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE</span><span class="p">(</span><span class="s">&quot;DAC2 Invert Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_DACINV</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE</span><span class="p">(</span><span class="s">&quot;DAC3 Invert Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_DACINV</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE</span><span class="p">(</span><span class="s">&quot;DAC4 Invert Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_DACINV</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE</span><span class="p">(</span><span class="s">&quot;ADC1 Invert Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_ADCINV</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_DOUBLE</span><span class="p">(</span><span class="s">&quot;ADC2 Invert Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_ADCINV</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SOC_SINGLE(xname, reg, shift, max, invert) \</span>
+<span class="cm">     * {    .iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = xname, \</span>
+<span class="cm">     *     .info = snd_soc_info_volsw, .get = snd_soc_get_volsw,\</span>
+<span class="cm">     *     .put = snd_soc_put_volsw, \</span>
+<span class="cm">     *     .private_value = SOC_SINGLE_VALUE(reg, shift, max, invert, 0) }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_SINGLE</span><span class="p">(</span><span class="s">&quot;ADC High-Pass Filter Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_ADCCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_SINGLE</span><span class="p">(</span><span class="s">&quot;DAC De-emphasis Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_ADCCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SOC_ENUM(xname, xenum) \</span>
+<span class="cm">     * {    .iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = xname,\</span>
+<span class="cm">     *     .info = snd_soc_info_enum_double, \</span>
+<span class="cm">     *     .get = snd_soc_get_enum_double, .put = snd_soc_put_enum_double, \</span>
+<span class="cm">     *     .private_value = (unsigned long)&amp;xenum }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_ENUM</span><span class="p">(</span><span class="s">&quot;ADC1 Single Ended Mode Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">adc1_single_enum</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_ENUM</span><span class="p">(</span><span class="s">&quot;ADC2 Single Ended Mode Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">adc2_single_enum</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_SINGLE</span><span class="p">(</span><span class="s">&quot;DAC Single Volume Control Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_TXCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_ENUM</span><span class="p">(</span><span class="s">&quot;DAC Soft Ramp &amp; Zero Cross Control Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dac_szc_enum</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_SINGLE</span><span class="p">(</span><span class="s">&quot;DAC Auto Mute Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_TXCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_SINGLE</span><span class="p">(</span><span class="s">&quot;Mute ADC Serial Port Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_TXCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_SINGLE</span><span class="p">(</span><span class="s">&quot;ADC Single Volume Control Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_TXCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SOC_ENUM</span><span class="p">(</span><span class="s">&quot;ADC Soft Ramp &amp; Zero Cross Control Switch&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">adc_szc_enum</span><span class="p">),</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="dapm-widgets">
+<h2>dapm_widgets<a class="headerlink" href="#dapm-widgets" title="Permalink to this headline"></a></h2>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="n">cs42xx8_dapm_widgets</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SND_SOC_DAPM_DAC(wname, stname, wreg, wshift, winvert) \</span>
+<span class="cm">     * {    .id = snd_soc_dapm_dac, .name = wname, .sname = stname, \</span>
+<span class="cm">     *     SND_SOC_DAPM_INIT_REG_VAL(wreg, wshift, winvert) }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_DAC</span><span class="p">(</span><span class="s">&quot;DAC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_DAC</span><span class="p">(</span><span class="s">&quot;DAC2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_DAC</span><span class="p">(</span><span class="s">&quot;DAC3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_DAC</span><span class="p">(</span><span class="s">&quot;DAC4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SND_SOC_DAPM_OUTPUT(wname) \</span>
+<span class="cm">     * {    .id = snd_soc_dapm_output, .name = wname, .kcontrol_news = NULL, \</span>
+<span class="cm">     *     .num_kcontrols = 0, .reg = SND_SOC_NOPM }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT1L&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT1R&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT2L&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT2R&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT3L&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT3R&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT4L&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_OUTPUT</span><span class="p">(</span><span class="s">&quot;AOUT4R&quot;</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SND_SOC_DAPM_ADC(wname, stname, wreg, wshift, winvert) \</span>
+<span class="cm">     * {    .id = snd_soc_dapm_adc, .name = wname, .sname = stname, \</span>
+<span class="cm">     *     SND_SOC_DAPM_INIT_REG_VAL(wreg, wshift, winvert), }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_ADC</span><span class="p">(</span><span class="s">&quot;ADC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_ADC</span><span class="p">(</span><span class="s">&quot;ADC2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SND_SOC_DAPM_INPUT(wname) \</span>
+<span class="cm">     * {    .id = snd_soc_dapm_input, .name = wname, .kcontrol_news = NULL, \</span>
+<span class="cm">     *     .num_kcontrols = 0, .reg = SND_SOC_NOPM }</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_INPUT</span><span class="p">(</span><span class="s">&quot;AIN1L&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_INPUT</span><span class="p">(</span><span class="s">&quot;AIN1R&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_INPUT</span><span class="p">(</span><span class="s">&quot;AIN2L&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_INPUT</span><span class="p">(</span><span class="s">&quot;AIN2R&quot;</span><span class="p">),</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SND_SOC_DAPM_SUPPLY(wname, wreg, wshift, winvert, wevent, wflags) \</span>
+<span class="cm">     * {    .id = snd_soc_dapm_supply, .name = wname, \</span>
+<span class="cm">     *     SND_SOC_DAPM_INIT_REG_VAL(wreg, wshift, winvert), \</span>
+<span class="cm">     *     .event = wevent, .event_flags = wflags}</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_SUPPLY</span><span class="p">(</span><span class="s">&quot;PWR&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="dapm-routes">
+<h2>dapm_routes<a class="headerlink" href="#dapm-routes" title="Permalink to this headline"></a></h2>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_route</span><span class="w"> </span><span class="n">cs42xx8_dapm_routes</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Playback */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT1L&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC1&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT1R&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC1&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;DAC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT2L&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC2&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT2R&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC2&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;DAC2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT3L&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC3&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT3R&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC3&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;DAC3&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT4L&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC4&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT4R&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC4&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;DAC4&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Capture */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;ADC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;AIN1L&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;ADC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;AIN1R&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;ADC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;ADC2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;AIN2L&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;ADC2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;AIN2R&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;ADC2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cs42xx8-probe">
+<h1>cs42xx8_probe解析<a class="headerlink" href="#cs42xx8-probe" title="Permalink to this headline"></a></h1>
+<p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/codecs/cs42xx8.c#L442">cs42xx8_probe source code</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">cs42xx8_probe</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">regmap</span><span class="w"> </span><span class="o">*</span><span class="n">regmap</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">of_device_id</span><span class="w"> </span><span class="o">*</span><span class="n">of_id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">cs42xx8_priv</span><span class="w"> </span><span class="o">*</span><span class="n">cs42xx8</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">regmap</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">regmap</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to allocate regmap: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cs42xx8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_kzalloc</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">cs42xx8</span><span class="p">),</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cs42xx8</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regmap</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">dev_set_drvdata</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">cs42xx8</span><span class="p">);</span><span class="w">                                              </span><span class="c1">// dev-&gt;driver_data = data;</span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * const struct of_device_id cs42xx8_of_match[] = {</span>
+<span class="cm">     *     { .compatible = &quot;cirrus,cs42448&quot;, .data = &amp;cs42448_data, },</span>
+<span class="cm">     *     { .compatible = &quot;cirrus,cs42888&quot;, .data = &amp;cs42888_data, },</span>
+<span class="cm">     *     { /* sentinel */</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">cs42xx8_driver_data</span><span class="w"> </span><span class="n">cs42888_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cs42888&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">.</span><span class="n">num_adcs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">     </span><span class="o">*/</span><span class="w"></span>
+<span class="w">    </span><span class="n">of_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_match_device</span><span class="p">(</span><span class="n">cs42xx8_of_match</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">of_id</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">drvdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_id</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">;</span><span class="w">                                         </span><span class="c1">// .name = &quot;cs42888&quot;, .num_adcs = 2</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">drvdata</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to find driver data</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_clk_get</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mclk&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">clk</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get the clock: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">clk</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">sysclk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clk_get_rate</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">clk</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define CS42XX8_NUM_SUPPLIES 4</span>
+<span class="cm">     * static const char *const cs42xx8_supply_names[CS42XX8_NUM_SUPPLIES] = {</span>
+<span class="cm">     *     &quot;VA&quot;,</span>
+<span class="cm">     *     &quot;VD&quot;,</span>
+<span class="cm">     *     &quot;VLS&quot;,</span>
+<span class="cm">     *     &quot;VLC&quot;,</span>
+<span class="cm">     * };</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">supply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8_supply_names</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_regulator_bulk_get</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">),</span><span class="w"> </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to request supplies: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regulator_bulk_enable</span><span class="p">(</span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">),</span><span class="w"></span>
+<span class="w">                    </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to enable supplies: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Make sure hardware reset done */</span><span class="w"></span>
+<span class="w">    </span><span class="n">msleep</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Validate the chip ID */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regmap_read</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_CHIPID</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">val</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get device ID, ret = %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err_enable</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The top four bits of the chip ID should be 0000 */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">val</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">CS42XX8_CHIPID_CHIP_ID_MASK</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unmatched chip ID: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">(</span><span class="n">val</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">CS42XX8_CHIPID_CHIP_ID_MASK</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err_enable</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dev_info</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;found device, revision %X</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">val</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">CS42XX8_CHIPID_REV_ID_MASK</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cs42xx8_dai</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">drvdata</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span><span class="w">                                      </span><span class="c1">// .name = &quot;cs42888&quot;, .num_adcs = 2</span>
+
+<span class="w">    </span><span class="cm">/* Each adc supports stereo input */</span><span class="w"></span>
+<span class="w">    </span><span class="n">cs42xx8_dai</span><span class="p">.</span><span class="n">capture</span><span class="p">.</span><span class="n">channels_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">drvdata</span><span class="o">-&gt;</span><span class="n">num_adcs</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">              </span><span class="c1">// .name = &quot;cs42888&quot;, .num_adcs = 2</span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_snd_soc_register_component</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">cs42xx8_driver</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">cs42xx8_dai</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to register component:%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err_enable</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">regcache_cache_only</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+
+<span class="nl">err_enable</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">regulator_bulk_disable</span><span class="p">(</span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">),</span><span class="w"></span>
+<span class="w">                   </span><span class="n">cs42xx8</span><span class="o">-&gt;</span><span class="n">supplies</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">EXPORT_SYMBOL_GPL</span><span class="p">(</span><span class="n">cs42xx8_probe</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="cs42xx8-component">
+<h1>CS42xx8 component注册流程：<a class="headerlink" href="#cs42xx8-component" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* static int cs42xx8_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
+  * int cs42xx8_probe(struct device *dev, struct regmap *regmap)                            // 填充struct snd_soc_component_driver、struct snd_soc_dai_driver
+    * ret = devm_snd_soc_register_component(dev, &amp;cs42xx8_driver, &amp;cs42xx8_dai, 1);
+      * ret = snd_soc_register_component(dev, cmpnt_drv, dai_drv, num_dai);
+        * component = devm_kzalloc(dev, sizeof(*component), GFP_KERNEL);                    // 创建struct snd_soc_component
+        * return snd_soc_add_component(dev, component, component_driver, dai_drv, num_dai);
+          * ret = snd_soc_component_initialize(component, component_driver, dev);           // 使用struct snd_soc_component_driver填充struct snd_soc_component
+          * ret = snd_soc_register_dais(component, dai_drv, num_dai);                       // 使用struct snd_soc_dai_driver填充struct snd_soc_component
+          * snd_soc_component_add(component);
+            * list_add(&amp;component-&gt;list, &amp;component_list);                                  // 添加到内核component_list链表中
+              * static LIST_HEAD(component_list);
+          * snd_soc_try_rebind_card();                                                      // 这里貌似会重新初始化所有的声卡
+            * if (!snd_soc_bind_card(card))
+              * ret = snd_soc_instantiate_card(card);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/login.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">uvc_scan_device</a><ul>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">代码分析</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uvc-scan-device">
+<h1>uvc_scan_device<a class="headerlink" href="#uvc-scan-device" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><span class="xref myst">可以看到这些Unit和Terminal是如何组建起来的</span></p></li>
+<li><p>从代码来看，正常来说，Ouput Terminal一般是第一个VC头之后的部分；</p></li>
+<li><p>所有的Chain被添加再<code class="docutils literal notranslate"><span class="pre">dev-&gt;chains</span></code>，结构类似于这种；<br />
+<img alt="images/UVC_Chain.jpg" src="../../../../_images/UVC_Chain.jpg" /></p></li>
+<li><p>个人感觉这里就是每个节点往下看都是一个链路，所以看上去有很多个链路；</p></li>
+</ul>
+<section id="id1">
+<h2>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.voidcn.com/article/p-kkokmxfu-gx.html">uvc摄像头代码解析6</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>代码分析<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>uvc_scan_device</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>static int uvc_scan_device(struct uvc_device *dev)
+{
+    struct uvc_video_chain *chain;
+    struct uvc_entity *term;
+
+    list_for_each_entry(term, &amp;dev-&gt;entities, list) {
+        if (!UVC_ENTITY_IS_OTERM(term))
+            continue;
+
+        /* If the terminal is already included in a chain, skip it.
+         * This can happen for chains that have multiple output
+         * terminals, where all output terminals beside the first one
+         * will be inserted in the chain in forward scans.
+         */
+        if (term-&gt;chain.next || term-&gt;chain.prev)                           // 如果entity已经初始化了，就不处理
+            continue;
+
+        chain = uvc_alloc_chain(dev);                                       // 申请一个chain，分配uvc视频链内存(有多少个输入Terminal就有多少个uvc_video_chain)
+        if (chain == NULL)
+            return -ENOMEM;
+
+        term-&gt;flags |= UVC_ENTITY_FLAG_DEFAULT;
+
+        if (uvc_scan_chain(chain, term) &lt; 0) {
+            kfree(chain);
+            continue;
+        }
+
+        uvc_trace(UVC_TRACE_PROBE, &quot;Found a valid video chain (%s).\n&quot;,
+              uvc_print_chain(chain));
+
+        list_add_tail(&amp;chain-&gt;list, &amp;dev-&gt;chains);
+    }
+
+    if (list_empty(&amp;dev-&gt;chains))
+        uvc_scan_fallback(dev);
+
+    if (list_empty(&amp;dev-&gt;chains)) {
+        uvc_printk(KERN_INFO, &quot;No valid video chain found.\n&quot;);
+        return -1;
+    }
+
+    return 0;
+}
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>uvc_scan_chain</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="nb">int</span> <span class="n">uvc_scan_chain</span><span class="p">(</span><span class="n">struct</span> <span class="n">uvc_video_chain</span> <span class="o">*</span><span class="n">chain</span><span class="p">,</span>
+              <span class="n">struct</span> <span class="n">uvc_entity</span> <span class="o">*</span><span class="n">term</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">struct</span> <span class="n">uvc_entity</span> <span class="o">*</span><span class="n">entity</span><span class="p">,</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span>
+
+    <span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_PROBE</span><span class="p">,</span> <span class="s2">&quot;Scanning UVC chain:&quot;</span><span class="p">);</span>
+
+    <span class="n">entity</span> <span class="o">=</span> <span class="n">term</span><span class="p">;</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">entity</span> <span class="o">!=</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">/*</span> <span class="n">Entity</span> <span class="n">must</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">part</span> <span class="n">of</span> <span class="n">an</span> <span class="n">existing</span> <span class="n">chain</span> <span class="o">*/</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">chain</span><span class="o">.</span><span class="n">next</span> <span class="o">||</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="n">chain</span><span class="o">.</span><span class="n">prev</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span> <span class="s2">&quot;Found reference to &quot;</span>
+                <span class="s2">&quot;entity </span><span class="si">%d</span><span class="s2"> already in chain.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">entity</span><span class="o">-&gt;</span><span class="nb">id</span><span class="p">);</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="o">/*</span> <span class="n">Process</span> <span class="n">entity</span> <span class="o">*/</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">uvc_scan_chain_entity</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">entity</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+        <span class="o">/*</span> <span class="n">Forward</span> <span class="n">scan</span> <span class="o">*/</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">uvc_scan_chain_forward</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">prev</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+        <span class="o">/*</span> <span class="n">Backward</span> <span class="n">scan</span> <span class="o">*/</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">entity</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">uvc_scan_chain_backward</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">entity</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

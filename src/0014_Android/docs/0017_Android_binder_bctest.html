@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android binder bctest</a></li>
+<li><a class="reference internal" href="#androidbctest">Android版本导致bctest无法使用补丁</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-binder-bctest">
+<h1>Android binder bctest<a class="headerlink" href="#android-binder-bctest" title="Permalink to this headline"></a></h1>
+<p>bctest程序没有根据servicemanager更新通信协议，Android版本导致的</p>
+</section>
+<section id="androidbctest">
+<h1>Android版本导致bctest无法使用补丁<a class="headerlink" href="#androidbctest" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://android.googlesource.com/platform/frameworks/native/+/refs/heads/android10-mainline-release/cmds/servicemanager/service_manager.c#283</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Equivalent</span> <span class="n">to</span> <span class="n">Parcel</span><span class="p">::</span><span class="n">enforceInterface</span><span class="p">(),</span> <span class="n">reading</span> <span class="n">the</span> <span class="n">RPC</span>
+<span class="o">//</span> <span class="n">header</span> <span class="k">with</span> <span class="n">the</span> <span class="n">strict</span> <span class="n">mode</span> <span class="n">policy</span> <span class="n">mask</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">interface</span> <span class="n">name</span><span class="o">.</span>
+<span class="o">//</span> <span class="n">Note</span> <span class="n">that</span> <span class="n">we</span> <span class="n">ignore</span> <span class="n">the</span> <span class="n">strict_policy</span> <span class="ow">and</span> <span class="n">don</span><span class="s1">&#39;t propagate it</span>
+<span class="o">//</span> <span class="n">further</span> <span class="p">(</span><span class="n">since</span> <span class="n">we</span> <span class="n">do</span> <span class="n">no</span> <span class="n">outbound</span> <span class="n">RPCs</span> <span class="n">anyway</span><span class="p">)</span><span class="o">.</span>
+<span class="n">strict_policy</span> <span class="o">=</span> <span class="n">bio_get_uint32</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+<span class="n">bio_get_uint32</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>  <span class="o">//</span> <span class="n">Ignore</span> <span class="n">worksource</span> <span class="n">header</span><span class="o">.</span>      <span class="o">&lt;--------------------</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">bio_get_string16</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">&amp;</span><span class="nb">len</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Android Q相对以前的Android版本通信协议里面多加了一个uint32，导致servicemanager数据获取处理出错：</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/frameworks/native/cmds/servicemanager/bctest.c b/frameworks/native/cmds/servicemanager/bctest.c</span><span class="w"></span>
+<span class="gh">index 354df670e54..782bf29e958 100644</span><span class="w"></span>
+<span class="gd">--- a/frameworks/native/cmds/servicemanager/bctest.c</span><span class="w"></span>
+<span class="gi">+++ b/frameworks/native/cmds/servicemanager/bctest.c</span><span class="w"></span>
+<span class="gu">@@ -16,6 +16,7 @@ uint32_t svcmgr_lookup(struct binder_state *bs, uint32_t target, const char *nam</span><span class="w"></span>
+
+<span class="w"> </span>    bio_init(&amp;msg, iodata, sizeof(iodata), 4);<span class="w"></span>
+<span class="w"> </span>    bio_put_uint32(&amp;msg, 0);  // strict mode header<span class="w"></span>
+<span class="gi">+    bio_put_uint32(&amp;msg, 0);</span><span class="w"></span>
+<span class="w"> </span>    bio_put_string16_x(&amp;msg, SVC_MGR_NAME);<span class="w"></span>
+<span class="w"> </span>    bio_put_string16_x(&amp;msg, name);<span class="w"></span>
+
+<span class="gu">@@ -40,6 +41,7 @@ int svcmgr_publish(struct binder_state *bs, uint32_t target, const char *name, v</span><span class="w"></span>
+
+<span class="w"> </span>    bio_init(&amp;msg, iodata, sizeof(iodata), 4);<span class="w"></span>
+<span class="w"> </span>    bio_put_uint32(&amp;msg, 0);  // strict mode header<span class="w"></span>
+<span class="gi">+    bio_put_uint32(&amp;msg, 0);</span><span class="w"></span>
+<span class="w"> </span>    bio_put_string16_x(&amp;msg, SVC_MGR_NAME);<span class="w"></span>
+<span class="w"> </span>    bio_put_string16_x(&amp;msg, name);<span class="w"></span>
+<span class="w"> </span>    bio_put_obj(&amp;msg, ptr);<span class="w"></span>
+<span class="gu">@@ -93,9 +95,12 @@ int main(int argc, char **argv)</span><span class="w"></span>
+<span class="w"> </span>                fprintf(stderr,&quot;argument required\n&quot;);<span class="w"></span>
+<span class="w"> </span>                return -1;<span class="w"></span>
+<span class="w"> </span>            }<span class="w"></span>
+<span class="gi">+            fprintf(stderr,&quot;published: [%s]\n&quot;, argv[1]);</span><span class="w"></span>
+<span class="w"> </span>            svcmgr_publish(bs, svcmgr, argv[1], &amp;token);<span class="w"></span>
+<span class="w"> </span>            argc--;<span class="w"></span>
+<span class="w"> </span>            argv++;<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+            while(1);</span><span class="w"></span>
+<span class="w"> </span>        } else {<span class="w"></span>
+<span class="w"> </span>            fprintf(stderr,&quot;unknown command %s\n&quot;, argv[0]);<span class="w"></span>
+<span class="w"> </span>            return -1;<span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

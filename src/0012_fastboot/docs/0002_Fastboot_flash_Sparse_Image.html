@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Fastboot flash Sparse Image</a></li>
+<li><a class="reference internal" href="#lkdebuglog">lk写入Debug输出调试log</a></li>
+<li><a class="reference internal" href="#lk-getvar">lk getvar</a></li>
+<li><a class="reference internal" href="#lk-download">lk download</a></li>
+<li><a class="reference internal" href="#lk-flash">lk flash</a></li>
+<li><a class="reference internal" href="#super">super分区写入</a></li>
+<li><a class="reference internal" href="#fastboot-pc-super-log">fastboot PC写入 super log</a></li>
+<li><a class="reference internal" href="#fastboot-superdebuglog">fastboot super写入debug输出log片段</a></li>
+<li><a class="reference internal" href="#id1">fastboot super写入debug输出完整log</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fastboot-flash-sparse-image">
+<h1>Fastboot flash Sparse Image<a class="headerlink" href="#fastboot-flash-sparse-image" title="Permalink to this headline"></a></h1>
+<p>分析fastboot命令flash文件原理，理解sparse image原理</p>
+</section>
+<section id="lkdebuglog">
+<h1>lk写入Debug输出调试log<a class="headerlink" href="#lkdebuglog" title="Permalink to this headline"></a></h1>
+<p>执行<code class="docutils literal notranslate"><span class="pre">fastboot</span> <span class="pre">flash</span> <span class="pre">lk</span> <span class="pre">lk-verified.img</span></code>时，LK输出log如下：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">25183</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">getvar</span><span class="p">:</span><span class="n">partition</span><span class="o">-</span><span class="nb">type</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">24</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25184</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0x85e0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25185</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">getvar</span><span class="p">:</span><span class="n">partition</span><span class="o">-</span><span class="nb">type</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="n">partition</span><span class="o">-</span><span class="nb">type</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+<span class="p">[</span><span class="mi">25186</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">getvar</span><span class="p">:</span><span class="nb">max</span><span class="o">-</span><span class="n">download</span><span class="o">-</span><span class="n">size</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">24</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25187</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0x85e0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25188</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">getvar</span><span class="p">:</span><span class="nb">max</span><span class="o">-</span><span class="n">download</span><span class="o">-</span><span class="n">size</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="nb">max</span><span class="o">-</span><span class="n">download</span><span class="o">-</span><span class="n">size</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+<span class="p">[</span><span class="mi">25190</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download</span><span class="p">:</span><span class="mi">000</span><span class="n">d7d5e</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">17</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25191</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0x85e0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25192</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">download</span><span class="p">:</span><span class="mi">000</span><span class="n">d7d5e</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="mi">000</span><span class="n">d7d5e</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+<span class="p">[</span><span class="mi">25212</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">flash</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">8</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25213</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0xd7d5e</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25214</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">flash</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+<span class="p">[</span><span class="mi">25215</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="n">mmc</span> <span class="n">read</span> <span class="mi">24</span> <span class="n">blks</span> <span class="ow">in</span> <span class="mi">0</span> <span class="n">ms</span><span class="p">:</span> <span class="mi">8</span><span class="n">KB</span><span class="o">/</span><span class="n">s</span>
+<span class="p">[</span><span class="mi">25216</span><span class="p">]</span> <span class="n">singlebootloader</span> <span class="n">bootloader</span> <span class="n">xxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+<span class="p">[</span><span class="mi">25217</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="n">mmc</span> <span class="n">read</span> <span class="mi">24</span> <span class="n">blks</span> <span class="ow">in</span> <span class="mi">0</span> <span class="n">ms</span><span class="p">:</span> <span class="mi">8</span><span class="n">KB</span><span class="o">/</span><span class="n">s</span>
+<span class="p">[</span><span class="mi">25218</span><span class="p">]</span> <span class="p">[</span><span class="n">SEC_POLICY</span><span class="p">]</span> <span class="n">sboot_state</span> <span class="o">=</span> <span class="mh">0x0</span>
+<span class="p">[</span><span class="mi">25218</span><span class="p">]</span> <span class="p">[</span><span class="n">SEC_POLICY</span><span class="p">]</span> <span class="n">lock_state</span> <span class="o">=</span> <span class="mh">0x3</span>
+<span class="n">paddr</span><span class="o">=</span><span class="mh">0x48b00000</span><span class="p">,</span> <span class="n">saddr</span><span class="o">=</span><span class="mh">0x48bd7c42</span><span class="p">,</span> <span class="n">psize</span><span class="o">=</span><span class="mh">0xd7c42</span><span class="p">,</span> <span class="n">ssize</span><span class="o">=</span><span class="mh">0x100</span><span class="p">,</span> <span class="n">pk_index</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">[</span><span class="mi">25240</span><span class="p">]</span> <span class="p">[</span><span class="n">func</span><span class="p">]</span><span class="n">cmd_flash_mmc_standard</span><span class="p">:</span> <span class="n">VerifyImage</span> <span class="n">lk</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">[</span><span class="mi">25241</span><span class="p">]</span> <span class="n">partid</span> <span class="mi">0</span><span class="p">,</span> <span class="n">addr</span> <span class="mh">0x15200000</span><span class="p">,</span> <span class="n">size</span> <span class="mh">0xd7d5e</span>
+<span class="p">[</span><span class="mi">25261</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="n">mmc</span> <span class="n">write</span> <span class="mi">1726</span> <span class="n">blks</span> <span class="ow">in</span> <span class="mi">19</span> <span class="n">ms</span><span class="p">:</span> <span class="mi">45421</span><span class="n">KB</span><span class="o">/</span><span class="n">s</span>
+<span class="p">[</span><span class="mi">25262</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="n">mmc</span> <span class="n">read</span> <span class="mi">1</span> <span class="n">blks</span> <span class="ow">in</span> <span class="mi">0</span> <span class="n">ms</span><span class="p">:</span> <span class="mi">8</span><span class="n">KB</span><span class="o">/</span><span class="n">s</span>
+<span class="p">[</span><span class="mi">25263</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="n">mmc</span> <span class="n">write</span> <span class="mi">1</span> <span class="n">blks</span> <span class="ow">in</span> <span class="mi">1</span> <span class="n">ms</span><span class="p">:</span> <span class="mi">500</span><span class="n">KB</span><span class="o">/</span><span class="n">s</span>
+</pre></div>
+</div>
+<p>如上log可知，<code class="docutils literal notranslate"><span class="pre">fastboot</span> <span class="pre">flash</span></code>命令，本质上是执行了LK中的fastboot command：</p>
+<ul class="simple">
+<li><p>[25183] [fastboot: command buf]-[getvar:partition-type:lk]-[len=24]</p></li>
+<li><p>[25186] [fastboot: command buf]-[getvar:max-download-size]-[len=24]</p></li>
+<li><p>[25190] [fastboot: command buf]-[download:000d7d5e]-[len=17]</p></li>
+<li><p>[25212] [fastboot: command buf]-[flash:lk]-[len=8]</p></li>
+</ul>
+</section>
+<section id="lk-getvar">
+<h1>lk getvar<a class="headerlink" href="#lk-getvar" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>所有的命令都是这么运行的，包括<code class="docutils literal notranslate"><span class="pre">download</span></code>、<code class="docutils literal notranslate"><span class="pre">flash</span></code>命令，调用流程类似；</p></li>
+<li><p>Buffer基地址：0x48B00000</p></li>
+<li><p>Buffer最大：0x08000000(128MB)</p></li>
+</ul>
+<p>如下是执行时输出的log信息</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">25183</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">getvar</span><span class="p">:</span><span class="n">partition</span><span class="o">-</span><span class="nb">type</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">24</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25184</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0x85e0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25185</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">getvar</span><span class="p">:</span><span class="n">partition</span><span class="o">-</span><span class="nb">type</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="n">partition</span><span class="o">-</span><span class="nb">type</span><span class="p">:</span><span class="n">lk</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+<span class="p">[</span><span class="mi">25186</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">getvar</span><span class="p">:</span><span class="nb">max</span><span class="o">-</span><span class="n">download</span><span class="o">-</span><span class="n">size</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">24</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25187</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0x85e0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25188</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">getvar</span><span class="p">:</span><span class="nb">max</span><span class="o">-</span><span class="n">download</span><span class="o">-</span><span class="n">size</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="nb">max</span><span class="o">-</span><span class="n">download</span><span class="o">-</span><span class="n">size</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+</pre></div>
+</div>
+<p>如下是函数注册及执行关系</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* void mt_boot_init(const struct app_descriptor *app)
+  ├── sz = target_get_max_flash_size();
+  ├── fastboot_init(target_get_scratch_address(), sz);
+  │   ├── target_get_scratch_address()
+  │   │   └── void *target_get_scratch_address(void)
+  │   │       └── return ((void *)SCRATCH_ADDR);
+  │   │           └── SCRATCH_ADDR     := 0x48B00000
+  │   └── int fastboot_init(void *base, unsigned size)
+  │       ├── download_max = SCRATCH_SIZE;
+  │       │   └── SCRATCH_SIZE     := 0x08000000 # 128MB
+  │       ├── snprintf(dl_max_str, sizeof(dl_max_str), &quot;0x%X&quot;, download_max);
+  │       ├── fastboot_publish(&quot;max-download-size&quot;, dl_max_str);                           --&gt; 主要是通过该函数将数据方如varlist链表中，得后续进行数据查询或者修改
+  │       │   ├── void fastboot_publish(const char *name, const char *value)
+  │       │   │   ├── var = malloc(sizeof(*var));
+  │       │   │   ├── var-&gt;value = value;
+  │       │   │   ├── var-&gt;next = varlist;
+  │       │   │   └── varlist = var;
+  │       │   └── dl_max_str
+  │       │       └── SCRATCH_SIZE     := 0x08000000 # 128MB
+  │       ├── udc_register_gadget(&amp;fastboot_gadget)
+  │       │   └── static struct udc_gadget fastboot_gadget
+  │       │       └── .notify     = fastboot_notify,
+  │       │           └── event_signal(&amp;usb_online, 0);
+  │       └── thr = thread_create(&quot;fastboot&quot;, fastboot_handler, 0, DEFAULT_PRIORITY, DEFAULT_STACK_SIZE);
+  │           └── static int fastboot_handler(void *arg)
+  │               └── for (;;)
+  │                   ├── event_wait(&amp;usb_online);
+  │                   └── fastboot_command_loop();
+  │                       └── dprintf(ALWAYS,&quot;fastboot: processing commands\n&quot;);
+  │                           ├── r = udc_request_queue(out, req);
+  │                           ├── dprintf(ALWAYS,&quot;[fastboot: command buf]-[%s]-[len=%d]\n&quot;, buffer, r);
+  │                           ├── dprintf(ALWAYS,&quot;[fastboot]-[download_base:0x%x]-[download_size:0x%x]\n&quot;,(unsigned int)download_base,(unsigned int)download_size);
+  │                           └── for (cmd = cmdlist; cmd; cmd = cmd-&gt;next)
+  │                               ├── memcmp(buffer, cmd-&gt;prefix, cmd-&gt;prefix_len)
+  │                               │   └── 不等于0的忽略，不是当前命令，continue
+  │                               ├── dprintf(ALWAYS,&quot;[Cmd process]-[buf:%s]-[lenBuf:%s]\n&quot;, buffer,  buffer + cmd-&gt;prefix_len);
+  │                               └── cmd-&gt;handle((const char*) buffer + cmd-&gt;prefix_len, (void*) download_base, download_size);              --&gt; 执行注册的处理函数
+  └── udc_start();
+</pre></div>
+</div>
+</section>
+<section id="lk-download">
+<h1>lk download<a class="headerlink" href="#lk-download" title="Permalink to this headline"></a></h1>
+<p>主要是理解<code class="docutils literal notranslate"><span class="pre">download_base</span></code>、<code class="docutils literal notranslate"><span class="pre">download_size</span></code>两个字段是干什么的，前者是下载的时候存储USB传下来的数据，后者是这次传了多少byte数据，为下次执行flash命令做准备；</p>
+<p>如下是执行时输出的log信息</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">25190</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">:</span> <span class="n">command</span> <span class="n">buf</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download</span><span class="p">:</span><span class="mi">000</span><span class="n">d7d5e</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="nb">len</span><span class="o">=</span><span class="mi">17</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25191</span><span class="p">]</span> <span class="p">[</span><span class="n">fastboot</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_base</span><span class="p">:</span><span class="mh">0x48b00000</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">download_size</span><span class="p">:</span><span class="mh">0x85e0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">25192</span><span class="p">]</span> <span class="p">[</span><span class="n">Cmd</span> <span class="n">process</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">buf</span><span class="p">:</span><span class="n">download</span><span class="p">:</span><span class="mi">000</span><span class="n">d7d5e</span><span class="p">]</span><span class="o">-</span><span class="p">[</span><span class="n">lenBuf</span><span class="p">:</span><span class="mi">000</span><span class="n">d7d5e</span><span class="p">]</span>
+<span class="p">[</span><span class="n">SEC_USBDL</span><span class="p">]</span> <span class="mh">0x22</span><span class="p">,</span> <span class="n">NSC</span>
+</pre></div>
+</div>
+<p>如下是函数注册及执行关系</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* void mt_boot_init(const struct app_descriptor *app)
+  ├── sz = target_get_max_flash_size();
+  ├── fastboot_init(target_get_scratch_address(), sz);
+  │   ├── fastboot_register(&quot;download:&quot;, cmd_download, TRUE, FALSE);
+  │   │   └── void cmd_download(const char *arg, void *data, unsigned sz)
+  │   │       └── cmd_download_standard(arg, data, sz);
+  │   │           ├── r = usb_read(download_base, len);                                       ----&gt; 将USB通信的数据搬到内部DRAM的Buffer中
+  │   │           └── download_size = len;                                                    ----&gt; 记录当前次的下载的字节数
+  │   ├── udc_register_gadget(&amp;fastboot_gadget)
+  │   │   └── static struct udc_gadget fastboot_gadget
+  │   │       └── .notify     = fastboot_notify,
+  │   │           └── event_signal(&amp;usb_online, 0);
+  │   └── thr = thread_create(&quot;fastboot&quot;, fastboot_handler, 0, DEFAULT_PRIORITY, DEFAULT_STACK_SIZE);
+  │       └── static int fastboot_handler(void *arg)
+  │           └── for (;;)
+  │               ├── event_wait(&amp;usb_online);
+  │               └── fastboot_command_loop();
+  │                   └── dprintf(ALWAYS,&quot;fastboot: processing commands\n&quot;);
+  │                       ├── r = udc_request_queue(out, req);
+  │                       ├── dprintf(ALWAYS,&quot;[fastboot: command buf]-[%s]-[len=%d]\n&quot;, buffer, r);
+  │                       ├── dprintf(ALWAYS,&quot;[fastboot]-[download_base:0x%x]-[download_size:0x%x]\n&quot;,(unsigned int)download_base,(unsigned int)download_size);
+  │                       └── for (cmd = cmdlist; cmd; cmd = cmd-&gt;next)
+  │                           ├── memcmp(buffer, cmd-&gt;prefix, cmd-&gt;prefix_len)
+  │                           │   └── 不等于0的忽略，不是当前命令，continue
+  │                           ├── dprintf(ALWAYS,&quot;[Cmd process]-[buf:%s]-[lenBuf:%s]\n&quot;, buffer,  buffer + cmd-&gt;prefix_len);
+  │                           └── cmd-&gt;handle((const char*) buffer + cmd-&gt;prefix_len, (void*) download_base, download_size);              --&gt; 执行注册的处理函数
+  └── udc_start();
+</pre></div>
+</div>
+<p>如下是<code class="docutils literal notranslate"><span class="pre">download</span></code>执行的时候处理下载这部分的代码</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span>int usb_read(void *_buf, unsigned len)
+{
+        int r;
+        unsigned xfer;
+        unsigned char *buf = _buf;
+        int count = 0;
+
+        if (fastboot_state == STATE_ERROR)
+                goto oops;
+
+        while (len &gt; 0) {
+                xfer = (len &gt; MAX_USBFS_BULK_SIZE) ? MAX_USBFS_BULK_SIZE : len;
+                req-&gt;buf = buf;
+                req-&gt;length = xfer;
+                req-&gt;complete = req_complete;
+                r = udc_request_queue(out, req);                              --&gt; 这里不进入深入分析，如果接收到了数据，会回调`req_complete`从而释放txn_done锁
+                if (r &lt; 0) {
+                        dprintf(INFO, &quot;usb_read() queue failed\n&quot;);
+                        goto oops;
+                }
+                event_wait(&amp;txn_done);
+
+                if (txn_status &lt; 0) {
+                        dprintf(INFO, &quot;usb_read() transaction failed\n&quot;);
+                        goto oops;
+                }
+
+                count += req-&gt;length;
+                buf += req-&gt;length;
+                len -= req-&gt;length;
+
+                /* short transfer? */
+                if (req-&gt;length != xfer) break;
+        }
+
+        return count;
+
+oops:
+        fastboot_state = STATE_ERROR;
+        return -1;
+}
+</pre></div>
+</div>
+</section>
+<section id="lk-flash">
+<h1>lk flash<a class="headerlink" href="#lk-flash" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>将上面<code class="docutils literal notranslate"><span class="pre">download</span></code>执行USB传入的数据写入对应的eMMC的分区中去；</p></li>
+<li><p>如果要写入的是大于Buffer大小的数据，fastboot会自动分批写入，每次分批写入都不会大于前面所说的128M；</p></li>
+<li><p>目前Android 大分区采用<code class="docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">image</span></code>镜像格式，再写入分区的时候进行合成<code class="docutils literal notranslate"><span class="pre">raw</span> <span class="pre">image</span></code>，主要是因为<code class="docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">image</span></code>格式节省空间；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* void mt_boot_init(const struct app_descriptor *app)
+  ├── sz = target_get_max_flash_size();
+  ├── fastboot_init(target_get_scratch_address(), sz);
+  │   ├── fastboot_register(&quot;flash:&quot;, cmd_flash_mmc, TRUE, TRUE);
+  │   │   ├── void fastboot_register(const char *prefix, void (*handle)(const char *arg, void *data, unsigned sz), unsigned allowed_when_security_on, unsigned forbidden_when_lock_on)
+  │   │   │   ├── cmd = malloc(sizeof(*cmd));
+  │   │   │   └── cmd-&gt;handle = handle;
+  │   │   └── cmd_flash_mmc
+  │   │       └── void cmd_flash_mmc(const char *arg, void *data, unsigned sz)              // data -&gt; SCRATCH_ADDR     := 0x48B00000
+  │   │           └── flash_storage(arg, data, sz);                                           // data -&gt; SCRATCH_ADDR     := 0x48B00000
+  │   │               └── else if (strcmp(arg, &quot;singlebootloader&quot;) != 0 &amp;&amp; strcmp(arg, &quot;bootloader&quot;) != 0)              // 根本不存在这样的镜像
+  │   │                   └── result = cmd_flash_mmc_standard(arg, data, sz);
+  │   │                       ├── if (sparse_header-&gt;magic != SPARSE_HEADER_MAGIC)
+  │   │                       │   └── result = cmd_flash_mmc_img(arg, data, sz);                      // 直接写入，这里主要就是写入eMMC了，不进一步分析了
+  │   │                       └── else
+  │   │                           └── result = cmd_flash_mmc_sparse_img(arg, data, sz);               // sparse image的镜像，需要单独处理      
+  │   │                               ├── if(fill_buf == NULL)
+  │   │                               │   └── fill_buf = special_heap_alloc(FILL_BUF_LEN);
+  │   │                               │       └── void* buf = (void*)(u32)mblock_reserve_ext(&amp;g_boot_arg-&gt;mblock_info, length, 0x10000, 0x80000000, 0, &quot;fastboot_heap&quot;);
+  │   │                               │           └── 这里输出了很多数据，貌似第0个block的原因
+  │   │                               └── #if (defined(MTK_UFS_SUPPORT) || defined(MTK_NEW_COMBO_EMMC_SUPPORT))
+  │   │                                   └── size_wrote = emmc_write(part_id, ptn + ((uint64_t)total_blocks*sparse_header-&gt;blk_sz), fill_buf, (u64)todo * sparse_header-&gt;blk_sz);
+  │   ├── udc_register_gadget(&amp;fastboot_gadget)
+  │   │   └── static struct udc_gadget fastboot_gadget
+  │   │       └── .notify     = fastboot_notify,
+  │   │           └── event_signal(&amp;usb_online, 0);
+  │   └── thr = thread_create(&quot;fastboot&quot;, fastboot_handler, 0, DEFAULT_PRIORITY, DEFAULT_STACK_SIZE);
+  │       └── static int fastboot_handler(void *arg)
+  │           └── for (;;)
+  │               ├── event_wait(&amp;usb_online);
+  │               └── fastboot_command_loop();
+  │                   └── dprintf(ALWAYS,&quot;fastboot: processing commands\n&quot;);
+  │                       ├── r = udc_request_queue(out, req);
+  │                       ├── dprintf(ALWAYS,&quot;[fastboot: command buf]-[%s]-[len=%d]\n&quot;, buffer, r);
+  │                       ├── dprintf(ALWAYS,&quot;[fastboot]-[download_base:0x%x]-[download_size:0x%x]\n&quot;,(unsigned int)download_base,(unsigned int)download_size);
+  │                       └── for (cmd = cmdlist; cmd; cmd = cmd-&gt;next)
+  │                           ├── memcmp(buffer, cmd-&gt;prefix, cmd-&gt;prefix_len)
+  │                           │   └── 不等于0的忽略，continue
+  │                           ├── dprintf(ALWAYS,&quot;[Cmd process]-[buf:%s]-[lenBuf:%s]\n&quot;, buffer,  buffer + cmd-&gt;prefix_len);
+  │                           └── cmd-&gt;handle((const char*) buffer + cmd-&gt;prefix_len, (void*) download_base, download_size);              --&gt; 执行注册的处理函数
+  └── udc_start();
+</pre></div>
+</div>
+</section>
+<section id="super">
+<h1>super分区写入<a class="headerlink" href="#super" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>参考文档：</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/wonxxx/article/details/52517739">sparse image</a></p></li>
+<li><p><a class="reference external" href="https://2net.co.uk/tutorial/android-sparse-image-format">Android sparse image format</a></p></li>
+</ul>
+</li>
+<li><p>sparse image:</p>
+<ul>
+<li><p>一个sparse image文件由一个<code class="docutils literal notranslate"><span class="pre">sparse_header</span></code>和许多的<code class="docutils literal notranslate"><span class="pre">chunk</span></code>构成，每个chunk含一个<code class="docutils literal notranslate"><span class="pre">chunk_header</span></code>来描述当前<code class="docutils literal notranslate"><span class="pre">chunk</span></code>，chuck可以没有实体，只有<code class="docutils literal notranslate"><span class="pre">chunk_header</span></code>；</p></li>
+<li><p>chunk arch<br />
+<img alt="0002_boot-sparse-image.png" src="../../../_images/0002_boot-sparse-image.png" /></p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#define SPARSE_HEADER_MAGIC     0xed26ff3a</span>
+
+<span class="cp">#define CHUNK_TYPE_RAW          0xCAC1</span>
+<span class="cp">#define CHUNK_TYPE_FILL         0xCAC2</span>
+<span class="cp">#define CHUNK_TYPE_DONT_CARE    0xCAC3</span>
+<span class="cp">#define CHUNK_TYPE_CRC          0xCAC4</span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">chunk_header</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kt">uint16_t</span><span class="w">      </span><span class="n">chunk_type</span><span class="p">;</span><span class="w">     </span><span class="cm">/* 0xCAC1 -&gt; raw; 0xCAC2 -&gt; fill; 0xCAC3 -&gt; don&#39;t care */</span><span class="w"></span>
+<span class="w">  </span><span class="kt">uint16_t</span><span class="w">      </span><span class="n">reserved1</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w">      </span><span class="n">chunk_sz</span><span class="p">;</span><span class="w">       </span><span class="cm">/* in blocks in output image */</span><span class="w"></span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w">      </span><span class="n">total_sz</span><span class="p">;</span><span class="w">       </span><span class="cm">/* in bytes of chunk input file including chunk header and data */</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">chunk_header_t</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">chunk_header</span></code>中的<code class="docutils literal notranslate"><span class="pre">chunk_sz</span></code>在fastboot烧录的时候并不像上面写的这层意思，而是根据<code class="docutils literal notranslate"><span class="pre">chunk_type</span></code>的不同，意义不一样：</p>
+<ul>
+<li><p>CHUNK_TYPE_RAW: <code class="docutils literal notranslate"><span class="pre">chunk_sz</span></code>表示chunk内部block多少；</p></li>
+<li><p>CHUNK_TYPE_FILL: 同上；</p></li>
+<li><p>CHUNK_TYPE_DONT_CARE: <code class="docutils literal notranslate"><span class="pre">chunk_sz</span></code>表示当前标签所在整个镜像的block位置，其一般接<code class="docutils literal notranslate"><span class="pre">CHUNK_TYPE_RAW</span></code>，是标定，在fastboot分批烧录中，其是都是以其开始，也是以其结束；</p>
+<ul>
+<li><p>注意擦除分区的时候填充的是0x00还是0xFF，这个会涉及到这个block默认值是多少的</p></li>
+</ul>
+</li>
+<li><p>CHUNK_TYPE_CRC: 一般忽略；</p></li>
+</ul>
+</li>
+<li><p>代码参考：<code class="docutils literal notranslate"><span class="pre">bool</span> <span class="pre">cmd_flash_mmc_sparse_img(const</span> <span class="pre">char*</span> <span class="pre">arg,</span> <span class="pre">void*</span> <span class="pre">data,</span> <span class="pre">unsigned</span> <span class="pre">sz)</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Android system.img镜像文件一般为sparse ext4 image格式，这里的super分区也是；</p></li>
+<li><p>第0个<code class="docutils literal notranslate"><span class="pre">block</span></code>写入的时候输出信息比较多，暂时不深入分析，跟平台有关系；</p></li>
+</ul>
+</section>
+<section id="fastboot-pc-super-log">
+<h1>fastboot PC写入 super log<a class="headerlink" href="#fastboot-pc-super-log" title="Permalink to this headline"></a></h1>
+<p>执行<code class="docutils literal notranslate"><span class="pre">fastboot</span> <span class="pre">flash</span> <span class="pre">super</span> <span class="pre">super.img</span></code>，分包处理了，得益于采用的是<code class="docutils literal notranslate"><span class="pre">Sparse</span> <span class="pre">image</span></code>镜像格式。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">1</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">131068</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">8.402</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.900</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">2</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">129576</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">7.908</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">3.752</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">3</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">120468</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">7.434</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.709</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">4</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">115440</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">7.316</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.495</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">5</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">131068</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">7.854</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.820</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">6</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">131071</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">7.727</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">6.000</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">7</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">131068</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span> <span class="mf">11.177</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.899</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">8</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">122848</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span> <span class="mf">17.996</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.694</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">9</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">131068</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span> <span class="mf">14.149</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.868</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">10</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">125213</span> <span class="n">KB</span><span class="p">)</span>           <span class="n">OKAY</span> <span class="p">[</span> <span class="mf">12.106</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">3.062</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">11</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">116632</span> <span class="n">KB</span><span class="p">)</span>           <span class="n">OKAY</span> <span class="p">[</span> <span class="mf">10.345</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.594</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">12</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">122080</span> <span class="n">KB</span><span class="p">)</span>           <span class="n">OKAY</span> <span class="p">[</span> <span class="mf">12.017</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.706</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Sending</span> <span class="n">sparse</span> <span class="s1">&#39;super&#39;</span> <span class="mi">13</span><span class="o">/</span><span class="mi">13</span> <span class="p">(</span><span class="mi">92644</span> <span class="n">KB</span><span class="p">)</span>            <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">9.217</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Writing</span> <span class="s1">&#39;super&#39;</span>                                    <span class="n">OKAY</span> <span class="p">[</span>  <span class="mf">2.060</span><span class="n">s</span><span class="p">]</span>
+<span class="n">Finished</span><span class="o">.</span> <span class="n">Total</span> <span class="n">time</span><span class="p">:</span> <span class="mf">175.190</span><span class="n">s</span>
+</pre></div>
+</div>
+</section>
+<section id="fastboot-superdebuglog">
+<h1>fastboot super写入debug输出log片段<a class="headerlink" href="#fastboot-superdebuglog" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[422947] [fastboot: command buf]-[download:07fff078]-[len=17]                         --&gt; 连续的download
+[422948] [fastboot]-[download_base:0x48b00000]-[download_size:0x70bc098]
+[422948] [Cmd process]-[buf:download:07fff078]-[lenBuf:07fff078]
+[SEC_USBDL] 0x22, NSC
+[430803] [fastboot: command buf]-[flash:super]-[len=11]                               --&gt; 开始写入
+[430803] [fastboot]-[download_base:0x48b00000]-[download_size:0x7fff078]
+[430804] [Cmd process]-[buf:flash:super]-[lenBuf:super]
+[SEC_USBDL] 0x22, NSC
+[430806] [PROFILE] mmc read 24 blks in 1 ms: 12000KB/s
+[430806] singlebootloader bootloader xxxxxxxxxxxxxxxxxxxxxxxxxxx
+[430807] [SEC_POLICY] reached the end, use default policy
+[430808] [PROFILE] mmc read 24 blks in 0 ms: 8KB/s
+[430809] [SEC_POLICY] sboot_state = 0x0
+[430809] [SEC_POLICY] lock_state = 0x3
+[430810] partition(super) index is 34, ptn is 0x19000000
+[430811] Image size span 0x7b8e8000, partition size 0x7b8e8000
+[430811] === Sparse Image Header ===                                                  --&gt; 识别为Sparse Image文件
+[430812] magic: 0xed26ff3a
+[430812] major_version: 0x1
+[430813] minor_version: 0x0
+[430813] file_hdr_sz: 28
+[430813] chunk_hdr_sz: 12
+[430814] blk_sz: 4096
+[430814] total_blks: 506088
+[430814] total_chunks: 7
+[430815] !!Blank: start: 0x0  offset: 0x1e900                                         --&gt; CHUNK_TYPE_DONT_CARE标签，从中获取offset作为start
+[430815] Raw: start block addr: 0x1e900                                                           --&gt;CHUNK_TYPE_RAW
+[431231] [PROFILE] mmc write 38824 blks in 415 ms: 46775KB/s
+[431231] cmd_flash_mmc_sparse_img 699: CHUNK_TYPE_FILL=0x65830001 size=4096 chunk_data_sz=20480   --&gt; CHUNK_TYPE_FILL 相关的信息
+[431236] [PROFILE] mmc write 40 blks in 2 ms: 10000KB/s
+[431236] Raw: start block addr: 0x1fbfa                                                           --&gt;CHUNK_TYPE_RAW
+[431504] [PROFILE] mmc write 24624 blks in 267 ms: 46112KB/s
+[431505] cmd_flash_mmc_sparse_img 699: CHUNK_TYPE_FILL=0xffffffff size=4096 chunk_data_sz=8192    --&gt; CHUNK_TYPE_FILL 相关的信息
+[431509] [PROFILE] mmc write 16 blks in 1 ms: 8000KB/s
+[431509] Raw: start block addr: 0x20802                                                           --&gt;CHUNK_TYPE_RAW
+[433621] [PROFILE] mmc write 198688 blks in 2111 ms: 47060KB/s
+[433622] !!Blank: start: 0x26906  offset: 0x54fe2                                     --&gt; CHUNK_TYPE_DONT_CARE标签，结尾start是下次的开始，这里offset暂时不知道干什么用的
+[433623] Wrote 506088 blocks, expected to write 506088 blocks
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h1>fastboot super写入debug输出完整log<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="refers/0002_Fastboot_super_Image.html"><span class="doc std std-doc">0002_Fastboot_super_Image.txt</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

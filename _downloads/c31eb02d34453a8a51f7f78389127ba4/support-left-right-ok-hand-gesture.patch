@@ -1,0 +1,137 @@
+From f78380d5596214bc4aecbb1136cf97f8b04de8ef Mon Sep 17 00:00:00 2001
+From: zengjf <zengjf42@163.com>
+Date: Wed, 2 Feb 2022 09:53:43 +0800
+Subject: [PATCH] support left/right/ok hand gesture
+
+---
+ .../android/solutions/hands/build.gradle      |  2 +
+ .../examples/hands/MainActivity.java          | 71 ++++++++++++++++++-
+ 2 files changed, 72 insertions(+), 1 deletion(-)
+
+diff --git a/mediapipe/examples/android/solutions/hands/build.gradle b/mediapipe/examples/android/solutions/hands/build.gradle
+index 6c21109..76457d5 100644
+--- a/mediapipe/examples/android/solutions/hands/build.gradle
++++ b/mediapipe/examples/android/solutions/hands/build.gradle
+@@ -38,4 +38,6 @@ dependencies {
+     // MediaPipe Hands Solution.
+     implementation 'com.google.mediapipe:solution-core:latest.release'
+     implementation 'com.google.mediapipe:hands:latest.release'
++
++    implementation 'org.tensorflow:tensorflow-lite:2.7.0'
+ }
+diff --git a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
+index d93f9b1..421cfb1 100644
+--- a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
++++ b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
+@@ -15,9 +15,12 @@
+ package com.google.mediapipe.examples.hands;
+ 
+ import android.content.Intent;
++import android.content.res.AssetFileDescriptor;
+ import android.graphics.Bitmap;
+ import android.graphics.Matrix;
+ import android.os.Bundle;
++import android.os.Handler;
++import android.os.Message;
+ import android.provider.MediaStore;
+ import androidx.appcompat.app.AppCompatActivity;
+ import android.util.Log;
+@@ -37,15 +40,35 @@ import com.google.mediapipe.solutions.hands.HandLandmark;
+ import com.google.mediapipe.solutions.hands.Hands;
+ import com.google.mediapipe.solutions.hands.HandsOptions;
+ import com.google.mediapipe.solutions.hands.HandsResult;
++
++import org.tensorflow.lite.Interpreter;
++
++import java.io.FileInputStream;
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.nio.ByteBuffer;
++import java.nio.FloatBuffer;
++import java.nio.channels.FileChannel;
++import java.util.Arrays;
+ 
+ /** Main activity of MediaPipe Hands app. */
+ public class MainActivity extends AppCompatActivity {
+   private static final String TAG = "MainActivity";
+ 
+   private Hands hands;
+-  // Run the pipeline and the model inference on GPU or CPU.
++  public Interpreter interpreter = null;
++  public String[] label = {"left", "right", "ok"};
++  public int maxAt = 0;
++  public Handler mHandler = new Handler() {
++    @Override
++    public void handleMessage(Message msg) {
++        if (msg.what == 1) {
++          setTitle(label[maxAt]);
++        }
++    }
++  };
++
++// Run the pipeline and the model inference on GPU or CPU.
+   private static final boolean RUN_ON_GPU = true;
+ 
+   private enum InputSource {
+@@ -74,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
+     setupStaticImageDemoUiComponents();
+     setupVideoDemoUiComponents();
+     setupLiveDemoUiComponents();
++
++    try {
++      interpreter = new Interpreter(loadModelFile("HandGesture"));
++      interpreter.allocateTensors();
++    } catch (IOException e) {
++      e.printStackTrace();
++    }
+   }
+ 
+   @Override
+@@ -369,5 +399,44 @@ public class MainActivity extends AppCompatActivity {
+             "MediaPipe Hand wrist world coordinates (in meters with the origin at the hand's"
+                 + " approximate geometric center): x=%f m, y=%f m, z=%f m",
+             wristWorldLandmark.getX(), wristWorldLandmark.getY(), wristWorldLandmark.getZ()));
++
++    Log.i("MonitorLandMark", "start capture data");
++    float[] inputs = new float[21 * 3];
++    int i = 0;
++    for (Landmark landmark : result.multiHandWorldLandmarks().get(0).getLandmarkList()) {
++      Log.i("MonitorLandMark", String.format("x=%f, y=%f, z=%f", landmark.getX(), landmark.getY(), landmark.getZ()));
++      inputs[i] = landmark.getX() * -1;
++      inputs[i + 21] = landmark.getY();
++      inputs[i + 21 + 21] = landmark.getZ();
++
++      i++;
++    }
++    Log.i("MonitorLandMark", "end capture data");
++
++    FloatBuffer input = FloatBuffer.allocate(interpreter.getInputTensor(0).numElements());
++    input.put(inputs);
++
++    FloatBuffer output = FloatBuffer.allocate(interpreter.getOutputTensor(0).numElements());
++    interpreter.run(inputs, output);
++
++    float[] outputs = output.array();
++    for (int j = 0; j < outputs.length; j++) {
++      maxAt = outputs[j] > outputs[maxAt] ? j : maxAt;
++    }
++
++    Message message = new Message();
++    message.what = 1;
++    mHandler.sendMessage(message);
++
++    Log.e(TAG, Arrays.toString(output.array()) + " -> " + maxAt + " -> " + label[maxAt]);
++  }
++
++  private ByteBuffer loadModelFile(String model) throws IOException {
++    AssetFileDescriptor fileDescriptor = getApplicationContext().getAssets().openFd(model + ".tflite");
++    FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
++    FileChannel fileChannel = inputStream.getChannel();
++    long startOffset = fileDescriptor.getStartOffset();
++    long declaredLength = fileDescriptor.getDeclaredLength();
++    return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+   }
+ }
+-- 
+2.30.1 (Apple Git-130)
+

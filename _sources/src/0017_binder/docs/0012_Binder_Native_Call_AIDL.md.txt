@@ -1,0 +1,538 @@
+# Binder Native Call AIDL
+
+从Native调用AIDL接口，实现C、C++如何访问aidl接口
+
+# Java AIDL
+
+分析AIDL中的binder code和被调用函数关系
+
+* [0012_BookController.aidl](refers/0012_BookController.aidl)
+  * [0012_BookController.java](refers/0012_BookController.java)
+    * static final int TRANSACTION_getBookList = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
+    * static final int TRANSACTION_addBookInOut = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
+    * static final int TRANSACTION_setCallBack = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);
+* android.os.IBinder.FIRST_CALL_TRANSACTION开始递增，和接口中的函数顺序对应
+
+# adbtool call aidl
+
+最终binder的code调用了硬编码的函数需要
+
+```
+* system/core/adbtool/adbtool.cpp
+  * int main(int argc, char *argv[])
+    * else if (!strcmp("install", argv[1]))
+      * ret = doInstall(ADBTOOL_CMD_INSTALL_APP, argv[3]);
+        * system/core/adbtool/command.cpp
+          * switch (cmd)
+            * case ADBTOOL_CMD_INSTALL_APP:
+              * ret = OsManager_install(adbtool_INSTALL_APP, sourceFile);
+                * external/xxx/lib/libBinderClient/BinderClient.cpp
+                  * int OsManager_install(int type, char *source)
+                    * sp<IServiceManager> sm = defaultServiceManager();
+                    * sp<IBinder> binder = sm->getService(String16("OsManager"));
+                    * data.writeInterfaceToken(String16("com.osmanager.IOsManager"));
+                    * status_t ret = binder->transact(TRANSACTION_OsManager_install, data, &reply);
+                      * #define TRANSACTION_OsManager_install (IBinder::FIRST_CALL_TRANSACTION + 2)
+```
+
+aidl定义在这里，也就是存在aidl函数需要被修改，从而导致adbtool中的硬编码无法对应的问题
+
+```java
+// frameworks/base/core/java/com/osmanager/IOsManager.aidl
+
+package com.osmanager;
+
+import android.os.Bundle;
+
+interface IOsManager {
+    int update(int mode, String what);
+    int cleanUp(String whatToClean);
+    int install(int type, String path);
+}
+```
+
+# server
+
+```
+* packages/apps/OsManager/src/com/osmanager/OsManager.java
+  * public class OsManager extends IOsManager.Stub
+```
+
+# aidl_interface
+
+* [Stable AIDL](https://source.android.com/devices/architecture/aidl/stable-aidl)
+* local_include_dir: 这个相对路径一定要给，要不然会找不到生成的文件
+  ```json
+  aidl_interface {
+      name: "aidl-test",
+      unstable: true,
+      srcs: ["core/java/**/IOsManager.aidl"],
+      include_dirs: [
+          "frameworks/base/core/java",
+      ],
+      local_include_dir: "core/java",
+      vendor_available: true,
+      backend: {
+          cpp: {
+              enabled: true,
+          },
+          java: {
+              enabled: false,
+          },
+          ndk: {
+              enabled: false,
+          },
+      },
+  }
+  ```
+
+# client example
+
+```CPP
+#define LOG_TAG "adbtool"
+#include <log/log.h>
+
+#include <String16.h>
+#include <binder/IServiceManager.h>
+#include <com/osmanager/IOsManager.h>
+
+
+using namespace com::droid::osmanager;
+using namespace android;
+
+int main(int argc, char *argv[])
+{
+    int i;
+    for (i = 0; i < argc; i++) {
+        //printf("argv[%d]=%s\n", i, argv[i]);
+        ALOGD("argv[%d]=%s\n", i, argv[i]);
+    }
+
+    sp<IOsManager> client = interface_cast<IOsManager>(defaultServiceManager()->getService(String16("OsManager")));
+
+    return 0;
+}
+```
+
+Android.mk
+
+```makefile
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_C_INCLUDES += $(LOCAL_PATH) \
+            frameworks/native/include \
+            system/core/base/include \
+            system/core/include/utils
+
+LOCAL_SRC_FILES := adbtool.cpp
+
+LOCAL_MODULE := jni2aidl
+
+LOCAL_CFLAGS += -Wno-unused-variable \
+                -Wno-typedef-redefinition \
+                -Wno-unused-function \
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_SHARED_LIBRARIES := libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp
+LOCAL_PROPRIETARY_MODULE := true
+include $(BUILD_EXECUTABLE)
+```
+
+# Service Example
+
+C++ Server版本
+
+## server
+
+C++ Server写法
+
+```CPP
+#define LOG_TAG "jni2aidl_server"
+#include <log/log.h>
+
+#include <String16.h>
+#include <String8.h>
+#include <binder/IServiceManager.h>
+#include <com/osmanager/IOsManager.h>
+#include <com/osmanager/BnOsManager.h>
+#include <binder/IPCThreadState.h>
+
+
+using namespace com::droid::osmanager;
+using namespace android;
+
+class OsManagerService : public BnOsManager {
+public:
+    OsManagerService();
+    ~OsManagerService();
+
+    ::android::binder::Status update(int32_t mode, const ::android::String16& what, int32_t* _aidl_return);
+    ::android::binder::Status cleanUp(const ::android::String16& whatToClean, int32_t* _aidl_return);
+    ::android::binder::Status install(int32_t type, const ::android::String16& path, int32_t* _aidl_return);
+};
+
+OsManagerService::OsManagerService() {
+}
+
+OsManagerService::~OsManagerService() {
+
+}
+
+::android::binder::Status OsManagerService::update(int32_t mode, const ::android::String16& what, int32_t* _aidl_return) {
+    ALOGD("update: %s, mode: %d", String8(what).string(), mode);
+    printf("update: %s, mode: %d", String8(what).string(), mode);
+
+    *_aidl_return = 1;
+    return ::android::binder::Status::ok();
+}
+
+::android::binder::Status OsManagerService::cleanUp(const ::android::String16& whatToClean, int32_t* _aidl_return) {
+    ALOGD("cleanUp: %s", String8(whatToClean).string());
+    printf("cleanUp: %s", String8(whatToClean).string());
+
+    *_aidl_return = 2;
+    return ::android::binder::Status::ok();
+}
+
+::android::binder::Status OsManagerService::install(int32_t type, const ::android::String16& path, int32_t* _aidl_return) {
+    ALOGD("install: type: %d, path: %s", type, String8(path).string());
+    printf("install: type: %d, path: %s", type, String8(path).string());
+
+    *_aidl_return = 3;
+    return ::android::binder::Status::ok();
+}
+
+int main(int argc, char *argv[])
+{
+    int i;
+    for (i = 0; i < argc; i++) {
+        printf("argv[%d]=%s\n", i, argv[i]);
+        ALOGD("argv[%d]=%s\n", i, argv[i]);
+    }
+
+    sp<ProcessState> proc(ProcessState::self());
+    sp<IServiceManager> sm = defaultServiceManager();
+    ALOGI("ServiceManager: %p", sm.get());
+    sm->addService(String16("OsManagerService"), new OsManagerService());
+    ProcessState::self()->startThreadPool();
+    IPCThreadState::self()->joinThreadPool();
+}
+```
+
+## client
+
+C++ Client写法
+
+```cpp
+#define LOG_TAG "jni2aidl_client"
+#include <log/log.h>
+
+#include <String16.h>
+#include <binder/IServiceManager.h>
+#include <com/osmanager/IOsManager.h>
+
+
+using namespace com::droid::osmanager;
+using namespace android;
+
+int main(int argc, char *argv[])
+{
+    int32_t i;
+    for (i = 0; i < argc; i++) {
+        printf("argv[%d]=%s\n", i, argv[i]);
+        ALOGD("argv[%d]=%s\n", i, argv[i]);
+    }
+
+    sp<IOsManager> client = interface_cast<IOsManager>(defaultServiceManager()->getService(String16("OsManagerService")));
+    client->update(1, String16("zengjf"), &i);
+    ALOGD("i = %d\n", i);
+    printf("i = %d\n", i);
+
+    client->cleanUp(String16("zengjf/"), &i);
+    ALOGD("i = %d\n", i);
+    printf("i = %d\n", i);
+
+    client->install(3, String16("zengjf/"), &i);
+    ALOGD("i = %d\n", i);
+    printf("i = %d\n", i);
+
+    return 0;
+}
+```
+
+## Android.mk
+
+```makefile
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_C_INCLUDES += $(LOCAL_PATH) \
+            frameworks/native/include \
+            system/core/base/include \
+            system/core/include/utils
+
+LOCAL_SRC_FILES := jni2aidl_server.cpp
+
+LOCAL_MODULE := jni2aidl_server
+
+LOCAL_CFLAGS += -Wno-unused-variable \
+                -Wno-typedef-redefinition \
+                -Wno-unused-function \
+                -Wno-unused-parameter
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_SHARED_LIBRARIES := libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp
+LOCAL_PROPRIETARY_MODULE := true
+include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+LOCAL_C_INCLUDES += $(LOCAL_PATH) \
+            frameworks/native/include \
+            system/core/base/include \
+            system/core/include/utils
+
+LOCAL_SRC_FILES := jni2aidl_client.cpp
+
+LOCAL_MODULE := jni2aidl_client
+
+LOCAL_CFLAGS += -Wno-unused-variable \
+                -Wno-typedef-redefinition \
+                -Wno-unused-function \
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_SHARED_LIBRARIES := libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp
+LOCAL_PROPRIETARY_MODULE := true
+include $(BUILD_EXECUTABLE)
+```
+
+## log
+
+```
+12-30 13:35:42.004  8479  8479 D jni2aidl_client: argv[0]=jni2aidl_client
+12-30 13:35:42.007  8310  8311 D jni2aidl_server: update: zengjf, mode: 1
+12-30 13:35:42.007  8479  8479 D jni2aidl_client: i = 1
+12-30 13:35:42.007  8310  8311 D jni2aidl_server: cleanUp: zengjf/
+12-30 13:35:42.008  8479  8479 D jni2aidl_client: i = 2
+12-30 13:35:42.008  8310  8311 D jni2aidl_server: install: type: 3, path: zengjf/
+12-30 13:35:42.009  8479  8479 D jni2aidl_client: i = 3
+```
+
+# C call CPP
+
+* [0012_CCallCPP](refers/0012_CCallCPP)
+  * 简要来说就是要用C++编译cpp代码成C接口，然后C调用C++的C接口程序；
+  * C++部分不要使用模板，否则
+    ```
+    error: templates must have C++ linkage
+    ```
+* 只能在C层实现binder通信
+
+
+## Android.bp
+
+C++提供的C接口库编译文件，主要是必须使用C++编译器才能编译出C接口，而不能直接使用C直接访问C++
+
+```json
+cc_library_shared {
+    name: "libOsManager",
+
+    cflags: [
+        "-Wno-error=return-type-c-linkage",
+    ],
+
+    srcs: [
+        "BinderClient.cpp",
+    ],
+
+    shared_libs: [
+        "liblog",
+        "libutils",
+        "libbinder",
+    ],
+
+    local_include_dirs: [
+        "."
+    ],
+    vendor_available: true,
+}
+```
+
+## CPP share lib
+
+自己填充binder通信数据，封装C++代码为C接口
+
+```CPP
+#include <stdio.h>
+#include <unistd.h>
+#include <binder/IServiceManager.h>
+#include <binder/IBinder.h>
+#include <binder/Parcel.h>
+#include <utils/String8.h>
+
+#include <cutils/log.h> // This require liblog
+//#define LOG_TAG "AdbtoolServer"
+
+using namespace android;
+
+
+extern "C" {
+
+#define TRANSACTION_OsManager_cleanUp                      (IBinder::FIRST_CALL_TRANSACTION + 1)
+#define TRANSACTION_OsManager_install                      (IBinder::FIRST_CALL_TRANSACTION + 2)
+
+#define OSMANAGERUTIL_SERVICE "OsManagerService"
+
+    // int cleanUp(String whatToClean)@com.osmanager.IOsManager.aidl
+    int OsManager_cleanUp(char *whatToClean)
+    {
+        sp<IServiceManager> sm = defaultServiceManager();
+        sp<IBinder> binder = sm->getService(String16(OSMANAGERUTIL_SERVICE));
+        if (binder == NULL) {
+            ALOGE("%s getService fail", __func__);
+#if 1
+            // wait for OsManager service ready
+            int timeout = 60; // 60 seconds
+            while (timeout-- > 0) {
+                usleep(1 * 1000 * 1000);
+                binder = sm->getService(String16(OSMANAGERUTIL_SERVICE));
+                if (binder != NULL) {
+                    ALOGE("service OsManager ready");
+                    break;
+                }
+            }
+            if (timeout <= 0)
+                ALOGE("get service OsManager timeout");
+#endif
+        }
+
+        Parcel data, reply;
+        data.writeInterfaceToken(String16("com.osmanager.IOsManager"));
+
+        String16 mStr16 = String16(whatToClean);
+        data.writeString16(mStr16);
+
+        status_t ret = binder->transact(TRANSACTION_OsManager_cleanUp, data, &reply);
+        if (ret != NO_ERROR) {
+            ALOGE("%s could not contact remote\n", __func__);
+            return ret;
+        }
+
+        int exceptionCode = reply.readInt32();
+        int retValue = exceptionCode;
+        if (exceptionCode != 0) {
+            String8 eString = String8(reply.readString16());
+            ALOGE("Exception [%s] exceptionCode = 0x%8x", (char *)eString.string(), exceptionCode);
+        } else {
+            retValue = reply.readInt32();
+        }
+
+        return retValue;
+    }
+
+    // int install(int type, String source)@com.osmanager.OsManager.aidl
+    int OsManager_install(int type, char *source)
+    {
+        sp<IServiceManager> sm = defaultServiceManager();
+        sp<IBinder> binder = sm->getService(String16(OSMANAGERUTIL_SERVICE));
+        if (binder == NULL) {
+#if 1
+            // wait for OsManager service ready
+            int timeout = 60; // 60 seconds
+            while (timeout-- > 0) {
+                usleep(1 * 1000 * 1000);
+                binder = sm->getService(String16(OSMANAGERUTIL_SERVICE));
+                if (binder != NULL) {
+                    ALOGE("service OsManager ready");
+                    break;
+                }
+            }
+            if (timeout <= 0)
+                ALOGE("get service OsManager timeout");
+#endif
+            ALOGE("%s:%d getService fail", __func__, __LINE__);
+        }
+
+        Parcel data, reply;
+        data.writeInterfaceToken(String16("com.osmanager.IOsManager"));
+
+        data.writeInt32(type);
+        String16 mStr16 = String16(source);
+        data.writeString16(mStr16);
+
+        status_t ret = binder->transact(TRANSACTION_OsManager_install, data, &reply);
+        if (ret != NO_ERROR) {
+            ALOGE("%s could not contact remote\n", __func__);
+            return ret;
+        }
+
+        int exceptionCode = reply.readInt32();
+        int retValue = exceptionCode;
+        if (exceptionCode != 0) {
+            String16 eString = reply.readString16();
+            ALOGE("Exception [%s] exceptionCode = 0x%8x", (char *)eString.string(), exceptionCode);
+        } else {
+            retValue = reply.readInt32();
+        }
+
+        return retValue;
+    }
+
+} // end extern "C"
+```
+
+## Android.mk
+
+C main程序Android.mk，主要涉及到引用C++提供的C接口库
+
+```
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_C_INCLUDES += $(LOCAL_PATH) \
+            frameworks/native/include \
+            system/core/base/include \
+            system/core/include/utils
+
+LOCAL_SRC_FILES := jni2aidl_client.c
+
+LOCAL_MODULE := jni2aidl_client_c
+
+LOCAL_CFLAGS += -Wno-unused-variable \
+                -Wno-typedef-redefinition \
+                -Wno-unused-function \
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_SHARED_LIBRARIES := libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp libOsManager
+LOCAL_PROPRIETARY_MODULE := true
+include $(BUILD_EXECUTABLE)
+```
+
+## C版本调用aidl
+
+```CPP
+#include <stdio.h>
+
+extern int OsManager_cleanUp(char *whatToClean);
+extern int OsManager_install(int type, char *source);
+
+int main(int argc, char *argv[])
+{
+    int32_t i;
+    for (i = 0; i < argc; i++) {
+        printf("argv[%d]=%s\n", i, argv[i]);
+    }
+
+    OsManager_cleanUp("zengjf");
+    OsManager_install(3, "zengjf/");
+
+    return 0;
+}
+```
+
+log
+
+```
+12-30 18:13:27.298  5927  5928 D jni2aidl_server: cleanUp: zengjf
+12-30 18:13:27.299  5927  5928 D jni2aidl_server: install: type: 3, path: zengjf/
+```

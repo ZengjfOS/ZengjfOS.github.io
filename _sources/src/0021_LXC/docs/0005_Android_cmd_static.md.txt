@@ -1,0 +1,73 @@
+# Android cmd static
+
+Android编译static cmd命令可执行程序
+
+# Android.bp示例
+
+* https://github.com/LowLevelOfLogic/RaspberryPi/tree/servicemanager/Android.bp
+  ```diff
+  diff --git a/frameworks/native/cmds/servicemanager/Android.bp b/frameworks/native/cmds/servicemanager/Android.bp
+  index 428561bc8ae..0681cc9606a 100644
+  --- a/frameworks/native/cmds/servicemanager/Android.bp
+  +++ b/frameworks/native/cmds/servicemanager/Android.bp
+  @@ -15,13 +15,31 @@ cc_defaults {
+       shared_libs: ["liblog"],
+   }
+  
+  +cc_defaults {
+  +    name: "servicemanager_static_flags",
+  +
+  +    cflags: [
+  +        "-Wall",
+  +        "-Wextra",
+  +        "-Werror",
+  +    ],
+  +    product_variables: {
+  +        binder32bit: {
+  +            cflags: ["-DBINDER_IPC_32BIT=1"],
+  +        },
+  +    },
+  +
+  +    static_libs: ["liblog"],
+  +}
+  +
+   cc_binary {
+       name: "bctest",
+  -    defaults: ["servicemanager_flags"],
+  +    defaults: ["servicemanager_static_flags"],
+       srcs: [
+           "bctest.c",
+           "binder.c",
+       ],
+  +       static_executable: true,
+   }
+  
+   cc_binary {
+  ```
+
+# Android.mk示例
+
+```Makefile
+LOCAL_PATH:= $(call my-dir)
+
+# static link
+include $(CLEAR_VARS)
+LOCAL_STATIC_LIBRARIES := liblog
+LOCAL_SRC_FILES := android_10/client.c binder.c
+# LOCAL_CFLAGS += $(svc_c_flags)
+LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
+LOCAL_LDFLAGS += -static
+LOCAL_MODULE := bclient
+LOCAL_FORCE_STATIC_EXECUTABLE := true
+include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+LOCAL_STATIC_LIBRARIES := liblog
+LOCAL_SRC_FILES := android_10/service.c binder.c
+# LOCAL_CFLAGS += $(svc_c_flags)
+LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
+LOCAL_LDFLAGS += -static
+LOCAL_MODULE := bservice
+LOCAL_FORCE_STATIC_EXECUTABLE := true
+include $(BUILD_EXECUTABLE)
+```

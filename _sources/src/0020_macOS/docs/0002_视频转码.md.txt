@@ -1,0 +1,8 @@
+# 视频转码
+
+macOS QuickTime Player录制视频是mov格式，转成mp4格式
+
+# steps
+
+* `brew install ffmpeg`
+* `ffmpeg -i input.mov output.mp4`

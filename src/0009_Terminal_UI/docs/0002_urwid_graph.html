@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">urwid graph</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#graph-ui">graph UI</a></li>
+<li><a class="reference internal" href="#graph-init">graph init</a></li>
+<li><a class="reference internal" href="#ui-layout">UI layout</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="urwid-graph">
+<h1>urwid graph<a class="headerlink" href="#urwid-graph" title="Permalink to this headline"></a></h1>
+<p>分析graph example工作原理，便于入门</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://urwid.org/examples/#graph-py">Example Programs graph-py</a></p></li>
+<li><p><a class="reference external" href="https://github.com/urwid/urwid/blob/master/examples/graph.py">graph.py</a></p></li>
+</ul>
+</section>
+<section id="graph-ui">
+<h1>graph UI<a class="headerlink" href="#graph-ui" title="Permalink to this headline"></a></h1>
+<p><img alt="0002_graph.png" src="../../../_images/0002_graph.png" /></p>
+</section>
+<section id="graph-init">
+<h1>graph init<a class="headerlink" href="#graph-init" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>GraphModel为图形数据初始化、获取类；</p></li>
+<li><p>GraphView为界面初始化、控制类，包括UI界面；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">examples</span><span class="o">/</span><span class="n">graph</span><span class="o">.</span><span class="n">py</span>
+  <span class="o">*</span> <span class="k">if</span> <span class="s1">&#39;__main__&#39;</span><span class="o">==</span><span class="vm">__name__</span><span class="p">:</span>
+    <span class="o">*</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+      <span class="o">*</span> <span class="n">GraphController</span><span class="p">()</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+        <span class="o">*</span> <span class="n">GraphController</span><span class="p">()</span>
+          <span class="o">*</span> <span class="k">class</span> <span class="nc">GraphController</span><span class="p">:</span>
+            <span class="o">*</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">GraphModel</span><span class="p">()</span>
+                <span class="o">*</span> <span class="k">class</span> <span class="nc">GraphModel</span><span class="p">:</span>
+                  <span class="o">*</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                    <span class="o">*</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+                    <span class="o">*</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                      <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+                      <span class="o">*</span> <span class="n">数据来源</span>
+              <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">GraphView</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+                <span class="o">*</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
+                  <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span>
+                  <span class="o">*</span> <span class="n">urwid</span><span class="o">.</span><span class="n">WidgetWrap</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_window</span><span class="p">())</span>
+                    <span class="o">*</span> <span class="k">def</span> <span class="nf">main_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                      <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bar_graph</span><span class="p">()</span>
+                      <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_wrap</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">WidgetWrap</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="p">)</span>
+                      <span class="o">*</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_controls</span><span class="p">()</span>
+                        <span class="o">*</span> <span class="n">UI界面</span>
+        <span class="o">*</span> <span class="n">main</span><span class="p">()</span>
+          <span class="o">*</span> <span class="k">class</span> <span class="nc">GraphController</span><span class="p">:</span>
+            <span class="o">*</span> <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">MainLoop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">palette</span><span class="p">)</span>
+              <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="ui-layout">
+<h1>UI layout<a class="headerlink" href="#ui-layout" title="Permalink to this headline"></a></h1>
+<p>BarGraph参数暂时无法看懂</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># examples/graph.py</span>
+
+<span class="k">def</span> <span class="nf">bar_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">satt</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">smooth</span><span class="p">:</span>
+        <span class="c1"># smooth attribute</span>
+        <span class="n">satt</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="s1">&#39;bg 1 smooth&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="s1">&#39;bg 2 smooth&#39;</span><span class="p">}</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">BarGraph</span><span class="p">([</span><span class="s1">&#39;bg background&#39;</span><span class="p">,</span><span class="s1">&#39;bg 1&#39;</span><span class="p">,</span><span class="s1">&#39;bg 2&#39;</span><span class="p">],</span> <span class="n">satt</span><span class="o">=</span><span class="n">satt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">w</span>
+
+<span class="k">def</span> <span class="nf">graph_controls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># 获取当前支持mode，也就是支持哪些波形</span>
+    <span class="n">modes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">get_modes</span><span class="p">()</span>
+
+    <span class="c1"># setup mode radio buttons</span>
+    <span class="c1"># 构建波形单选按钮</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">mode_buttons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
+        <span class="n">rb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">radio_button</span><span class="p">(</span> <span class="n">group</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_mode_button</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode_buttons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">rb</span> <span class="p">)</span>
+    
+    <span class="c1"># setup animate button</span>
+    <span class="c1"># 构建动画开启、关闭、重置按钮</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">animate_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="p">(</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_animate_button</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">on_animate_button</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">animate_button</span> <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># 进度条</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">animate_progress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">()</span>
+    <span class="n">animate_controls</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">GridFlow</span><span class="p">(</span> <span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animate_button</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Reset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_reset_button</span><span class="p">),</span>
+        <span class="p">],</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+    <span class="c1"># 构建复选框</span>
+    <span class="k">if</span> <span class="n">urwid</span><span class="o">.</span><span class="n">get_encoding_mode</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;utf8&quot;</span><span class="p">:</span>
+        <span class="n">unicode_checkbox</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">CheckBox</span><span class="p">(</span>
+            <span class="s2">&quot;Enable Unicode Graphics&quot;</span><span class="p">,</span>
+            <span class="n">on_state_change</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_unicode_checkbox</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">unicode_checkbox</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+            <span class="s2">&quot;UTF-8 encoding not detected&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 不知道为什么要这个wrap</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">animate_progress_wrap</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">WidgetWrap</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animate_progress</span><span class="p">)</span>
+
+    <span class="c1"># 采用list的形式列出layout，并传给ListBox</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[</span>    <span class="n">urwid</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+        <span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode_buttons</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">urwid</span><span class="o">.</span><span class="n">Divider</span><span class="p">(),</span>
+        <span class="n">urwid</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;Animation&quot;</span><span class="p">,</span><span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+        <span class="n">animate_controls</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animate_progress_wrap</span><span class="p">,</span>
+        <span class="n">urwid</span><span class="o">.</span><span class="n">Divider</span><span class="p">(),</span>
+        <span class="n">urwid</span><span class="o">.</span><span class="n">LineBox</span><span class="p">(</span> <span class="n">unicode_checkbox</span> <span class="p">),</span>
+        <span class="n">urwid</span><span class="o">.</span><span class="n">Divider</span><span class="p">(),</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Quit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_program</span> <span class="p">),</span>
+        <span class="p">]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">ListBox</span><span class="p">(</span><span class="n">urwid</span><span class="o">.</span><span class="n">SimpleListWalker</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">w</span>
+
+<span class="k">def</span> <span class="nf">main_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bar_graph</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graph_wrap</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">WidgetWrap</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="p">)</span>
+
+    <span class="c1"># 竖线</span>
+    <span class="n">vline</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">AttrWrap</span><span class="p">(</span> <span class="n">urwid</span><span class="o">.</span><span class="n">SolidFill</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;</span><span class="se">\u2502</span><span class="s1">&#39;</span><span class="p">),</span> <span class="s1">&#39;line&#39;</span><span class="p">)</span>
+
+    <span class="c1"># 获取控制面板layout</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_controls</span><span class="p">()</span>
+
+    <span class="c1"># 水平布局，三列，</span>
+    <span class="c1"># (&#39;weight&#39;,2,self.graph_wrap): 采用2:1(这里的1表示和剩下的界面)权重分配当前的列数</span>
+    <span class="c1"># (&#39;fixed&#39;,1,vline): 固定1个字符的列，使用vline填充</span>
+    <span class="c1"># dividechars=1: 列之间1个字符</span>
+    <span class="c1"># focus_column=2: 聚焦到第3列，从0开始计算</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">Columns</span><span class="p">([(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_wrap</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;fixed&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">vline</span><span class="p">),</span> <span class="n">c</span><span class="p">],</span>
+        <span class="n">dividechars</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">focus_column</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="c1"># 左右边框padding设置</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">Padding</span><span class="p">(</span><span class="n">w</span><span class="p">,(</span><span class="s1">&#39;fixed left&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="s1">&#39;fixed right&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="c1"># 使用body名字的前景色、背景色，绘制LineBox</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">AttrWrap</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="s1">&#39;body&#39;</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">LineBox</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="c1"># 使用line名字的前景色、背景色，绘制阴影效果</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">urwid</span><span class="o">.</span><span class="n">AttrWrap</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="s1">&#39;line&#39;</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_shadow</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="k">return</span> 
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

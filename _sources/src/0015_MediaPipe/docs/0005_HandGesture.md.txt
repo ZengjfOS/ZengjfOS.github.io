@@ -1,0 +1,111 @@
+# HandGesture
+
+基于MediaPipe的手势识别
+
+# Training Model
+
+* [HandGesture_Colab.ipynb](refers/0005_HandGesture/HandGesture_Colab.ipynb)
+  * https://colab.research.google.com/
+    * 上传
+    * 上传完就回进入Google提供的模型训练虚拟环境，在里面执行、修改程序
+    * [Training data](refers/0005_HandGesture/HandGesture.csv)
+    * [修改] -> [清除所有输出项]
+
+# predict test data
+
+* [HandGesture.txt](refers/0005_HandGesture/HandGesture.txt)
+  ```
+  [-1.3194e-02  6.8620e-03  1.5590e-02  2.8740e-02  2.7185e-02  1.2828e-02
+    4.0429e-02  4.1205e-02  2.6742e-02  2.5640e-03  3.0143e-02  2.9686e-02
+    1.0562e-02 -8.3320e-03  2.6354e-02  2.3919e-02  6.1170e-03 -4.2540e-03
+    1.9591e-02  2.3045e-02  5.7310e-03  1.4447e-02 -3.1540e-03 -1.7755e-02
+   -4.1493e-02 -6.2809e-02 -1.4507e-02 -4.1340e-03 -3.1030e-03 -5.4180e-03
+   -4.1090e-03  2.8040e-03  3.3470e-03 -3.8670e-03  7.5990e-03  1.8592e-02
+    1.2670e-02  1.0060e-02  2.6096e-02  2.9950e-02  2.7247e-02  2.4915e-02
+    8.8800e-02  6.4944e-02  4.6603e-02  2.5458e-02  6.7000e-04 -1.7520e-03
+   -1.1990e-02  6.7540e-03  2.9948e-02 -2.7240e-03 -1.2755e-02  1.2018e-02
+    2.8365e-02 -2.8000e-05 -6.1790e-03  1.5845e-02  4.0248e-02  1.1887e-02
+    3.4740e-03  1.7685e-02  3.8312e-02]
+  [4.5349663e-07 2.6038929e-08 9.9999952e-01]
+  2
+  ```
+  * 将上面的测试数据写入上面的文件，程序只读一行，数据调成单行数据
+* python3 LogTools.py HandGesture -mode predict
+  * [HandGesture.py](refers/0005_HandGesture/HandGesture.py)
+
+# live predict
+
+* python3 LogTools.py MediaPipeHands -mode live
+  * [MediaPipeHands.py](refers/0004_MediaPipeHands/MediaPipeHands.py)
+  * MediaPipeHands可以用于数据采集
+    * z: open data file
+    * x: close data file
+    * a: start or stop write to file
+* python3 LogTools.py HandGesture -mode live
+  * [HandGesture.py](refers/0005_HandGesture/HandGesture.py)
+  * 在MediaPipeHands基础上加了predict代码，也就是加了通过MediaPipeHands采集的数据训练的模型
+    * 握拳大拇指向右 -> left
+    * 握拳大拇指向左 -> right
+    * 握拳大拇指向上 -> ok
+* 需要注意，TensorFlow Lite和正常版本的TensorFlow使用上是有差异的
+
+# Local Jupyter
+
+* [HandGesture_Local.ipynb](refers/0005_HandGesture/HandGesture_Local.ipynb)
+  * 不在Google Colab上训练模型，在本地电脑直接训练模型
+
+# Android
+
+* tensorflow-lite的版本需要和训练模型的版本保持一致，都用最新的版本应该就好了
+* 为了便于查看3D手势，所以对X轴取了对称值，也就是乘以负一
+* [support-left-right-ok-hand-gesture.patch](refers/0005_HandGesture/support-left-right-ok-hand-gesture.patch)
+
+logcat 
+
+```
+2022-02-01 18:46:56.071 15189-15274/com.google.mediapipe.apps.hands E/MainActivity: [3.1813193E-4, 0.9975777, 0.0021041732] -> 1 -> right
+```
+
+video
+
+* [HandGesture.mp4](refers/0005_HandGesture/HandGesture.mp4)
+
+# 图片绘制手指检测结果
+
+* 视频流渲染结果由MediaPipe库处理，回调HandsResultGlRenderer.java中的OpenGL ES处理方法，可以处理绘框
+* 单张图片的渲染有Canvas绘图源代码，可以修改查看结果，所以在这个基础上可以画一个框，显示手指范围
+* 最终是通过Canvas进行处理的
+
+```
+* src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
+  ├── private void setupStreamingModePipeline(InputSource inputSource)
+  │   ├── hands = new Hands(...);
+  │   ├── glSurfaceView = new SolutionGlSurfaceView<>(this, hands.getGlContext(), hands.getGlMajorVersion());
+  │   ├── glSurfaceView.setSolutionResultRenderer(new HandsResultGlRenderer());
+  │   │   └── src/main/java/com/google/mediapipe/examples/hands/HandsResultGlRenderer.java
+  │   │       └── public void renderResult(HandsResult result, float[] projectionMatrix)
+  │   │           └── 视频流调用这里的OpenGL ES进行图像渲染，画框操作可以在这里进行处理
+  │   └── hands.setResultListener(...)
+  │       └── handsResult -> {...}
+  │           ├── logWristLandmark(handsResult, /*showPixelValues=*/ false);
+  │           ├── glSurfaceView.setRenderData(handsResult);
+  │           │   └── SolutionGlSurfaceView.class
+  │           │       └── 没有源代码，转为分析单张图片的，因为有直接处理的源代码，这里会回调上面的HandsResultGlRenderer.java类中的处理方法
+  │           └── glSurfaceView.requestRender();
+  └── private void setupStaticImageModePipeline()
+      ├── hands = new Hands(...);
+      └── hands.setResultListener(...)
+          └── handsResult -> {...}
+              ├── logWristLandmark(handsResult, /*showPixelValues=*/ true);
+              ├── imageView.setHandsResult(handsResult);
+              │   └── src/main/java/com/google/mediapipe/examples/hands/HandsResultImageView.java
+              │       └── public void setHandsResult(HandsResult result)
+              │           ├── Bitmap bmInput = result.inputBitmap();
+              │           ├── latest = Bitmap.createBitmap(width, height, bmInput.getConfig());
+              │           ├── Canvas canvas = new Canvas(latest);
+              │           ├── canvas.drawBitmap(bmInput, new Matrix(), null);
+              │           └── drawLandmarksOnCanvas(...)
+              │               └── 实际绘图操作原理
+              └── runOnUiThread(() -> imageView.update());
+                  └── 貌似这个更新UI的方法不错的样子，省的写handler
+```

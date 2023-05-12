@@ -1,0 +1,25 @@
+# LXC chroot fs isolate
+
+对于rootfs隔离，使用pivot_root切换到根文件系统目录，chroot一样
+
+# 参考文档
+
+* [pivot_root](https://zhuanlan.zhihu.com/p/101096040)
+
+# call flow
+
+```
+* https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/start.c
+  └── static int do_start(void *data)
+      └── ret = lxc_setup(handler);
+          └── ret = lxc_setup_rootfs_switch_root(&lxc_conf->rootfs);
+              ├── detect_ramfs_rootfs()
+              │   └── return lxc_chroot(rootfs);
+              │       ├── ret = chdir("..");
+              │       └── ret = chroot(".");
+              └── return lxc_pivot_root(rootfs->mount);
+                  ├── oldroot = open("/", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
+                  ├── newroot = open(rootfs, O_DIRECTORY | O_RDONLY | O_CLOEXEC);
+                  ├── ret = fchdir(newroot);
+                  └── ret = pivot_root(".", ".");
+```

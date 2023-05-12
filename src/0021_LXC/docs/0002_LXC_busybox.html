@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">LXC busybox</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#busybox-binaries">busybox binaries</a></li>
+<li><a class="reference internal" href="#template">template</a></li>
+<li><a class="reference internal" href="#id2">lxc busybox来自哪里</a></li>
+<li><a class="reference internal" href="#lxc">查看lxc配置</a></li>
+<li><a class="reference internal" href="#id3">容器配置</a></li>
+<li><a class="reference internal" href="#id4">检查内核配置</a></li>
+<li><a class="reference internal" href="#lxc-for-android">LXC for Android</a></li>
+<li><a class="reference internal" href="#busyboxandroid-q">测试树莓派busybox运行在Android Q上</a></li>
+<li><a class="reference internal" href="#id5">启动树莓派容器</a></li>
+<li><a class="reference internal" href="#busybox">创建Busybox容器</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lxc-busybox">
+<h1>LXC busybox<a class="headerlink" href="#lxc-busybox" title="Permalink to this headline"></a></h1>
+<p>busybox lxc工作原理分析</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/ZengjfOS/lxc-android</p></li>
+</ul>
+</section>
+<section id="busybox-binaries">
+<h1>busybox binaries<a class="headerlink" href="#busybox-binaries" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://busybox.net/downloads/binaries/1.21.1/</p>
+<ul>
+<li><p>busybox-armv7l</p></li>
+</ul>
+</li>
+<li><p>Android测试存放路径</p>
+<ul>
+<li><p>/vendor/bin/</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="template">
+<h1>template<a class="headerlink" href="#template" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/lxc/lxc/blob/master/templates/lxc-busybox.in</p></li>
+<li><p>https://github.com/ppoffice/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>lxc busybox来自哪里<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/usr/share/lxc/templates/lxc-busybox</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...省略</span>
+
+configure_busybox<span class="o">()</span>
+<span class="o">{</span>
+  <span class="nv">rootfs</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">1</span><span class="si">}</span><span class="s2">&quot;</span>
+
+  <span class="k">if</span> ! which busybox &gt; /dev/null <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;ERROR: Failed to find busybox binary&quot;</span>
+    <span class="k">return</span> <span class="m">1</span>
+  <span class="k">fi</span>
+
+  <span class="c1"># copy busybox in the rootfs</span>
+  <span class="k">if</span> ! cp <span class="s2">&quot;</span><span class="k">$(</span>which busybox<span class="k">)</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/bin&quot;</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;ERROR: Failed to copy busybox binary&quot;</span>
+    <span class="k">return</span> <span class="m">1</span>
+  <span class="k">fi</span>
+
+  <span class="c1"># symlink busybox for the commands it supports</span>
+  <span class="c1"># it would be nice to just use &quot;chroot $rootfs busybox --install -s /bin&quot;</span>
+  <span class="c1"># but that only works right in a chroot with busybox &gt;= 1.19.0</span>
+  <span class="o">(</span>
+    <span class="nb">cd</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/bin&quot;</span> <span class="o">||</span> <span class="k">return</span> <span class="m">1</span>
+    ./busybox --list <span class="p">|</span> grep -v busybox <span class="p">|</span> xargs -n1 ln -s busybox
+  <span class="o">)</span>
+
+  <span class="c1"># relink /sbin/init</span>
+  ln <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/bin/busybox&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/sbin/init&quot;</span>
+
+  <span class="c1"># /etc/fstab must exist for &quot;mount -a&quot;</span>
+  touch <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/etc/fstab&quot;</span>
+
+  <span class="c1"># passwd exec must be setuid</span>
+  chmod +s <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/bin/passwd&quot;</span>
+  touch <span class="s2">&quot;</span><span class="si">${</span><span class="nv">rootfs</span><span class="si">}</span><span class="s2">/etc/shadow&quot;</span>
+
+  <span class="k">return</span> <span class="m">0</span>
+<span class="o">}</span>
+
+<span class="c1"># ...省略</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="lxc">
+<h1>查看lxc配置<a class="headerlink" href="#lxc" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>lxc-config –help</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">lxc</span><span class="o">-</span><span class="n">config</span> <span class="o">-</span><span class="n">l</span><span class="p">:</span> <span class="nb">list</span> <span class="nb">all</span> <span class="n">available</span> <span class="n">configuration</span> <span class="n">items</span>
+       <span class="n">lxc</span><span class="o">-</span><span class="n">config</span> <span class="n">item</span><span class="p">:</span> <span class="nb">print</span> <span class="n">configuration</span> <span class="n">item</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config -l</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">.</span><span class="n">default_config</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">lxcpath</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">bdev</span><span class="o">.</span><span class="n">lvm</span><span class="o">.</span><span class="n">vg</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">bdev</span><span class="o">.</span><span class="n">lvm</span><span class="o">.</span><span class="n">thin_pool</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">bdev</span><span class="o">.</span><span class="n">zfs</span><span class="o">.</span><span class="n">root</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">cgroup</span><span class="o">.</span><span class="n">use</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">cgroup</span><span class="o">.</span><span class="n">pattern</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.default_config</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.lxcpath</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lxc</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.bdev.lvm.vg</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.bdev.lvm.thin_pool</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.bdev.zfs.root</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.cgroup.use</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">.</span><span class="n">cgroup</span><span class="o">.</span><span class="n">use</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">set</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-config lxc.cgroup.pattern</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">/%</span><span class="n">n</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>容器配置<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/var/lib/lxc/zengjf/config</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Template used to create this container: /usr/share/lxc/templates/lxc-busybox</span>
+<span class="c1"># Parameters passed to the template:</span>
+<span class="c1"># Template script checksum (SHA-1): 21abc1440b73cdb95d96d5459b27c3a87df9976f</span>
+<span class="c1"># For additional config options, please look at lxc.container.conf(5)</span>
+
+<span class="c1"># Uncomment the following line to support nesting containers:</span>
+<span class="c1">#lxc.include = /usr/share/lxc/config/nesting.conf</span>
+<span class="c1"># (Be aware this has security implications)</span>
+
+lxc.net.0.type <span class="o">=</span> empty
+lxc.apparmor.profile <span class="o">=</span> generated
+lxc.apparmor.allow_nesting <span class="o">=</span> <span class="m">1</span>
+lxc.rootfs.path <span class="o">=</span> dir:/var/lib/lxc/zengjf/rootfs
+lxc.signal.halt <span class="o">=</span> SIGUSR1
+lxc.signal.reboot <span class="o">=</span> SIGTERM
+lxc.uts.name <span class="o">=</span> <span class="s2">&quot;zengjf&quot;</span>
+lxc.tty.max <span class="o">=</span> <span class="m">1</span>
+lxc.pty.max <span class="o">=</span> <span class="m">1</span>
+lxc.cap.drop <span class="o">=</span> sys_module mac_admin mac_override sys_time
+
+<span class="c1"># When using LXC with apparmor, uncomment the next line to run unconfined:</span>
+<span class="c1">#lxc.apparmor.profile = unconfined</span>
+
+lxc.mount.auto <span class="o">=</span> cgroup:mixed proc:mixed sys:mixed
+lxc.mount.entry <span class="o">=</span> shm /dev/shm tmpfs defaults <span class="m">0</span> <span class="m">0</span>
+lxc.mount.entry <span class="o">=</span> /lib lib none ro,bind <span class="m">0</span> <span class="m">0</span>
+lxc.mount.entry <span class="o">=</span> /usr/lib usr/lib none ro,bind <span class="m">0</span> <span class="m">0</span>
+lxc.mount.entry <span class="o">=</span> /sys/kernel/security sys/kernel/security none ro,bind,optional <span class="m">0</span> <span class="m">0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h1>检查内核配置<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>ls /proc/config.gz</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ls</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">access</span> <span class="s1">&#39;/proc/config.gz&#39;</span><span class="p">:</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-checkconfig</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Kernel</span> <span class="n">configuration</span> <span class="ow">not</span> <span class="n">found</span> <span class="n">at</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">gz</span><span class="p">;</span> <span class="n">searching</span><span class="o">...</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">checkconfig</span><span class="p">:</span> <span class="n">unable</span> <span class="n">to</span> <span class="n">retrieve</span> <span class="n">kernel</span> <span class="n">configuration</span>
+
+<span class="n">Try</span> <span class="n">modprobe</span> <span class="n">configs</span> <span class="n">module</span><span class="p">,</span> <span class="ow">or</span>
+<span class="n">Try</span> <span class="n">recompiling</span> <span class="k">with</span> <span class="n">IKCONFIG_PROC</span><span class="p">,</span> <span class="n">installing</span> <span class="n">the</span> <span class="n">kernel</span> <span class="n">headers</span><span class="p">,</span>
+<span class="ow">or</span> <span class="n">specifying</span> <span class="n">the</span> <span class="n">kernel</span> <span class="n">configuration</span> <span class="n">path</span> <span class="k">with</span><span class="p">:</span>
+  <span class="n">CONFIG</span><span class="o">=&lt;</span><span class="n">path</span><span class="o">&gt;</span> <span class="n">lxc</span><span class="o">-</span><span class="n">checkconfig</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo modprobe configs</p></li>
+<li><p>ls /proc/config.gz</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-checkconfig检查内核配置</p>
+<ul>
+<li><p>原理如下：https://github.com/ppoffice/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/cmd/lxc-checkconfig.in</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+
+<span class="c1"># Allow environment variables to override config</span>
+: <span class="si">${</span><span class="nv">CONFIG</span><span class="p">:=/proc/config.gz</span><span class="si">}</span>                        <span class="c1"># proc内核配置</span>
+: <span class="si">${</span><span class="nv">MODNAME</span><span class="p">:=configs</span><span class="si">}</span>                               <span class="c1"># 生成上面proc的内核配置的内核模块</span>
+
+<span class="nv">CAT</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span>                                           <span class="c1"># 默认假设没有压缩，如果压缩了要用zcat读取</span>
+
+<span class="c1"># ...省略</span>
+
+is_set<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">$CAT</span> <span class="nv">$CONFIG</span> <span class="p">|</span> grep <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">=[y|m]&quot;</span> &gt; /dev/null      <span class="c1"># cat/zcat读取/proc/config.gz</span>
+    <span class="k">return</span> <span class="nv">$?</span>
+<span class="o">}</span>
+
+<span class="c1"># ...省略</span>
+
+<span class="k">if</span> gunzip -tq &lt; <span class="nv">$CONFIG</span> <span class="m">2</span>&gt;/dev/null<span class="p">;</span> <span class="k">then</span>           <span class="c1"># 用gunzip检查，但是在Android下这行行不通</span>
+    <span class="nv">CAT</span><span class="o">=</span><span class="s2">&quot;zcat&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># ...省略</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;--- Namespaces ---&quot;</span>
+<span class="nb">echo</span> -n <span class="s2">&quot;Namespaces: &quot;</span> <span class="o">&amp;&amp;</span> is_enabled CONFIG_NAMESPACES yes
+<span class="nb">echo</span>
+<span class="c1"># ...省略</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/cmd/lxc-checkconfig.in#L7</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="lxc-for-android">
+<h1>LXC for Android<a class="headerlink" href="#lxc-for-android" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/ppoffice/lxc-android</p>
+<ul>
+<li><p><strong>针对Android的相关配置</strong>：https://github.com/ppoffice/lxc-android/blob/lxc-3.0.3-android-28/src/Android.bp</p></li>
+</ul>
+</li>
+<li><p>https://github.com/ZengjfOS/lxc-android</p></li>
+<li><p><a class="reference external" href="https://gist.github.com/ppoffice/154acbc7fa6f8b73b7b3b57af3ca6951">ppoffice/01_Android_LXC_Note.md</a></p></li>
+<li><p>测试打包镜像的时候注意执行下面命令，否则容易不执行打包，结果系统里没更新：</p>
+<ul>
+<li><p>rm vendor.img</p></li>
+<li><p>rm system.img</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="busyboxandroid-q">
+<h1>测试树莓派busybox运行在Android Q上<a class="headerlink" href="#busyboxandroid-q" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>adb root</p></li>
+<li><p>adb remount</p></li>
+<li><p>adb push &lt;busybox path&gt; /vendor/bin</p></li>
+<li><p>adb shell</p></li>
+<li><p>cd /data/data &amp;&amp; mkdir zengjf &amp;&amp; cd zengjf</p></li>
+<li><p>ln -s /vendor/bin/busybox ls</p></li>
+<li><p>./ls /</p></li>
+</ul>
+</section>
+<section id="id5">
+<h1>启动树莓派容器<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>cd /var/lib/lxc</p></li>
+<li><p>tar cf zengjf.tar zengjf</p></li>
+<li><p>拷贝出系统</p></li>
+<li><p>adb root</p></li>
+<li><p>adb remount</p></li>
+<li><p>adb push &lt;zengjf.tar path&gt; /data/data/zengjf.tar</p></li>
+<li><p>adb shell</p>
+<ul>
+<li><p>cd /data/data</p></li>
+<li><p>tar xf zengjf.tar</p></li>
+<li><p>lxc-config lxc.lxcpath</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+</pre></div>
+</div>
+</li>
+<li><p>mv zengjf /data/lxc/containers</p></li>
+</ul>
+</li>
+<li><p>lxc-start -n zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Failed</span> <span class="n">to</span> <span class="n">create</span> <span class="n">lock</span> <span class="k">for</span> <span class="n">zengjf</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">265</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">create</span> <span class="n">lxc_container</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>mkdir /data/lxc/run -p</p></li>
+</ul>
+</li>
+<li><p>lxc-start -n zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengjf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">confile</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">parse_line</span><span class="p">:</span> <span class="mi">2262</span> <span class="n">Unknown</span> <span class="n">configuration</span> <span class="n">key</span> <span class="s2">&quot;lxc.apparmor.allow_nesting&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">parse</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">lxc_file_for_each_line_mmap</span><span class="p">:</span> <span class="mi">142</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">parse</span> <span class="n">config</span> <span class="n">file</span> <span class="s2">&quot;/data/lxc/containers/zengjf/config&quot;</span> <span class="n">at</span> <span class="n">line</span> <span class="s2">&quot;lxc.apparmor.allow_nesting = 1&quot;</span>
+<span class="n">Failed</span> <span class="n">to</span> <span class="n">load</span> <span class="n">config</span> <span class="k">for</span> <span class="n">zengjf</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">265</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">create</span> <span class="n">lxc_container</span>
+</pre></div>
+</div>
+<ul>
+<li><p>注释容器/var/lib/lxc/zengjf/config配置文件</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#lxc.apparmor.allow_nesting = 1</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>lxc-start -n zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengjf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">wait_on_daemonized_start</span><span class="p">:</span> <span class="mi">842</span> <span class="n">Received</span> <span class="n">container</span> <span class="n">state</span> <span class="s2">&quot;ABORTING&quot;</span> <span class="n">instead</span> <span class="n">of</span> <span class="s2">&quot;RUNNING&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">331</span> <span class="n">The</span> <span class="n">container</span> <span class="n">failed</span> <span class="n">to</span> <span class="n">start</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">334</span> <span class="n">To</span> <span class="n">get</span> <span class="n">more</span> <span class="n">details</span><span class="p">,</span> <span class="n">run</span> <span class="n">the</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">foreground</span> <span class="n">mode</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">337</span> <span class="n">Additional</span> <span class="n">information</span> <span class="n">can</span> <span class="n">be</span> <span class="n">obtained</span> <span class="n">by</span> <span class="n">setting</span> <span class="n">the</span> <span class="o">--</span><span class="n">logfile</span> <span class="ow">and</span> <span class="o">--</span><span class="n">logpriority</span> <span class="n">options</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-start -n zengjf -l DEBUG -o lxc.log</p>
+<ul>
+<li><p>-l, –logpriority=LEVEL</p>
+<ul class="simple">
+<li><p>Set log priority to LEVEL. The default log priority is ERROR. Possible values are : FATAL, CRIT, WARN, ERROR, NOTICE, INFO, DEBUG.</p></li>
+</ul>
+</li>
+<li><p>-o, –logfile=FILE</p>
+<ul class="simple">
+<li><p>Output to an alternate log FILE. The default is no log.</p></li>
+</ul>
+</li>
+<li><p>cat lxc.log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.185</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">262</span> <span class="o">-</span> <span class="n">create</span> <span class="n">lxc_container</span> <span class="n">lxcpath</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.344</span> <span class="n">WARN</span>     <span class="n">initutils</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">initutils</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">setproctitle</span><span class="p">:</span><span class="mi">324</span> <span class="o">-</span> <span class="n">Invalid</span> <span class="n">argument</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">cmdline</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.344</span> <span class="n">INFO</span>     <span class="n">lxccontainer</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">do_lxcapi_start</span><span class="p">:</span><span class="mi">959</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">process</span> <span class="n">title</span> <span class="n">to</span> <span class="p">[</span><span class="n">lxc</span> <span class="n">monitor</span><span class="p">]</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span> <span class="n">zengjf</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.471</span> <span class="n">INFO</span>     <span class="n">lsm</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lsm</span><span class="o">/</span><span class="n">lsm</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lsm_init</span><span class="p">:</span><span class="mi">50</span> <span class="o">-</span> <span class="n">LSM</span> <span class="n">security</span> <span class="n">driver</span> <span class="n">nop</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.478</span> <span class="n">DEBUG</span>    <span class="n">terminal</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">terminal</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_terminal_peer_default</span><span class="p">:</span><span class="mi">707</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">device</span> <span class="o">-</span> <span class="n">The</span> <span class="n">process</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">have</span> <span class="n">a</span> <span class="n">controlling</span> <span class="n">terminal</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.482</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/cg2_bpf rw,nosuid,nodev,noexec,relatime shared:8 - cgroup2 none rw</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.484</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/cpuctl rw,nosuid,nodev,noexec,relatime shared:13 - cgroup none rw,cpu</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.484</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/acct rw,nosuid,nodev,noexec,relatime shared:14 - cgroup none rw,cpuacct</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.484</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/cpuset rw,nosuid,nodev,noexec,relatime shared:15 - cgroup none rw,cpuset,noprefix,release_agent=/sbin/cpuset_release_agent</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.484</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/memcg rw,nosuid,nodev,noexec,relatime shared:16 - cgroup none rw,memory</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.484</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/stune rw,nosuid,nodev,noexec,relatime shared:17 - cgroup none rw,schedtune</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.487</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_init</span><span class="p">:</span><span class="mi">897</span> <span class="o">-</span> <span class="n">Container</span> <span class="s2">&quot;zengjf&quot;</span> <span class="ow">is</span> <span class="n">initialized</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.558</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWNS</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.558</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWPID</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.558</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWUTS</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.559</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWIPC</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.559</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWNET</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.559</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">mnt</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">15</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.560</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">pid</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">16</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.560</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">uts</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">17</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.560</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">ipc</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">18</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.561</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">net</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">19</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.565</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1742</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">net</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">10</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.569</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">do_start</span><span class="p">:</span><span class="mi">1242</span> <span class="o">-</span> <span class="n">Unshared</span> <span class="n">CLONE_NEWCGROUP</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.580</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_mount_rootfs</span><span class="p">:</span><span class="mi">1309</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">access</span> <span class="n">to</span> <span class="s2">&quot;/data/lxc/rootfs&quot;</span><span class="o">.</span> <span class="n">Check</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">present</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.581</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_setup_rootfs_prepare_root</span><span class="p">:</span><span class="mi">3445</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">rootfs</span> <span class="k">for</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.581</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_setup</span><span class="p">:</span><span class="mi">3498</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">rootfs</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.581</span> <span class="n">ERROR</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">do_start</span><span class="p">:</span><span class="mi">1263</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">container</span> <span class="s2">&quot;zengjf&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.582</span> <span class="n">ERROR</span>    <span class="n">sync</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">sync</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">__sync_wait</span><span class="p">:</span><span class="mi">62</span> <span class="o">-</span> <span class="n">An</span> <span class="n">error</span> <span class="n">occurred</span> <span class="ow">in</span> <span class="n">another</span> <span class="n">process</span> <span class="p">(</span><span class="n">expected</span> <span class="n">sequence</span> <span class="n">number</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.583</span> <span class="n">DEBUG</span>    <span class="n">network</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">network</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_delete_network</span><span class="p">:</span><span class="mi">3180</span> <span class="o">-</span> <span class="n">Deleted</span> <span class="n">network</span> <span class="n">devices</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.583</span> <span class="n">DEBUG</span>    <span class="n">lxccontainer</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">wait_on_daemonized_start</span><span class="p">:</span><span class="mi">830</span> <span class="o">-</span> <span class="n">First</span> <span class="n">child</span> <span class="mi">12698</span> <span class="n">exited</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.583</span> <span class="n">ERROR</span>    <span class="n">lxccontainer</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">wait_on_daemonized_start</span><span class="p">:</span><span class="mi">842</span> <span class="o">-</span> <span class="n">Received</span> <span class="n">container</span> <span class="n">state</span> <span class="s2">&quot;ABORTING&quot;</span> <span class="n">instead</span> <span class="n">of</span> <span class="s2">&quot;RUNNING&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.584</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">331</span> <span class="o">-</span> <span class="n">The</span> <span class="n">container</span> <span class="n">failed</span> <span class="n">to</span> <span class="n">start</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.584</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">334</span> <span class="o">-</span> <span class="n">To</span> <span class="n">get</span> <span class="n">more</span> <span class="n">details</span><span class="p">,</span> <span class="n">run</span> <span class="n">the</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">foreground</span> <span class="n">mode</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.584</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">337</span> <span class="o">-</span> <span class="n">Additional</span> <span class="n">information</span> <span class="n">can</span> <span class="n">be</span> <span class="n">obtained</span> <span class="n">by</span> <span class="n">setting</span> <span class="n">the</span> <span class="o">--</span><span class="n">logfile</span> <span class="ow">and</span> <span class="o">--</span><span class="n">logpriority</span> <span class="n">options</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.591</span> <span class="n">ERROR</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">__lxc_start</span><span class="p">:</span><span class="mi">1939</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">spawn</span> <span class="n">container</span> <span class="s2">&quot;zengjf&quot;</span>
+</pre></div>
+</div>
+<ul>
+<li><p>报错原因</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040137.580</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_mount_rootfs</span><span class="p">:</span><span class="mi">1309</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">access</span> <span class="n">to</span> <span class="s2">&quot;/data/lxc/rootfs&quot;</span><span class="o">.</span> <span class="n">Check</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">present</span>
+</pre></div>
+</div>
+</li>
+<li><p>mkdir /data/lxc/rootfs -p</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>lxc-start -n zengjf -l DEBUG -o lxc.log</p>
+<ul>
+<li><p>cat lxc.log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.583</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">262</span> <span class="o">-</span> <span class="n">create</span> <span class="n">lxc_container</span> <span class="n">lxcpath</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.693</span> <span class="n">WARN</span>     <span class="n">initutils</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">initutils</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">setproctitle</span><span class="p">:</span><span class="mi">324</span> <span class="o">-</span> <span class="n">Invalid</span> <span class="n">argument</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">cmdline</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.694</span> <span class="n">INFO</span>     <span class="n">lxccontainer</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">do_lxcapi_start</span><span class="p">:</span><span class="mi">959</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="nb">set</span> <span class="n">process</span> <span class="n">title</span> <span class="n">to</span> <span class="p">[</span><span class="n">lxc</span> <span class="n">monitor</span><span class="p">]</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span> <span class="n">zengjf</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.807</span> <span class="n">INFO</span>     <span class="n">lsm</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lsm</span><span class="o">/</span><span class="n">lsm</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lsm_init</span><span class="p">:</span><span class="mi">50</span> <span class="o">-</span> <span class="n">LSM</span> <span class="n">security</span> <span class="n">driver</span> <span class="n">nop</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.812</span> <span class="n">DEBUG</span>    <span class="n">terminal</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">terminal</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_terminal_peer_default</span><span class="p">:</span><span class="mi">707</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">device</span> <span class="o">-</span> <span class="n">The</span> <span class="n">process</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">have</span> <span class="n">a</span> <span class="n">controlling</span> <span class="n">terminal</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.817</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/cg2_bpf rw,nosuid,nodev,noexec,relatime shared:8 - cgroup2 none rw</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.819</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/cpuctl rw,nosuid,nodev,noexec,relatime shared:13 - cgroup none rw,cpu</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.819</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/acct rw,nosuid,nodev,noexec,relatime shared:14 - cgroup none rw,cpuacct</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.819</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/cpuset rw,nosuid,nodev,noexec,relatime shared:15 - cgroup none rw,cpuset,noprefix,release_agent=/sbin/cpuset_release_agent</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.819</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/memcg rw,nosuid,nodev,noexec,relatime shared:16 - cgroup none rw,memory</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.819</span> <span class="n">WARN</span>     <span class="n">cgfsng</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">cgroups</span><span class="o">/</span><span class="n">cgfsng</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">cg_hybrid_get_controllers</span><span class="p">:</span><span class="mi">746</span> <span class="o">-</span> <span class="n">Found</span> <span class="n">hierarchy</span> <span class="ow">not</span> <span class="n">under</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="p">:</span> <span class="s2">&quot;/dev/stune rw,nosuid,nodev,noexec,relatime shared:17 - cgroup none rw,schedtune</span>
+<span class="s2">&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.822</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_init</span><span class="p">:</span><span class="mi">897</span> <span class="o">-</span> <span class="n">Container</span> <span class="s2">&quot;zengjf&quot;</span> <span class="ow">is</span> <span class="n">initialized</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.889</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWNS</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.889</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWPID</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.889</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWUTS</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.889</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWIPC</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.889</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1688</span> <span class="o">-</span> <span class="n">Cloned</span> <span class="n">CLONE_NEWNET</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.890</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">mnt</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">15</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.891</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">pid</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">16</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.891</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">uts</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">17</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.891</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">ipc</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">18</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.892</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_try_preserve_namespaces</span><span class="p">:</span><span class="mi">196</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">net</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">19</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.895</span> <span class="n">DEBUG</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_spawn</span><span class="p">:</span><span class="mi">1742</span> <span class="o">-</span> <span class="n">Preserved</span> <span class="n">net</span> <span class="n">namespace</span> <span class="n">via</span> <span class="n">fd</span> <span class="mi">10</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.898</span> <span class="n">INFO</span>     <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">do_start</span><span class="p">:</span><span class="mi">1242</span> <span class="o">-</span> <span class="n">Unshared</span> <span class="n">CLONE_NEWCGROUP</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.908</span> <span class="n">DEBUG</span>    <span class="n">storage</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">storage</span><span class="o">/</span><span class="n">storage</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">get_storage_by_name</span><span class="p">:</span><span class="mi">231</span> <span class="o">-</span> <span class="n">Detected</span> <span class="n">rootfs</span> <span class="nb">type</span> <span class="s2">&quot;dir&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.909</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_mount_rootfs</span><span class="p">:</span><span class="mi">1332</span> <span class="o">-</span> <span class="n">Mounted</span> <span class="n">rootfs</span> <span class="s2">&quot;/data/lxc/containers/zengjf/rootfs&quot;</span> <span class="n">onto</span> <span class="s2">&quot;/data/lxc/rootfs&quot;</span> <span class="k">with</span> <span class="n">options</span> <span class="s2">&quot;(null)&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.909</span> <span class="n">INFO</span>     <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">setup_utsname</span><span class="p">:</span><span class="mi">791</span> <span class="o">-</span> <span class="n">Set</span> <span class="n">hostname</span> <span class="n">to</span> <span class="s2">&quot;zengjf&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.909</span> <span class="n">INFO</span>     <span class="n">network</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">network</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_setup_network_in_child_namespaces</span><span class="p">:</span><span class="mi">3053</span> <span class="o">-</span> <span class="n">network</span> <span class="n">has</span> <span class="n">been</span> <span class="n">setup</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.910</span> <span class="n">INFO</span>     <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">mount_autodev</span><span class="p">:</span><span class="mi">1118</span> <span class="o">-</span> <span class="n">Preparing</span> <span class="s2">&quot;/dev&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.913</span> <span class="n">INFO</span>     <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">mount_autodev</span><span class="p">:</span><span class="mi">1165</span> <span class="o">-</span> <span class="n">Prepared</span> <span class="s2">&quot;/dev&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.925</span> <span class="n">INFO</span>     <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1209</span> <span class="o">-</span> <span class="n">Populating</span> <span class="s2">&quot;/dev&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.926</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1224</span> <span class="o">-</span> <span class="n">Created</span> <span class="n">device</span> <span class="n">node</span> <span class="s2">&quot;/data/lxc/rootfs/dev/full&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.926</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1224</span> <span class="o">-</span> <span class="n">Created</span> <span class="n">device</span> <span class="n">node</span> <span class="s2">&quot;/data/lxc/rootfs/dev/null&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.926</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1224</span> <span class="o">-</span> <span class="n">Created</span> <span class="n">device</span> <span class="n">node</span> <span class="s2">&quot;/data/lxc/rootfs/dev/random&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.926</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1224</span> <span class="o">-</span> <span class="n">Created</span> <span class="n">device</span> <span class="n">node</span> <span class="s2">&quot;/data/lxc/rootfs/dev/tty&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.927</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1224</span> <span class="o">-</span> <span class="n">Created</span> <span class="n">device</span> <span class="n">node</span> <span class="s2">&quot;/data/lxc/rootfs/dev/urandom&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.927</span> <span class="n">DEBUG</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1224</span> <span class="o">-</span> <span class="n">Created</span> <span class="n">device</span> <span class="n">node</span> <span class="s2">&quot;/data/lxc/rootfs/dev/zero&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.927</span> <span class="n">INFO</span>     <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_fill_autodev</span><span class="p">:</span><span class="mi">1286</span> <span class="o">-</span> <span class="n">Populated</span> <span class="s2">&quot;/dev&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.927</span> <span class="n">WARN</span>     <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">mount_entry_on_absolute_rootfs</span><span class="p">:</span><span class="mi">2282</span> <span class="o">-</span> <span class="n">Ignoring</span> <span class="n">mount</span> <span class="n">point</span> <span class="s2">&quot;/dev/shm&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.928</span> <span class="n">ERROR</span>    <span class="n">utils</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">utils</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">safe_mount</span><span class="p">:</span><span class="mi">1179</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">mount</span> <span class="s2">&quot;/lib&quot;</span> <span class="n">onto</span> <span class="s2">&quot;/data/lxc/rootfs/lib&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.928</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">mount_entry</span><span class="p">:</span><span class="mi">2019</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">mount</span> <span class="s2">&quot;/lib&quot;</span> <span class="n">on</span> <span class="s2">&quot;/data/lxc/rootfs/lib&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.929</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_setup</span><span class="p">:</span><span class="mi">3611</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">mount</span> <span class="n">entries</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.929</span> <span class="n">ERROR</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">do_start</span><span class="p">:</span><span class="mi">1263</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">container</span> <span class="s2">&quot;zengjf&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.930</span> <span class="n">ERROR</span>    <span class="n">sync</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">sync</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">__sync_wait</span><span class="p">:</span><span class="mi">62</span> <span class="o">-</span> <span class="n">An</span> <span class="n">error</span> <span class="n">occurred</span> <span class="ow">in</span> <span class="n">another</span> <span class="n">process</span> <span class="p">(</span><span class="n">expected</span> <span class="n">sequence</span> <span class="n">number</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.931</span> <span class="n">DEBUG</span>    <span class="n">network</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">network</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_delete_network</span><span class="p">:</span><span class="mi">3180</span> <span class="o">-</span> <span class="n">Deleted</span> <span class="n">network</span> <span class="n">devices</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.932</span> <span class="n">DEBUG</span>    <span class="n">lxccontainer</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">wait_on_daemonized_start</span><span class="p">:</span><span class="mi">830</span> <span class="o">-</span> <span class="n">First</span> <span class="n">child</span> <span class="mi">17694</span> <span class="n">exited</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.933</span> <span class="n">ERROR</span>    <span class="n">lxccontainer</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">wait_on_daemonized_start</span><span class="p">:</span><span class="mi">842</span> <span class="o">-</span> <span class="n">Received</span> <span class="n">container</span> <span class="n">state</span> <span class="s2">&quot;ABORTING&quot;</span> <span class="n">instead</span> <span class="n">of</span> <span class="s2">&quot;RUNNING&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.934</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">331</span> <span class="o">-</span> <span class="n">The</span> <span class="n">container</span> <span class="n">failed</span> <span class="n">to</span> <span class="n">start</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.934</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">334</span> <span class="o">-</span> <span class="n">To</span> <span class="n">get</span> <span class="n">more</span> <span class="n">details</span><span class="p">,</span> <span class="n">run</span> <span class="n">the</span> <span class="n">container</span> <span class="ow">in</span> <span class="n">foreground</span> <span class="n">mode</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.935</span> <span class="n">ERROR</span>    <span class="n">lxc_start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">main</span><span class="p">:</span><span class="mi">337</span> <span class="o">-</span> <span class="n">Additional</span> <span class="n">information</span> <span class="n">can</span> <span class="n">be</span> <span class="n">obtained</span> <span class="n">by</span> <span class="n">setting</span> <span class="n">the</span> <span class="o">--</span><span class="n">logfile</span> <span class="ow">and</span> <span class="o">--</span><span class="n">logpriority</span> <span class="n">options</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.938</span> <span class="n">ERROR</span>    <span class="n">start</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">start</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">__lxc_start</span><span class="p">:</span><span class="mi">1939</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">spawn</span> <span class="n">container</span> <span class="s2">&quot;zengjf&quot;</span>
+</pre></div>
+</div>
+<ul>
+<li><p>报错原因</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.928</span> <span class="n">ERROR</span>    <span class="n">utils</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">utils</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">safe_mount</span><span class="p">:</span><span class="mi">1179</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">mount</span> <span class="s2">&quot;/lib&quot;</span> <span class="n">onto</span> <span class="s2">&quot;/data/lxc/rootfs/lib&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.928</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">mount_entry</span><span class="p">:</span><span class="mi">2019</span> <span class="o">-</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">mount</span> <span class="s2">&quot;/lib&quot;</span> <span class="n">on</span> <span class="s2">&quot;/data/lxc/rootfs/lib&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">start</span> <span class="n">zengjf</span> <span class="mf">20210209040942.929</span> <span class="n">ERROR</span>    <span class="n">conf</span> <span class="o">-</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="n">lxc_setup</span><span class="p">:</span><span class="mi">3611</span> <span class="o">-</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">mount</span> <span class="n">entries</span>
+</pre></div>
+</div>
+</li>
+<li><p>注释容器/var/lib/lxc/zengjf/config配置文件相关mount</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span><span class="n">省略</span>
+
+<span class="c1">#lxc.apparmor.allow_nesting = 1</span>
+
+<span class="o">...</span><span class="n">省略</span>
+
+<span class="c1">#lxc.mount.entry = /lib lib none ro,bind 0 0</span>
+<span class="c1">#lxc.mount.entry = /usr/lib usr/lib none ro,bind 0 0</span>
+<span class="c1">#lxc.mount.entry = /sys/kernel/security sys/kernel/security none ro,bind,optional 0 0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>sudo lxc-console -n zengjf</p>
+<ul>
+<li><p>root用户，无密码</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">dest</span> <span class="o">=</span>: /data/lxc/run/lxc/lock//data/lxc/containers
+dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengjf
+config path: /data/lxc/containers
+
+Connected to tty <span class="m">1</span>
+Type &lt;Ctrl+a q&gt; to <span class="nb">exit</span> the console, &lt;Ctrl+a Ctrl+a&gt; to enter Ctrl+a itself
+
+zengjf login: root
+
+
+BusyBox v1.30.1 <span class="o">(</span>Raspbian <span class="m">1</span>:1.30.1-4<span class="o">)</span> built-in shell <span class="o">(</span>ash<span class="o">)</span>
+Enter <span class="s1">&#39;help&#39;</span> <span class="k">for</span> a list of built-in commands.
+
+~ <span class="c1"># ls /</span>
+bin      etc      lib64    proc     sbin     tmp      tty1     usr
+console  home     mnt      ram0     selinux  tty      tty5     var
+dev      lib      null     root     sys      tty0     urandom  zero
+~ <span class="c1"># exit</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctrl</span> <span class="pre">+</span> <span class="pre">a</span> <span class="pre">q</span></code>退出容器console</p></li>
+</ul>
+</li>
+<li><p>lxc-info -n zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengjf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">Name</span><span class="p">:</span>           <span class="n">zengjf</span>
+<span class="n">State</span><span class="p">:</span>          <span class="n">RUNNING</span>
+<span class="n">PID</span><span class="p">:</span>            <span class="mi">20796</span>
+</pre></div>
+</div>
+</li>
+<li><p>ls /data/lxc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">containers</span> <span class="n">log</span> <span class="n">rootfs</span> <span class="n">run</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>如上所示，经测试，需要先建立如上目录才能正常启动容器系统</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="busybox">
+<h1>创建Busybox容器<a class="headerlink" href="#busybox" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>lxc-create -n zengsf -t busybox</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengsf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">confile</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">parse_line</span><span class="p">:</span> <span class="mi">2262</span> <span class="n">Unknown</span> <span class="n">configuration</span> <span class="n">key</span> <span class="s2">&quot;lxc.apparmor.allow_nesting&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">parse</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">lxc_file_for_each_line_mmap</span><span class="p">:</span> <span class="mi">142</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">parse</span> <span class="n">config</span> <span class="n">file</span> <span class="s2">&quot;/vendor/etc/lxc/default.conf&quot;</span> <span class="n">at</span> <span class="n">line</span> <span class="s2">&quot;lxc.apparmor.allow_nesting = 1&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">utils</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">get_template_path</span><span class="p">:</span> <span class="mi">918</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span> <span class="o">-</span> <span class="n">bad</span> <span class="n">template</span><span class="p">:</span> <span class="n">busybox</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">do_lxcapi_create</span><span class="p">:</span> <span class="mi">1786</span> <span class="n">Unknown</span> <span class="n">template</span> <span class="s2">&quot;busybox&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_create</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">327</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">create</span> <span class="n">container</span> <span class="n">zengsf</span>
+</pre></div>
+</div>
+<ul>
+<li><p>注释容器/vendor/etc/lxc/default.conf配置文件</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#lxc.apparmor.allow_nesting = 1</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ZengjfOS/lxc-android/tree/lxc-3.0.3-android-28/config/etc">主要是由于前面使用树莓派的配置，<code class="docutils literal notranslate"><span class="pre">/vendor/etc/lxc/default.conf</span></code>应使用这里面的配置</a></p></li>
+<li><p>https://github.com/ZengjfOS/lxc-android/tree/lxc-3.0.3-android-28/config/etc</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>push模板lxc-busybox到/data/lxc/templates</p>
+<ul class="simple">
+<li><p>https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in</p></li>
+</ul>
+</li>
+<li><p>lxc-create -n zengsf -t busybox</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengsf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">utils</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">get_template_path</span><span class="p">:</span> <span class="mi">918</span> <span class="n">Permission</span> <span class="n">denied</span> <span class="o">-</span> <span class="n">bad</span> <span class="n">template</span><span class="p">:</span> <span class="n">busybox</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lxccontainer</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">do_lxcapi_create</span><span class="p">:</span> <span class="mi">1786</span> <span class="n">Unknown</span> <span class="n">template</span> <span class="s2">&quot;busybox&quot;</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">create</span><span class="p">:</span> <span class="n">zengsf</span><span class="p">:</span> <span class="n">external</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">android</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">lxc_create</span><span class="o">.</span><span class="n">c</span><span class="p">:</span> <span class="n">main</span><span class="p">:</span> <span class="mi">327</span> <span class="n">Failed</span> <span class="n">to</span> <span class="n">create</span> <span class="n">container</span> <span class="n">zengsf</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>chmod 777 /data/lxc/templates/lxc-busybox</p></li>
+</ul>
+</li>
+<li><p>lxc-create -n zengsf -t busybox</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+config path: /data/lxc/containers
+/data/lxc/templates/lxc-busybox[277]: getopt: inaccessible or not found
+LXC busybox image builder
+
+Special arguments:
+[ -h | --help ]: Print this help message and exit.
+
+LXC internal arguments (do not pass manually!):
+[ --name &lt;name&gt; ]: The container name
+[ --path &lt;path&gt; ]: The path to the container
+[ --rootfs &lt;rootfs&gt; ]: The path to the container&#39;s rootfs
+[ --mapped-uid &lt;map&gt; ]: A uid map (user namespaces)
+[ --mapped-gid &lt;map&gt; ]: A gid map (user namespaces)
+lxc-create: zengsf: external/lxc-android/src/lxc/lxccontainer.c: create_run_template: 1617 Failed to create container from template
+lxc-create: zengsf: external/lxc-android/src/lxc/tools/lxc_create.c: main: 327 Failed to create container zengsf
+</pre></div>
+</div>
+<ul>
+<li><p>报错原因：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">templates</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">busybox</span><span class="p">[</span><span class="mi">277</span><span class="p">]:</span> <span class="n">getopt</span><span class="p">:</span> <span class="n">inaccessible</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">found</span>
+</pre></div>
+</div>
+</li>
+<li><p>修改模板使用busybox的getopt命令</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> ! <span class="nv">options</span><span class="o">=</span><span class="k">$(</span>busybox getopt -o hp:n: -l help,rootfs:,path:,name:,mapped-uid:,mapped-gid: -- <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="k">)</span><span class="p">;</span> <span class="k">then</span>
+  usage
+  <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in#L274</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>lxc-create -n zengsf -t busybox -l DEBUG -o lxc.log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengsf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">ln</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">create</span> <span class="n">symbolic</span> <span class="n">link</span> <span class="kn">from</span> <span class="s1">&#39;busybox&#39;</span> <span class="n">to</span> <span class="s1">&#39;./busybox&#39;</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+</pre></div>
+</div>
+<ul>
+<li><p>该ln报错不影响代码处理，主要由模板这段代码ln产生</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># symlink busybox for the commands it supports</span>
+<span class="c1"># it would be nice to just use &quot;chroot $rootfs busybox --install -s /bin&quot;</span>
+<span class="c1"># but that only works right in a chroot with busybox &gt;= 1.19.0</span>
+<span class="p">(</span>
+  <span class="n">cd</span> <span class="s2">&quot;$</span><span class="si">{rootfs}</span><span class="s2">/bin&quot;</span> <span class="o">||</span> <span class="k">return</span> <span class="mi">1</span>
+  <span class="o">./</span><span class="n">busybox</span> <span class="o">--</span><span class="nb">list</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">busybox</span> <span class="o">|</span> <span class="n">xargs</span> <span class="o">-</span><span class="n">n1</span> <span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="n">busybox</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in#L190</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>lxc-start -n zengsf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengsf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-console -n zengsf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dest</span> <span class="o">=</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">create</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+<span class="n">dest</span> <span class="n">lock</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">lock</span><span class="o">//</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span><span class="o">/.</span><span class="n">zengsf</span>
+<span class="n">config</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">containers</span>
+
+<span class="n">Connected</span> <span class="n">to</span> <span class="n">tty</span> <span class="mi">1</span>
+<span class="n">Type</span> <span class="o">&lt;</span><span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span> <span class="n">q</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">exit</span> <span class="n">the</span> <span class="n">console</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span> <span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">enter</span> <span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span> <span class="n">itself</span>
+
+<span class="n">zengsf</span> <span class="n">login</span><span class="p">:</span> <span class="n">root</span>
+<span class="n">Password</span><span class="p">:</span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctrl</span> <span class="pre">+</span> <span class="pre">a</span> <span class="pre">q</span></code>退出容器console</p></li>
+<li><p>lxc-stop -n zengsf</p></li>
+<li><p>/data/lxc/containers/zengsf/rootfs/etc/passwd</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="p">::</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="o">/</span><span class="n">root</span><span class="p">:</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>设置成无密码</p>
+<ul>
+<li><p>https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in#L102</p></li>
+</ul>
+</li>
+<li><p>chroot /data/lxc/containers/zengsf/rootfs /bin/passwd</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>lxc-start -n zengsf</p></li>
+<li><p>lxc-console -n zengsf</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">dest</span> <span class="o">=</span>: /data/lxc/run/lxc/lock//data/lxc/containers
+dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+config path: /data/lxc/containers
+
+Connected to tty <span class="m">1</span>
+Type &lt;Ctrl+a q&gt; to <span class="nb">exit</span> the console, &lt;Ctrl+a Ctrl+a&gt; to enter Ctrl+a itself
+
+zengsf login: root
+~ <span class="c1"># ls /</span>
+bin      etc      lib64    proc     sbin     tmp      tty1     usr
+console  home     mnt      ram0     selinux  tty      tty5     var
+dev      lib      null     root     sys      tty0     urandom  zero
+~ <span class="c1">#</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

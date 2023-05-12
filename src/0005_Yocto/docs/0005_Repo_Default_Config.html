@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Repo Default Config</a></li>
+<li><a class="reference internal" href="#default-xml">default.xml</a></li>
+<li><a class="reference internal" href="#fsl-setup-release-sh">fsl-setup-release.sh</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="repo-default-config">
+<h1>Repo Default Config<a class="headerlink" href="#repo-default-config" title="Permalink to this headline"></a></h1>
+<p>Yocto Repo</p>
+<ul class="simple">
+<li><p>创建自己layer仓库；</p></li>
+<li><p>参考下面<code class="docutils literal notranslate"><span class="pre">fsl-setup-release.sh</span></code>添加<code class="docutils literal notranslate"><span class="pre">layer</span></code>到<code class="docutils literal notranslate"><span class="pre">conf/bblayers.conf</span></code>方式，换成自己的<code class="docutils literal notranslate"><span class="pre">fsl-setup-release.sh</span></code>；</p></li>
+<li><p>修改下面的<code class="docutils literal notranslate"><span class="pre">default.xml</span></code>成自己的需求，push到github仓库里；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repo</span> <span class="pre">init</span> <span class="pre">-u</span> <span class="pre">&lt;your</span> <span class="pre">github</span> <span class="pre">repository</span> <span class="pre">url&gt;</span> <span class="pre">-b</span> <span class="pre">&lt;your</span> <span class="pre">github</span> <span class="pre">repository</span> <span class="pre">branch&gt;</span></code>；</p></li>
+</ul>
+</section>
+<section id="default-xml">
+<h1>default.xml<a class="headerlink" href="#default-xml" title="Permalink to this headline"></a></h1>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;manifest&gt;</span>
+
+  <span class="nt">&lt;default</span> <span class="na">sync-j=</span><span class="s">&quot;2&quot;</span><span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;remote</span> <span class="na">fetch=</span><span class="s">&quot;git://git.yoctoproject.org&quot;</span> <span class="na">name=</span><span class="s">&quot;yocto&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;remote</span> <span class="na">fetch=</span><span class="s">&quot;git://github.com/Freescale&quot;</span> <span class="na">name=</span><span class="s">&quot;freescale&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;remote</span> <span class="na">fetch=</span><span class="s">&quot;git://git.openembedded.org&quot;</span> <span class="na">name=</span><span class="s">&quot;oe&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;remote</span> <span class="na">fetch=</span><span class="s">&quot;git://github.com/OSSystems&quot;</span> <span class="na">name=</span><span class="s">&quot;OSSystems&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;remote</span> <span class="na">fetch=</span><span class="s">&quot;git://github.com/meta-qt5&quot;</span>  <span class="na">name=</span><span class="s">&quot;QT5&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;remote</span> <span class="na">fetch=</span><span class="s">&quot;git://git.freescale.com/imx&quot;</span> <span class="na">name=</span><span class="s">&quot;fsl-release&quot;</span> <span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;yocto&quot;</span> <span class="na">revision=</span><span class="s">&quot;f5da2a5913319ad6ac2141438ba1aa17576326ab&quot;</span> <span class="na">name=</span><span class="s">&quot;poky&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/poky&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;yocto&quot;</span> <span class="na">revision=</span><span class="s">&quot;be78894e4682f111575470fb23e51e6ba523508d&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-fsl-arm&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-fsl-arm&quot;</span><span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;oe&quot;</span> <span class="na">revision=</span><span class="s">&quot;247b1267bbe95719cd4877d2d3cfbaf2a2f4865a&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-openembedded&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-openembedded&quot;</span><span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;freescale&quot;</span> <span class="na">revision=</span><span class="s">&quot;krogoth&quot;</span> <span class="na">name=</span><span class="s">&quot;fsl-community-bsp-base&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/base&quot;</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;copyfile</span> <span class="na">dest=</span><span class="s">&quot;README&quot;</span> <span class="na">src=</span><span class="s">&quot;README&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;copyfile</span> <span class="na">dest=</span><span class="s">&quot;0005_setup-environment&quot;</span> <span class="na">src=</span><span class="s">&quot;0005_setup-environment&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/project&gt;</span>
+
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;freescale&quot;</span> <span class="na">revision=</span><span class="s">&quot;3dfb82fc7e703eae9891b3ffda0e9393701f2396&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-fsl-arm-extra&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-fsl-arm-extra&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;freescale&quot;</span> <span class="na">revision=</span><span class="s">&quot;a165068f8a0d1cf29aabe4b4053f28be1c2aa492&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-fsl-demos&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-fsl-demos&quot;</span><span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;OSSystems&quot;</span> <span class="na">revision=</span><span class="s">&quot;77736988073a5d90fcff9d0005c8477332ede387&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-browser&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-browser&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;QT5&quot;</span> <span class="na">revision=</span><span class="s">&quot;ccae79be69c5268df3b47e4e14cea0591c39a531&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-qt5&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-qt5&quot;</span> <span class="nt">/&gt;</span>
+
+  <span class="nt">&lt;project</span> <span class="na">remote=</span><span class="s">&quot;fsl-release&quot;</span> <span class="na">name=</span><span class="s">&quot;meta-fsl-bsp-release&quot;</span> <span class="na">path=</span><span class="s">&quot;sources/meta-fsl-bsp-release&quot;</span> <span class="na">revision=</span><span class="s">&quot;krogoth_4.1.y&quot;</span> <span class="nt">&gt;</span>
+     <span class="nt">&lt;copyfile</span> <span class="na">src=</span><span class="s">&quot;imx/tools/fsl-setup-release.sh&quot;</span> <span class="na">dest=</span><span class="s">&quot;fsl-setup-release.sh&quot;</span><span class="nt">/&gt;</span>
+     <span class="nt">&lt;copyfile</span> <span class="na">src=</span><span class="s">&quot;imx/README&quot;</span> <span class="na">dest=</span><span class="s">&quot;README-IMXBSP&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/project&gt;</span>
+
+<span class="nt">&lt;/manifest&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="fsl-setup-release-sh">
+<h1>fsl-setup-release.sh<a class="headerlink" href="#fsl-setup-release-sh" title="Permalink to this headline"></a></h1>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>...省略<span class="o">]</span>
+<span class="nv">META_FSL_BSP_RELEASE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CWD</span><span class="si">}</span><span class="s2">/sources/meta-fsl-bsp-release/imx/meta-bsp&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;##Freescale Yocto Project Release layer&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-bsp \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-sdk \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-browser \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-gnome \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-networking \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-python \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-filesystems \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-qt5 \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+
+<span class="nb">echo</span> <span class="nv">BSPDIR</span><span class="o">=</span><span class="nv">$BSPDIR</span>
+<span class="nb">echo</span> <span class="nv">BUILD_DIR</span><span class="o">=</span><span class="nv">$BUILD_DIR</span>
+<span class="o">[</span>...省略<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

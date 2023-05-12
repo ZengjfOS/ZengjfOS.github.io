@@ -1,0 +1,83 @@
+# StateMachine
+
+状态机基本工作原理
+
+# 参考文档
+
+* [Android StateMachine学习](https://blog.csdn.net/mockingbirds/article/details/78988672)
+
+# 模型图
+
+```
+      mP0
+     /   \
+    mP1   mS0
+   /   \
+  mS2   mS1
+ /  \    \
+mS3  mS4  mS5  ---> initial state
+```
+
+* 对于上面的状态机启动以后，当前处于激活的状态有：mP0 -> mP1 -> mS1 -> mS5。 由于初始状态是mS5，所以发过来的消息，首先由mS5处理，假如mS5和他的父状态都不能处理该消息，则依次返回false，依次执行下面状态机的processMessage：mS5–>mS1–>mP1–>mP0
+* 还是上面的状态机，假如当前状态机mS5返回true并且处理了消息，并且调用transitionTo(mS4)切换到新的mS4状态，此时会依次执行如下方法：mS5.exit() –> mS1.exit() –> mS2.enter() –> mS4.enter()，此时处于激活的状态：mP0 -> mP1 -> mS2 -> mS4。由于当前的状态是mS4，所以此时发过来的消息由mS4来处理
+
+
+```
+      mP1
+     /   \
+    mS2   mS1 ----> initial state
+```
+
+* init
+  * mP1 enter
+  * mS1 enter
+* hsm.sendMessage(obtainMessage(hsm.CMD_1)); 
+  * ms1 processMessage
+  * mS1 exit
+    * 需要注意这里会先exit，后面再enter
+  * mS1 enter
+
+# WifiController
+
+* wifi状态机
+  ```
+  * frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiServiceImpl.java
+    * public WifiServiceImpl(Context context, WifiInjector wifiInjector, AsyncChannel asyncChannel)
+      * mWifiController = mWifiInjector.getWifiController();
+        * return mWifiController;
+          * frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiInjector.java
+            * public WifiInjector(Context context)
+              * mWifiController = new WifiController(mContext, mClientModeImpl, clientModeImplLooper, mSettingsStore, mWifiServiceHandlerThread.getLooper(), mFrameworkFacade, mActiveModeWarden, mWifiPermissionsUtil);
+                * public class WifiController extends StateMachine
+                  * WifiController本质就是一个状态机；
+                    ```Java
+                    WifiController(Context context, ClientModeImpl clientModeImpl, Looper clientModeImplLooper,
+                                   WifiSettingsStore wss, Looper wifiServiceLooper, FrameworkFacade f,
+                                   ActiveModeWarden amw, WifiPermissionsUtil wifiPermissionsUtil) {
+                        // ...省略
+        
+                        // CHECKSTYLE:OFF IndentationCheck
+                        addState(mDefaultState);
+                            addState(mStaDisabledState, mDefaultState);
+                            addState(mStaEnabledState, mDefaultState);
+                            addState(mStaDisabledWithScanState, mDefaultState);
+                            addState(mEcmState, mDefaultState);
+                        // CHECKSTYLE:ON IndentationCheck
+    
+                        // ...省略
+                    }
+                    ```
+                    * private DefaultState mDefaultState = new DefaultState();
+                      * class DefaultState extends State
+  ```
+
+# 总结
+
+* 如状态模型里的，每个状态机包含多个状态（state）,每种状态里可以有多种cmd，依赖switch处理；
+* 每种state是一种状态，也就是一种类，里面实现了基本的三个方法：
+  * enter(): 刚切换到这种状态的时候会处理的函数；
+  * processMessage(): 在当前状态的时候，当有信息发送过来时，该函数进行处理，processMessage主要处理同一种状态下，可能有多种信息（cmd），通过switch来处理；
+  * exit(): 切换到其他状态时，会被调用的退出该状态的函数；
+* 切换状态的时候，公有的基础节点，是不会重新执行他的enter()函数的，先经过processMessage来确定要转到哪个状态，然后会调用exit/enter切到状态；
+* 切换state是通过：transitionTo()。状态切换。
+* setInitialState()设置默认state

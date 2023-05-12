@@ -1,0 +1,164 @@
+# LXC binder
+
+尝试容器中使用binder
+
+# 参考文档
+
+* [How to determine the cgroup of a device and give it to a lxc container](https://stackoverflow.com/questions/59142605/how-to-determine-the-cgroup-of-a-device-and-give-it-to-a-lxc-container)
+
+# lxc guest添加device
+
+* sudo lxc-start -n zengjf
+* https://github.com/LowLevelOfLogic/RaspberryPi/tree/servicemanager
+  * 编译拷贝到busybox的bin目录下去
+  * frameworks/native/cmds/servicemanager
+* 手动添加节点：
+  * sudo lxc-device -n zengjf -l TRACE -o lxc.log add /dev/binder
+    * Creates a /dev/binder device in container zengjf based on the matching device on the host.
+* 自动添加节点：
+  * ls -al /dev/binder
+    ```
+    crw------- 1 root root 10, 61 Feb 21 07:50 /dev/binder
+    ```
+    * 主设备号：10
+    * 此设备号：61
+  * /var/lib/lxc/zengjf/config
+    ```
+    # ...省略
+    lxc.cgroup.devices.allow = c 10:61 rwm
+    lxc.mount.entry = /dev/binder dev/binder none bind,optional,create=file
+    ```
+  * sudo lxc-start -n zengjf -l TRACE -o lxc.log
+
+# host运行服务程序 
+
+* sudo ./servicemanager
+
+# guest运行service
+
+* ./service
+  ```
+  0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+  0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+  0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+  0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+  0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+  0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 . 85 . 2a * 62 b 73 s 7f . 01 . 00 . 00 .
+  0096: 7b { 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+  BR_NOOP:
+  BR_INCREFS:
+    0xbe9139cc, 0xbe9139d0
+  BR_ACQUIRE:
+    0xbe9139e0, 0xbe9139e4
+  BR_TRANSACTION_COMPLETE:
+  BR_REPLY:
+    target 0000000000000000  cookie 0000000000000000  code 00000000  flags 00000000
+    pid        0  uid        0  data 4  offs 0
+  0000: 00 . 00 . 00 . 00 .
+  ```
+* host端servicemanager收到信息如下：
+  ```
+  BR_NOOP:
+  BR_TRANSACTION:
+    target 0000000000000000  cookie 0000000000000000  code 00000003  flags 00000000
+    pid     4501  uid        0  data 112  offs 8
+  0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+  0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+  0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+  0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+  0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+  0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 . 85 . 2a * 68 h 73 s 7f . 01 . 00 . 00 .
+  0096: 01 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+    - type 73682a85  flags 0000017f  ptr 0000000000000001  cookie 0000000000000000
+  BR_NOOP:
+  BR_TRANSACTION_COMPLETE:
+  ```
+
+# guest测试client
+
+* 运行service后运行client完整输出：
+  ```sh
+  ~ # service &
+  ~ # 0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+  0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+  0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+  0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+  0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+  0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 . 85 . 2a * 62 b 73 s 7f . 01 . 00 . 00 .
+  0096: 7b { 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+  BR_NOOP:
+  BR_INCREFS:
+    0xbe97f9cc, 0xbe97f9d0
+  BR_ACQUIRE:
+    0xbe97f9e0, 0xbe97f9e4
+  BR_TRANSACTION_COMPLETE:
+  BR_REPLY:
+    target 0000000000000000  cookie 0000000000000000  code 00000000  flags 00000000
+    pid        0  uid        0  data 4  offs 0
+  0000: 00 . 00 . 00 . 00 .
+  
+  ~ # client a 121
+  0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+  0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+  0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+  0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+  0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+  0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 .
+  BR_NOOP:
+  BR_TRANSACTION_COMPLETE:
+  BR_REPLY:
+    target 0000000000000000  cookie 0000000000000000  code 00000000  flags 00000000
+    pid        0  uid        0  data 24  offs 8
+  0000: 85 . 2a * 68 h 73 s 7f . 01 . 00 . 00 . 01 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+  0016: 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+    - type 73682a85  flags 0000017f  ptr 0000000000000001  cookie 0000000000000000
+  milliseconds: 1613619932681
+  0000: 00 . 00 . 00 . 00 . 79 y 00 . 00 . 00 .
+  BR_NOOP:
+  BR_TRANSACTION:
+    target 000000000000007b  cookie 0000000000000000  code 00000000  flags 00000000
+    pid       28  uid        0  data 8  offs 0
+  0000: 00 . 00 . 00 . 00 . 79 y 00 . 00 . 00 .
+  i am server,add one 121
+  BR_NOOP:
+  BR_TRANSACTION_COMPLETE:
+  BR_NOOP:
+  BR_TRANSACTION_COMPLETE:
+  BR_REPLY:
+    target 0000000000000000  cookie 0000000000000000  code 00000000  flags 00000000
+    pid        0  uid        0  data 4  offs 0
+  0000: 7a z 00 . 00 . 00 .
+  milliseconds: 1613619937682
+  get ret of addone= 122
+  ~ #
+  ```
+* servicemanager完整输出
+  ```
+  pi@raspberrypi:servicemanager $ sudo ./servicemanager
+  BR_NOOP:
+  BR_TRANSACTION:
+    target 0000000000000000  cookie 0000000000000000  code 00000003  flags 00000000
+    pid     4514  uid        0  data 112  offs 8
+  0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+  0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+  0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+  0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+  0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+  0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 . 85 . 2a * 68 h 73 s 7f . 01 . 00 . 00 .
+  0096: 01 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+    - type 73682a85  flags 0000017f  ptr 0000000000000001  cookie 0000000000000000
+  BR_NOOP:
+  BR_TRANSACTION_COMPLETE:
+  BR_NOOP:
+  BR_TRANSACTION:
+    target 0000000000000000  cookie 0000000000000000  code 00000002  flags 00000000
+    pid     4515  uid        0  data 88  offs 0
+  0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+  0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+  0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+  0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+  0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+  0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 .
+  BR_NOOP:
+  BR_TRANSACTION_COMPLETE:
+  ```

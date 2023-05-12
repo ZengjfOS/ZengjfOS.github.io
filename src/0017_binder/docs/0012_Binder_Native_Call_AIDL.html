@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Binder Native Call AIDL</a></li>
+<li><a class="reference internal" href="#java-aidl">Java AIDL</a></li>
+<li><a class="reference internal" href="#adbtool-call-aidl">adbtool call aidl</a></li>
+<li><a class="reference internal" href="#server">server</a></li>
+<li><a class="reference internal" href="#aidl-interface">aidl_interface</a></li>
+<li><a class="reference internal" href="#client-example">client example</a></li>
+<li><a class="reference internal" href="#service-example">Service Example</a><ul>
+<li><a class="reference internal" href="#id1">server</a></li>
+<li><a class="reference internal" href="#client">client</a></li>
+<li><a class="reference internal" href="#android-mk">Android.mk</a></li>
+<li><a class="reference internal" href="#log">log</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#c-call-cpp">C call CPP</a><ul>
+<li><a class="reference internal" href="#android-bp">Android.bp</a></li>
+<li><a class="reference internal" href="#cpp-share-lib">CPP share lib</a></li>
+<li><a class="reference internal" href="#id2">Android.mk</a></li>
+<li><a class="reference internal" href="#caidl">C版本调用aidl</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="binder-native-call-aidl">
+<h1>Binder Native Call AIDL<a class="headerlink" href="#binder-native-call-aidl" title="Permalink to this headline"></a></h1>
+<p>从Native调用AIDL接口，实现C、C++如何访问aidl接口</p>
+</section>
+<section id="java-aidl">
+<h1>Java AIDL<a class="headerlink" href="#java-aidl" title="Permalink to this headline"></a></h1>
+<p>分析AIDL中的binder code和被调用函数关系</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/6f1dd63b5acf30746f68642fbf33c5a2/0012_BookController.aidl"><span class="xref download myst">0012_BookController.aidl</span></a></p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/d7e0d097cf61ab91896ffe9379706980/0012_BookController.java"><span class="xref download myst">0012_BookController.java</span></a></p>
+<ul>
+<li><p>static final int TRANSACTION_getBookList = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);</p></li>
+<li><p>static final int TRANSACTION_addBookInOut = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);</p></li>
+<li><p>static final int TRANSACTION_setCallBack = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>android.os.IBinder.FIRST_CALL_TRANSACTION开始递增，和接口中的函数顺序对应</p></li>
+</ul>
+</section>
+<section id="adbtool-call-aidl">
+<h1>adbtool call aidl<a class="headerlink" href="#adbtool-call-aidl" title="Permalink to this headline"></a></h1>
+<p>最终binder的code调用了硬编码的函数需要</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* system/core/adbtool/adbtool.cpp
+  * int main(int argc, char *argv[])
+    * else if (!strcmp(&quot;install&quot;, argv[1]))
+      * ret = doInstall(ADBTOOL_CMD_INSTALL_APP, argv[3]);
+        * system/core/adbtool/command.cpp
+          * switch (cmd)
+            * case ADBTOOL_CMD_INSTALL_APP:
+              * ret = OsManager_install(adbtool_INSTALL_APP, sourceFile);
+                * external/xxx/lib/libBinderClient/BinderClient.cpp
+                  * int OsManager_install(int type, char *source)
+                    * sp&lt;IServiceManager&gt; sm = defaultServiceManager();
+                    * sp&lt;IBinder&gt; binder = sm-&gt;getService(String16(&quot;OsManager&quot;));
+                    * data.writeInterfaceToken(String16(&quot;com.osmanager.IOsManager&quot;));
+                    * status_t ret = binder-&gt;transact(TRANSACTION_OsManager_install, data, &amp;reply);
+                      * #define TRANSACTION_OsManager_install (IBinder::FIRST_CALL_TRANSACTION + 2)
+</pre></div>
+</div>
+<p>aidl定义在这里，也就是存在aidl函数需要被修改，从而导致adbtool中的硬编码无法对应的问题</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// frameworks/base/core/java/com/osmanager/IOsManager.aidl</span>
+
+<span class="kn">package</span> <span class="nn">com.osmanager</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="p">;</span>
+
+<span class="kd">interface</span> <span class="nc">IOsManager</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="nf">update</span><span class="p">(</span><span class="kt">int</span> <span class="n">mode</span><span class="p">,</span> <span class="n">String</span> <span class="n">what</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">cleanUp</span><span class="p">(</span><span class="n">String</span> <span class="n">whatToClean</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">install</span><span class="p">(</span><span class="kt">int</span> <span class="n">type</span><span class="p">,</span> <span class="n">String</span> <span class="n">path</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="server">
+<h1>server<a class="headerlink" href="#server" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">packages</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">OsManager</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">com</span><span class="o">/</span><span class="n">osmanager</span><span class="o">/</span><span class="n">OsManager</span><span class="o">.</span><span class="n">java</span>
+  <span class="o">*</span> <span class="n">public</span> <span class="k">class</span> <span class="nc">OsManager</span> <span class="n">extends</span> <span class="n">IOsManager</span><span class="o">.</span><span class="n">Stub</span>
+</pre></div>
+</div>
+</section>
+<section id="aidl-interface">
+<h1>aidl_interface<a class="headerlink" href="#aidl-interface" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><a class="reference external" href="https://source.android.com/devices/architecture/aidl/stable-aidl">Stable AIDL</a></p></li>
+<li><p>local_include_dir: 这个相对路径一定要给，要不然会找不到生成的文件</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>aidl_interface {
+    name: &quot;aidl-test&quot;,
+    unstable: true,
+    srcs: [&quot;core/java/**/IOsManager.aidl&quot;],
+    include_dirs: [
+        &quot;frameworks/base/core/java&quot;,
+    ],
+    local_include_dir: &quot;core/java&quot;,
+    vendor_available: true,
+    backend: {
+        cpp: {
+            enabled: true,
+        },
+        java: {
+            enabled: false,
+        },
+        ndk: {
+            enabled: false,
+        },
+    },
+}
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="client-example">
+<h1>client example<a class="headerlink" href="#client-example" title="Permalink to this headline"></a></h1>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#define LOG_TAG &quot;adbtool&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;log/log.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;String16.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/IServiceManager.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;com/osmanager/IOsManager.h&gt;</span><span class="cp"></span>
+
+
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">com</span><span class="o">::</span><span class="nn">droid</span><span class="o">::</span><span class="nn">osmanager</span><span class="p">;</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">android</span><span class="p">;</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//printf(&quot;argv[%d]=%s\n&quot;, i, argv[i]);</span>
+<span class="w">        </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;argv[%d]=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IOsManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interface_cast</span><span class="o">&lt;</span><span class="n">IOsManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">defaultServiceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;OsManager&quot;</span><span class="p">)));</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Android.mk</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LOCAL_PATH</span> <span class="o">:=</span> <span class="k">$(</span>call my-dir<span class="k">)</span>
+
+<span class="cp">include $(CLEAR_VARS)</span>
+<span class="nv">LOCAL_C_INCLUDES</span> <span class="o">+=</span> <span class="k">$(</span>LOCAL_PATH<span class="k">)</span> <span class="se">\</span>
+            frameworks/native/include <span class="se">\</span>
+            system/core/base/include <span class="se">\</span>
+            system/core/include/utils
+
+<span class="nv">LOCAL_SRC_FILES</span> <span class="o">:=</span> adbtool.cpp
+
+<span class="nv">LOCAL_MODULE</span> <span class="o">:=</span> jni2aidl
+
+<span class="nv">LOCAL_CFLAGS</span> <span class="o">+=</span> -Wno-unused-variable <span class="se">\</span>
+                -Wno-typedef-redefinition <span class="se">\</span>
+                -Wno-unused-function <span class="se">\</span>
+
+<span class="nv">LOCAL_MODULE_TAGS</span> <span class="o">:=</span> optional
+<span class="nv">LOCAL_SHARED_LIBRARIES</span> <span class="o">:=</span> libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp
+<span class="nv">LOCAL_PROPRIETARY_MODULE</span> <span class="o">:=</span> <span class="nb">true</span>
+<span class="cp">include $(BUILD_EXECUTABLE)</span>
+</pre></div>
+</div>
+</section>
+<section id="service-example">
+<h1>Service Example<a class="headerlink" href="#service-example" title="Permalink to this headline"></a></h1>
+<p>C++ Server版本</p>
+<section id="id1">
+<h2>server<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<p>C++ Server写法</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#define LOG_TAG &quot;jni2aidl_server&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;log/log.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;String16.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;String8.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/IServiceManager.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;com/osmanager/IOsManager.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;com/osmanager/BnOsManager.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/IPCThreadState.h&gt;</span><span class="cp"></span>
+
+
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">com</span><span class="o">::</span><span class="nn">droid</span><span class="o">::</span><span class="nn">osmanager</span><span class="p">;</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">android</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">OsManagerService</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">BnOsManager</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">OsManagerService</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="o">~</span><span class="n">OsManagerService</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="n">mode</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">String16</span><span class="o">&amp;</span><span class="w"> </span><span class="n">what</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">_aidl_return</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="nf">cleanUp</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">String16</span><span class="o">&amp;</span><span class="w"> </span><span class="n">whatToClean</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">_aidl_return</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">String16</span><span class="o">&amp;</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">_aidl_return</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="n">OsManagerService</span><span class="o">::</span><span class="n">OsManagerService</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">OsManagerService</span><span class="o">::~</span><span class="n">OsManagerService</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="p">}</span><span class="w"></span>
+
+<span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="n">OsManagerService</span><span class="o">::</span><span class="n">update</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="n">mode</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">String16</span><span class="o">&amp;</span><span class="w"> </span><span class="n">what</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">_aidl_return</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;update: %s, mode: %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">what</span><span class="p">).</span><span class="n">string</span><span class="p">(),</span><span class="w"> </span><span class="n">mode</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;update: %s, mode: %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">what</span><span class="p">).</span><span class="n">string</span><span class="p">(),</span><span class="w"> </span><span class="n">mode</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="o">*</span><span class="n">_aidl_return</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="o">::</span><span class="n">ok</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="n">OsManagerService</span><span class="o">::</span><span class="n">cleanUp</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">String16</span><span class="o">&amp;</span><span class="w"> </span><span class="n">whatToClean</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">_aidl_return</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;cleanUp: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">whatToClean</span><span class="p">).</span><span class="n">string</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;cleanUp: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">whatToClean</span><span class="p">).</span><span class="n">string</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="o">*</span><span class="n">_aidl_return</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="o">::</span><span class="n">ok</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="w"> </span><span class="n">OsManagerService</span><span class="o">::</span><span class="n">install</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">String16</span><span class="o">&amp;</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">_aidl_return</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;install: type: %d, path: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="n">string</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;install: type: %d, path: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">path</span><span class="p">).</span><span class="n">string</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="o">*</span><span class="n">_aidl_return</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">::</span><span class="n">android</span><span class="o">::</span><span class="n">binder</span><span class="o">::</span><span class="n">Status</span><span class="o">::</span><span class="n">ok</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;argv[%d]=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;argv[%d]=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">ProcessState</span><span class="o">&gt;</span><span class="w"> </span><span class="n">proc</span><span class="p">(</span><span class="n">ProcessState</span><span class="o">::</span><span class="n">self</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IServiceManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">defaultServiceManager</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;ServiceManager: %p&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sm</span><span class="p">.</span><span class="n">get</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">sm</span><span class="o">-&gt;</span><span class="n">addService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;OsManagerService&quot;</span><span class="p">),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OsManagerService</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">ProcessState</span><span class="o">::</span><span class="n">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">startThreadPool</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">IPCThreadState</span><span class="o">::</span><span class="n">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">joinThreadPool</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="client">
+<h2>client<a class="headerlink" href="#client" title="Permalink to this headline"></a></h2>
+<p>C++ Client写法</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#define LOG_TAG &quot;jni2aidl_client&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;log/log.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;String16.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/IServiceManager.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;com/osmanager/IOsManager.h&gt;</span><span class="cp"></span>
+
+
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">com</span><span class="o">::</span><span class="nn">droid</span><span class="o">::</span><span class="nn">osmanager</span><span class="p">;</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">android</span><span class="p">;</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;argv[%d]=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;argv[%d]=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IOsManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">interface_cast</span><span class="o">&lt;</span><span class="n">IOsManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">defaultServiceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;OsManagerService&quot;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="n">client</span><span class="o">-&gt;</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;zengjf&quot;</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;i = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;i = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">client</span><span class="o">-&gt;</span><span class="n">cleanUp</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;zengjf/&quot;</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;i = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;i = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">client</span><span class="o">-&gt;</span><span class="n">install</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;zengjf/&quot;</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;i = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;i = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="android-mk">
+<h2>Android.mk<a class="headerlink" href="#android-mk" title="Permalink to this headline"></a></h2>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LOCAL_PATH</span> <span class="o">:=</span> <span class="k">$(</span>call my-dir<span class="k">)</span>
+
+<span class="cp">include $(CLEAR_VARS)</span>
+<span class="nv">LOCAL_C_INCLUDES</span> <span class="o">+=</span> <span class="k">$(</span>LOCAL_PATH<span class="k">)</span> <span class="se">\</span>
+            frameworks/native/include <span class="se">\</span>
+            system/core/base/include <span class="se">\</span>
+            system/core/include/utils
+
+<span class="nv">LOCAL_SRC_FILES</span> <span class="o">:=</span> jni2aidl_server.cpp
+
+<span class="nv">LOCAL_MODULE</span> <span class="o">:=</span> jni2aidl_server
+
+<span class="nv">LOCAL_CFLAGS</span> <span class="o">+=</span> -Wno-unused-variable <span class="se">\</span>
+                -Wno-typedef-redefinition <span class="se">\</span>
+                -Wno-unused-function <span class="se">\</span>
+                -Wno-unused-parameter
+
+<span class="nv">LOCAL_MODULE_TAGS</span> <span class="o">:=</span> optional
+<span class="nv">LOCAL_SHARED_LIBRARIES</span> <span class="o">:=</span> libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp
+<span class="nv">LOCAL_PROPRIETARY_MODULE</span> <span class="o">:=</span> <span class="nb">true</span>
+<span class="cp">include $(BUILD_EXECUTABLE)</span>
+
+<span class="cp">include $(CLEAR_VARS)</span>
+<span class="nv">LOCAL_C_INCLUDES</span> <span class="o">+=</span> <span class="k">$(</span>LOCAL_PATH<span class="k">)</span> <span class="se">\</span>
+            frameworks/native/include <span class="se">\</span>
+            system/core/base/include <span class="se">\</span>
+            system/core/include/utils
+
+<span class="nv">LOCAL_SRC_FILES</span> <span class="o">:=</span> jni2aidl_client.cpp
+
+<span class="nv">LOCAL_MODULE</span> <span class="o">:=</span> jni2aidl_client
+
+<span class="nv">LOCAL_CFLAGS</span> <span class="o">+=</span> -Wno-unused-variable <span class="se">\</span>
+                -Wno-typedef-redefinition <span class="se">\</span>
+                -Wno-unused-function <span class="se">\</span>
+
+<span class="nv">LOCAL_MODULE_TAGS</span> <span class="o">:=</span> optional
+<span class="nv">LOCAL_SHARED_LIBRARIES</span> <span class="o">:=</span> libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp
+<span class="nv">LOCAL_PROPRIETARY_MODULE</span> <span class="o">:=</span> <span class="nb">true</span>
+<span class="cp">include $(BUILD_EXECUTABLE)</span>
+</pre></div>
+</div>
+</section>
+<section id="log">
+<h2>log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.004</span>  <span class="mi">8479</span>  <span class="mi">8479</span> <span class="n">D</span> <span class="n">jni2aidl_client</span><span class="p">:</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">jni2aidl_client</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.007</span>  <span class="mi">8310</span>  <span class="mi">8311</span> <span class="n">D</span> <span class="n">jni2aidl_server</span><span class="p">:</span> <span class="n">update</span><span class="p">:</span> <span class="n">zengjf</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="mi">1</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.007</span>  <span class="mi">8479</span>  <span class="mi">8479</span> <span class="n">D</span> <span class="n">jni2aidl_client</span><span class="p">:</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.007</span>  <span class="mi">8310</span>  <span class="mi">8311</span> <span class="n">D</span> <span class="n">jni2aidl_server</span><span class="p">:</span> <span class="n">cleanUp</span><span class="p">:</span> <span class="n">zengjf</span><span class="o">/</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.008</span>  <span class="mi">8479</span>  <span class="mi">8479</span> <span class="n">D</span> <span class="n">jni2aidl_client</span><span class="p">:</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.008</span>  <span class="mi">8310</span>  <span class="mi">8311</span> <span class="n">D</span> <span class="n">jni2aidl_server</span><span class="p">:</span> <span class="n">install</span><span class="p">:</span> <span class="nb">type</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">zengjf</span><span class="o">/</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span><span class="p">:</span><span class="mf">42.009</span>  <span class="mi">8479</span>  <span class="mi">8479</span> <span class="n">D</span> <span class="n">jni2aidl_client</span><span class="p">:</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="c-call-cpp">
+<h1>C call CPP<a class="headerlink" href="#c-call-cpp" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><span class="xref myst">0012_CCallCPP</span></p>
+<ul>
+<li><p>简要来说就是要用C++编译cpp代码成C接口，然后C调用C++的C接口程序；</p></li>
+<li><p>C++部分不要使用模板，否则</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">error</span><span class="p">:</span> <span class="n">templates</span> <span class="n">must</span> <span class="n">have</span> <span class="n">C</span><span class="o">++</span> <span class="n">linkage</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>只能在C层实现binder通信</p></li>
+</ul>
+<section id="android-bp">
+<h2>Android.bp<a class="headerlink" href="#android-bp" title="Permalink to this headline"></a></h2>
+<p>C++提供的C接口库编译文件，主要是必须使用C++编译器才能编译出C接口，而不能直接使用C直接访问C++</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>cc_library_shared {
+    name: &quot;libOsManager&quot;,
+
+    cflags: [
+        &quot;-Wno-error=return-type-c-linkage&quot;,
+    ],
+
+    srcs: [
+        &quot;BinderClient.cpp&quot;,
+    ],
+
+    shared_libs: [
+        &quot;liblog&quot;,
+        &quot;libutils&quot;,
+        &quot;libbinder&quot;,
+    ],
+
+    local_include_dirs: [
+        &quot;.&quot;
+    ],
+    vendor_available: true,
+}
+</pre></div>
+</div>
+</section>
+<section id="cpp-share-lib">
+<h2>CPP share lib<a class="headerlink" href="#cpp-share-lib" title="Permalink to this headline"></a></h2>
+<p>自己填充binder通信数据，封装C++代码为C接口</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/IServiceManager.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/IBinder.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;binder/Parcel.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;utils/String8.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cutils/log.h&gt;</span><span class="c1"> // This require liblog</span><span class="cp"></span>
+<span class="c1">//#define LOG_TAG &quot;AdbtoolServer&quot;</span>
+
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">android</span><span class="p">;</span><span class="w"></span>
+
+
+<span class="k">extern</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="cp">#define TRANSACTION_OsManager_cleanUp                      (IBinder::FIRST_CALL_TRANSACTION + 1)</span>
+<span class="cp">#define TRANSACTION_OsManager_install                      (IBinder::FIRST_CALL_TRANSACTION + 2)</span>
+
+<span class="cp">#define OSMANAGERUTIL_SERVICE &quot;OsManagerService&quot;</span>
+
+<span class="w">    </span><span class="c1">// int cleanUp(String whatToClean)@com.osmanager.IOsManager.aidl</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">OsManager_cleanUp</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">whatToClean</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IServiceManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">defaultServiceManager</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;</span><span class="w"> </span><span class="n">binder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sm</span><span class="o">-&gt;</span><span class="n">getService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="n">OSMANAGERUTIL_SERVICE</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">binder</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;%s getService fail&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#if 1</span>
+<span class="w">            </span><span class="c1">// wait for OsManager service ready</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"> </span><span class="c1">// 60 seconds</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">timeout</span><span class="o">--</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">usleep</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">binder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sm</span><span class="o">-&gt;</span><span class="n">getService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="n">OSMANAGERUTIL_SERVICE</span><span class="p">));</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">binder</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                    </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;service OsManager ready&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">timeout</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;get service OsManager timeout&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">Parcel</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">reply</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">data</span><span class="p">.</span><span class="n">writeInterfaceToken</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;com.osmanager.IOsManager&quot;</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">String16</span><span class="w"> </span><span class="n">mStr16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String16</span><span class="p">(</span><span class="n">whatToClean</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">data</span><span class="p">.</span><span class="n">writeString16</span><span class="p">(</span><span class="n">mStr16</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">status_t</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">binder</span><span class="o">-&gt;</span><span class="n">transact</span><span class="p">(</span><span class="n">TRANSACTION_OsManager_cleanUp</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">reply</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NO_ERROR</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;%s could not contact remote</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">exceptionCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reply</span><span class="p">.</span><span class="n">readInt32</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">retValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exceptionCode</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">exceptionCode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">String8</span><span class="w"> </span><span class="n">eString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String8</span><span class="p">(</span><span class="n">reply</span><span class="p">.</span><span class="n">readString16</span><span class="p">());</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;Exception [%s] exceptionCode = 0x%8x&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">eString</span><span class="p">.</span><span class="n">string</span><span class="p">(),</span><span class="w"> </span><span class="n">exceptionCode</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">retValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reply</span><span class="p">.</span><span class="n">readInt32</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">retValue</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// int install(int type, String source)@com.osmanager.OsManager.aidl</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">OsManager_install</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IServiceManager</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">defaultServiceManager</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;</span><span class="w"> </span><span class="n">binder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sm</span><span class="o">-&gt;</span><span class="n">getService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="n">OSMANAGERUTIL_SERVICE</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">binder</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="cp">#if 1</span>
+<span class="w">            </span><span class="c1">// wait for OsManager service ready</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span><span class="w"> </span><span class="c1">// 60 seconds</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">timeout</span><span class="o">--</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">usleep</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">binder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sm</span><span class="o">-&gt;</span><span class="n">getService</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="n">OSMANAGERUTIL_SERVICE</span><span class="p">));</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">binder</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                    </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;service OsManager ready&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">timeout</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;get service OsManager timeout&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;%s:%d getService fail&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">__LINE__</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">Parcel</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">reply</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">data</span><span class="p">.</span><span class="n">writeInterfaceToken</span><span class="p">(</span><span class="n">String16</span><span class="p">(</span><span class="s">&quot;com.osmanager.IOsManager&quot;</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">data</span><span class="p">.</span><span class="n">writeInt32</span><span class="p">(</span><span class="n">type</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">String16</span><span class="w"> </span><span class="n">mStr16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String16</span><span class="p">(</span><span class="n">source</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">data</span><span class="p">.</span><span class="n">writeString16</span><span class="p">(</span><span class="n">mStr16</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">status_t</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">binder</span><span class="o">-&gt;</span><span class="n">transact</span><span class="p">(</span><span class="n">TRANSACTION_OsManager_install</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">reply</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NO_ERROR</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;%s could not contact remote</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">exceptionCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reply</span><span class="p">.</span><span class="n">readInt32</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">retValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exceptionCode</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">exceptionCode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">String16</span><span class="w"> </span><span class="n">eString</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reply</span><span class="p">.</span><span class="n">readString16</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;Exception [%s] exceptionCode = 0x%8x&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">eString</span><span class="p">.</span><span class="n">string</span><span class="p">(),</span><span class="w"> </span><span class="n">exceptionCode</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">retValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reply</span><span class="p">.</span><span class="n">readInt32</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">retValue</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="p">}</span><span class="w"> </span><span class="c1">// end extern &quot;C&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>Android.mk<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<p>C main程序Android.mk，主要涉及到引用C++提供的C接口库</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_C_INCLUDES += $(LOCAL_PATH) \
+            frameworks/native/include \
+            system/core/base/include \
+            system/core/include/utils
+
+LOCAL_SRC_FILES := jni2aidl_client.c
+
+LOCAL_MODULE := jni2aidl_client_c
+
+LOCAL_CFLAGS += -Wno-unused-variable \
+                -Wno-typedef-redefinition \
+                -Wno-unused-function \
+
+LOCAL_MODULE_TAGS := optional
+LOCAL_SHARED_LIBRARIES := libbinder libutils liblog libcutils libnvram AIDLIOsManager-cpp libOsManager
+LOCAL_PROPRIETARY_MODULE := true
+include $(BUILD_EXECUTABLE)
+</pre></div>
+</div>
+</section>
+<section id="caidl">
+<h2>C版本调用aidl<a class="headerlink" href="#caidl" title="Permalink to this headline"></a></h2>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">OsManager_cleanUp</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">whatToClean</span><span class="p">);</span><span class="w"></span>
+<span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">OsManager_install</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="p">);</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">argc</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;argv[%d]=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">OsManager_cleanUp</span><span class="p">(</span><span class="s">&quot;zengjf&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">OsManager_install</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;zengjf/&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">18</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mf">27.298</span>  <span class="mi">5927</span>  <span class="mi">5928</span> <span class="n">D</span> <span class="n">jni2aidl_server</span><span class="p">:</span> <span class="n">cleanUp</span><span class="p">:</span> <span class="n">zengjf</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">30</span> <span class="mi">18</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mf">27.299</span>  <span class="mi">5927</span>  <span class="mi">5928</span> <span class="n">D</span> <span class="n">jni2aidl_server</span><span class="p">:</span> <span class="n">install</span><span class="p">:</span> <span class="nb">type</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">zengjf</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

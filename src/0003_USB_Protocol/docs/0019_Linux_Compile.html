@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Linux Compile</a></li>
+<li><a class="reference internal" href="#source-code">Source Code</a></li>
+<li><a class="reference internal" href="#steps">Steps</a></li>
+<li><a class="reference internal" href="#dir-info">Dir info</a></li>
+<li><a class="reference internal" href="#id1">反汇编</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linux-compile">
+<h1>Linux Compile<a class="headerlink" href="#linux-compile" title="Permalink to this headline"></a></h1>
+<p>Linux编译DSLogic-fw</p>
+</section>
+<section id="source-code">
+<h1>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>git clone https://github.com/DreamSourceLab/DSLogic-fw</p></li>
+</ul>
+</section>
+<section id="steps">
+<h1>Steps<a class="headerlink" href="#steps" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>apt-cache search sdcc</p></li>
+<li><p>sudo apt-get install sdcc</p></li>
+<li><p>./autogen.sh</p></li>
+<li><p>./configure</p></li>
+<li><p>make</p></li>
+</ul>
+</section>
+<section id="dir-info">
+<h1>Dir info<a class="headerlink" href="#dir-info" title="Permalink to this headline"></a></h1>
+<div class="highlight-Console notranslate"><div class="highlight"><pre><span></span><span class="gp">pi@raspberrypi:~/zengjf/DSLogic-fw $ </span>ls
+<span class="go">aclocal.m4  autom4te.cache  config.h.in    configure     DSLogic.asm  DSLogic.re</span>
+<span class="go">AUTHORS     autostuff       config.log     configure.ac  DSLogic.c    DSLogic.rs</span>
+<span class="go">autogen.sh  config.h        config.status  COPYING       DSLogic.lst  DSLogic.sy</span>
+<span class="gp">pi@raspberrypi:~/zengjf/DSLogic-fw $ </span>ls
+<span class="go">aclocal.m4      config.log     DSLogic.lst  INSTALL        Makefile     usb.c</span>
+<span class="go">AUTHORS         config.status  DSLogic.rel  interface.asm  Makefile.am  usb.lst</span>
+<span class="go">autogen.sh      configure      DSLogic.rst  interface.c    Makefile.in  usb.rel</span>
+<span class="go">autom4te.cache  configure.ac   DSLogic.sym  interface.lst  NEWS         usb.rst</span>
+<span class="go">autostuff       COPYING        fx2lib       interface.rel  README       usb.sym</span>
+<span class="go">config.h        DSLogic.asm    hw           interface.rst  stamp-h1</span>
+<span class="go">config.h.in     DSLogic.c      include      interface.sym  usb.asm</span>
+<span class="gp">pi@raspberrypi:~/zengjf/DSLogic-fw $ </span>ls hw/
+<span class="go">dscr.a51  dscr.rst    DSLogic.ihx  DSLogic.mem  Makefile.in</span>
+<span class="go">dscr.lst  dscr.sym    DSLogic.lk   Makefile</span>
+<span class="go">dscr.rel  DSLogic.fw  DSLogic.map  Makefile.am</span>
+<span class="gp">pi@raspberrypi:~/zengjf/DSLogic-fw $ </span>ls -alh hw/DSLogic.fw
+<span class="go">-rw-r--r-- 1 pi pi 8.0K Nov 30 08:42 hw/DSLogic.fw</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h1>反汇编<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>安装dis51</p>
+<ul>
+<li><p>http://plit.de/asem-51/dis51.html</p>
+<ul>
+<li><p>http://plit.de/asem-51/dis51-0.5.tar.gz</p></li>
+<li><p>wget http://plit.de/asem-51/dis51-0.5.tar.gz</p></li>
+<li><p>tar xvf dis51-0.5.tar.gz</p></li>
+<li><p>make</p></li>
+</ul>
+</li>
+<li><p>sudo apt-get install dis51</p></li>
+</ul>
+</li>
+<li><p>packihx DSLogic.ihx &gt; DSLogic.hex</p></li>
+<li><p>反汇编：</p>
+<ul>
+<li><p>cat DSLogic.hex | dis51 &gt; DSLogic.a51</p></li>
+<li><p>cat DSLogic.hex | dis51 0x80 0x00 &gt; DSLogic.a51</p>
+<ul>
+<li><p>CSEG：code segment</p></li>
+<li><p>LJMP：The LJMP instruction transfers program execution to the specified 16-bit address.</p></li>
+<li><p>DB：The DB statement initializes memory with one or more byte values. label is a symbol that is assigned the current memory address. expression is a byte value that is stored in memory. Each expression may be a symbol, a string, or an expression.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

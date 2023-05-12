@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">apksigner签名原理</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#apk">apk组成</a></li>
+<li><a class="reference internal" href="#id2">签名流程</a></li>
+<li><a class="reference internal" href="#keystore">keystore简要说明</a></li>
+<li><a class="reference internal" href="#id3">自建keystore</a></li>
+<li><a class="reference internal" href="#macos-keytool">macos keytool</a></li>
+<li><a class="reference internal" href="#android-studio-keystore">android studio keystore</a></li>
+<li><a class="reference internal" href="#cert-rsa">CERT.RSA签名流程</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="apksigner">
+<h1>apksigner签名原理<a class="headerlink" href="#apksigner" title="Permalink to this headline"></a></h1>
+<p>apk签名原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/weixin_42600398/article/details/125042210">Android apk签名原理</a></p></li>
+<li><p><a class="reference external" href="https://cloud.tencent.com/developer/article/1354380">Android APK 签名原理</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_43278826/article/details/118677962">Android V1签名与校验原理分析(全网最全最详细)</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/onelei1994/article/details/52096670">KeyStore简介和使用</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_30304193/article/details/81781914?spm=1001.2101.3001.6661.1&amp;utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-81781914-blog-52096670.pc_relevant_multi_platform_whitelistv3&amp;depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-81781914-blog-52096670.pc_relevant_multi_platform_whitelistv3&amp;utm_relevant_index=1">Android keystore简介、生成、查看</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/49a664b8cff4">keystore 使用</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/75a6dd3a126a">android debug.keystore 的默认密码</a></p></li>
+</ul>
+</section>
+<section id="apk">
+<h1>apk组成<a class="headerlink" href="#apk" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>dex：最终生成的Dalvik字节码。</p></li>
+<li><p>res：存放资源文件的目录。</p></li>
+<li><p>asserts：额外建立的资源文件夹。</p></li>
+<li><p>lib：如果存在的话，存放的是ndk编出来的so库。</p></li>
+<li><p>META-INF：存放签名信息</p>
+<ul>
+<li><p>MANIFEST.MF（清单文件）：其中每一个资源文件都有一个SHA-256-Digest签名，MANIFEST.MF文件的SHA256（SHA1）并base64编码的结果即为CERT.SF中的SHA256-Digest-Manifest值。</p></li>
+<li><p>CERT.SF（待签名文件）：除了开头处定义的SHA256（SHA1）-Digest-Manifest值，后面几项的值是对MANIFEST.MF文件中的每项再次SHA256并base64编码后的值。</p></li>
+<li><p>CERT.RSA（签名结果文件）：其中包含了公钥、加密算法等信息。首先对前一步生成的MANIFEST.MF使用了SHA256（SHA1）-RSA算法，用开发者私钥签名，然后在安装时使用公钥解密。最后，将其与未加密的摘要信息（MANIFEST.MF文件）进行对比，如果相符，则表明内容没有被修改。</p></li>
+</ul>
+</li>
+<li><p>androidManifest：程序的全局清单配置文件。</p></li>
+<li><p>resources.arsc：编译后的二进制资源文件。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>签名流程<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><img alt="0013_android_v1_sign.png" src="../../../_images/0013_android_v1_sign.png" /></p>
+<p>为了防止APK在传送的过程中被第三方篡改，Google引入了签名机制。签过名的APK文件比未签名的APK文件多了一个META-AF文件夹，包含以下三个文件。签名的信息就在这三个文件中。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MANIFEST</span><span class="o">.</span><span class="n">MF</span>
+<span class="n">CERT</span><span class="o">.</span><span class="n">RSA</span>
+<span class="n">CERT</span><span class="o">.</span><span class="n">SF</span>
+</pre></div>
+</div>
+<p>对APK文件夹中的文件逐一遍历进行SHA1（或者SHA256）算法计算文件的消息摘要，然后进行BASE64编码后，作为”SHA1-Digest”属性的值写入到MANIFEST.MF文件中的一个块中。该块有一个”Name”属性，其值就是该文件在APK包中的路径。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Manifest</span><span class="o">-</span><span class="n">Version</span><span class="p">:</span> <span class="mf">1.0</span>
+<span class="n">Built</span><span class="o">-</span><span class="n">By</span><span class="p">:</span> <span class="n">Generated</span><span class="o">-</span><span class="n">by</span><span class="o">-</span><span class="n">ADT</span>
+<span class="n">Created</span><span class="o">-</span><span class="n">By</span><span class="p">:</span> <span class="n">Android</span> <span class="n">Gradle</span> <span class="mf">3.1.0</span>
+
+<span class="n">Name</span><span class="p">:</span> <span class="n">AndroidManifest</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="p">:</span> <span class="mi">9</span><span class="n">hTSmRfzHEeQc7V2wxBbTT3DmCY</span><span class="o">=</span>
+
+<span class="n">Name</span><span class="p">:</span> <span class="n">META</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">arch</span><span class="o">.</span><span class="n">core_runtime</span><span class="o">.</span><span class="n">version</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="p">:</span> <span class="n">BeF7ZGqBckDCBhhvlPj0xwl01dw</span><span class="o">=</span>
+
+<span class="n">Name</span><span class="p">:</span> <span class="n">META</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">arch</span><span class="o">.</span><span class="n">lifecycle_livedata</span><span class="o">-</span><span class="n">core</span><span class="o">.</span><span class="n">version</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="p">:</span> <span class="n">BeF7ZGqBckDCBhhvlPj0xwl01dw</span><span class="o">=</span>
+</pre></div>
+</div>
+<p>计算这个MANIFEST.MF文件的整体SHA1值，再经过BASE64编码后，记录在CERT.SF主属性块（在文件头上）的”SHA1-Digest-Manifest”属性值值下。然后，再逐条计算MANIFEST.MF文件中每一个块的SHA1，并经过BASE64编码后，记录在CERT.SF中的同名块中，属性的名字是”SHA1-Digest”。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Signature</span><span class="o">-</span><span class="n">Version</span><span class="p">:</span> <span class="mf">1.0</span>
+<span class="n">Created</span><span class="o">-</span><span class="n">By</span><span class="p">:</span> <span class="mf">1.0</span> <span class="p">(</span><span class="n">Android</span><span class="p">)</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="o">-</span><span class="n">Manifest</span><span class="p">:</span> <span class="n">MJQyZ0dc4dv7G9nlJPAMQLwEwbU</span><span class="o">=</span>
+<span class="n">X</span><span class="o">-</span><span class="n">Android</span><span class="o">-</span><span class="n">APK</span><span class="o">-</span><span class="n">Signed</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="n">Name</span><span class="p">:</span> <span class="n">AndroidManifest</span><span class="o">.</span><span class="n">xml</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="p">:</span> <span class="n">IJioMmfD693T4qnUJcPKhq9woHQ</span><span class="o">=</span>
+
+<span class="n">Name</span><span class="p">:</span> <span class="n">META</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">arch</span><span class="o">.</span><span class="n">core_runtime</span><span class="o">.</span><span class="n">version</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="p">:</span> <span class="n">OPQCkzMXJVPQryHeMowVNZmfRMw</span><span class="o">=</span>
+
+<span class="n">Name</span><span class="p">:</span> <span class="n">META</span><span class="o">-</span><span class="n">INF</span><span class="o">/</span><span class="n">android</span><span class="o">.</span><span class="n">arch</span><span class="o">.</span><span class="n">lifecycle_livedata</span><span class="o">-</span><span class="n">core</span><span class="o">.</span><span class="n">version</span>
+<span class="n">SHA1</span><span class="o">-</span><span class="n">Digest</span><span class="p">:</span> <span class="n">TSBGEIW1zN2n2sraHWcuRYSO8JU</span><span class="o">=</span>
+</pre></div>
+</div>
+<p>把之前生成的CERT.SF文件，用私钥计算出签名, 然后将签名以及包含公钥信息的数字证书一同写入CERT.RSA中保存。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">3082</span> <span class="mi">02</span><span class="n">f9</span> <span class="mi">0609</span> <span class="mi">2</span><span class="n">a86</span> <span class="mi">4886</span> <span class="n">f70d</span> <span class="mi">0107</span> <span class="mi">02</span><span class="n">a0</span>
+<span class="mi">8202</span> <span class="n">ea30</span> <span class="mi">8202</span> <span class="n">e602</span> <span class="mi">0101</span> <span class="mi">310</span><span class="n">b</span> <span class="mi">3009</span> <span class="mi">0605</span>
+<span class="mi">2</span><span class="n">b0e</span> <span class="mi">0302</span> <span class="mi">1</span><span class="n">a05</span> <span class="mi">0030</span> <span class="mb">0b0</span><span class="mi">6</span> <span class="mi">092</span><span class="n">a</span> <span class="mi">8648</span> <span class="mi">86</span><span class="n">f7</span>
+<span class="mi">0</span><span class="n">d01</span> <span class="mi">0701</span> <span class="n">a082</span> <span class="mf">01e1</span> <span class="mi">3082</span> <span class="mi">01</span><span class="n">dd</span> <span class="mi">3082</span> <span class="mi">0146</span>
+<span class="mi">0201</span> <span class="mi">0130</span> <span class="mi">0</span><span class="n">d06</span> <span class="mi">092</span><span class="n">a</span> <span class="mi">8648</span> <span class="mi">86</span><span class="n">f7</span> <span class="mi">0</span><span class="n">d01</span> <span class="mi">0105</span>
+<span class="mi">0500</span> <span class="mi">3037</span> <span class="mi">3116</span> <span class="mi">3014</span> <span class="mi">0603</span> <span class="mi">5504</span> <span class="mi">030</span><span class="n">c</span> <span class="mi">0</span><span class="n">d41</span>
+<span class="mf">6e64</span> <span class="mi">726</span><span class="n">f</span> <span class="mi">6964</span> <span class="mi">2044</span> <span class="mi">6562</span> <span class="mi">7567</span> <span class="mi">3110</span> <span class="mi">300</span><span class="n">e</span>
+<span class="mi">0603</span> <span class="mi">5504</span> <span class="mi">0</span><span class="n">a0c</span> <span class="mi">0741</span> <span class="mf">6e64</span> <span class="mi">726</span><span class="n">f</span> <span class="mi">6964</span> <span class="mi">310</span><span class="n">b</span>
+<span class="mi">3009</span> <span class="mi">0603</span> <span class="mi">5504</span> <span class="mi">0613</span> <span class="mi">0255</span> <span class="mi">5330</span> <span class="mf">1e17</span> <span class="mi">0</span><span class="n">d31</span>
+</pre></div>
+</div>
+</section>
+<section id="keystore">
+<h1>keystore简要说明<a class="headerlink" href="#keystore" title="Permalink to this headline"></a></h1>
+<p>keystore文件中包含了私钥、公钥和数字证书。根据编码不同，keystore文件分为很多种，Android使用的是Java标准keystore格式JKS(Java Key Storage)，所以通过Android Studio导出的keystore文件是以.jks结尾的。</p>
+<p>Keytool是一个有效的安全钥匙和证书的管理工具，Java 中的 keytool.exe （位于 JDK\Bin 目录下）可以用来创建数字证书。keystore数字证书，是一个存储了证书的文件。文件包含证书的私钥，公钥和对应的数字证书的信息。Keytool将密钥（key）和证书（certificates）存在一个称为keystore的文件中。 在keystore里，包含两种数据：</p>
+<ul class="simple">
+<li><p>密钥实体（Key entity）——密钥（secret key）又或者是私钥和配对公钥（采用非对称加密）</p></li>
+<li><p>可信任的证书实体（trusted certificate entries）——只包含公钥</p></li>
+</ul>
+</section>
+<section id="id3">
+<h1>自建keystore<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>keytool -genkey -alias android.keystore -keyalg RSA -validity 20000 -keystore android.keystore</p></li>
+<li><p>keytool -list -v -keystore [你的keystore路径] -storepass [密码]</p></li>
+</ul>
+</section>
+<section id="macos-keytool">
+<h1>macos keytool<a class="headerlink" href="#macos-keytool" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>export PATH=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:$PATH</p></li>
+<li><p>keytool –help</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Key</span> <span class="ow">and</span> <span class="n">Certificate</span> <span class="n">Management</span> <span class="n">Tool</span>
+
+<span class="n">Commands</span><span class="p">:</span>
+
+ <span class="o">-</span><span class="n">certreq</span>            <span class="n">Generates</span> <span class="n">a</span> <span class="n">certificate</span> <span class="n">request</span>
+ <span class="o">-</span><span class="n">changealias</span>        <span class="n">Changes</span> <span class="n">an</span> <span class="n">entry</span><span class="s1">&#39;s alias</span>
+ <span class="o">-</span><span class="n">delete</span>             <span class="n">Deletes</span> <span class="n">an</span> <span class="n">entry</span>
+ <span class="o">-</span><span class="n">exportcert</span>         <span class="n">Exports</span> <span class="n">certificate</span>
+ <span class="o">-</span><span class="n">genkeypair</span>         <span class="n">Generates</span> <span class="n">a</span> <span class="n">key</span> <span class="n">pair</span>
+ <span class="o">-</span><span class="n">genseckey</span>          <span class="n">Generates</span> <span class="n">a</span> <span class="n">secret</span> <span class="n">key</span>
+ <span class="o">-</span><span class="n">gencert</span>            <span class="n">Generates</span> <span class="n">certificate</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">certificate</span> <span class="n">request</span>
+ <span class="o">-</span><span class="n">importcert</span>         <span class="n">Imports</span> <span class="n">a</span> <span class="n">certificate</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">certificate</span> <span class="n">chain</span>
+ <span class="o">-</span><span class="n">importpass</span>         <span class="n">Imports</span> <span class="n">a</span> <span class="n">password</span>
+ <span class="o">-</span><span class="n">importkeystore</span>     <span class="n">Imports</span> <span class="n">one</span> <span class="ow">or</span> <span class="nb">all</span> <span class="n">entries</span> <span class="kn">from</span> <span class="nn">another</span> <span class="n">keystore</span>
+ <span class="o">-</span><span class="n">keypasswd</span>          <span class="n">Changes</span> <span class="n">the</span> <span class="n">key</span> <span class="n">password</span> <span class="n">of</span> <span class="n">an</span> <span class="n">entry</span>
+ <span class="o">-</span><span class="nb">list</span>               <span class="n">Lists</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">keystore</span>
+ <span class="o">-</span><span class="n">printcert</span>          <span class="n">Prints</span> <span class="n">the</span> <span class="n">content</span> <span class="n">of</span> <span class="n">a</span> <span class="n">certificate</span>
+ <span class="o">-</span><span class="n">printcertreq</span>       <span class="n">Prints</span> <span class="n">the</span> <span class="n">content</span> <span class="n">of</span> <span class="n">a</span> <span class="n">certificate</span> <span class="n">request</span>
+ <span class="o">-</span><span class="n">printcrl</span>           <span class="n">Prints</span> <span class="n">the</span> <span class="n">content</span> <span class="n">of</span> <span class="n">a</span> <span class="n">CRL</span> <span class="n">file</span>
+ <span class="o">-</span><span class="n">storepasswd</span>        <span class="n">Changes</span> <span class="n">the</span> <span class="n">store</span> <span class="n">password</span> <span class="n">of</span> <span class="n">a</span> <span class="n">keystore</span>
+ <span class="o">-</span><span class="n">showinfo</span>           <span class="n">Displays</span> <span class="n">security</span><span class="o">-</span><span class="n">related</span> <span class="n">information</span>
+
+<span class="n">Use</span> <span class="s2">&quot;keytool -?, -h, or --help&quot;</span> <span class="k">for</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span>
+<span class="n">Use</span> <span class="s2">&quot;keytool -command_name --help&quot;</span> <span class="k">for</span> <span class="n">usage</span> <span class="n">of</span> <span class="n">command_name</span><span class="o">.</span>
+<span class="n">Use</span> <span class="n">the</span> <span class="o">-</span><span class="n">conf</span> <span class="o">&lt;</span><span class="n">url</span><span class="o">&gt;</span> <span class="n">option</span> <span class="n">to</span> <span class="n">specify</span> <span class="n">a</span> <span class="n">pre</span><span class="o">-</span><span class="n">configured</span> <span class="n">options</span> <span class="n">file</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>版本不对，不能直接使用</p></li>
+</ul>
+</section>
+<section id="android-studio-keystore">
+<h1>android studio keystore<a class="headerlink" href="#android-studio-keystore" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>默认debug.keystore的信息如下：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Keystore</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;debug.keystore&quot;</span>
+<span class="n">Keystore</span> <span class="n">password</span><span class="p">:</span> <span class="s2">&quot;android&quot;</span>
+<span class="n">Key</span> <span class="n">alias</span><span class="p">:</span> <span class="s2">&quot;androiddebugkey&quot;</span>
+<span class="n">Key</span> <span class="n">password</span><span class="p">:</span> <span class="s2">&quot;android&quot;</span>
+<span class="n">CN</span><span class="p">:</span> <span class="s2">&quot;CN=Android Debug,O=Android,C=US&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>cd ~/.android</p></li>
+<li><p>keytool -list -v -keystore debug.keystore</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Enter</span> <span class="n">keystore</span> <span class="n">password</span><span class="p">:</span>  
+<span class="n">Keystore</span> <span class="nb">type</span><span class="p">:</span> <span class="n">PKCS12</span>
+<span class="n">Keystore</span> <span class="n">provider</span><span class="p">:</span> <span class="n">SUN</span>
+
+<span class="n">Your</span> <span class="n">keystore</span> <span class="n">contains</span> <span class="mi">1</span> <span class="n">entry</span>
+
+<span class="n">Alias</span> <span class="n">name</span><span class="p">:</span> <span class="n">androiddebugkey</span>
+<span class="n">Creation</span> <span class="n">date</span><span class="p">:</span> <span class="n">Dec</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2021</span>
+<span class="n">Entry</span> <span class="nb">type</span><span class="p">:</span> <span class="n">PrivateKeyEntry</span>
+<span class="n">Certificate</span> <span class="n">chain</span> <span class="n">length</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Certificate</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+<span class="n">Owner</span><span class="p">:</span> <span class="n">C</span><span class="o">=</span><span class="n">US</span><span class="p">,</span> <span class="n">O</span><span class="o">=</span><span class="n">Android</span><span class="p">,</span> <span class="n">CN</span><span class="o">=</span><span class="n">Android</span> <span class="n">Debug</span>
+<span class="n">Issuer</span><span class="p">:</span> <span class="n">C</span><span class="o">=</span><span class="n">US</span><span class="p">,</span> <span class="n">O</span><span class="o">=</span><span class="n">Android</span><span class="p">,</span> <span class="n">CN</span><span class="o">=</span><span class="n">Android</span> <span class="n">Debug</span>
+<span class="n">Serial</span> <span class="n">number</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Valid</span> <span class="n">from</span><span class="p">:</span> <span class="n">Tue</span> <span class="n">Dec</span> <span class="mi">07</span> <span class="mi">21</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">54</span> <span class="n">CST</span> <span class="mi">2021</span> <span class="n">until</span><span class="p">:</span> <span class="n">Thu</span> <span class="n">Nov</span> <span class="mi">30</span> <span class="mi">21</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">54</span> <span class="n">CST</span> <span class="mi">2051</span>
+<span class="n">Certificate</span> <span class="n">fingerprints</span><span class="p">:</span>
+	 <span class="n">SHA1</span><span class="p">:</span> <span class="n">F4</span><span class="p">:</span><span class="mi">68</span><span class="p">:</span><span class="mi">8</span><span class="n">C</span><span class="p">:</span><span class="mi">99</span><span class="p">:</span><span class="mi">2</span><span class="n">B</span><span class="p">:</span><span class="n">EC</span><span class="p">:</span><span class="mi">43</span><span class="p">:</span><span class="mi">5</span><span class="n">A</span><span class="p">:</span><span class="n">DA</span><span class="p">:</span><span class="mi">1</span><span class="n">E</span><span class="p">:</span><span class="mi">0</span><span class="n">C</span><span class="p">:</span><span class="mi">2</span><span class="n">A</span><span class="p">:</span><span class="mi">65</span><span class="p">:</span><span class="mi">44</span><span class="p">:</span><span class="mi">26</span><span class="p">:</span><span class="n">BF</span><span class="p">:</span><span class="mi">89</span><span class="p">:</span><span class="mi">89</span><span class="p">:</span><span class="n">C6</span><span class="p">:</span><span class="mi">85</span>
+	 <span class="n">SHA256</span><span class="p">:</span> <span class="mi">54</span><span class="p">:</span><span class="mi">8</span><span class="n">E</span><span class="p">:</span><span class="n">C9</span><span class="p">:</span><span class="n">C3</span><span class="p">:</span><span class="mi">74</span><span class="p">:</span><span class="mi">08</span><span class="p">:</span><span class="mi">7</span><span class="n">A</span><span class="p">:</span><span class="n">FA</span><span class="p">:</span><span class="mi">18</span><span class="p">:</span><span class="mi">3</span><span class="n">D</span><span class="p">:</span><span class="mi">31</span><span class="p">:</span><span class="mi">0</span><span class="n">B</span><span class="p">:</span><span class="mi">7</span><span class="n">D</span><span class="p">:</span><span class="n">E6</span><span class="p">:</span><span class="n">DC</span><span class="p">:</span><span class="mi">61</span><span class="p">:</span><span class="mi">1</span><span class="n">B</span><span class="p">:</span><span class="n">FE</span><span class="p">:</span><span class="mi">48</span><span class="p">:</span><span class="mi">8</span><span class="n">E</span><span class="p">:</span><span class="n">B9</span><span class="p">:</span><span class="n">A3</span><span class="p">:</span><span class="n">A9</span><span class="p">:</span><span class="n">F9</span><span class="p">:</span><span class="mi">21</span><span class="p">:</span><span class="mi">07</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">37</span><span class="p">:</span><span class="mi">4</span><span class="n">E</span><span class="p">:</span><span class="n">CA</span><span class="p">:</span><span class="n">FE</span><span class="p">:</span><span class="mi">4</span><span class="n">A</span>
+<span class="n">Signature</span> <span class="n">algorithm</span> <span class="n">name</span><span class="p">:</span> <span class="n">SHA1withRSA</span> <span class="p">(</span><span class="n">weak</span><span class="p">)</span>
+<span class="n">Subject</span> <span class="n">Public</span> <span class="n">Key</span> <span class="n">Algorithm</span><span class="p">:</span> <span class="mi">2048</span><span class="o">-</span><span class="n">bit</span> <span class="n">RSA</span> <span class="n">key</span>
+<span class="n">Version</span><span class="p">:</span> <span class="mi">1</span>
+<span class="o">...</span><span class="n">省略</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="cert-rsa">
+<h1>CERT.RSA签名流程<a class="headerlink" href="#cert-rsa" title="Permalink to this headline"></a></h1>
+<p>最终的加密处理由java.security.Signature加密库进行处理</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* https://android.googlesource.com/platform/tools/apksig/+/refs/tags/android-12.1.0_r16
+  └── src/main/java/com/android/apksig/ApkSigner.java
+      └── public void sign()
+          └── sign(inputApk, outputApkOut, outputApkIn);
+              └── ApkSignerEngine.OutputJarSignatureRequest outputJarSignatureRequest = signerEngine.outputJarEntries();
+                  └── src/main/java/com/android/apksig/DefaultApkSignerEngine.java
+                      └── public OutputJarSignatureRequest outputJarEntries()
+                          └── signatureZipEntries = V1SchemeSigner.sign(mV1SignerConfigs, mV1ContentDigestAlgorithm, mOutputJarEntryDigests, apkSigningSchemeIds, inputJarManifest, mCreatedBy);
+                              └── src/main/java/com/android/apksig/internal/apk/v1/V1SchemeSigner.java
+                                  └── public static List&lt;Pair&lt;String, byte[]&gt;&gt; sign(List&lt;SignerConfig&gt; signerConfigs, DigestAlgorithm jarEntryDigestAlgorithm, Map&lt;String, byte[]&gt; jarEntryDigests, List&lt;Integer&gt; apkSigningSchemeIds, byte[] sourceManifestBytes, String createdBy)
+                                      └── return signManifest(signerConfigs, jarEntryDigestAlgorithm, apkSigningSchemeIds, createdBy, manifest);
+                                          └── for (SignerConfig signerConfig : signerConfigs)
+                                              └── signatureBlock = generateSignatureBlock(signerConfig, sfBytes);
+                                                  └── src/main/java/com/android/apksig/internal/apk/v1/V1SchemeSigner.java
+                                                      └── private static byte[] generateSignatureBlock(SignerConfig signerConfig, byte[] signatureFileBytes)
+                                                          ├── Signature signature = Signature.getInstance(jcaSignatureAlgorithm);
+                                                          ├── signature.initSign(signerConfig.privateKey);
+                                                          ├── signature.update(signatureFileBytes);
+                                                          ├── signatureBytes = signature.sign();
+                                                          └── return ApkSigningBlockUtils.generatePkcs7DerEncodedMessage(signatureBytes, null, signerCerts, digestAlgorithmId, signatureAlgorithmId);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

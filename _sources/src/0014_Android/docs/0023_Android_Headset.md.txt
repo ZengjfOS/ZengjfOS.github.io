@@ -1,0 +1,524 @@
+# Android Headset
+
+Android耳机外设
+
+# 参考文档
+
+* [android拔掉耳机后音乐自动暂停](https://blog.csdn.net/songche123/article/details/50512044)
+* [A2DP ：蓝牙耳机和有线耳机听同时连接，音频从有线耳机出来，拔掉有线耳机，音频不能自动切换到蓝牙耳机](https://blog.csdn.net/weixin_40537714/article/details/108069875)
+* [Android音频架构总结](https://www.cnblogs.com/wen123456/p/14379165.html)
+
+# 音频策略
+
+* [Android音频架构总结](https://www.cnblogs.com/wen123456/p/14379165.html)
+* 音频管理策略管理音频的输入输出，它决定各种类型的声音优先送往系统哪个输出设备，或使用哪个输入设备进行采样。
+* 创建AudioTrack的时候会传入一个Stream类型，根据这个类型获得strategy，然后根据strategy获得一个device。
+
+# WiredAccessoryManager
+
+* [WiredAccessoryManager（有线辅助管理器）](https://blog.csdn.net/lsn946803746/article/details/82787795)
+
+当前Android主要通过WiredAccessoryManager去监测音频外设的插入和拔出。WiredAccessoryManager开机的时候已经通过SystemServer.java间接启动并分配了一个自由的线程，一旦监测到有音频外设的操作，这线程就会进行处理。WiredAccessoryManager刚开始时通过WiredAccessoryObserver去处理外设消息。
+
+* 外设说明
+  * headset：  听筒mic
+    * headset = 听筒 + MIC = SW_HEADPHONE_INSERT + SW_MICROPHONE_INSERT，同时上报SW_HEADPHONE_INSERT和SW_MICROPHONE_INSERT, 就表示headset为了简化, 对于android系统只上报SW_MICROPHONE_INSERT也表示headset
+  * headphone：听筒没有mic
+  * Lineout：  声音输出没有mic
+* 插入耳机
+  ```
+  V WiredAccessoryManager: notifyWiredAccessoryChanged: when=10930484443000 bits=SW_MICROPHONE_INSERT mask=10
+  V WiredAccessoryManager: newName=h2w newState=1 headsetState=1 prev headsetState=0
+  I WiredAccessoryManager: MSG_NEW_DEVICE_STATE
+  V WiredAccessoryManager: headsetName:  connected
+  D AudioManager: setWiredDeviceConnectionState(), type=4, state=1, address=, name=
+  D AS.AudioService: setWiredDeviceConnectionState()) from u/pid:1000/950, type=4, state=1, address=, name=, caller=android
+  D AudioManager: setWiredDeviceConnectionState(), type=-2147483632, state=1, address=, name=
+  D AS.AudioService: setWiredDeviceConnectionState()) from u/pid:1000/950, type=-2147483632, state=1, address=, name=, caller=android
+  I AS.AudioDeviceInventory: handleDeviceConnection(true dev:4 address: name:)
+  I AS.AudioDeviceInventory: handleDeviceConnection(true dev:4[headset] address: name:)
+  I AS.AudioDeviceInventory: deviceKey:0x4:
+  I AS.AudioDeviceInventory: deviceInfo:null is(already)Connected:false
+  V AudioPolicyIntefaceImpl: setDeviceConnectionState()
+  D APM_AudioPolicyManager: setDeviceConnectionStateInt() device: 0x4, state 1, address  name  format 0x0
+  V AudioPolicyService: AudioCommandThread() adding set parameter string connect=4, io 0 ,delay 0
+  V AudioPolicyService: AudioCommandThread() processing set parameters string connect=4, io 0
+  D AudioSystem: +setParameters(): connect=4
+  D AudioALSAHardware: +setParameters(): connect=4
+  D AudioALSAHardwareResourceManager: +HpImpeDanceDetect
+  D AudioALSAHardwareResourceManager: -HpImpeDanceDetect : output device Busy
+  D AudioALSAStreamManager: +DeviceNoneUpdate()
+  D AudioALSAStreamManager: -DeviceNoneUpdate()
+  D AudioALSAHardware: -setParameters(): connect=4
+  D AudioPolicyManagerCustomImpl: setOutputDevices() mIoHandle 13 mId 1 device 0000(0002)(1101c7f) delayMs 0 force 1 size 3
+  V AudioPolicyService: AudioCommandThread() adding release patch delay 0
+  D AudioALSAHardware: +routing releaseAudioPatch Mixer->2
+  D AudioALSAHardware: handlecheck releaseAudioPatch remove handle [6] OK
+  V AudioPolicyService: AudioCommandThread() processing update audio patch list
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  D AudioPolicyManagerCustomImpl: setOutputDevices() mIoHandle 21 mId 5 device 0000(0002)(000f) delayMs 0 force 1 size 3
+  D APM::AudioOutputDescriptor: setVolume output 21 for volumeSource 1, volume -21.000002, delay 0 stream=AUDIO_STREAM_ACCESSIBILITY
+  D APM::AudioOutputDescriptor: setVolume output 21 for volumeSource 6, volume -14.000001, delay 0 stream=AUDIO_STREAM_MUSIC
+  D AudioPolicyServiceCustomImpl: AudioCommandThread() processing set volume stream 3,                 volume 0.199527, output 21
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  D AudioPolicyManagerCustomImpl: setOutputDevices() mIoHandle 29 mId 7 device 0000(10000)(10000) delayMs 0 force 1 size 3
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x10000 [1/0x2/8]
+  V AudioPolicyService: AudioCommandThread() adding update audio port list
+  I AS.AudioDeviceBroker: setForceUse(FOR_MEDIA, FORCE_NO_BT_A2DP) due to setBluetoothA2dpOn(false) from u/pid:1000/950 src:onSetWiredDeviceConnectionState state not DISCONNEC
+  V AudioPolicyIntefaceImpl: setForceUse()
+  I AS.AudioService: onAccessoryPlugMediaUnmute newDevice=4 [headset]
+  D APM_AudioPolicyManager: setForceUse() usage 1, config 10, mPhoneState 0
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x10000 [1/0x2/8]
+  I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x4 state:0x1 address: name:);
+  I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x4 state:0x1[headset] address: name:);
+  D PhoneStatusBarPolicy: updateHeadsetPlug connected:true,hasMic:true
+  E WiredAccessoryManager: setDeviceState() No state change
+  ```
+  * type=4
+    * SW_MICROPHONE_INSERT(headset)
+* 拔出耳机
+  ```
+  V WiredAccessoryManager: notifyWiredAccessoryChanged: when=11613747966000 bits= mask=10
+  V WiredAccessoryManager: newName=h2w newState=0 headsetState=0 prev headsetState=1
+  I WiredAccessoryManager: MSG_NEW_DEVICE_STATE
+  V WiredAccessoryManager: headsetName:  disconnected
+  D AudioManager: setWiredDeviceConnectionState(), type=4, state=0, address=, name=
+  D AS.AudioService: setWiredDeviceConnectionState()) from u/pid:1000/950, type=4, state=0, address=, name=, caller=android
+  I AS.AudioDeviceInventory: dropping ACTION_AUDIO_BECOMING_NOISY
+  D MediaSessionService: dispatchMediaKeyEvent, pkg=com.android.settings pid=2104, uid=1000, asSystem=true, event=KeyEvent { action=ACTION_UP, keyCode=KEYCODE_MEDIA_PLAY_PAUSE
+  ags=0x8, repeatCount=0, eventTime=11613748, downTime=11613700, deviceId=4, source=0x101, displayId=-1 }
+  D AudioManager: setWiredDeviceConnectionState(), type=-2147483632, state=0, address=, name=
+  D AS.AudioService: setWiredDeviceConnectionState()) from u/pid:1000/950, type=-2147483632, state=0, address=, name=, caller=android
+  I AS.AudioDeviceBroker: setForceUse(FOR_MEDIA, FORCE_NONE) due to setBluetoothA2dpOn(true) from u/pid:1000/950 src:onSetWiredDeviceConnectionState state DISCONNECTED
+  V AudioPolicyIntefaceImpl: setForceUse()
+  D APM_AudioPolicyManager: setForceUse() usage 1, config 0, mPhoneState 0
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x10000 [1/0x2/8]
+  I AS.AudioDeviceInventory: handleDeviceConnection(false dev:4 address: name:)
+  I AS.AudioDeviceInventory: handleDeviceConnection(false dev:4[headset] address: name:)
+  I AS.AudioDeviceInventory: deviceKey:0x4:
+  I AS.AudioDeviceInventory: deviceInfo:[DeviceInfo: type:0x4 name: addr: codec: 0] is(already)Connected:true
+  V AudioPolicyIntefaceImpl: setDeviceConnectionState()
+  D APM_AudioPolicyManager: setDeviceConnectionStateInt() device: 0x4, state 0, address  name  format 0x0
+  V AudioPolicyService: AudioCommandThread() adding set parameter string disconnect=4, io 0 ,delay 0
+  V AudioPolicyService: AudioCommandThread() processing set parameters string disconnect=4, io 0
+  D AudioSystem: +setParameters(): disconnect=4
+  D AudioALSAHardware: +setParameters(): disconnect=4
+  D AudioALSAStreamManager: +DeviceNoneUpdate()
+  D AudioALSAStreamManager: -DeviceNoneUpdate()
+  D AudioALSAHardware: -setParameters(): disconnect=4
+  D AudioPolicyManagerCustomImpl: setOutputDevices() mIoHandle 13 mId 1 device 0000(0002)(1101c7f) delayMs 0 force 1 size 3
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  D AudioPolicyManagerCustomImpl: setOutputDevices() mIoHandle 21 mId 5 device 0000(0002)(000f) delayMs 0 force 1 size 3
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x2 [1/0x2/8]
+  D AudioPolicyManagerCustomImpl: setOutputDevices() mIoHandle 29 mId 7 device 0000(10000)(10000) delayMs 0 force 1 size 3
+  I AudioPolicyManagerCustomImpl: -computeGainTableCustomVolume volume 1.000000 stream 12, index 0, device 0x10000 [1/0x2/8]
+  V AudioPolicyService: AudioCommandThread() adding update audio port list
+  I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x4 state:0x0 address: name:);
+  I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x4 state:0x0[headset] address: name:);
+  D PhoneStatusBarPolicy: updateHeadsetPlug connected:false,hasMic:true
+  I hwcomposer: [HWC] (0) displayGetActiveConfig config:0
+  E WiredAccessoryManager: setDeviceState() No state change
+  I chatty  : uid=1000 system_server identical 3 lines
+  E WiredAccessoryManager: setDeviceState() No state change
+  I AS.AudioDeviceInventory: handleDeviceConnection(false dev:80000010 address: name:)
+  I Telecom-WiredHeadsetManager: ACTION_HEADSET_PLUG event, plugged in: true, : WHC.oADR@wgg
+  I AS.AudioDeviceInventory: handleDeviceConnection(false dev:80000010[headset] address: name:)
+  I AS.AudioDeviceInventory: deviceKey:0x80000010:
+  I AS.AudioDeviceInventory: deviceInfo:[DeviceInfo: type:0x80000010 name: addr: codec: 0] is(already)Connected:true
+  D MediaRouter: Dispatching route change: RouteInfo{ name=Phone, description=null, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIV
+  portedTypes=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO , presentationDisplay=null }
+  V AudioPolicyIntefaceImpl: setDeviceConnectionState()
+  D MediaRouter: dispatchRouteChanged oldVisibility: falsenewVisibility: false
+  D APM_AudioPolicyManager: setDeviceConnectionStateInt() device: 0x80000010, state 0, address  name  format 0x0
+  V AudioPolicyService: AudioCommandThread() adding set parameter string disconnect=-2147483632, io 0 ,delay 0
+  V AudioPolicyService: AudioCommandThread() processing set parameters string disconnect=-2147483632, io 0
+  D AudioSystem: +setParameters(): disconnect=-2147483632
+  D AudioALSAHardware: +setParameters(): disconnect=-2147483632
+  D AudioALSAHardware: -setParameters(): disconnect=-2147483632
+  V AudioPolicyService: AudioCommandThread() adding update audio port list
+  I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x80000010 state:0x0 address: name:);
+  I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x80000010 state:0x0[headset] address: name:);
+  E AS.AudioDeviceInventory: Action=null, skip Headset Pluged-out broadcast.
+  V MediaRouter: Audio routes updated: AudioRoutesInfo{ type=SPEAKER, bluetoothName=zengjf }, a2dp=true
+  V MediaRouter: Selecting route: RouteInfo{ name=zengjf, description=Bluetooth audio, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO , presentationDisplay=null }
+  D MediaRouter: dispatchRouteUnselected info: RouteInfo{ name=Phone, description=null, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO , presentationDisplay=null } type: 1
+  D MediaRouter: dispatchRouteSelected info: RouteInfo{ name=zengjf, description=Bluetooth audio, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIOROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO , presentationDisplay=null } type: 1
+  D MediaRouter: Dispatching route change: RouteInfo{ name=Phone, description=null, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO , presentationDisplay=null }
+  V MediaRouter: Audio routes updated: AudioRoutesInfo{ type=SPEAKER, bluetoothName=zengjf }, a2dp=true
+  V MediaRouter: Selecting route: RouteInfo{ name=zengjf, description=Bluetooth audio, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO , presentationDisplay=null }
+  D MediaRouter: dispatchRouteUnselected info: RouteInfo{ name=Phone, description=null, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO , presentationDisplay=null } type: 1
+  D MediaRouter: dispatchRouteSelected info: RouteInfo{ name=zengjf, description=Bluetooth audio, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIOROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO , presentationDisplay=null } type: 1
+  D MediaRouter: Dispatching route change: RouteInfo{ name=Phone, description=null, status=null, category=RouteCategory{ name=System types=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO  groupable=false }, supportedTypes=ROUTE_TYPE_LIVE_AUDIO ROUTE_TYPE_LIVE_VIDEO , presentationDisplay=null }
+  D MediaRouter: dispatchRouteChanged oldVisibility: falsenewVisibility: false
+  E AVSync  : open dev failed: retry=23178, g_fd_avsync=-1, errno=2, No such file or directory
+  I Telecom-WiredHeadsetManager: ACTION_HEADSET_PLUG event, plugged in: false, : WHC.oADR@wgk
+  ```
+  * I AS.AudioDeviceInventory: deviceKey:0x80000010:
+    ```
+    * frameworks/base/media/java/android/media/AudioSystem.java
+      * public static final int DEVICE_BIT_IN = 0x80000000;
+      * public static final int DEVICE_IN_WIRED_HEADSET = DEVICE_BIT_IN | 0x10;
+    ```
+    * 不知道为什么又识别到这个headset，不过最终还是没有使用
+      ```
+      I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x80000010 state:0x0 address: name:);
+      I AS.AudioDeviceInventory: sendDeviceConnectionIntent(dev:0x80000010 state:0x0[headset] address: name:);
+      E AS.AudioDeviceInventory: Action=null, skip Headset Pluged-out broadcast.
+      ```
+* getevent
+  ```
+  add device 1: /dev/input/event5
+    name:     "betterlife_inputdev"
+  add device 2: /dev/input/event4
+    name:     "mtk-tpd"
+  add device 3: /dev/input/event2
+    name:     "hwmdata"
+  add device 4: /dev/input/event0
+    name:     "ACCDET"
+  add device 5: /dev/input/event3
+    name:     "bsp_gpios"
+  add device 6: /dev/input/event1
+    name:     "mtk-kpd"
+  /dev/input/event0: 0005 0004 00000001
+  /dev/input/event0: 0000 0000 00000000
+  /dev/input/event0: 0005 0004 00000000
+  /dev/input/event0: 0000 0000 00000000
+  ```
+  * /dev/input/event0: 0005 0004 00000001
+    * 插入事件
+  * /dev/input/event0: 0005 0004 00000000
+    * 拔出事件
+* getevent -l
+  ```
+  add device 1: /dev/input/event5
+    name:     "betterlife_inputdev"
+  add device 2: /dev/input/event4
+    name:     "mtk-tpd"
+  add device 3: /dev/input/event2
+    name:     "hwmdata"
+  add device 4: /dev/input/event0
+    name:     "ACCDET"
+  add device 5: /dev/input/event3
+    name:     "bsp_gpios"
+  add device 6: /dev/input/event1
+    name:     "mtk-kpd"
+  /dev/input/event0: EV_SW        SW_MICROPHONE_INSERT 00000001
+  /dev/input/event0: EV_SYN       SYN_REPORT           00000000
+  /dev/input/event0: EV_SW        SW_MICROPHONE_INSERT 00000000
+  /dev/input/event0: EV_SYN       SYN_REPORT           00000000
+  ```
+* MT6357
+  * ACCDET
+    * Accessory Detection
+* kernel
+  * 耳机插入
+    ```
+    [12722.720755] (4)[99:pmic_thread][PMIC] [PMIC_INT] Reg[0x20ae]=0x40
+    [12722.720923] (4)[99:pmic_thread]accdet_eint_handler() enter
+    [12722.720960] (4)[99:pmic_thread]accdet_irq_handle() IRQ_STS = 0x4, pmic eint-0 triggered.
+    [12722.721002] (4)[99:pmic_thread]clear_accdet_eint() eint-0 IRQ-STS:[0x2320]=0x4404
+    [12722.721089] (4)[99:pmic_thread]clear_accdet_eint_check() eint-0 IRQ-STS:[0x2320]=0x4000 TOP_INT_STS:[0x20ae]:0x0
+    [12722.721110] (4)[99:pmic_thread]pmic_eint_queue_work() Enter. eint-0
+    [12722.721208] (4)[99:pmic_thread]accdet_eint_handler() exit
+    [12722.721424] (7)[27616:kworker/u16:4]accdet eint_work_callback(),DCC EINT func
+    [12722.721454] (7)[27616:kworker/u16:4]accdet cur: plug-in, cur_eint_state = 1
+    [12722.724549] (7)[27616:kworker/u16:4]accdet_init() done.
+    [12722.725062] (7)[27616:kworker/u16:4]enable_accdet done IRQ-STS[0x2320]=0x4000,STATE_SWCTRL[0x230c]=0xf0f
+    [12722.803197] (4)[99:pmic_thread][PMIC] [PMIC_INT] Reg[0x20ae]=0x20
+    [12722.803524] (4)[99:pmic_thread]accdet_int_handler()
+    [12722.803556] (4)[99:pmic_thread]accdet_irq_handle() IRQ_STS = 0x4001, IRQ triggered
+    [12722.803595] (4)[99:pmic_thread]clear_accdet_int() IRQ_STS = 0x4101
+    [12722.803705] (6)[27616:kworker/u16:4]accdet check_cable_type(), cur_status:Plug_out current AB = 1
+    [12722.803747] (6)[27616:kworker/u16:4]accdet cur cable type:[Headset_mic], status switch:[Plug_out]->[Headset_plug_in]
+    [12722.804054] (6)[27616:kworker/u16:4]send_accdet_status_event MICROPHONE(4-pole) PlugIn
+    [12722.804081] (6)[27616:kworker/u16:4]accdet_work_callback() report cable_type done
+    [12722.818566] (4)[10164:HwBinder:531_5]mt635x-auxadc mt-pmic:mt635x-auxadc: name:ACCDET, channel=5, adc_out=0xb86, adc_result=1296
+    [12722.818622] (4)[10164:HwBinder:531_5]hp_plugged_in_set(), mic_vinp_mv = 1296
+    [12722.818845] (4)[10164:HwBinder:531_5]AudDrv_Clk_On, Aud_AFE_Clk_cntr:0
+    [12722.818984] (4)[10164:HwBinder:531_5]AudDrv_AUDINTBUS_Sel(), parentidx = 1, CLK_CFG_4 = 0x83838101\x0d
+    [12722.819136] (4)[10164:HwBinder:531_5]TurnOnDacPower()
+    [12722.819167] (4)[10164:HwBinder:531_5]-PMIC DCXO XO_AUDIO_EN_M enable, DCXO_CW14 = 0xa2b5
+    [12722.819802] (4)[10164:HwBinder:531_5]setDlMtkifSrc(), enable = 1, freq = 48000
+    [12722.824097] (4)[10164:HwBinder:531_5]mt635x-auxadc mt-pmic:mt635x-auxadc: name:HPOFS_CAL, channel=9, adc_out=0x6fb0, adc_result=28592
+    [12722.826756] (4)[10164:HwBinder:531_5]mt635x-auxadc mt-pmic:mt635x-auxadc: name:HPOFS_CAL, channel=9, adc_out=0x6fad, adc_result=28589
+    [12722.829388] (4)[10164:HwBinder:531_5]mt635x-auxadc mt-pmic:mt635x-auxadc: name:HPOFS_CAL, channel=9, adc_out=0x6fb6, adc_result=28598
+    [12722.832047] (4)[10164:HwBinder:531_5]mt635x-auxadc mt-pmic:mt635x-auxadc: name:HPOFS_CAL, channel=9, adc_out=0x6f9d, adc_result=28573
+    [12722.886229] (4)[10164:HwBinder:531_5]detect_impedance(), phase 2 [dc,detect]Sum 8 times [228702,231701], hp_impedance 31, pick_impedance 61, AUXADC_CON10 0x65
+    [12722.904467] (7)[10164:HwBinder:531_5]TurnOffDacPower()
+    [12722.904506] (7)[10164:HwBinder:531_5]setDlMtkifSrc(), enable = 0, freq = 48000
+    [12722.904872] (7)[10164:HwBinder:531_5]-PMIC DCXO XO_AUDIO_EN_M disable, DCXO_CW14 = 0x82b5
+    [12722.905251] (7)[10164:HwBinder:531_5]!! AudDrv_Clk_Off, Aud_AFE_Clk_cntr:1
+    [12722.905307] (7)[10164:HwBinder:531_5]AudDrv_AUDINTBUS_Sel(), parentidx = 0, CLK_CFG_4 = 0x83838100\x0d
+    [12722.905364] (7)[10164:HwBinder:531_5]hp_impedance_get(), hp_impedance = 31, efuse = -1
+    [12723.171826] (4)[23152:kworker/u16:1][CH3_DBG] bat_cur = 47
+    ```
+    * 耳机插入经过两次中断处理
+  * 耳机拔出
+    ```
+    [12724.910853] (4)[99:pmic_thread][PMIC] [PMIC_INT] Reg[0x20ae]=0x40
+    [12724.910945] (4)[99:pmic_thread]accdet_eint_handler() enter
+    [12724.910993] (4)[99:pmic_thread]accdet_irq_handle() IRQ_STS = 0x4004, pmic eint-0 triggered.
+    [12724.911049] (4)[99:pmic_thread]clear_accdet_eint() eint-0 IRQ-STS:[0x2320]=0x404
+    [12724.911160] (4)[99:pmic_thread]clear_accdet_eint_check() eint-0 IRQ-STS:[0x2320]=0x0 TOP_INT_STS:[0x20ae]:0x0
+    [12724.911190] (4)[99:pmic_thread]pmic_eint_queue_work() Enter. eint-0
+    [12724.911568] (6)[12336:kworker/u16:3]accdet eint_work_callback(),DCC EINT func
+    [12724.911585] (4)[99:pmic_thread]accdet_eint_handler() exit
+    [12724.911642] (6)[12336:kworker/u16:3]accdet cur:plug-out, cur_eint_state = 0
+    [12724.911723] (6)[12336:kworker/u16:3]clear_accdet_int() IRQ_STS = 0x100
+    [12724.911989] (6)[12336:kworker/u16:3]disable_accdet done IRQ-STS[0x2320]=0x0,STATE_SWCTRL[0x230c]=0x808
+    [12724.912028] (6)[12336:kworker/u16:3]accdet headset_plug_out
+    [12724.912589] (6)[12336:kworker/u16:3]send_accdet_status_event MICROPHONE(4-pole) PlugOut
+    [12724.912628] (6)[12336:kworker/u16:3]accdet headset_plug_out, set cable_type = NO_DEVICE
+    ```
+    * 耳机拔出经过一次中断处理
+  * driver
+    ```
+    * kernel-4.9/drivers/misc/mediatek/accdet/mt6357/accdet.c
+      * static void eint_work_callback(struct work_struct *work)
+        * headset_plug_out();
+    ```
+* Frameworks
+  ```
+  * frameworks/base/media/java/android/media/AudioSystem.java
+    /*
+    public static final int DEVICE_NONE = 0x0;
+    // reserved bits
+    public static final int DEVICE_BIT_IN = 0x80000000;
+    public static final int DEVICE_BIT_DEFAULT = 0x40000000;
+    // output devices, be sure to update AudioManager.java also
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_EARPIECE = 0x1;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_SPEAKER = 0x2;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_WIRED_HEADSET = 0x4;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_WIRED_HEADPHONE = 0x8;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_BLUETOOTH_SCO = 0x10;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_BLUETOOTH_SCO_HEADSET = 0x20;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_BLUETOOTH_SCO_CARKIT = 0x40;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_BLUETOOTH_A2DP = 0x80;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES = 0x100;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER = 0x200;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_AUX_DIGITAL = 0x400;
+    public static final int DEVICE_OUT_HDMI = DEVICE_OUT_AUX_DIGITAL;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_ANLG_DOCK_HEADSET = 0x800;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_DGTL_DOCK_HEADSET = 0x1000;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_USB_ACCESSORY = 0x2000;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_USB_DEVICE = 0x4000;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_REMOTE_SUBMIX = 0x8000;
+    @UnsupportedAppUsage
+    public static final int DEVICE_OUT_TELEPHONY_TX = 0x10000;
+    public static final int DEVICE_OUT_LINE = 0x20000;
+    public static final int DEVICE_OUT_HDMI_ARC = 0x40000;
+    public static final int DEVICE_OUT_SPDIF = 0x80000;
+    */
+  * frameworks/base/services/core/java/com/android/server/input/InputManagerService.java
+    * private void notifySwitch(long whenNanos, int switchValues, int switchMask)
+      * mWiredAccessoryCallbacks.notifyWiredAccessoryChanged(whenNanos, switchValues, switchMask);
+        * frameworks/base/services/core/java/com/android/server/WiredAccessoryManager.java
+          * public void notifyWiredAccessoryChanged(long whenNanos, int switchValues, int switchMask)
+            * updateLocked(NAME_H2W, (mHeadsetState & ~(BIT_HEADSET | BIT_HEADSET_NO_MIC | BIT_LINEOUT)) | headset);
+              * Message msg = mHandler.obtainMessage(MSG_NEW_DEVICE_STATE, headsetState, mHeadsetState, "");
+              * mHandler.sendMessage(msg);
+          * private final Handler mHandler = new Handler(Looper.myLooper(), null, true)
+            * setDevicesState(msg.arg1, msg.arg2, (String) msg.obj);
+              * setDeviceStateLocked(curHeadset, headsetState, prevHeadsetState, headsetName);
+                * outDevice = AudioManager.DEVICE_OUT_WIRED_HEADSET;
+                * inDevice = AudioManager.DEVICE_IN_WIRED_HEADSET;
+                * mAudioManager.setWiredDeviceConnectionState(outDevice, state, "", headsetName);
+                  * frameworks/base/media/java/android/media/AudioManager.java
+                    * public void setWiredDeviceConnectionState(int type, int state, String address, String name)
+                      * final IAudioService service = getService();
+                      * service.setWiredDeviceConnectionState(type, state, address, name, mApplicationContext.getOpPackageName());
+                        * frameworks/base/services/core/java/com/android/server/audio/AudioService.java
+                          * public void setWiredDeviceConnectionState(int type, @ConnectionState int state, String address, String name, String caller)
+                            * int delay = checkSendBecomingNoisyIntentInt(type, state, AudioSystem.DEVICE_NONE);
+                              * if ((device & mBecomingNoisyIntentDevices) == 0)
+                                * return 0;
+                                  * private int mBecomingNoisyIntentDevices
+                                    * 可以解决拔出暂停问题
+                            * mDeviceBroker.setWiredDeviceConnectionState(type, state, address, name, caller);
+                              * mDeviceBroker在AudioService()构造函数中处理
+                                * public AudioService(Context context)
+                                  * mDeviceBroker = new AudioDeviceBroker(mContext, this);
+                                    * frameworks/base/services/core/java/com/android/server/audio/AudioDeviceBroker.java
+                                      * void setWiredDeviceConnectionState(int type, @AudioService.ConnectionState int state, String address, String name, String caller)
+                                        * mDeviceInventory.setWiredDeviceConnectionState(type, state, address, name, caller);
+                                          * mDeviceBroker.postSetWiredDeviceConnectionState(new WiredDeviceConnectionState(type, state, address, name, caller), delay);
+                                            * frameworks/base/services/core/java/com/android/server/audio/AudioDeviceInventory.java
+                                              * WiredDeviceConnectionState(int type, @AudioService.ConnectionState int state, String address, String name, String caller)
+                                            * frameworks/base/services/core/java/com/android/server/audio/AudioDeviceBroker.java
+                                              * void postSetWiredDeviceConnectionState(AudioDeviceInventory.WiredDeviceConnectionState connectionState, int delay)
+                                                * sendLMsg(MSG_L_SET_WIRED_DEVICE_CONNECTION_STATE, SENDMSG_QUEUE, connectionState, delay);
+                                                  * sendIILMsg(msg, existingMsgPolicy, 0, 0, obj, delay);
+                                                    * private void sendIILMsg(int msg, int existingMsgPolicy, int arg1, int arg2, Object obj, int delay)
+                                                      * mBrokerHandler.sendMessageAtTime(mBrokerHandler.obtainMessage(msg, arg1, arg2, obj), time);
+                                              * private class BrokerThread extends Thread
+                                                * mBrokerHandler = new BrokerHandler();
+                                              * private class BrokerHandler extends Handler
+                                                * public void handleMessage(Message msg)
+                                                  * case MSG_L_SET_WIRED_DEVICE_CONNECTION_STATE:
+                                                    * mDeviceInventory.onSetWiredDeviceConnectionState((AudioDeviceInventory.WiredDeviceConnectionState) msg.obj);
+                                                      * frameworks/base/services/core/java/com/android/server/audio/AudioDeviceInventory.java
+                                                        * void onSetWiredDeviceConnectionState(AudioDeviceInventory.WiredDeviceConnectionState wdcs)
+                                                          * handleDeviceConnection(wdcs.mState == AudioService.CONNECTION_STATE_CONNECTED, wdcs.mType, wdcs.mAddress, wdcs.mName)
+                                                            * final int res = AudioSystem.setDeviceConnectionState(device, AudioSystem.DEVICE_STATE_AVAILABLE, address, deviceName, AudioSystem.AUDIO_FORMAT_DEFAULT);
+                                                            * mDeviceBroker.postAccessoryPlugMediaUnmute(device);
+                                                              * frameworks/av/services/audiopolicy/service/AudioPolicyInterfaceImpl.cpp
+                                                                * status_t AudioPolicyService::setDeviceConnectionState(audio_devices_t device, audio_policy_dev_state_t state, const char *device_address, const char *device_name, audio_format_t encodedFormat)
+                                                                  * frameworks/av/services/audiopolicy/managerdefault/AudioPolicyManager.cpp
+                                                                    * status = setDeviceConnectionStateInt(device, state, device_address, device_name, encodedFormat);
+                * mAudioManager.setWiredDeviceConnectionState(inDevice, state, "", headsetName);
+  ```
+
+![0023_Android_Headset_Event.png](images/0023_Android_Headset_Event.png)
+
+
+# 插拔耳机自动播放音乐
+
+* 应用收到ACTION_AUDIO_BECOMING_NOISY这个通知后会做一个暂停的处理；
+* frameworks/base/services/core/java/com/android/server/audio/AudioDeviceInventory.java
+  ```Java
+  rivate int mBecomingNoisyIntentDevices =
+         AudioSystem.DEVICE_OUT_WIRED_HEADSET | AudioSystem.DEVICE_OUT_WIRED_HEADPHONE
+                 | AudioSystem.DEVICE_OUT_ALL_A2DP | AudioSystem.DEVICE_OUT_HDMI
+                 | AudioSystem.DEVICE_OUT_ANLG_DOCK_HEADSET
+                 | AudioSystem.DEVICE_OUT_DGTL_DOCK_HEADSET
+                 | AudioSystem.DEVICE_OUT_ALL_USB | AudioSystem.DEVICE_OUT_LINE
+                 | AudioSystem.DEVICE_OUT_HEARING_AID;
+
+  / must be called before removing the device from mConnectedDevices
+  / musicDevice argument is used when not AudioSystem.DEVICE_NONE instead of querying
+  / from AudioSystem
+  GuardedBy("mConnectedDevices")
+  rivate int checkSendBecomingNoisyIntentInt(int device,
+         @AudioService.ConnectionState int state, int musicDevice) {
+     if (state != AudioService.CONNECTION_STATE_DISCONNECTED) {
+         return 0;
+     }
+     if ((device & mBecomingNoisyIntentDevices) == 0) {
+         return 0;
+     }
+     int delay = 0;
+     int devices = 0;
+     for (int i = 0; i < mConnectedDevices.size(); i++) {
+         int dev = mConnectedDevices.valueAt(i).mDeviceType;
+         if (((dev & AudioSystem.DEVICE_BIT_IN) == 0)
+                 && ((dev & mBecomingNoisyIntentDevices) != 0)) {
+             devices |= dev;
+         }
+     }
+     if (musicDevice == AudioSystem.DEVICE_NONE) {
+         musicDevice = mDeviceBroker.getDeviceForStream(AudioSystem.STREAM_MUSIC);
+     }
+
+     // always ignore condition on device being actually used for music when in communication
+     // because music routing is altered in this case.
+     // also checks whether media routing if affected by a dynamic policy or mirroring
+     if (((device == musicDevice) || mDeviceBroker.isInCommunication())
+             && (device == devices) && !mDeviceBroker.hasMediaDynamicPolicy()
+                     && ((musicDevice & AudioSystem.DEVICE_OUT_REMOTE_SUBMIX) == 0)) {
+         if (!AudioSystem.isStreamActive(AudioSystem.STREAM_MUSIC, 0 /*not looking in past*/)
+                 && !mDeviceBroker.hasAudioFocusUsers()) {
+             // no media playback, not a "becoming noisy" situation, otherwise it could cause
+             // the pausing of some apps that are playing remotely
+             AudioService.sDeviceLogger.log((new AudioEventLogger.StringEvent(
+                     "dropping ACTION_AUDIO_BECOMING_NOISY")).printLog(TAG));
+             return 0;
+         }
+         mDeviceBroker.postBroadcastBecomingNoisy();
+         delay = 1000;
+     }
+
+     return delay;
+  }
+  ```
+  * 修改过滤变量：mBecomingNoisyIntentDevices
+
+# 拔耳机切到蓝牙
+
+* [A2DP ：蓝牙耳机和有线耳机听同时连接，音频从有线耳机出来，拔掉有线耳机，音频不能自动切换到蓝牙耳机](https://blog.csdn.net/weixin_40537714/article/details/108069875)
+  ```diff
+  diff --git a/vendor/mediatek/proprietary/packages/apps/Bluetooth/src/com/android/bluetooth/btservice/ActiveDeviceManager.java b/vendor/mediatek/proprietary/packages/apps/Bluetooth/src/com/android/bluetooth/btservice/ActiveDeviceManager.java
+  index 69381c53db8..bdecd5f3418 100644
+  --- a/vendor/mediatek/proprietary/packages/apps/Bluetooth/src/com/android/bluetooth/btservice/ActiveDeviceManager.java
+  +++ b/vendor/mediatek/proprietary/packages/apps/Bluetooth/src/com/android/bluetooth/btservice/ActiveDeviceManager.java
+  @@ -355,7 +355,7 @@ class ActiveDeviceManager {
+                   }
+               }
+               if (hasAddedWiredDevice) {
+  -                wiredAudioDeviceConnected();
+  +                // wiredAudioDeviceConnected();
+               }
+           }
+  
+  ```
+* 注册及处理流程
+  ```
+  * vendor/mediatek/proprietary/packages/apps/Bluetooth/src/com/android/bluetooth/btservice/ActiveDeviceManager.java
+    * ActiveDeviceManager(AdapterService service, ServiceFactory factory)
+      * mAudioManager = (AudioManager) service.getSystemService(Context.AUDIO_SERVICE);
+      * mAudioManagerAudioDeviceCallback = new AudioManagerAudioDeviceCallback();
+        * private class AudioManagerAudioDeviceCallback extends AudioDeviceCallback
+          * public void onAudioDevicesAdded(AudioDeviceInfo[] addedDevices)
+            * 被AudioManager调用
+    * void start()
+      * mAudioManager.registerAudioDeviceCallback(mAudioManagerAudioDeviceCallback, mHandler);
+        * 将回调函数注册到AudioManager
+    * void wiredAudioDeviceConnected()
+      * setA2dpActiveDevice(null);
+        * final A2dpService a2dpService = mFactory.getA2dpService();
+        * a2dpService.setActiveDevice(device)
+          * frameworks/base/core/java/android/bluetooth/BluetoothA2dp.java
+            * final IBluetoothA2dp service = getService();
+            * service.setActiveDevice(device);
+              * frameworks/base/packages/SettingsLib/src/com/android/settingslib/bluetooth/A2dpProfile.java
+                * public boolean setActiveDevice(BluetoothDevice device)
+                  * vendor/mediatek/proprietary/packages/apps/Bluetooth/src/com/android/bluetooth/a2dp/A2dpService.java
+                    * public boolean setActiveDevice(BluetoothDevice device)
+                      * if (device == null)
+                        * removeActiveDevice(false);
+                          * updateAndBroadcastActiveDevice(null);
+                          * mAudioManager.setBluetoothA2dpDeviceConnectionStateSuppressNoisyIntent(previousActiveDevice, BluetoothProfile.STATE_DISCONNECTED, BluetoothProfile.A2DP, suppressNoisyIntent, -1);
+  ```
+* log
+  ```
+  E WiredAccessoryManager: setDeviceState() No state change
+  I AS.AudioDeviceInventory: handleDeviceConnection(true dev:80000010 address: name:)
+  D MediaRouter: dispatchRouteChanged oldVisibility: falsenewVisibility: false
+  I AS.AudioDeviceInventory: handleDeviceConnection(true dev:80000010[headset] address: name:)
+  I AS.AudioDeviceInventory: deviceKey:0x80000010:
+  I AS.AudioDeviceInventory: deviceInfo:null is(already)Connected:false
+  V AudioPolicyIntefaceImpl: setDeviceConnectionState()
+  D APM_AudioPolicyManager: setDeviceConnectionStateInt() device: 0x80000010, state 1, address  name  format 0x0
+  V AudioPolicyService: AudioCommandThread() adding set parameter string connect=-2147483632, io 0 ,delay 0
+  V AudioPolicyService: AudioCommandThread() processing set parameters string connect=-2147483632, io 0
+  D AudioSystem: +setParameters(): connect=-2147483632
+  D BluetoothActiveDeviceManager: onAudioDevicesAdded
+  D BluetoothActiveDeviceManager: Audio device added: C50 type: 3
+  D AudioALSAHardware: +setParameters(): connect=-2147483632
+  D AudioALSAHardware: -setParameters(): connect=-2147483632
+  D BluetoothActiveDeviceManager: wiredAudioDeviceConnected
+  D BluetoothActiveDeviceManager: setA2dpActiveDevice(null)
+  D AudioALSAStreamManager: openInputStream(), devices = 0x80000010, format = 0x1, channels = 0xc, sampleRate = 48000, status = 70, acoustics = 0x0
+  E AVSync  : open dev failed: retry=21813, g_fd_avsync=-1, errno=2, No such file or directory
+  D A2dpService: setActiveDevice(null): previous is null
+  D AudioALSAStreamIn: AudioALSAStreamIn()
+  ```

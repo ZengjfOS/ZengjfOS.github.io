@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">fsl-setup-release setup-environment</a></li>
+<li><a class="reference internal" href="#fsl-setup-release-setup-environment-relationship">fsl-setup-release setup-environment relationship</a></li>
+<li><a class="reference internal" href="#fsl-setup-release-sh-hacking">fsl-setup-release.sh hacking</a></li>
+<li><a class="reference internal" href="#setup-environment-hacking">setup-environment hacking</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fsl-setup-release-setup-environment">
+<h1>fsl-setup-release setup-environment<a class="headerlink" href="#fsl-setup-release-setup-environment" title="Permalink to this headline"></a></h1>
+<p>Freescal i.MX6 Yocto编译</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">fsl-release-bsp</span> <span class="pre">&amp;&amp;</span> <span class="pre">cd</span> <span class="pre">fsl-release-bsp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repo</span> <span class="pre">init</span> <span class="pre">-u</span> <span class="pre">git://git.freescale.com/imx/fsl-arm-yocto-bsp.git</span> <span class="pre">-b</span> <span class="pre">imx-4.1-krogoth</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repo</span> <span class="pre">sync</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MACHINE=imx6dlsabresd</span> <span class="pre">DISTRO=fsl-imx-x11</span> <span class="pre">source</span> <span class="pre">./fsl-setup-release.sh</span> <span class="pre">-b</span> <span class="pre">imx6q-x11</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">fsl-image-qt5</span></code></p></li>
+<li><p>output: <code class="docutils literal notranslate"><span class="pre">imx6q-x11/tmp/deploy/images/imx6dlsabresd</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">setup-environment</span> <span class="pre">imx6q-x11</span></code></p></li>
+</ul>
+</section>
+<section id="fsl-setup-release-setup-environment-relationship">
+<h1>fsl-setup-release setup-environment relationship<a class="headerlink" href="#fsl-setup-release-setup-environment-relationship" title="Permalink to this headline"></a></h1>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>...<span class="o">[</span>省略<span class="o">]</span>
+<span class="nv">PROGNAME</span><span class="o">=</span><span class="s2">&quot;setup-environment&quot;</span>
+...<span class="o">[</span>省略<span class="o">]</span>
+<span class="c1"># Set up the basic yocto environment</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+   <span class="nv">DISTRO</span><span class="o">=</span><span class="nv">$FSLDISTRO</span> <span class="nv">MACHINE</span><span class="o">=</span><span class="nv">$MACHINE</span> . ./<span class="nv">$PROGNAME</span> <span class="nv">$BUILD_DIR</span>
+<span class="k">else</span>
+   <span class="nv">MACHINE</span><span class="o">=</span><span class="nv">$MACHINE</span> . ./<span class="nv">$PROGNAME</span> <span class="nv">$BUILD_DIR</span>
+<span class="k">fi</span>
+...<span class="o">[</span>省略<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="fsl-setup-release-sh-hacking">
+<h1>fsl-setup-release.sh hacking<a class="headerlink" href="#fsl-setup-release-sh-hacking" title="Permalink to this headline"></a></h1>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>...<span class="o">[</span>省略<span class="o">]</span>
+
+<span class="nv">CWD</span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>                           <span class="c1"># 获取当前执行脚本的目录</span>
+<span class="nv">PROGNAME</span><span class="o">=</span><span class="s2">&quot;setup-environment&quot;</span>        <span class="c1"># 这里是指定了会调用setup-environment程序</span>
+exit_message <span class="o">()</span>
+<span class="o">{</span>
+   <span class="nb">echo</span> <span class="s2">&quot;To return to this build environment later please run:&quot;</span>
+   <span class="nb">echo</span> <span class="s2">&quot;    source setup-environment &lt;build_dir&gt;&quot;</span>
+
+<span class="o">}</span>
+
+usage<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">echo</span> -e <span class="s2">&quot;\nUsage: source fsl-setup-release.sh</span>
+<span class="s2">    Optional parameters: [-b build-dir] [-e back-end] [-h]&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;</span>
+<span class="s2">    * [-b build-dir]: Build directory, if unspecified script uses &#39;build&#39; as output directory</span>
+<span class="s2">    * [-e back-end]: Options are &#39;fb&#39;, &#39;dfb&#39;, &#39;x11, &#39;wayland&#39;</span>
+<span class="s2">    * [-h]: help</span>
+<span class="s2">&quot;</span>
+<span class="o">}</span>
+
+
+clean_up<span class="o">()</span>
+<span class="o">{</span>
+
+    <span class="nb">unset</span> CWD BUILD_DIR BACKEND FSLDISTRO
+    <span class="nb">unset</span> fsl_setup_help fsl_setup_error fsl_setup_flag
+    <span class="nb">unset</span> usage clean_up
+    <span class="nb">unset</span> ARM_DIR META_FSL_BSP_RELEASE
+    exit_message clean_up
+<span class="o">}</span>
+
+<span class="c1"># get command line options</span>
+<span class="nv">OLD_OPTIND</span><span class="o">=</span><span class="nv">$OPTIND</span>
+<span class="nb">unset</span> FSLDISTRO
+
+<span class="c1"># 获取命令行参数</span>
+<span class="k">while</span> <span class="nb">getopts</span> <span class="s2">&quot;k:r:t:b:e:gh&quot;</span> fsl_setup_flag
+<span class="k">do</span>
+    <span class="k">case</span> <span class="nv">$fsl_setup_flag</span> <span class="k">in</span>
+        b<span class="o">)</span> <span class="nv">BUILD_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OPTARG</span><span class="s2">&quot;</span><span class="p">;</span>
+           <span class="nb">echo</span> -e <span class="s2">&quot;\n Build directory is &quot;</span> <span class="nv">$BUILD_DIR</span>
+           <span class="p">;;</span>
+        e<span class="o">)</span>
+            <span class="c1"># Determine what distro needs to be used.</span>
+            <span class="nv">BACKEND</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OPTARG</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$BACKEND</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;fb&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nv">FSLDISTRO</span><span class="o">=</span><span class="s1">&#39;fsl-imx-fb&#39;</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n Using FB backend with FB DIST_FEATURES to override poky X11 DIST FEATURES&quot;</span>
+                <span class="k">elif</span> <span class="o">[</span> ! <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;fsl-imx-fb&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n DISTRO specified conflicts with -e. Please use just one or the other.&quot;</span>
+                    <span class="nv">fsl_setup_error</span><span class="o">=</span><span class="s1">&#39;true&#39;</span>
+                <span class="k">fi</span>
+
+            <span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$BACKEND</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;dfb&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nv">FSLDISTRO</span><span class="o">=</span><span class="s1">&#39;fsl-imx-dfb&#39;</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n Using DirectFB backend with DirectFB DIST_FEATURES to override poky X11 DIST FEATURES&quot;</span>
+                <span class="k">elif</span> <span class="o">[</span> ! <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;fsl-imx-dfb&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n DISTRO specified conflicts with -e. Please use just one or the other.&quot;</span>
+                    <span class="nv">fsl_setup_error</span><span class="o">=</span><span class="s1">&#39;true&#39;</span>
+                <span class="k">fi</span>
+
+            <span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$BACKEND</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;wayland&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nv">FSLDISTRO</span><span class="o">=</span><span class="s1">&#39;fsl-imx-wayland&#39;</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n Using Wayland backend.&quot;</span>
+                <span class="k">elif</span> <span class="o">[</span> ! <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;fsl-imx-wayland&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n DISTRO specified conflicts with -e. Please use just one or the other.&quot;</span>
+                    <span class="nv">fsl_setup_error</span><span class="o">=</span><span class="s1">&#39;true&#39;</span>
+                <span class="k">fi</span>
+
+            <span class="k">elif</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$BACKEND</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;x11&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nv">FSLDISTRO</span><span class="o">=</span><span class="s1">&#39;fsl-imx-x11&#39;</span>
+                    <span class="nb">echo</span> -e  <span class="s2">&quot;\n Using X11 backend with poky DIST_FEATURES&quot;</span>
+                <span class="k">elif</span> <span class="o">[</span> ! <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;fsl-imx-x11&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                    <span class="nb">echo</span> -e <span class="s2">&quot;\n DISTRO specified conflicts with -e. Please use just one or the other.&quot;</span>
+                    <span class="nv">fsl_setup_error</span><span class="o">=</span><span class="s1">&#39;true&#39;</span>
+                <span class="k">fi</span>
+
+            <span class="k">else</span>
+                <span class="nb">echo</span> -e <span class="s2">&quot;\n Invalid backend specified with -e.  Use fb, dfb, wayland, or x11&quot;</span>
+                <span class="nv">fsl_setup_error</span><span class="o">=</span><span class="s1">&#39;true&#39;</span>
+            <span class="k">fi</span>
+           <span class="p">;;</span>
+        h<span class="o">)</span> <span class="nv">fsl_setup_help</span><span class="o">=</span><span class="s1">&#39;true&#39;</span><span class="p">;</span>
+           <span class="p">;;</span>
+        ?<span class="o">)</span> <span class="nv">fsl_setup_error</span><span class="o">=</span><span class="s1">&#39;true&#39;</span><span class="p">;</span>
+           <span class="p">;;</span>
+    <span class="k">esac</span>
+<span class="k">done</span>
+
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$FSLDISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nv">FSLDISTRO</span><span class="o">=</span><span class="s1">&#39;fsl-imx-x11&#39;</span>
+    <span class="k">fi</span>
+<span class="k">else</span>
+    <span class="nv">FSLDISTRO</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+<span class="nv">OPTIND</span><span class="o">=</span><span class="nv">$OLD_OPTIND</span>
+
+<span class="c1"># check the &quot;-h&quot; and other not supported options</span>
+<span class="k">if</span> <span class="nb">test</span> <span class="nv">$fsl_setup_error</span> <span class="o">||</span> <span class="nb">test</span> <span class="nv">$fsl_setup_help</span><span class="p">;</span> <span class="k">then</span>
+    usage <span class="o">&amp;&amp;</span> clean_up <span class="o">&amp;&amp;</span> <span class="k">return</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># 如果一些变量未设置，那就给默认配置</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$BUILD_DIR</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">BUILD_DIR</span><span class="o">=</span><span class="s1">&#39;build&#39;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$MACHINE</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> setting to default machine
+    <span class="nv">MACHINE</span><span class="o">=</span><span class="s1">&#39;imx6qsabresd&#39;</span>
+<span class="k">fi</span>
+
+<span class="c1"># New machine definitions may need to be added to the expected location</span>
+<span class="k">if</span> <span class="o">[</span> -d ./sources/meta-freescale <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+   cp -r sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/* sources/meta-freescale/conf/machine
+<span class="k">else</span>
+   cp -r sources/meta-fsl-bsp-release/imx/meta-bsp/conf/machine/* sources/meta-fsl-arm/conf/machine
+<span class="k">fi</span>
+
+<span class="c1"># copy new EULA into community so setup uses latest i.MX EULA</span>
+<span class="k">if</span> <span class="o">[</span> -d ./sources/meta-freescale <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+   cp sources/meta-fsl-bsp-release/imx/EULA.txt sources/meta-freescale/EULA
+   cp sources/meta-fsl-bsp-release/imx/classes/fsl-eula-unpack.bbclass sources/meta-freescale/classes
+<span class="k">else</span>
+   cp sources/meta-fsl-bsp-release/imx/EULA.txt sources/meta-fsl-arm/EULA
+   cp sources/meta-fsl-bsp-release/imx/classes/fsl-eula-unpack.bbclass sources/meta-fsl-arm/classes
+<span class="k">fi</span>
+
+<span class="c1"># Set up the basic yocto environment</span>
+<span class="c1"># 执行setup-environment脚本</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+   <span class="nv">DISTRO</span><span class="o">=</span><span class="nv">$FSLDISTRO</span> <span class="nv">MACHINE</span><span class="o">=</span><span class="nv">$MACHINE</span> . ./<span class="nv">$PROGNAME</span> <span class="nv">$BUILD_DIR</span>
+<span class="k">else</span>
+   <span class="nv">MACHINE</span><span class="o">=</span><span class="nv">$MACHINE</span> . ./<span class="nv">$PROGNAME</span> <span class="nv">$BUILD_DIR</span>
+<span class="k">fi</span>
+
+<span class="c1"># Point to the current directory since the last command changed the directory to $BUILD_DIR</span>
+<span class="nv">BUILD_DIR</span><span class="o">=</span>.
+
+<span class="c1"># 检查文件是否存在</span>
+<span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$BUILD_DIR</span>/conf/local.conf <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> -e <span class="s2">&quot;\n ERROR - No build directory is set yet. Run the &#39;setup-environment&#39; script before running this script to create &quot;</span> <span class="nv">$BUILD_DIR</span>
+    <span class="nb">echo</span> -e <span class="s2">&quot;\n&quot;</span>
+    <span class="k">return</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># On the first script run, backup the local.conf file</span>
+<span class="c1"># Consecutive runs, it restores the backup and changes are appended on this one.</span>
+<span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$BUILD_DIR</span>/conf/local.conf.org <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    cp <span class="nv">$BUILD_DIR</span>/conf/local.conf <span class="nv">$BUILD_DIR</span>/conf/local.conf.org
+<span class="k">else</span>
+    cp <span class="nv">$BUILD_DIR</span>/conf/local.conf.org <span class="nv">$BUILD_DIR</span>/conf/local.conf
+<span class="k">fi</span>
+
+
+<span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf.org <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    cp <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf.org
+<span class="k">else</span>
+    cp <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf.org <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="k">fi</span>
+
+
+<span class="nv">META_FSL_BSP_RELEASE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CWD</span><span class="si">}</span><span class="s2">/sources/meta-fsl-bsp-release/imx/meta-bsp&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;##Freescale Yocto Project Release layer&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-bsp \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-sdk \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-browser \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-gnome \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-networking \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-python \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-openembedded/meta-filesystems \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+
+<span class="nb">echo</span> <span class="s2">&quot;BBLAYERS += \&quot; \${BSPDIR}/sources/meta-qt5 \&quot;&quot;</span> &gt;&gt; <span class="nv">$BUILD_DIR</span>/conf/bblayers.conf
+
+<span class="nb">echo</span> <span class="nv">BSPDIR</span><span class="o">=</span><span class="nv">$BSPDIR</span>
+<span class="nb">echo</span> <span class="nv">BUILD_DIR</span><span class="o">=</span><span class="nv">$BUILD_DIR</span>
+
+<span class="c1"># Support integrating community meta-freescale instead of meta-fsl-arm</span>
+<span class="k">if</span> <span class="o">[</span> -d ../sources/meta-freescale <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> meta-freescale directory found
+    <span class="c1"># Change settings according to environment</span>
+    sed -e <span class="s2">&quot;s,meta-fsl-arm\s,meta-freescale ,g&quot;</span> -i conf/bblayers.conf
+    sed -e <span class="s2">&quot;s,\$.BSPDIR./sources/meta-fsl-arm-extra\s,,g&quot;</span> -i conf/bblayers.conf
+<span class="k">fi</span>
+
+<span class="nb">cd</span>  <span class="nv">$BUILD_DIR</span>
+clean_up
+<span class="nb">unset</span> FSLDISTRO
+</pre></div>
+</div>
+</section>
+<section id="setup-environment-hacking">
+<h1>setup-environment hacking<a class="headerlink" href="#setup-environment-hacking" title="Permalink to this headline"></a></h1>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span>...<span class="o">[</span>省略<span class="o">]</span>
+
+<span class="nv">CWD</span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>
+<span class="nv">PROGNAME</span><span class="o">=</span><span class="s2">&quot;setup-environment&quot;</span>
+
+usage<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">echo</span> -e <span class="s2">&quot;\nUsage: source </span><span class="nv">$PROGNAME</span><span class="s2"> &lt;build-dir&gt;</span>
+<span class="s2">    &lt;build-dir&gt;: specifies the build directory location (required)</span>
+
+<span class="s2">If undefined, this script will set \$MACHINE to &#39;imx6qsabresd&#39;.</span>
+<span class="s2">&quot;</span>
+
+    ls sources/*/conf/machine/*.conf &gt; /dev/null <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -eq <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> -e <span class="s2">&quot;</span>
+<span class="s2">Supported machines: `echo; ls sources/*/conf/machine/*.conf \</span>
+<span class="s2">| sed s/\.conf//g | sed -r &#39;s/^.+\///&#39; | xargs -I% echo -e &quot;</span><span class="se">\t</span>%<span class="s2">&quot;`</span>
+
+<span class="s2">To build for a machine listed above, run this script as:</span>
+<span class="s2">MACHINE=&lt;machine&gt; source </span><span class="nv">$PROGNAME</span><span class="s2"> &lt;build-dir&gt;</span>
+<span class="s2">&quot;</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+clean_up<span class="o">()</span>
+<span class="o">{</span>
+   <span class="nb">unset</span> EULA LIST_MACHINES VALID_MACHINE
+   <span class="nb">unset</span> CWD TEMPLATES SHORTOPTS LONGOPTS ARGS PROGNAME
+   <span class="nb">unset</span> generated_config updated
+   <span class="nb">unset</span> MACHINE SDKMACHINE DISTRO OEROOT
+<span class="o">}</span>
+
+<span class="c1"># get command line options</span>
+<span class="nv">SHORTOPTS</span><span class="o">=</span><span class="s2">&quot;h&quot;</span>
+<span class="nv">LONGOPTS</span><span class="o">=</span><span class="s2">&quot;help&quot;</span>
+
+<span class="nv">ARGS</span><span class="o">=</span><span class="k">$(</span>getopt --options <span class="nv">$SHORTOPTS</span>  <span class="se">\</span>
+  --longoptions <span class="nv">$LONGOPTS</span> --name <span class="nv">$PROGNAME</span> -- <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span> <span class="k">)</span>
+<span class="c1"># Print the usage menu if invalid options are specified</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> !<span class="o">=</span> <span class="m">0</span> -o <span class="nv">$#</span> -lt <span class="m">1</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+   usage <span class="o">&amp;&amp;</span> clean_up
+   <span class="k">return</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">eval</span> <span class="nb">set</span> -- <span class="s2">&quot;</span><span class="nv">$ARGS</span><span class="s2">&quot;</span>
+<span class="k">while</span> true<span class="p">;</span>
+<span class="k">do</span>
+    <span class="k">case</span> <span class="nv">$1</span> <span class="k">in</span>
+        -h<span class="p">|</span>--help<span class="o">)</span>
+           usage
+           clean_up
+           <span class="k">return</span> <span class="m">0</span>
+           <span class="p">;;</span>
+        --<span class="o">)</span>
+           <span class="nb">shift</span>
+           <span class="nb">break</span>
+           <span class="p">;;</span>
+    <span class="k">esac</span>
+<span class="k">done</span>
+
+<span class="c1"># 不能使用root权限</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="k">$(</span>whoami<span class="k">)</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;root&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;ERROR: do not use the BSP as root. Exiting...&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># 设置默认机型</span>
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$MACHINE</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">MACHINE</span><span class="o">=</span><span class="s1">&#39;imx6qsabresd&#39;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Check the machine type specified</span>
+<span class="nv">LIST_MACHINES</span><span class="o">=</span><span class="sb">`</span>ls -1 <span class="nv">$CWD</span>/sources/*/conf/machine<span class="sb">`</span>
+<span class="nv">VALID_MACHINE</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> -e <span class="s2">&quot;</span><span class="nv">$LIST_MACHINES</span><span class="s2">&quot;</span> <span class="p">|</span> grep <span class="si">${</span><span class="nv">MACHINE</span><span class="si">}</span>.conf$ <span class="p">|</span> wc -l<span class="sb">`</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;x</span><span class="nv">$MACHINE</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$VALID_MACHINE</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> -e <span class="s2">&quot;\nThe \$MACHINE you have specified (</span><span class="nv">$MACHINE</span><span class="s2">) is not supported by this build setup&quot;</span>
+    usage <span class="o">&amp;&amp;</span> clean_up
+    <span class="k">return</span> <span class="m">1</span>
+<span class="k">else</span>
+    <span class="k">if</span> <span class="o">[</span> ! -e <span class="nv">$1</span>/conf/local.conf.sample <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nb">echo</span> <span class="s2">&quot;Configuring for </span><span class="si">${</span><span class="nv">MACHINE</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$SDKMACHINE</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">SDKMACHINE</span><span class="o">=</span><span class="s1">&#39;i686&#39;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$DISTRO</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">DISTRO</span><span class="o">=</span><span class="s1">&#39;poky&#39;</span>
+<span class="k">fi</span>
+
+<span class="nv">OEROOT</span><span class="o">=</span><span class="nv">$PWD</span>/sources/poky
+<span class="k">if</span> <span class="o">[</span> -e <span class="nv">$PWD</span>/sources/oe-core <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nv">OEROOT</span><span class="o">=</span><span class="nv">$PWD</span>/sources/oe-core
+<span class="k">fi</span>
+
+<span class="c1"># Ensure all files in sources/base are kept in sync with project root</span>
+<span class="nv">updated</span><span class="o">=</span>
+<span class="k">for</span> f <span class="k">in</span> <span class="nv">$CWD</span>/sources/base/*<span class="p">;</span> <span class="k">do</span>
+    <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>basename <span class="nv">$f</span><span class="k">)</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;conf&quot;</span> <span class="o">]</span> <span class="o">||</span> <span class="nb">echo</span> <span class="nv">$file</span> <span class="p">|</span> grep -q <span class="s1">&#39;~$&#39;</span><span class="p">;</span> <span class="k">then</span>
+        <span class="k">continue</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> ! cmp -s <span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$f</span><span class="s2">&quot;</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nv">updated</span><span class="o">=</span><span class="s2">&quot;true&quot;</span>
+        <span class="o">[</span> -e <span class="nv">$file</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> chmod u+w <span class="nv">$file</span>
+        cp <span class="nv">$f</span> <span class="nv">$file</span>
+    <span class="k">fi</span>
+<span class="k">done</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$updated</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;The project root content has been updated. Please run &#39;</span><span class="nv">$PROGNAME</span><span class="s2">&#39; again.&quot;</span>
+    <span class="k">return</span>
+<span class="k">fi</span>
+
+. <span class="nv">$OEROOT</span>/oe-init-build-env <span class="nv">$CWD</span>/<span class="nv">$1</span> &gt; /dev/null
+
+<span class="c1"># if conf/local.conf not generated, no need to go further</span>
+<span class="k">if</span> <span class="o">[</span> ! -e conf/local.conf <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    clean_up <span class="o">&amp;&amp;</span> <span class="k">return</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># Clean up PATH, because if it includes tokens to current directories somehow,</span>
+<span class="c1"># wrong binaries can be used instead of the expected ones during task execution</span>
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;`echo </span><span class="nv">$PATH</span><span class="s2"> | sed &#39;s/\(:.\|:\)*:/:/g;s/^.\?://;s/:.\?</span>$<span class="s2">//&#39;`&quot;</span>
+
+<span class="nv">generated_config</span><span class="o">=</span>
+<span class="k">if</span> <span class="o">[</span> ! -e conf/local.conf.sample <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    mv conf/local.conf conf/local.conf.sample
+
+    <span class="c1"># Generate the local.conf based on the Yocto defaults</span>
+    <span class="nv">TEMPLATES</span><span class="o">=</span><span class="nv">$CWD</span>/sources/base/conf 
+    grep -v <span class="s1">&#39;^#\|^$&#39;</span> conf/local.conf.sample &gt; conf/local.conf
+    cat &gt;&gt; conf/local.conf <span class="s">&lt;&lt;EOF</span>
+
+<span class="s">DL_DIR ?= &quot;\${BSPDIR}/downloads/&quot;</span>
+<span class="s">EOF</span>
+    <span class="c1"># Change settings according environment</span>
+    sed -e <span class="s2">&quot;s,MACHINE ??=.*,MACHINE ??= &#39;</span><span class="nv">$MACHINE</span><span class="s2">&#39;,g&quot;</span> <span class="se">\</span>
+        -e <span class="s2">&quot;s,SDKMACHINE ??=.*,SDKMACHINE ??= &#39;</span><span class="nv">$SDKMACHINE</span><span class="s2">&#39;,g&quot;</span> <span class="se">\</span>
+        -e <span class="s2">&quot;s,DISTRO ?=.*,DISTRO ?= &#39;</span><span class="nv">$DISTRO</span><span class="s2">&#39;,g&quot;</span> <span class="se">\</span>
+        -i conf/local.conf
+
+    cp <span class="nv">$TEMPLATES</span>/* conf/
+
+    <span class="k">for</span> s <span class="k">in</span> <span class="nv">$HOME</span>/.oe <span class="nv">$HOME</span>/.yocto<span class="p">;</span> <span class="k">do</span>
+        <span class="k">if</span> <span class="o">[</span> -e <span class="nv">$s</span>/site.conf <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+            <span class="nb">echo</span> <span class="s2">&quot;Linking </span><span class="nv">$s</span><span class="s2">/site.conf to conf/site.conf&quot;</span>
+            ln -s <span class="nv">$s</span>/site.conf conf
+        <span class="k">fi</span>
+    <span class="k">done</span>
+
+    <span class="nv">generated_config</span><span class="o">=</span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># Handle EULA setting</span>
+<span class="nv">EULA_ACCEPTED</span><span class="o">=</span>
+
+<span class="c1"># EULA has been accepted already (ACCEPT_FSL_EULA is set in local.conf)</span>
+<span class="k">if</span> grep -q <span class="s1">&#39;^\s*ACCEPT_FSL_EULA\s*=\s*[&quot;&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;]..*[&quot;&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;]&#39;</span> conf/local.conf<span class="p">;</span> <span class="k">then</span>
+    <span class="nv">EULA_ACCEPTED</span><span class="o">=</span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$EULA_ACCEPTED</span><span class="s2">&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$EULA</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="c1"># The FSL EULA is not set as accepted in local.conf, but the EULA</span>
+    <span class="c1"># variable is set in the environment, so we just configure</span>
+    <span class="c1"># ACCEPT_FSL_EULA in local.conf according to $EULA.</span>
+    <span class="nb">echo</span> <span class="s2">&quot;ACCEPT_FSL_EULA = \&quot;</span><span class="nv">$EULA</span><span class="s2">\&quot;&quot;</span> &gt;&gt; conf/local.conf
+<span class="k">elif</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$EULA_ACCEPTED</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="c1"># The FSL EULA has been accepted once, so ACCEPT_FSL_EULA is set</span>
+    <span class="c1"># in local.conf.  No need to do anything.</span>
+    :
+<span class="k">else</span>
+    <span class="c1"># THE FSL EULA is not set as accepted in local.conf, and EULA is</span>
+    <span class="c1"># not set in the environment, so we need to ask user if he/she</span>
+    <span class="c1"># accepts the FSL EULA:</span>
+    cat <span class="s">&lt;&lt;EOF</span>
+
+<span class="s">Some BSPs depend on libraries and packages which are covered by Freescale&#39;s</span>
+<span class="s">End User License Agreement (EULA). To have the right to use these binaries in</span>
+<span class="s">your images, you need to read and accept the following...</span>
+
+<span class="s">EOF</span>
+
+    sleep <span class="m">4</span>
+
+    more -d <span class="nv">$CWD</span>/sources/meta-fsl-arm/EULA
+    <span class="nb">echo</span>
+    <span class="nv">REPLY</span><span class="o">=</span>
+    <span class="k">while</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$REPLY</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">do</span>
+        <span class="nb">echo</span> -n <span class="s2">&quot;Do you accept the EULA you just read? (y/n) &quot;</span>
+        <span class="nb">read</span> REPLY
+        <span class="k">case</span> <span class="s2">&quot;</span><span class="nv">$REPLY</span><span class="s2">&quot;</span> <span class="k">in</span>
+            y<span class="p">|</span>Y<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;EULA has been accepted.&quot;</span>
+            <span class="nb">echo</span> <span class="s2">&quot;ACCEPT_FSL_EULA = \&quot;1\&quot;&quot;</span> &gt;&gt; conf/local.conf
+            <span class="p">;;</span>
+            n<span class="p">|</span>N<span class="o">)</span>
+            <span class="nb">echo</span> <span class="s2">&quot;EULA has not been accepted.&quot;</span>
+            <span class="p">;;</span>
+            *<span class="o">)</span>
+            <span class="nv">REPLY</span><span class="o">=</span>
+            <span class="p">;;</span>
+        <span class="k">esac</span>
+    <span class="k">done</span>
+<span class="k">fi</span>
+
+cat <span class="s">&lt;&lt;EOF</span>
+
+<span class="s">Welcome to Freescale Community BSP</span>
+
+<span class="s">The Yocto Project has extensive documentation about OE including a</span>
+<span class="s">reference manual which can be found at:</span>
+<span class="s">    http://yoctoproject.org/documentation</span>
+
+<span class="s">For more information about OpenEmbedded see their website:</span>
+<span class="s">    http://www.openembedded.org/</span>
+
+<span class="s">You can now run &#39;bitbake &lt;target&gt;&#39;</span>
+
+<span class="s">Common targets are:</span>
+<span class="s">    core-image-minimal</span>
+<span class="s">    meta-toolchain</span>
+<span class="s">    meta-toolchain-sdk</span>
+<span class="s">    adt-installer</span>
+<span class="s">    meta-ide-support</span>
+
+<span class="s">EOF</span>
+
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="nv">$generated_config</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    cat <span class="s">&lt;&lt;EOF</span>
+<span class="s">Your build environment has been configured with:</span>
+
+<span class="s">    MACHINE=$MACHINE</span>
+<span class="s">    SDKMACHINE=$SDKMACHINE</span>
+<span class="s">    DISTRO=$DISTRO</span>
+<span class="s">    EULA=$EULA</span>
+<span class="s">EOF</span>
+<span class="k">else</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Your configuration files at </span><span class="nv">$1</span><span class="s2"> have not been touched.&quot;</span>
+<span class="k">fi</span>
+
+clean_up
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

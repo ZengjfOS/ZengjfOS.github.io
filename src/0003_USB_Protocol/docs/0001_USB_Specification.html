@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">USB Specification</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简要</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usb-specification">
+<h1>USB Specification<a class="headerlink" href="#usb-specification" title="Permalink to this headline"></a></h1>
+<p>了解USB一些基本标准概念</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.cypress.com/documentation/technical-reference-manuals/ez-usb-technical-reference-manual">EZ-USB® Technical Reference Manual</a>——1.2 The USB Specification</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简要<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>USB分master(Host)、slave，输入(IN)输出(OUT)端点是站在Master的角度来定义的；</p></li>
+<li><p>除了USB远程唤醒以外，所有的操作均是由USB Master发起；</p></li>
+<li><p>USB通信的时候和I2C通信的时候数据方式类似：</p>
+<ul>
+<li><p>站在地址、数据、响应三个阶段进行分析；</p></li>
+<li><p>USB Token相当于I2C发送地址阶段，当然功能不止于I2C地址那么简单；</p></li>
+<li><p>USB Data相当于I2C发送数据阶段，当然功能不止于I2C数据那么简单；</p></li>
+<li><p>USB Handshake相当于I2C发送响应阶段，当然功能不止于I2C响应那么简单；</p></li>
+<li><p>由于USB比I2C功能更完善，不过思维模型可以从I2C上借鉴；</p></li>
+</ul>
+</li>
+<li><p>DATA0/DATA1出现原因是为了防止握手数据包出错；</p></li>
+<li><p>SETUP tokens是控制命令，8 Bytes；</p></li>
+<li><p>SOF在全速模式和高速模式下不一样；</p></li>
+<li><p>Host发送数据：</p>
+<ul>
+<li><p>OUT token packet;</p></li>
+<li><p>Data packet</p></li>
+<li><p>handshake packet;</p>
+<ul>
+<li><p>ACK;</p></li>
+<li><p>NAK;              (host re-sends the data at a later time)</p></li>
+<li><p>Back nothing;     (host re-sends the data at a later time)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Host接收数据：</p>
+<ul>
+<li><p>Salve从来不会主动发送数据给主设备，除了远程唤醒功能；</p></li>
+<li><p>和HOST发送数据类似</p></li>
+</ul>
+</li>
+<li><p>USB Frames(SOF)，不管是全速、高速，都是1ms计数一次，高速1ms中的8次计数不会增加，可以用于数据同步；</p></li>
+<li><p>传输方式：</p>
+<ul>
+<li><p>Bulk传输：8/16/32/64 Bytes全速，512 Bytes高速，Host在适当的时候进行数据发送；</p></li>
+<li><p>Interrupt传输：64 Bytes全速，1024Byte高速，实时性相对高的场合；</p></li>
+<li><p>Isochronous传输：实时性要求比较高的场合，音视频流，1023 Bytes全速，1024 Bytes高速，没有handshake，不使用数据切换机制；</p></li>
+<li><p>Control传输：</p>
+<ul>
+<li><p>SETUP阶段；</p></li>
+<li><p>数据阶段(可选)；</p></li>
+<li><p>状态阶段；</p></li>
+</ul>
+</li>
+<li><p>除了Control传输，前面都是针对应用场合，控制传输是在设备配置阶段进行处理的；</p></li>
+</ul>
+</li>
+<li><p>USB枚举：</p>
+<ul>
+<li><p>首先硬件、固件正常情况下；</p></li>
+<li><p>USB设备插入Host，使用USB Host的默认地址0；</p></li>
+<li><p>USB Host通过默认地址发送获取设备描述符请求，控制指令；</p></li>
+<li><p>USB设备反馈ID数据给USB Host；</p></li>
+<li><p>USB Host分配一个唯一的地址并发送给USB设备，控制指令；</p></li>
+<li><p>USB Host获取全部的描述符，从而知道设备端点数、供电、带宽以及需要什么驱动；</p></li>
+</ul>
+</li>
+<li><p>Serial Interface Engine(SIE)</p>
+<ul>
+<li><p>每个USB设备都有SIE；</p></li>
+<li><p>SIE主要进行数据编解码USB总线上的数据包；</p></li>
+<li><p>自动获取PID，数据校验，提取数据；</p></li>
+<li><p>会自动处理handshake；</p></li>
+</ul>
+</li>
+<li><p>Endpoint</p>
+<ul>
+<li><p>Since USB is a serial bus, a device endpoint is actually a FIFO which sequentially empties or fills with USB data bytes.</p></li>
+<li><p>最大4 bit地址 + 1 bit方向位，最多32个Endpoint IN和OUT；</p></li>
+<li><p>From the EZ-USB’s point of view, an endpoint is a buffer full of bytes received or held for transmission over the bus. The EZ-USB reads host data from an OUT endpoint buffer, and writes data for transmission to the host to an IN endpoint buffer.</p></li>
+<li><p>EZ-USB contains three 64-byte endpoint buffers, plus 4 KB of buffer space that can be configured 12 ways. The three 64-byte buffers are common to all configurations.</p></li>
+<li><p>The three 64-byte buffers are designated EP0, EP1IN and EP1OUT. EP0 is the default CONTROL endpoint, a bidirectional endpoint that uses a single 64-byte buffer for both IN and OUT data. EZ-USB firmware reads or fills the EP0 buffer when the (optional) data stage of a CONTROL transfer is required.</p></li>
+<li><p><strong>Note</strong> The eight SETUP bytes in a CONTROL transfer do not appear in the 64-byte EP0 endpoint buffer. Instead, to simplify programming, the EZ-USB automatically stores the eight SETUP bytes in a separate buffer (SETUPDAT, at 0xE6B8-0xE6BF).</p></li>
+<li><p>EP1IN and EP1OUT use separate 64 byte buffers. EZ-USB firmware can configure these endpoints as BULK or INTERRUPT.  These endpoints, as well as EP0, are accessible only by EZ-USB firmware. This is in contrast to the large endpoint buffers EP2, EP4, EP6 and EP8, which are designed to move high bandwidth data directly on and off chip without firmware intervention.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

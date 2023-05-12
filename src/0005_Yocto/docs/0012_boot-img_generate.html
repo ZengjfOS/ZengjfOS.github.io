@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">boot.img</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#boot-partition">boot partition</a></li>
+<li><a class="reference internal" href="#mcopy">mcopy</a></li>
+<li><a class="reference internal" href="#recipes">recipes依赖关系</a></li>
+<li><a class="reference internal" href="#id2">代码分析</a></li>
+<li><a class="reference internal" href="#kernel">Kernel 编译代码分析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="boot-img">
+<h1>boot.img<a class="headerlink" href="#boot-img" title="Permalink to this headline"></a></h1>
+<p>boot.img合成原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0009_YOCTO_SD_Image_Generate.html"><span class="doc std std-doc">0009_YOCTO_SD_Image_Generate.md</span></a></p></li>
+</ul>
+</section>
+<section id="boot-partition">
+<h1>boot partition<a class="headerlink" href="#boot-partition" title="Permalink to this headline"></a></h1>
+<p><img alt="images/0012_FAT_Image.png" src="../../../_images/0012_FAT_Image.png" /></p>
+</section>
+<section id="mcopy">
+<h1>mcopy<a class="headerlink" href="#mcopy" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>where is mcopy</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>zengjf@UbuntuServer:imx8-build-wayland$ find * -iname mcopy
+tmp/work/x86_64-linux/mtools-native/4.0.18-r0/image/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/x86_64-linux/mtools-native/4.0.18-r0/recipe-sysroot-native/usr/bin/mcopy
+tmp/work/x86_64-linux/mtools-native/4.0.18-r0/build/mcopy
+tmp/work/x86_64-linux/mtools-native/4.0.18-r0/sysroot-destdir/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/x86_64-linux/mtools-native/4.0.18-r0/recipe-sysroot-native/usr/bin/mcopy
+^C
+</pre></div>
+</div>
+</li>
+<li><p>mcopy help</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Mtools</span> <span class="n">version</span> <span class="mf">4.0.18</span><span class="p">,</span> <span class="n">dated</span> <span class="n">January</span> <span class="mi">9</span><span class="n">th</span><span class="p">,</span> <span class="mi">2013</span>
+<span class="n">Usage</span><span class="p">:</span> <span class="o">./</span><span class="n">mcopy</span> <span class="p">[</span><span class="o">-</span><span class="n">spatnmQVBT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">D</span> <span class="n">clash_option</span><span class="p">]</span> <span class="n">sourcefile</span> <span class="n">targetfile</span>
+       <span class="o">./</span><span class="n">mcopy</span> <span class="p">[</span><span class="o">-</span><span class="n">spatnmQVBT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">D</span> <span class="n">clash_option</span><span class="p">]</span> <span class="n">sourcefile</span> <span class="p">[</span><span class="n">sourcefiles</span><span class="o">...</span><span class="p">]</span> <span class="n">targetdirectory</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mcopy</span> <span class="pre">-i</span></code> code: https://github.com/Distrotech/mtools/blob/master/mcopy.c#L533</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">set_cmd_line_image(char</span> <span class="pre">*img,</span> <span class="pre">int</span> <span class="pre">flags);</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="recipes">
+<h1>recipes依赖关系<a class="headerlink" href="#recipes" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">linux-imx</span> <span class="pre">-c</span> <span class="pre">deploy</span> <span class="pre">-DD</span> <span class="pre">-f</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Parsing</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx_4</span><span class="mf">.14.78</span><span class="o">.</span><span class="n">bb</span> <span class="p">(</span><span class="n">full</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">CONF</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx_4</span><span class="mf">.14.78</span><span class="o">.</span><span class="n">bb</span><span class="p">:</span><span class="mi">5</span><span class="p">:</span> <span class="n">including</span> <span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">.</span><span class="n">inc</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">kernel</span><span class="o">-</span><span class="n">base</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">module</span><span class="o">-</span><span class="n">split</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">uimage</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">120</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">uboot</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">uimage</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">arch</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">146</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">deploy</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">146</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">cml1</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">535</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">devicetree</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">kernel</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">713</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">kernel</span><span class="o">-</span><span class="n">localversion</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">.</span><span class="n">inc</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">vivante</span><span class="o">-</span><span class="n">kernel</span><span class="o">-</span><span class="n">driver</span><span class="o">-</span><span class="n">handler</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">.</span><span class="n">inc</span><span class="p">:</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">CONF</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx_4</span><span class="mf">.14.78</span><span class="o">.</span><span class="n">bb</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span> <span class="n">including</span> <span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">src</span><span class="o">-</span><span class="mf">4.14.78</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Use</span> <span class="s1">&#39;imx8qmmek&#39;</span> <span class="k">as</span> <span class="n">package</span> <span class="n">architecture</span> <span class="k">for</span> <span class="s1">&#39;linux-imx&#39;</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>代码分析<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/classes/image_types_fsl.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>_generate_boot_image() {
+        local boot_part=$1
+
+        # Create boot partition image
+        BOOT_BLOCKS=$(LC_ALL=C parted -s ${SDCARD} unit b print \
+                          | awk &quot;/ $boot_part / { print substr(\$4, 1, length(\$4 -1)) / 1024 }&quot;)
+
+        # mkdosfs will sometimes use FAT16 when it is not appropriate,
+        # resulting in a boot failure from SYSLINUX. Use FAT32 for
+        # images larger than 512MB, otherwise let mkdosfs decide.
+        if [ $(expr $BOOT_BLOCKS / 1024) -gt 512 ]; then
+                FATSIZE=&quot;-F 32&quot;
+        fi
+
+        rm -f ${WORKDIR}/boot.img
+        mkfs.vfat -n &quot;${BOOTDD_VOLUME_ID}&quot; -S 512 ${FATSIZE} -C ${WORKDIR}/boot.img $BOOT_BLOCKS
+
+        mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.bin ::/${KERNEL_IMAGETYPE}
+
+        # Copy boot scripts
+        for item in ${BOOT_SCRIPTS}; do
+                src=`echo $item | awk -F&#39;:&#39; &#39;{ print $1 }&#39;`
+                dst=`echo $item | awk -F&#39;:&#39; &#39;{ print $2 }&#39;`
+
+                mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/$src ::/$dst
+        done
+
+        # Copy device tree file
+        if test -n &quot;${KERNEL_DEVICETREE}&quot;; then
+                for DTS_FILE in ${KERNEL_DEVICETREE}; do
+                        DTS_BASE_NAME=`basename ${DTS_FILE} | awk -F &quot;.&quot; &#39;{print $1}&#39;`
+                        if [ -e &quot;${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb&quot; ]; then
+                                kernel_bin=&quot;`readlink ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${MACHINE}.bin`&quot;
+                                kernel_bin_for_dtb=&quot;`readlink ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb | sed &quot;s,$DTS_BASE_NAME,${MACHINE},g;s,\.dtb$,.bin,g&quot;`&quot;
+                                if [ $kernel_bin = $kernel_bin_for_dtb ]; then
+                                        mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_BASE_NAME}.dtb ::/${DTS_BASE_NAME}.dtb
+                                fi
+                        else
+                                bbfatal &quot;${DTS_FILE} does not exist.&quot;
+                        fi
+                done
+        fi
+
+        # Copy extlinux.conf to images that have U-Boot Extlinux support.
+        if [ &quot;${UBOOT_EXTLINUX}&quot; = &quot;1&quot; ]; then
+                mmd -i ${WORKDIR}/boot.img ::/extlinux
+                mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/extlinux.conf ::/extlinux/extlinux.conf
+        fi
+
+        # Copy additional files to boot partition: such as m4 images and firmwares
+        if [ -n &quot;${IMAGE_BOOTFILES}&quot; ]; then
+            for IMAGE_FILE in ${IMAGE_BOOTFILES}; do
+                if [ -e &quot;${DEPLOY_DIR_IMAGE}/${IMAGE_FILE}&quot; ]; then
+                    mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${IMAGE_FILE} ::/${IMAGE_FILE}
+                else
+                    bbfatal &quot;${IMAGE_FILE} does not exist.&quot;
+                fi
+            done
+        fi
+
+    # add tee to boot image
+    if ${@bb.utils.contains(&#39;COMBINED_FEATURES&#39;, &#39;optee&#39;, &#39;true&#39;, &#39;false&#39;, d)}; then
+        for UTEE_FILE_PATH in `find ${DEPLOY_DIR_IMAGE} -maxdepth 1 -type f -name &#39;uTee-*&#39; -print -quit`; do
+            UTEE_FILE=`basename ${UTEE_FILE_PATH}`
+            mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${UTEE_FILE} ::/${UTEE_FILE}
+        done
+    fi
+
+}
+</pre></div>
+</div>
+</li>
+<li><p>run time code: <code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/temp/run.do_image_sdcard</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>_generate_boot_image() {
+        local boot_part=$1
+
+        # Create boot partition image
+        BOOT_BLOCKS=$(LC_ALL=C parted -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/deploy-fsl-image-qt5-validation-imx-image-complete/fsl-image-qt5-validation-imx-imx8qmmek-20190725051445.rootfs.sdcard unit b print \
+                          | awk &quot;/ $boot_part / { print substr(\$4, 1, length(\$4 -1)) / 1024 }&quot;)
+
+        # mkdosfs will sometimes use FAT16 when it is not appropriate,
+        # resulting in a boot failure from SYSLINUX. Use FAT32 for
+        # images larger than 512MB, otherwise let mkdosfs decide.
+        if [ $(expr $BOOT_BLOCKS / 1024) -gt 512 ]; then
+                FATSIZE=&quot;-F 32&quot;
+        fi
+
+        rm -f /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img
+        mkfs.vfat -n &quot;Boot imx8qmmek&quot; -S 512 ${FATSIZE} -C /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img $BOOT_BLOCKS
+
+        mcopy -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/Image-imx8qmmek.bin ::/Image
+
+        # Copy boot scripts
+        for item in ${BOOT_SCRIPTS}; do
+                src=`echo $item | awk -F&#39;:&#39; &#39;{ print $1 }&#39;`
+                dst=`echo $item | awk -F&#39;:&#39; &#39;{ print $2 }&#39;`
+
+                mcopy -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/$src ::/$dst
+        done
+
+        # Copy device tree file
+        if test -n &quot;freescale/fsl-imx8qm-mek.dtb freescale/fsl-imx8qm-mek_ca53.dtb freescale/fsl-imx8qm-mek_ca72.dtb  freescale/fsl-imx8qm-mek-8cam.dtb  freescale/fsl-imx8qm-mek-hdmi.dtb  freescale/fsl-imx8qm-mek-jdi-wuxga-lvds1-panel.dtb freescale/fsl-imx8qm-mek-dsi-rm67191.dtb freescale/fsl-imx8qm-mek-mipi-ov5640.dtb freescale/fsl-imx8qm-mek-mipi-two-ov5640.dtb freescale/fsl-imx8qm-mek-enet2-tja1100.dtb freescale/fsl-imx8qm-mek-inmate.dtb freescale/fsl-imx8qm-mek-dom0.dtb freescale/fsl-imx8qm-mek-domu.dtb freescale/fsl-imx8qm-mek-domu-car.dtb freescale/fsl-imx8qm-mek-domu-dpu1.dtb freescale/fsl-imx8qm-mek-dom0-dpu2.dtb freescale/fsl-imx8qm-mek-domu-dpu1-hdmi.dtb freescale/fsl-imx8qm-mek-root.dtb freescale/fsl-imx8qm-mek-hdmi-in.dtb freescale/fsl-imx8qm-mek-m4.dtb&quot;; then
+                for DTS_FILE in freescale/fsl-imx8qm-mek.dtb freescale/fsl-imx8qm-mek_ca53.dtb freescale/fsl-imx8qm-mek_ca72.dtb  freescale/fsl-imx8qm-mek-8cam.dtb  freescale/fsl-imx8qm-mek-hdmi.dtb  freescale/fsl-imx8qm-mek-jdi-wuxga-lvds1-panel.dtb freescale/fsl-imx8qm-mek-dsi-rm67191.dtb freescale/fsl-imx8qm-mek-mipi-ov5640.dtb freescale/fsl-imx8qm-mek-mipi-two-ov5640.dtb freescale/fsl-imx8qm-mek-enet2-tja1100.dtb freescale/fsl-imx8qm-mek-inmate.dtb freescale/fsl-imx8qm-mek-dom0.dtb freescale/fsl-imx8qm-mek-domu.dtb freescale/fsl-imx8qm-mek-domu-car.dtb freescale/fsl-imx8qm-mek-domu-dpu1.dtb freescale/fsl-imx8qm-mek-dom0-dpu2.dtb freescale/fsl-imx8qm-mek-domu-dpu1-hdmi.dtb freescale/fsl-imx8qm-mek-root.dtb freescale/fsl-imx8qm-mek-hdmi-in.dtb freescale/fsl-imx8qm-mek-m4.dtb; do
+                        DTS_BASE_NAME=`basename ${DTS_FILE} | awk -F &quot;.&quot; &#39;{print $1}&#39;`
+                        if [ -e &quot;/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/Image-${DTS_BASE_NAME}.dtb&quot; ]; then
+                                kernel_bin=&quot;`readlink /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/Image-imx8qmmek.bin`&quot;
+                                kernel_bin_for_dtb=&quot;`readlink /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/Image-${DTS_BASE_NAME}.dtb | sed &quot;s,$DTS_BASE_NAME,imx8qmmek,g;s,\.dtb$,.bin,g&quot;`&quot;
+                                if [ $kernel_bin = $kernel_bin_for_dtb ]; then
+                                        mcopy -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/Image-${DTS_BASE_NAME}.dtb ::/${DTS_BASE_NAME}.dtb
+                                fi
+                        else
+                                bbfatal &quot;${DTS_FILE} does not exist.&quot;
+                        fi
+                done
+        fi
+
+        # Copy extlinux.conf to images that have U-Boot Extlinux support.
+        if [ &quot;${UBOOT_EXTLINUX}&quot; = &quot;1&quot; ]; then
+                mmd -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img ::/extlinux
+                mcopy -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/extlinux.conf ::/extlinux/extlinux.conf
+        fi
+
+        # Copy additional files to boot partition: such as m4 images and firmwares
+        if [ -n &quot; hdmitxfw.bin hdmirxfw.bin dpfw.bin xen&quot; ]; then
+            for IMAGE_FILE in  hdmitxfw.bin hdmirxfw.bin dpfw.bin xen; do
+                if [ -e &quot;/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/${IMAGE_FILE}&quot; ]; then
+                    mcopy -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/${IMAGE_FILE} ::/${IMAGE_FILE}
+                else
+                    bbfatal &quot;${IMAGE_FILE} does not exist.&quot;
+                fi
+            done
+        fi
+
+    # add tee to boot image
+    if false; then
+        for UTEE_FILE_PATH in `find /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek -maxdepth 1 -type f -name &#39;uTee-*&#39; -print -quit`; do
+            UTEE_FILE=`basename ${UTEE_FILE_PATH}`
+            mcopy -i /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/boot.img -s /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/${UTEE_FILE} ::/${UTEE_FILE}
+        done
+    fi
+}
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="kernel">
+<h1>Kernel 编译代码分析<a class="headerlink" href="#kernel" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">fsl-image-qt5-validation-imx</span> <span class="pre">-g</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">recipe-depends.dot</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">linux</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">kernel</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;cryptodev-linux&quot;</span> <span class="p">[</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;cryptodev-linux</span><span class="se">\n</span><span class="s2">:1.9-r0</span><span class="se">\n</span><span class="s2">/home/zengjf/imx8-yocto-ga/sources/poky/meta/recipes-kernel/cryptodev/cryptodev-linux_1.9.bb&quot;</span><span class="p">]</span>
+<span class="s2">&quot;kernel-module-imx-gpu-viv&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;linux-imx&quot;</span>
+<span class="s2">&quot;kernel-module-imx-gpu-viv&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;linux-libc-headers&quot;</span>
+<span class="s2">&quot;kernel-module-qca6174&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;linux-imx&quot;</span>
+<span class="s2">&quot;kernel-module-qca6174&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;linux-libc-headers&quot;</span>
+<span class="s2">&quot;linux-imx&quot;</span> <span class="p">[</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;linux-imx</span><span class="se">\n</span><span class="s2">:4.14.78-r0</span><span class="se">\n</span><span class="s2">/home/zengjf/imx8-yocto-ga/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-kernel/linux/linux-imx_4.14.78.bb&quot;</span><span class="p">]</span>
+<span class="s2">&quot;linux-libc-headers&quot;</span> <span class="p">[</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;linux-libc-headers</span><span class="se">\n</span><span class="s2">:4.14-r0</span><span class="se">\n</span><span class="s2">/home/zengjf/imx8-yocto-ga/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-kernel/linux-libc-headers/linux-libc-headers_4.14.bb&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-kernel/linux/linux-imx_4.14.78.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Copyright (C) 2013-2016 Freescale Semiconductor
+# Copyright 2017-2018 NXP
+# Released under the MIT license (see COPYING.MIT for the terms)
+
+require recipes-kernel/linux/linux-imx.inc
+require recipes-kernel/linux/linux-imx-src-${PV}.inc
+
+SUMMARY = &quot;Linux Kernel provided and supported by NXP&quot;
+DESCRIPTION = &quot;Linux Kernel provided and supported by NXP with focus on \
+i.MX Family Reference Boards. It includes support for many IPs such as GPU, VPU and IPU.&quot;
+
+DEPENDS += &quot;lzop-native bc-native&quot;
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p>meta-freescale/recipes-kernel/linux/linux-imx.inc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Copyright (C) 2012, 2015 O.S. Systems Software LTDA.
+# Released under the MIT license (see COPYING.MIT for the terms)
+
+LICENSE = &quot;GPLv2&quot;
+LIC_FILES_CHKSUM = &quot;file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7&quot;
+
+inherit kernel fsl-kernel-localversion fsl-vivante-kernel-driver-handler
+
+# Put a local version until we have a true SRCREV to point to
+LOCALVERSION ?= &quot;&quot;
+SCMVERSION ?= &quot;y&quot;
+SRCBRANCH ?= &quot;&quot;
+
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poky/meta/classes/kernel.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">do_deploy</span><span class="p">[</span><span class="n">cleandirs</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{DEPLOYDIR}</span><span class="s2">&quot;</span>
+<span class="n">do_deploy</span><span class="p">[</span><span class="n">dirs</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{DEPLOYDIR}</span><span class="s2"> $</span><span class="si">{B}</span><span class="s2">&quot;</span>
+<span class="n">do_deploy</span><span class="p">[</span><span class="n">prefuncs</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;package_get_auto_pr&quot;</span>
+
+<span class="n">addtask</span> <span class="n">deploy</span> <span class="n">after</span> <span class="n">do_populate_sysroot</span> <span class="n">do_packagedata</span>
+
+<span class="n">EXPORT_FUNCTIONS</span> <span class="n">do_deploy</span>
+
+<span class="c1"># Add using Device Tree support</span>
+<span class="n">inherit</span> <span class="n">kernel</span><span class="o">-</span><span class="n">devicetree</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poky/meta/classes/kernel-devicetree.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_deploy_append() {
+        for DTB in ${KERNEL_DEVICETREE}; do
+                DTB=`normalize_dtb &quot;${DTB}&quot;`
+                DTB_EXT=${DTB##*.}
+                DTB_BASE_NAME=`basename ${DTB} .&quot;${DTB_EXT}&quot;`
+                for type in ${KERNEL_IMAGETYPE_FOR_MAKE}; do
+                        base_name=${type}&quot;-&quot;${KERNEL_IMAGE_BASE_NAME}
+                        symlink_name=${type}&quot;-&quot;${KERNEL_IMAGE_SYMLINK_NAME}
+                        DTB_NAME=`echo ${base_name} | sed &quot;s/${MACHINE}/${DTB_BASE_NAME}/g&quot;`
+                        DTB_SYMLINK_NAME=`echo ${symlink_name} | sed &quot;s/${MACHINE}/${DTB_BASE_NAME}/g&quot;`
+                        DTB_PATH=`get_real_dtb_path_in_kernel &quot;${DTB}&quot;`
+                        install -d ${DEPLOYDIR}
+                        install -m 0644 ${DTB_PATH} ${DEPLOYDIR}/${DTB_NAME}.${DTB_EXT}
+                        ln -sf ${DTB_NAME}.${DTB_EXT} ${DEPLOYDIR}/${DTB_SYMLINK_NAME}.${DTB_EXT}
+                        ln -sf ${DTB_NAME}.${DTB_EXT} ${DEPLOYDIR}/${DTB_BASE_NAME}.${DTB_EXT}
+
+                        if [ &quot;$type&quot; = &quot;zImage&quot; ] &amp;&amp; [ &quot;${KERNEL_DEVICETREE_BUNDLE}&quot; = &quot;1&quot; ]; then
+                                cat ${DEPLOYDIR}/$type \
+                                        ${DEPLOYDIR}/${DTB_NAME}.${DTB_EXT} \
+                                        &gt; ${DEPLOYDIR}/${DTB_NAME}.${DTB_EXT}.bin
+                                ln -sf ${DTB_NAME}.${DTB_EXT}.bin ${DEPLOYDIR}/$type-${DTB_BASE_NAME}.${DTB_EXT}.bin
+
+                                if [ -e &quot;${KERNEL_OUTPUT_DIR}/${type}.initramfs&quot; ]; then
+                                        cat ${KERNEL_OUTPUT_DIR}/${type}.initramfs \
+                                                ${DEPLOYDIR}/${DTB_NAME}.${DTB_EXT} \
+                                                &gt; ${DEPLOYDIR}/${type}-${INITRAMFS_BASE_NAME}-${DTB_BASE_NAME}.${DTB_EXT}.bin
+                                        ln -sf ${type}-${INITRAMFS_BASE_NAME}-${DTB_BASE_NAME}.${DTB_EXT}.bin \
+                                               ${DEPLOYDIR}/${type}-initramfs-${DTB_BASE_NAME}.${DTB_EXT}-${MACHINE}.bin
+                                fi
+                        fi
+                done
+        done
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="mi">640</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">15</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Mar</span>  <span class="mi">5</span> <span class="mi">15</span><span class="p">:</span><span class="mi">32</span> <span class="o">.</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">3</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span>  <span class="mi">3</span>  <span class="mi">2019</span> <span class="o">..</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span>   <span class="mi">1</span> <span class="n">zengjf</span> <span class="n">zengjf</span>    <span class="mi">619</span> <span class="n">Jan</span>  <span class="mi">3</span>  <span class="mi">2019</span> <span class="mi">0001</span><span class="o">-</span><span class="n">uapi</span><span class="o">-</span><span class="n">Add</span><span class="o">-</span><span class="n">ion</span><span class="o">.</span><span class="n">h</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">userspace</span><span class="o">.</span><span class="n">patch</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">22</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">build</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>   <span class="mi">1</span> <span class="n">zengjf</span> <span class="n">zengjf</span>  <span class="mi">19223</span> <span class="n">Jan</span>  <span class="mi">3</span>  <span class="mi">2019</span> <span class="n">defconfig</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">deploy</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">3</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">deploy</span><span class="o">-</span><span class="n">rpms</span>
+<span class="n">lrwxrwxrwx</span>   <span class="mi">1</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">83</span> <span class="n">Jan</span>  <span class="mi">3</span>  <span class="mi">2019</span> <span class="n">git</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">wayland</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">work</span><span class="o">-</span><span class="n">shared</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">kernel</span><span class="o">-</span><span class="n">source</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">5</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">image</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">3</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span>  <span class="mi">5</span>  <span class="mi">2019</span> <span class="n">license</span><span class="o">-</span><span class="n">destdir</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>   <span class="mi">1</span> <span class="n">zengjf</span> <span class="n">zengjf</span> <span class="mi">519018</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">.</span><span class="n">spec</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">4</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">package</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">304</span> <span class="n">zengjf</span> <span class="n">zengjf</span>  <span class="mi">28672</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">packages</span><span class="o">-</span><span class="n">split</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">7</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">pkgdata</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">pseudo</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">5</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">recipe</span><span class="o">-</span><span class="n">sysroot</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">10</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span>  <span class="mi">4</span>  <span class="mi">2019</span> <span class="n">recipe</span><span class="o">-</span><span class="n">sysroot</span><span class="o">-</span><span class="n">native</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">3</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">23</span>  <span class="mi">2019</span> <span class="n">sysroot</span><span class="o">-</span><span class="n">destdir</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>  <span class="mi">20480</span> <span class="n">Jul</span> <span class="mi">26</span> <span class="mi">12</span><span class="p">:</span><span class="mi">10</span> <span class="n">temp</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/temp/run.do_deploy</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+do_deploy() {                                # 暂时没找到这个是怎么包含下面的代码的
+    kernel_do_deploy
+        for DTB in freescale/fsl-imx8qm-mek.dtb freescale/fsl-imx8qm-mek_ca53.dtb freescale/fsl-imx8qm-mek_ca72.dtb  freescale/fsl-imx8qm-mek-8cam.dtb  freescale/fsl-imx8qm-mek-hdmi.dtb  freescale/fsl-imx8qm-mek-jdi-wuxga-lvds1-panel.dtb freescale/fsl-imx8qm-mek-dsi-rm67191.dtb freescale/fsl-imx8qm-mek-mipi-ov5640.dtb freescale/fsl-imx8qm-mek-mipi-two-ov5640.dtb freescale/fsl-imx8qm-mek-enet2-tja1100.dtb freescale/fsl-imx8qm-mek-inmate.dtb freescale/fsl-imx8qm-mek-dom0.dtb freescale/fsl-imx8qm-mek-domu.dtb freescale/fsl-imx8qm-mek-domu-car.dtb freescale/fsl-imx8qm-mek-domu-dpu1.dtb freescale/fsl-imx8qm-mek-dom0-dpu2.dtb freescale/fsl-imx8qm-mek-domu-dpu1-hdmi.dtb freescale/fsl-imx8qm-mek-root.dtb freescale/fsl-imx8qm-mek-hdmi-in.dtb freescale/fsl-imx8qm-mek-m4.dtb; do
+                DTB=`normalize_dtb &quot;${DTB}&quot;`
+                DTB_EXT=${DTB##*.}
+                DTB_BASE_NAME=`basename ${DTB} .&quot;${DTB_EXT}&quot;`
+                for type in Image; do
+                        base_name=${type}&quot;-&quot;-4.14.78-r0-imx8qmmek-20190123120805
+                        symlink_name=${type}&quot;-&quot;imx8qmmek
+                        DTB_NAME=`echo ${base_name} | sed &quot;s/imx8qmmek/${DTB_BASE_NAME}/g&quot;`
+                        DTB_SYMLINK_NAME=`echo ${symlink_name} | sed &quot;s/imx8qmmek/${DTB_BASE_NAME}/g&quot;`
+                        DTB_PATH=`get_real_dtb_path_in_kernel &quot;${DTB}&quot;`
+                        install -d /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx
+                        install -m 0644 ${DTB_PATH} /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${DTB_NAME}.${DTB_EXT}
+                        ln -sf ${DTB_NAME}.${DTB_EXT} /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${DTB_SYMLINK_NAME}.${DTB_EXT}
+                        ln -sf ${DTB_NAME}.${DTB_EXT} /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${DTB_BASE_NAME}.${DTB_EXT}
+
+                        if [ &quot;$type&quot; = &quot;zImage&quot; ] &amp;&amp; [ &quot;0&quot; = &quot;1&quot; ]; then
+                                cat /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/$type \
+                                        /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${DTB_NAME}.${DTB_EXT} \
+                                        &gt; /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${DTB_NAME}.${DTB_EXT}.bin
+                                ln -sf ${DTB_NAME}.${DTB_EXT}.bin /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/$type-${DTB_BASE_NAME}.${DTB_EXT}.bin
+
+                                if [ -e &quot;arch/arm64/boot/${type}.initramfs&quot; ]; then
+                                        cat arch/arm64/boot/${type}.initramfs \
+                                                /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${DTB_NAME}.${DTB_EXT} \
+                                                &gt; /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${type}-initramfs-4.14.78-r0-imx8qmmek-20190123120805-${DTB_BASE_NAME}.${DTB_EXT}.bin
+                                        ln -sf ${type}-initramfs-4.14.78-r0-imx8qmmek-20190123120805-${DTB_BASE_NAME}.${DTB_EXT}.bin \
+                                               /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/${type}-initramfs-${DTB_BASE_NAME}.${DTB_EXT}-imx8qmmek.bin
+                                fi
+                        fi
+                done
+        done
+}
+
+kernel_do_deploy() {
+        deployDir=&quot;/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx&quot;
+        if [ -n &quot;&quot; ]; then
+                deployDir=&quot;/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/deploy-linux-imx/&quot;
+                mkdir &quot;$deployDir&quot;
+
+        for type in Image ; do
+                base_name=${type}--4.14.78-r0-imx8qmmek-20190726055721
+                install -m 0644 arch/arm64/boot/${type} $deployDir/${base_name}.bin                   // Image转换成带格式的文件
+        done
+        if [ 1 = &quot;1&quot; ] &amp;&amp; (grep -q -i -e &#39;^CONFIG_MODULES=y$&#39; .config); then
+                mkdir -p /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/image/lib
+                tar -cvzf $deployDir/modules--4.14.78-r0-imx8qmmek-20190726055721.tgz -C /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/image lib
+                ln -sf modules--4.14.78-r0-imx8qmmek-20190726055721.tgz $deployDir/modules-imx8qmmek.tgz
+
+        for type in Image ; do
+                base_name=${type}--4.14.78-r0-imx8qmmek-20190726055721
+                symlink_name=${type}-imx8qmmek
+                ln -sf ${base_name}.bin $deployDir/${symlink_name}.bin                                // 目标链接生成
+                ln -sf ${base_name}.bin $deployDir/${type}
+        do
+         cd /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/linux-imx/4.14.78-r0/build
+         # Update deploy directory
+         for type in Image ; do
+                 if [ -e &quot;arch/arm64/boot/${type}.initramfs&quot; ]; then
+                         echo &quot;Copying deploy ${type} kernel-initramfs image and setting up links...&quot;
+                         initramfs_base_name=${type}-initramfs-4.14.78-r0-imx8qmmek-20190726055721
+                         initramfs_symlink_name=${type}-initramfs-imx8qmmek
+                         install -m 0644 arch/arm64/boot/${type}.initramfs $deployDir/${initramfs_base_name}.bin
+                         ln -sf ${initramfs_base_name}.bin $deployDir/${initramfs_symlink_name}.bin
+                 fi
+         done
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/deploy/images/imx8qmmek/Image-imx8qmmek.bin</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>       <span class="mi">46</span> <span class="n">Jul</span> <span class="mi">26</span> <span class="mi">13</span><span class="p">:</span><span class="mi">57</span> <span class="n">Image</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">--</span><span class="mf">4.14.78</span><span class="o">-</span><span class="n">r0</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">20190726055721.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Image--4.14.78-r0-imx8qmmek-20190726055721.bin</span></code> –&gt; <code class="docutils literal notranslate"><span class="pre">arch/arm64/boot/Image</span></code></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

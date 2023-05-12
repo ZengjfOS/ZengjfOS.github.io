@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">bind dai_link</a></li>
+<li><a class="reference internal" href="#snd-soc-register-card">snd_soc_register_card调用</a></li>
+<li><a class="reference internal" href="#soc-bind-dai-link">soc_bind_dai_link代码分析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bind-dai-link">
+<h1>bind dai_link<a class="headerlink" href="#bind-dai-link" title="Permalink to this headline"></a></h1>
+<p>pcm runtime(rtd)在这里绑定需要dai_link涉及到的CPU/Platform/Codec component</p>
+<p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L862">soc_bind_dai_link Source Code</a></p>
+<ul class="simple">
+<li><p>一个dai_link创建一个pcm runtime(rtd: runtime dai)；</p></li>
+<li><p>这部分相当于去检查当前的dai_link中需要的CPU/Platform/Codec component是否注册了，只有注册了的才能通过<code class="docutils literal notranslate"><span class="pre">snd_soc_rtdcom_add</span></code>添加到rtd中。</p></li>
+</ul>
+</section>
+<section id="snd-soc-register-card">
+<h1>snd_soc_register_card调用<a class="headerlink" href="#snd-soc-register-card" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_instantiate_card</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* bind DAIs */</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_card_prelinks</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_bind_dai_link</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="p">);</span><span class="w">        </span><span class="c1">// &lt;------</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">base_error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">snd_soc_bind_card</span><span class="p">(</span><span class="n">card</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">EXPORT_SYMBOL_GPL</span><span class="p">(</span><span class="n">snd_soc_register_card</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="soc-bind-dai-link">
+<h1>soc_bind_dai_link代码分析<a class="headerlink" href="#soc-bind-dai-link" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L862">soc_bind_dai_link Source Code</a></p></li>
+<li><p><span class="xref myst">i.MX6 soc dai_link添加link-component数组结构展开</span></p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">soc_bind_dai_link</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="o">*</span><span class="n">dai_link</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_pcm_runtime</span><span class="w"> </span><span class="o">*</span><span class="n">rtd</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="w"> </span><span class="o">*</span><span class="n">codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="w"> </span><span class="n">cpu_dai_component</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component</span><span class="w"> </span><span class="o">*</span><span class="n">component</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai</span><span class="w"> </span><span class="o">**</span><span class="n">codec_dais</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">ignore</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dev_dbg</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: binding %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">soc_is_dai_link_bound</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">                            </span><span class="c1">// 检查当前的dai_link是否已经绑定了</span>
+<span class="w">        </span><span class="n">dev_dbg</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: dai link %s already bound</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">rtd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_new_pcm_runtime</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="p">);</span><span class="w">                              </span><span class="c1">// 每一个dai_link对应一个pcm runtime(rtd: runtime dai)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rtd</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cpu_dai_component</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">cpu_name</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">cpu_dai_component</span><span class="p">.</span><span class="n">of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">cpu_of_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">cpu_dai_component</span><span class="p">.</span><span class="n">dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">cpu_dai_name</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">cpu_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_find_dai</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cpu_dai_component</span><span class="p">);</span><span class="w">                    </span><span class="c1">// 根据dai_link-&gt;cpu_of_node查找CPU DAI，其实就是esai</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">cpu_dai</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_info</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: CPU DAI %s not registered</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">cpu_dai_name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">_err_defer</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">snd_soc_rtdcom_add</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">cpu_dai</span><span class="o">-&gt;</span><span class="n">component</span><span class="p">);</span><span class="w">                       </span><span class="c1">// 添加CPU DAI的component到rtd</span>
+
+<span class="w">    </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Find CODEC from registered CODECs */</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* we can use for_each_rtd_codec_dai() after this */</span><span class="w"></span>
+<span class="w">    </span><span class="n">codec_dais</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">codec_dais</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">codec_dais</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_find_dai</span><span class="p">(</span><span class="o">&amp;</span><span class="n">codecs</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w">                       </span><span class="c1">// 根据codecs信息获取codec DAI</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">codec_dais</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: CODEC DAI %s not registered</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">codecs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dai_name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">_err_defer</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">snd_soc_rtdcom_add</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">codec_dais</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">component</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 添加Codec DAI的component到rtd</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Single codec links expect codec and codec_dai in runtime data */</span><span class="w"></span>
+<span class="w">    </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">codec_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dais</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* find one from the set of registered platforms */</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_component</span><span class="p">(</span><span class="n">component</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">snd_soc_is_matching_component</span><span class="p">(</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="p">,</span><span class="w"></span>
+<span class="w">                           </span><span class="n">component</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">snd_soc_rtdcom_add</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">component</span><span class="p">);</span><span class="w">                                 </span><span class="c1">// 添加platform到rtd中</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">soc_add_pcm_runtime</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">);</span><span class="w">                                         </span><span class="c1">// 将rtd添加到声卡中</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="nl">_err_defer</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">soc_free_pcm_runtime</span><span class="p">(</span><span class="n">rtd</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EPROBE_DEFER</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

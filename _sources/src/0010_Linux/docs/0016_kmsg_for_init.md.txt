@@ -1,0 +1,58 @@
+# kmsg for init
+
+init进程调试信息是如何输出？
+
+# 参考文档
+
+* [What is the difference between /proc/kmsg and /dev/kmsg?](https://unix.stackexchange.com/questions/585919/what-is-the-difference-between-proc-kmsg-and-dev-kmsg)
+* [Android Debugging](https://elinux.org/Android_Debugging)
+
+# steps
+
+* read
+  * sudo cat /proc/kmsg
+* write
+  * sudo su
+  * echo "zengjf" > /dev/kmsg
+
+# Android init
+
+* The Android init program outputs some messages to the kernel log, as it starts the system. You can increase the verbosity of init, using the "loglevel" command in the /init.rc file.
+* The default loglevel is 3, but you can change it to 8 (the highest) by changing the following line in the /init.rc file. 
+  * Change:
+    ```
+    loglevel 3
+    ```
+  * to
+    ```
+    loglevel 8
+    ```
+* init.rc
+  ```
+  on property:sys.init_log_level=*
+      loglevel ${sys.init_log_level}
+  ```
+* system/core/init/builtins.cpp
+  ```cpp
+  static Result<Success> do_loglevel(const BuiltinArguments& args) {
+      // TODO: support names instead/as well?
+      int log_level = -1;
+      android::base::ParseInt(args[1], &log_level);
+      android::base::LogSeverity severity;
+      switch (log_level) {
+          case 7: severity = android::base::DEBUG; break;
+          case 6: severity = android::base::INFO; break;
+          case 5:
+          case 4: severity = android::base::WARNING; break;
+          case 3: severity = android::base::ERROR; break;
+          case 2:
+          case 1:
+          case 0: severity = android::base::FATAL; break;
+          default:
+              return Error() << "invalid log level " << log_level;
+      }
+      android::base::SetMinimumLogSeverity(severity);
+      return Success();
+  }
+  ```
+  * loglevel 7

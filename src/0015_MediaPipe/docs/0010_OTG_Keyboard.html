@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">OTG Keyboard</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#hid">hid</a></li>
+<li><a class="reference internal" href="#hid-gadget-test">hid_gadget_test</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="otg-keyboard">
+<h1>OTG Keyboard<a class="headerlink" href="#otg-keyboard" title="Permalink to this headline"></a></h1>
+<p>通过Type-C OTG模拟键盘</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/raspberrypisig/pizero-usb-hid-keyboard">pizero-usb-hid-keyboard</a></p></li>
+<li><p><a class="reference external" href="https://randomnerdtutorials.com/raspberry-pi-zero-usb-keyboard-hid/">Turn Your Raspberry Pi Zero into a USB Keyboard (HID)</a></p></li>
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/59156906/raspberry-pi-zero-emulate-mouse">Raspberry Pi Zero emulate mouse</a></p></li>
+<li><p><a class="reference external" href="https://www.kernel.org/doc/Documentation/usb/gadget_configfs.txt">Linux USB gadget configured through configfs</a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/a83eea955a567c61d49ad83c3b8bbf6d/0010_Kernel_USB_Gadget_Configfs_Interface.pdf"><span class="xref download myst">0010_Kernel_USB_Gadget_Configfs_Interface.pdf</span></a></p></li>
+<li><p><a class="reference external" href="https://www.kernel.org/doc/Documentation/usb/gadget_hid.txt">gadget_hid.txt</a></p></li>
+</ul>
+</section>
+<section id="hid">
+<h1>hid<a class="headerlink" href="#hid" title="Permalink to this headline"></a></h1>
+<p>https://github.com/raspberrypisig/pizero-usb-hid-keyboard/blob/master/rpi-hid.sh</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="c1"># Snippet from https://github.com/girst/hardpass-sendHID/blob/master/README.md . In which, the following notice was left:</span>
+
+<span class="c1"># this is a stripped down version of https://github.com/ckuethe/usbarmory/wiki/USB-Gadgets - I don&#39;t claim any rights</span>
+
+modprobe libcomposite
+
+<span class="nb">cd</span> /sys/kernel/config/usb_gadget/
+
+mkdir -p g1
+<span class="nb">cd</span> g1
+<span class="nb">echo</span> 0x1d6b &gt; idVendor <span class="c1"># Linux Foundation</span>
+<span class="nb">echo</span> 0x0104 &gt; idProduct <span class="c1"># Multifunction Composite Gadget</span>
+<span class="nb">echo</span> 0x0100 &gt; bcdDevice <span class="c1"># v1.0.0</span>
+<span class="nb">echo</span> 0x0200 &gt; bcdUSB <span class="c1"># USB2</span>
+
+<span class="c1"># Instantiate English language strings</span>
+mkdir -p strings/0x409
+<span class="nb">echo</span> <span class="s2">&quot;deadbeef01234567890&quot;</span> &gt; strings/0x409/serialnumber
+<span class="nb">echo</span> <span class="s2">&quot;raspberrypi&quot;</span> &gt; strings/0x409/manufacturer
+<span class="nb">echo</span> <span class="s2">&quot;Generic USB Keyboard&quot;</span> &gt; strings/0x409/product
+
+<span class="c1"># Create function instances. Note that multiple function instances of the same type must have a unique extension</span>
+<span class="nv">N</span><span class="o">=</span><span class="s2">&quot;usb0&quot;</span>
+mkdir -p functions/hid.<span class="nv">$N</span>
+<span class="nb">echo</span> <span class="m">1</span> &gt; functions/hid.usb0/protocol
+<span class="nb">echo</span> <span class="m">1</span> &gt; functions/hid.usb0/subclass
+<span class="nb">echo</span> <span class="m">8</span> &gt; functions/hid.usb0/report_length
+<span class="nb">echo</span> -ne <span class="se">\\</span>x05<span class="se">\\</span>x01<span class="se">\\</span>x09<span class="se">\\</span>x06<span class="se">\\</span>xa1<span class="se">\\</span>x01<span class="se">\\</span>x05<span class="se">\\</span>x07<span class="se">\\</span>x19<span class="se">\\</span>xe0<span class="se">\\</span>x29<span class="se">\\</span>xe7<span class="se">\\</span>x15<span class="se">\\</span>x00<span class="se">\\</span>x25<span class="se">\\</span>x01<span class="se">\\</span>x75<span class="se">\\</span>x01<span class="se">\\</span>x95<span class="se">\\</span>x08<span class="se">\\</span>x81<span class="se">\\</span>x02<span class="se">\\</span>x95<span class="se">\\</span>x01<span class="se">\\</span>x75<span class="se">\\</span>x08<span class="se">\\</span>x81<span class="se">\\</span>x03<span class="se">\\</span>x95<span class="se">\\</span>x05<span class="se">\\</span>x75<span class="se">\\</span>x01<span class="se">\\</span>x05<span class="se">\\</span>x08<span class="se">\\</span>x19<span class="se">\\</span>x01<span class="se">\\</span>x29<span class="se">\\</span>x05<span class="se">\\</span>x91<span class="se">\\</span>x02<span class="se">\\</span>x95<span class="se">\\</span>x01<span class="se">\\</span>x75<span class="se">\\</span>x03<span class="se">\\</span>x91<span class="se">\\</span>x03<span class="se">\\</span>x95<span class="se">\\</span>x06<span class="se">\\</span>x75<span class="se">\\</span>x08<span class="se">\\</span>x15<span class="se">\\</span>x00<span class="se">\\</span>x25<span class="se">\\</span>x65<span class="se">\\</span>x05<span class="se">\\</span>x07<span class="se">\\</span>x19<span class="se">\\</span>x00<span class="se">\\</span>x29<span class="se">\\</span>x65<span class="se">\\</span>x81<span class="se">\\</span>x00<span class="se">\\</span>xc0 &gt; functions/hid.usb0/report_desc
+
+<span class="c1"># Create a configuration instance</span>
+<span class="nv">C</span><span class="o">=</span><span class="m">1</span>
+mkdir -p configs/c.<span class="nv">$C</span>/strings/0x409
+<span class="c1"># Create English language strings and write in a description for this device configuration </span>
+<span class="nb">echo</span> <span class="s2">&quot;Config </span><span class="nv">$C</span><span class="s2">: ECM network&quot;</span> &gt; configs/c.<span class="nv">$C</span>/strings/0x409/configuration 
+<span class="nb">echo</span> <span class="m">250</span> &gt; configs/c.<span class="nv">$C</span>/MaxPower 
+
+<span class="c1"># Bind each of our function instances to this configuration</span>
+ln -s functions/hid.<span class="nv">$N</span> configs/c.<span class="nv">$C</span>/
+
+<span class="c1"># Verify which UDC drivers are available. Attach the created gadget device to our UDC driver.</span>
+ls /sys/class/udc &gt; UDC
+</pre></div>
+</div>
+<p>不禁要问hid设备属性具体代表什么: https://elixir.bootlin.com/linux/v4.0/source/Documentation/ABI/testing/configfs-usb-gadget-hid</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">What</span><span class="p">:</span>        <span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">usb</span><span class="o">-</span><span class="n">gadget</span><span class="o">/</span><span class="n">gadget</span><span class="o">/</span><span class="n">functions</span><span class="o">/</span><span class="n">hid</span><span class="o">.</span><span class="n">name</span>
+<span class="n">Date</span><span class="p">:</span>        <span class="n">Nov</span> <span class="mi">2014</span>
+<span class="n">KernelVersion</span><span class="p">:</span>    <span class="mf">3.19</span>
+<span class="n">Description</span><span class="p">:</span>
+        <span class="n">The</span> <span class="n">attributes</span><span class="p">:</span>
+
+        <span class="n">protocol</span>    <span class="o">-</span> <span class="n">HID</span> <span class="n">protocol</span> <span class="n">to</span> <span class="n">use</span>
+        <span class="n">report_desc</span>    <span class="o">-</span> <span class="n">blob</span> <span class="n">corresponding</span> <span class="n">to</span> <span class="n">HID</span> <span class="n">report</span> <span class="n">descriptors</span>
+                <span class="k">except</span> <span class="n">the</span> <span class="n">data</span> <span class="n">passed</span> <span class="n">through</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">hidg</span><span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;</span>
+        <span class="n">report_length</span>    <span class="o">-</span> <span class="n">HID</span> <span class="n">report</span> <span class="n">length</span>
+        <span class="n">subclass</span>    <span class="o">-</span> <span class="n">HID</span> <span class="n">device</span> <span class="n">subclass</span> <span class="n">to</span> <span class="n">use</span>
+</pre></div>
+</div>
+<ul>
+<li><p>attributes</p>
+<ul class="simple">
+<li><p>protocol - HID protocol to use</p></li>
+<li><p>report_desc - blob corresponding to HID report descriptors except the data passed through /dev/hidg<N></p></li>
+<li><p>report_length - HID report length</p></li>
+<li><p>subclass - HID device subclass to use</p></li>
+</ul>
+</li>
+<li><p>report_desc: https://www.kernel.org/doc/Documentation/usb/gadget_hid.txt</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cm">/* hid descriptor for a keyboard */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">hidg_func_descriptor</span><span class="w"> </span><span class="n">my_hid_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="p">.</span><span class="n">subclass</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/* No subclass */</span><span class="w"></span>
+<span class="w">  </span><span class="p">.</span><span class="n">protocol</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="cm">/* Keyboard */</span><span class="w"></span>
+<span class="w">  </span><span class="p">.</span><span class="n">report_length</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">.</span><span class="n">report_desc_length</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mi">63</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">.</span><span class="n">report_desc</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="mh">0x05</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/* USAGE_PAGE (Generic Desktop)           */</span><span class="w">  </span><span class="c1">// 0x05, 0x01</span>
+<span class="w">      </span><span class="mh">0x09</span><span class="p">,</span><span class="w"> </span><span class="mh">0x06</span><span class="p">,</span><span class="w">    </span><span class="cm">/* USAGE (Keyboard)                       */</span><span class="w">  </span><span class="c1">// 0x09, 0x06</span>
+<span class="w">      </span><span class="mh">0xa1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/* COLLECTION (Application)               */</span><span class="w">  </span><span class="c1">// 0xa1, 0x01</span>
+<span class="w">      </span><span class="mh">0x05</span><span class="p">,</span><span class="w"> </span><span class="mh">0x07</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_PAGE (Keyboard)                */</span><span class="w">  </span><span class="c1">// 0x05, 0x07</span>
+<span class="w">      </span><span class="mh">0x19</span><span class="p">,</span><span class="w"> </span><span class="mh">0xe0</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_MINIMUM (Keyboard LeftControl) */</span><span class="w">  </span><span class="c1">// 0x19, 0xe0</span>
+<span class="w">      </span><span class="mh">0x29</span><span class="p">,</span><span class="w"> </span><span class="mh">0xe7</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_MAXIMUM (Keyboard Right GUI)   */</span><span class="w">  </span><span class="c1">// 0x29, 0xe7</span>
+<span class="w">      </span><span class="mh">0x15</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   LOGICAL_MINIMUM (0)                  */</span><span class="w">  </span><span class="c1">// 0x15, 0x00</span>
+<span class="w">      </span><span class="mh">0x25</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   LOGICAL_MAXIMUM (1)                  */</span><span class="w">  </span><span class="c1">// 0x25, 0x01</span>
+<span class="w">      </span><span class="mh">0x75</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_SIZE (1)                      */</span><span class="w">  </span><span class="c1">// 0x75, 0x01</span>
+<span class="w">      </span><span class="mh">0x95</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_COUNT (8)                     */</span><span class="w">  </span><span class="c1">// 0x95, 0x08</span>
+<span class="w">      </span><span class="mh">0x81</span><span class="p">,</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   INPUT (Data,Var,Abs)                 */</span><span class="w">  </span><span class="c1">// 0x81, 0x02</span>
+<span class="w">      </span><span class="mh">0x95</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_COUNT (1)                     */</span><span class="w">  </span><span class="c1">// 0x95, 0x01</span>
+<span class="w">      </span><span class="mh">0x75</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_SIZE (8)                      */</span><span class="w">  </span><span class="c1">// 0x75, 0x08</span>
+<span class="w">      </span><span class="mh">0x81</span><span class="p">,</span><span class="w"> </span><span class="mh">0x03</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   INPUT (Cnst,Var,Abs)                 */</span><span class="w">  </span><span class="c1">// 0x81, 0x03</span>
+<span class="w">      </span><span class="mh">0x95</span><span class="p">,</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_COUNT (5)                     */</span><span class="w">  </span><span class="c1">// 0x95, 0x05</span>
+<span class="w">      </span><span class="mh">0x75</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_SIZE (1)                      */</span><span class="w">  </span><span class="c1">// 0x75, 0x01</span>
+<span class="w">      </span><span class="mh">0x05</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_PAGE (LEDs)                    */</span><span class="w">  </span><span class="c1">// 0x05, 0x08</span>
+<span class="w">      </span><span class="mh">0x19</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_MINIMUM (Num Lock)             */</span><span class="w">  </span><span class="c1">// 0x19, 0x01</span>
+<span class="w">      </span><span class="mh">0x29</span><span class="p">,</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_MAXIMUM (Kana)                 */</span><span class="w">  </span><span class="c1">// 0x29, 0x05</span>
+<span class="w">      </span><span class="mh">0x91</span><span class="p">,</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   OUTPUT (Data,Var,Abs)                */</span><span class="w">  </span><span class="c1">// 0x91, 0x02</span>
+<span class="w">      </span><span class="mh">0x95</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_COUNT (1)                     */</span><span class="w">  </span><span class="c1">// 0x95, 0x01</span>
+<span class="w">      </span><span class="mh">0x75</span><span class="p">,</span><span class="w"> </span><span class="mh">0x03</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_SIZE (3)                      */</span><span class="w">  </span><span class="c1">// 0x75, 0x03</span>
+<span class="w">      </span><span class="mh">0x91</span><span class="p">,</span><span class="w"> </span><span class="mh">0x03</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   OUTPUT (Cnst,Var,Abs)                */</span><span class="w">  </span><span class="c1">// 0x91, 0x03</span>
+<span class="w">      </span><span class="mh">0x95</span><span class="p">,</span><span class="w"> </span><span class="mh">0x06</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_COUNT (6)                     */</span><span class="w">  </span><span class="c1">// 0x95, 0x06</span>
+<span class="w">      </span><span class="mh">0x75</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   REPORT_SIZE (8)                      */</span><span class="w">  </span><span class="c1">// 0x75, 0x08</span>
+<span class="w">      </span><span class="mh">0x15</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   LOGICAL_MINIMUM (0)                  */</span><span class="w">  </span><span class="c1">// 0x15, 0x00</span>
+<span class="w">      </span><span class="mh">0x25</span><span class="p">,</span><span class="w"> </span><span class="mh">0x65</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   LOGICAL_MAXIMUM (101)                */</span><span class="w">  </span><span class="c1">// 0x25, 0x65</span>
+<span class="w">      </span><span class="mh">0x05</span><span class="p">,</span><span class="w"> </span><span class="mh">0x07</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_PAGE (Keyboard)                */</span><span class="w">  </span><span class="c1">// 0x05, 0x07</span>
+<span class="w">      </span><span class="mh">0x19</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_MINIMUM (Reserved)             */</span><span class="w">  </span><span class="c1">// 0x19, 0x00</span>
+<span class="w">      </span><span class="mh">0x29</span><span class="p">,</span><span class="w"> </span><span class="mh">0x65</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   USAGE_MAXIMUM (Keyboard Application) */</span><span class="w">  </span><span class="c1">// 0x29, 0x65</span>
+<span class="w">      </span><span class="mh">0x81</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="p">,</span><span class="w">    </span><span class="cm">/*   INPUT (Data,Ary,Abs)                 */</span><span class="w">  </span><span class="c1">// 0x81, 0x00</span>
+<span class="w">      </span><span class="mh">0xc0</span><span class="w">        </span><span class="cm">/* END_COLLECTION                            */</span><span class="w">  </span><span class="c1">// 0xc0</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>需要注意的描述符是描述最终鼠标传输的数据，其中的INPUT、OUTPUT会转成对应IN、OUT Endpoint的Buffer长度</p>
+<ul>
+<li><p>https://github.com/ZengjfOS/USB/blob/master/docs/0008_HID_Keyboard.md</p>
+<ul>
+<li><p>INPUT: 1 * 8 bit + 1 * 8 bit + 3 * 8 bit = 5 * 8 bit = 5 byte</p>
+<ul>
+<li><p>EP1INBUF[]长度为5，观察赋值就可以看出来；</p></li>
+</ul>
+</li>
+<li><p>OUTPUT: 5 bit + 3 bit = 1 byte</p>
+<ul>
+<li><p>EP1OUTBUF[]长度为1，观察赋值就可看出来；</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>这个描述符相当于告诉Host端怎么去映射出自己的IN、OUT Endpoint的Buffer长度，从而确保两边的数据通信结构没问题</p></li>
+<li><p>上面的描述符：</p>
+<ul>
+<li><p>INPUT: 1 * 8 bit + 1 * 8 bit + 6 * 8 bit = 8 * 8 bit = 8 byte</p></li>
+<li><p>OUTPUT: 5 bit + 3 bit = 1 byte</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="hid-gadget-test">
+<h1>hid_gadget_test<a class="headerlink" href="#hid-gadget-test" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://www.kernel.org/doc/Documentation/usb/gadget_hid.txt</p>
+<ul class="simple">
+<li><p>Sample code::</p>
+<ul>
+<li><p>/* hid_gadget_test */</p>
+<ul>
+<li><p>其中使用select + read从命令行读取数据</p>
+<ul>
+<li><p>select从终端获取到一行以后才会触发一次read</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>select等待数据，read获取数据</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/time.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/types.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#define STDIN 0</span>
+<span class="cp">#define BUF_LEN 512</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">BUF_LEN</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cmd_len</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">fd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">//1. 初始化fd集合</span>
+<span class="w">    </span><span class="n">fd_set</span><span class="w"> </span><span class="n">fds</span><span class="p">;</span><span class="w">           </span><span class="c1">//定义fd集合</span>
+<span class="w">    </span><span class="n">FD_ZERO</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fds</span><span class="p">);</span><span class="w">        </span><span class="c1">//清空fd集合</span>
+<span class="w">    </span><span class="n">FD_SET</span><span class="p">(</span><span class="n">STDIN</span><span class="p">,</span><span class="o">&amp;</span><span class="n">fds</span><span class="p">);</span><span class="w">   </span><span class="c1">//添加STDIN</span>
+
+<span class="w">    </span><span class="c1">//2. 监控fd集合 - 遍历集合方式</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">select</span><span class="p">(</span><span class="n">STDIN</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fds</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">perror</span><span class="p">(</span><span class="s">&quot;select&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">//3. 判断STDIN的读属性是否发生变化</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">FD_ISSET</span><span class="p">(</span><span class="n">STDIN</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fds</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;someone input a char!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">cmd_len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="n">STDIN</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">BUF_LEN</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;recv report(%d): &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cmd_len</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">cmd_len</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot; %02x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">//4. 清空集合</span>
+<span class="w">    </span><span class="n">FD_CLR</span><span class="p">(</span><span class="n">STDIN</span><span class="p">,</span><span class="o">&amp;</span><span class="n">fds</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">FD_ZERO</span><span class="p">(</span><span class="o">&amp;</span><span class="n">fds</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>使用如下命令进入键盘模拟环境</p>
+<ul>
+<li><p>./hid-gadget-test /dev/hidg0 keyboard</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span>                 <span class="c1"># 输出小写 a</span>
+<span class="o">--</span><span class="n">enter</span>           <span class="c1"># 输出回车</span>
+<span class="o">--</span><span class="n">left</span><span class="o">-</span><span class="n">shift</span> <span class="n">a</span>    <span class="c1"># 输出大写 A</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

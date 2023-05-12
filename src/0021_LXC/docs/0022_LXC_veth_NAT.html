@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">LXC veth NAT</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">运行架构图</a></li>
+<li><a class="reference internal" href="#steps">steps</a></li>
+<li><a class="reference internal" href="#nat">NAT网络设置</a></li>
+<li><a class="reference internal" href="#ping">虚拟网卡间ping不通：</a></li>
+<li><a class="reference internal" href="#id3">重置网卡名字</a></li>
+<li><a class="reference internal" href="#ip-route">ip route详细解释</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lxc-veth-nat">
+<h1>LXC veth NAT<a class="headerlink" href="#lxc-veth-nat" title="Permalink to this headline"></a></h1>
+<p>LXC通过虚拟网卡NAT到Wifi获取网络</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cnblogs.com/sammyliu/p/5760125.html">Netruon 理解（11）：使用 NAT 将 Linux network namespace 连接外网</a></p></li>
+<li><p><a class="reference external" href="https://unix.stackexchange.com/questions/205010/centos-7-rename-network-interface-without-rebooting">CentOS 7 - Rename network interface without rebooting</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/vevenlcf/article/details/48026965">linux 路由表设置 之 route 指令详解</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>运行架构图<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><img alt="0022_LXC_veth_NAT.png" src="../../../_images/0022_LXC_veth_NAT.png" /></p>
+</section>
+<section id="steps">
+<h1>steps<a class="headerlink" href="#steps" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo vim /etc/lxc/default.conf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">.</span><span class="n">net</span><span class="mf">.0</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">veth</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">net</span><span class="mf">.0</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">up</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">apparmor</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">generated</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo rm /var/lib/lxc/zengjf -rf</p></li>
+<li><p>sudo ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log</p></li>
+<li><p>sudo ./src/lxc/lxc-start -n zengjf -l TRACE -o lxc.log</p></li>
+<li><p>ifconfig</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="o">...</span><span class="n">省略</span>
+<span class="n">vethDW1WMT</span><span class="p">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">4163</span><span class="o">&lt;</span><span class="n">UP</span><span class="p">,</span><span class="n">BROADCAST</span><span class="p">,</span><span class="n">RUNNING</span><span class="p">,</span><span class="n">MULTICAST</span><span class="o">&gt;</span>  <span class="n">mtu</span> <span class="mi">1500</span>
+        <span class="n">inet6</span> <span class="n">fe80</span><span class="p">::</span><span class="n">e6f</span><span class="p">:</span><span class="mi">30</span><span class="n">bf</span><span class="p">:</span><span class="mi">5</span><span class="n">ff</span><span class="p">:</span><span class="mi">5307</span>  <span class="n">prefixlen</span> <span class="mi">64</span>  <span class="n">scopeid</span> <span class="mh">0x20</span><span class="o">&lt;</span><span class="n">link</span><span class="o">&gt;</span>
+        <span class="n">ether</span> <span class="n">fe</span><span class="p">:</span><span class="mi">9</span><span class="n">a</span><span class="p">:</span><span class="n">a5</span><span class="p">:</span><span class="n">fb</span><span class="p">:</span><span class="mi">8</span><span class="n">b</span><span class="p">:</span><span class="mi">35</span>  <span class="n">txqueuelen</span> <span class="mi">1000</span>  <span class="p">(</span><span class="n">Ethernet</span><span class="p">)</span>
+        <span class="n">RX</span> <span class="n">packets</span> <span class="mi">6</span>  <span class="nb">bytes</span> <span class="mi">1296</span> <span class="p">(</span><span class="mf">1.2</span> <span class="n">KiB</span><span class="p">)</span>
+        <span class="n">RX</span> <span class="n">errors</span> <span class="mi">0</span>  <span class="n">dropped</span> <span class="mi">0</span>  <span class="n">overruns</span> <span class="mi">0</span>  <span class="n">frame</span> <span class="mi">0</span>
+        <span class="n">TX</span> <span class="n">packets</span> <span class="mi">16</span>  <span class="nb">bytes</span> <span class="mi">2180</span> <span class="p">(</span><span class="mf">2.1</span> <span class="n">KiB</span><span class="p">)</span>
+        <span class="n">TX</span> <span class="n">errors</span> <span class="mi">0</span>  <span class="n">dropped</span> <span class="mi">0</span> <span class="n">overruns</span> <span class="mi">0</span>  <span class="n">carrier</span> <span class="mi">0</span>  <span class="n">collisions</span> <span class="mi">0</span>
+<span class="o">//</span> <span class="o">...</span><span class="n">省略</span>
+</pre></div>
+</div>
+</li>
+<li><p>进入系统</p>
+<ul>
+<li><p>sudo ./src/lxc/lxc-console -n zengjf -l TRACE -o lxc.log</p>
+<ul class="simple">
+<li><p>貌似无法使用</p></li>
+</ul>
+</li>
+<li><p>sudo ./src/lxc/lxc-attach -n zengjf -l TRACE -o lxc.log</p>
+<ul>
+<li><p>可以使用</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BusyBox</span> <span class="n">v1</span><span class="mf">.30.1</span> <span class="p">(</span><span class="n">Raspbian</span> <span class="mi">1</span><span class="p">:</span><span class="mf">1.30.1</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">shell</span> <span class="p">(</span><span class="n">ash</span><span class="p">)</span>
+<span class="n">Enter</span> <span class="s1">&#39;help&#39;</span> <span class="k">for</span> <span class="n">a</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">commands</span><span class="o">.</span>
+
+<span class="o">/</span> <span class="c1"># ifconfig -a</span>
+<span class="n">eth0</span>      <span class="n">Link</span> <span class="n">encap</span><span class="p">:</span><span class="n">Ethernet</span>  <span class="n">HWaddr</span> <span class="mi">42</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">53</span><span class="p">:</span><span class="mi">72</span><span class="p">:</span><span class="mi">9</span><span class="n">A</span><span class="p">:</span><span class="mi">9</span><span class="n">B</span>
+          <span class="n">BROADCAST</span> <span class="n">MULTICAST</span>  <span class="n">MTU</span><span class="p">:</span><span class="mi">1500</span>  <span class="n">Metric</span><span class="p">:</span><span class="mi">1</span>
+          <span class="n">RX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">0</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">frame</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">TX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">0</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">carrier</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">collisions</span><span class="p">:</span><span class="mi">0</span> <span class="n">txqueuelen</span><span class="p">:</span><span class="mi">1000</span>
+          <span class="n">RX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">0</span> <span class="p">(</span><span class="mf">0.0</span> <span class="n">B</span><span class="p">)</span>  <span class="n">TX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">0</span> <span class="p">(</span><span class="mf">0.0</span> <span class="n">B</span><span class="p">)</span>
+
+<span class="n">lo</span>        <span class="n">Link</span> <span class="n">encap</span><span class="p">:</span><span class="n">Local</span> <span class="n">Loopback</span>
+          <span class="n">LOOPBACK</span>  <span class="n">MTU</span><span class="p">:</span><span class="mi">65536</span>  <span class="n">Metric</span><span class="p">:</span><span class="mi">1</span>
+          <span class="n">RX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">0</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">frame</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">TX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">0</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">carrier</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">collisions</span><span class="p">:</span><span class="mi">0</span> <span class="n">txqueuelen</span><span class="p">:</span><span class="mi">1000</span>
+          <span class="n">RX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">0</span> <span class="p">(</span><span class="mf">0.0</span> <span class="n">B</span><span class="p">)</span>  <span class="n">TX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">0</span> <span class="p">(</span><span class="mf">0.0</span> <span class="n">B</span><span class="p">)</span>
+<span class="o">/</span> <span class="c1">#</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>sudo ./src/lxc/lxc-stop -n zengjf -l TRACE -o lxc.log</p></li>
+</ul>
+</section>
+<section id="nat">
+<h1>NAT网络设置<a class="headerlink" href="#nat" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo su</p>
+<ul class="simple">
+<li><p>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</p></li>
+</ul>
+</li>
+<li><p>sudo ifconfig vethDW1WMT 192.168.45.2 netmask 255.255.255.0</p></li>
+<li><p>容器系统内：</p>
+<ul class="simple">
+<li><p>sudo ./src/lxc/lxc-attach -n zengjf -l TRACE -o lxc.log</p></li>
+<li><p>ifconfig eth0 192.168.45.3 netmask 255.255.255.0</p></li>
+<li><p>route add default gw 192.168.45.2</p></li>
+</ul>
+</li>
+<li><p>sudo iptables -t nat -A POSTROUTING -s 192.168.45.0/24 -o wlan0 -j MASQUERADE</p>
+<ul>
+<li><p>sudo iptables -nvL -t nat</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Chain</span> <span class="n">PREROUTING</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span> <span class="mi">0</span> <span class="n">packets</span><span class="p">,</span> <span class="mi">0</span> <span class="nb">bytes</span><span class="p">)</span>
+ <span class="n">pkts</span> <span class="nb">bytes</span> <span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="ow">in</span>     <span class="n">out</span>     <span class="n">source</span>               <span class="n">destination</span>
+
+<span class="n">Chain</span> <span class="n">INPUT</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span> <span class="mi">0</span> <span class="n">packets</span><span class="p">,</span> <span class="mi">0</span> <span class="nb">bytes</span><span class="p">)</span>
+ <span class="n">pkts</span> <span class="nb">bytes</span> <span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="ow">in</span>     <span class="n">out</span>     <span class="n">source</span>               <span class="n">destination</span>
+
+<span class="n">Chain</span> <span class="n">POSTROUTING</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span> <span class="mi">0</span> <span class="n">packets</span><span class="p">,</span> <span class="mi">0</span> <span class="nb">bytes</span><span class="p">)</span>
+ <span class="n">pkts</span> <span class="nb">bytes</span> <span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="ow">in</span>     <span class="n">out</span>     <span class="n">source</span>               <span class="n">destination</span>
+    <span class="mi">3</span>   <span class="mi">252</span> <span class="n">MASQUERADE</span>  <span class="nb">all</span>  <span class="o">--</span>  <span class="o">*</span>      <span class="n">wlan0</span>   <span class="mf">192.168.45.0</span><span class="o">/</span><span class="mi">24</span>      <span class="mf">0.0.0.0</span><span class="o">/</span><span class="mi">0</span>
+
+<span class="n">Chain</span> <span class="n">OUTPUT</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span> <span class="mi">0</span> <span class="n">packets</span><span class="p">,</span> <span class="mi">0</span> <span class="nb">bytes</span><span class="p">)</span>
+ <span class="n">pkts</span> <span class="nb">bytes</span> <span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="ow">in</span>     <span class="n">out</span>     <span class="n">source</span>               <span class="n">destination</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>sudo iptables -t filter -A FORWARD -i wlan0 -o vethDW1WMT -j ACCEPT</p></li>
+<li><p>sudo iptables -t filter -A FORWARD -o wlan0 -i vethDW1WMT -j ACCEPT</p></li>
+<li><p>sudo iptables -t filter -L</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Chain</span> <span class="n">INPUT</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+
+<span class="n">Chain</span> <span class="n">FORWARD</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+<span class="n">ACCEPT</span>     <span class="nb">all</span>  <span class="o">--</span>  <span class="n">anywhere</span>             <span class="n">anywhere</span>
+<span class="n">ACCEPT</span>     <span class="nb">all</span>  <span class="o">--</span>  <span class="n">anywhere</span>             <span class="n">anywhere</span>
+
+<span class="n">Chain</span> <span class="n">OUTPUT</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="ping">
+<h1>虚拟网卡间ping不通：<a class="headerlink" href="#ping" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>容器系统内</p>
+<ul class="simple">
+<li><p>ping 192.168.45.2</p>
+<ul>
+<li><p>容器系统eth0自身IP为192.168.45.3，ping不通对应的容器外的网卡</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>sudo tcpdump -nnt -i vethDW1WMT</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tcpdump</span><span class="p">:</span> <span class="n">verbose</span> <span class="n">output</span> <span class="n">suppressed</span><span class="p">,</span> <span class="n">use</span> <span class="o">-</span><span class="n">v</span> <span class="ow">or</span> <span class="o">-</span><span class="n">vv</span> <span class="k">for</span> <span class="n">full</span> <span class="n">protocol</span> <span class="n">decode</span>
+<span class="n">listening</span> <span class="n">on</span> <span class="n">vethDW1WMT</span><span class="p">,</span> <span class="n">link</span><span class="o">-</span><span class="nb">type</span> <span class="n">EN10MB</span> <span class="p">(</span><span class="n">Ethernet</span><span class="p">),</span> <span class="n">capture</span> <span class="n">size</span> <span class="mi">262144</span> <span class="nb">bytes</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">25.547728</span> <span class="n">IP</span> <span class="mf">0.0.0.0.68</span> <span class="o">&gt;</span> <span class="mf">255.255.255.255.67</span><span class="p">:</span> <span class="n">BOOTP</span><span class="o">/</span><span class="n">DHCP</span><span class="p">,</span> <span class="n">Request</span> <span class="kn">from</span> <span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">77</span><span class="p">:</span><span class="mi">5</span><span class="n">e</span><span class="p">:</span><span class="n">f3</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="n">c0</span><span class="p">,</span> <span class="n">length</span> <span class="mi">300</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">28.637717</span> <span class="n">IP</span> <span class="mf">0.0.0.0.68</span> <span class="o">&gt;</span> <span class="mf">255.255.255.255.67</span><span class="p">:</span> <span class="n">BOOTP</span><span class="o">/</span><span class="n">DHCP</span><span class="p">,</span> <span class="n">Request</span> <span class="kn">from</span> <span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">77</span><span class="p">:</span><span class="mi">5</span><span class="n">e</span><span class="p">:</span><span class="n">f3</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="n">c0</span><span class="p">,</span> <span class="n">length</span> <span class="mi">300</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">35.707905</span> <span class="n">IP</span> <span class="mf">192.168.45.3</span> <span class="o">&gt;</span> <span class="mf">192.168.45.2</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">request</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">4609</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">0</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">36.708270</span> <span class="n">IP</span> <span class="mf">192.168.45.3</span> <span class="o">&gt;</span> <span class="mf">192.168.45.2</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">request</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">4609</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">1</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">37.708542</span> <span class="n">IP</span> <span class="mf">192.168.45.3</span> <span class="o">&gt;</span> <span class="mf">192.168.45.2</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">request</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">4609</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">2</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">38.708804</span> <span class="n">IP</span> <span class="mf">192.168.45.3</span> <span class="o">&gt;</span> <span class="mf">192.168.45.2</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">request</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">4609</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">3</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">39.709062</span> <span class="n">IP</span> <span class="mf">192.168.45.3</span> <span class="o">&gt;</span> <span class="mf">192.168.45.2</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">request</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">4609</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">4</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">40.737726</span> <span class="n">ARP</span><span class="p">,</span> <span class="n">Request</span> <span class="n">who</span><span class="o">-</span><span class="n">has</span> <span class="mf">192.168.45.2</span> <span class="n">tell</span> <span class="mf">192.168.45.3</span><span class="p">,</span> <span class="n">length</span> <span class="mi">28</span>
+<span class="mi">06</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">40.737770</span> <span class="n">ARP</span><span class="p">,</span> <span class="n">Reply</span> <span class="mf">192.168.45.2</span> <span class="ow">is</span><span class="o">-</span><span class="n">at</span> <span class="n">fe</span><span class="p">:</span><span class="mi">9</span><span class="n">a</span><span class="p">:</span><span class="n">a5</span><span class="p">:</span><span class="n">fb</span><span class="p">:</span><span class="mi">8</span><span class="n">b</span><span class="p">:</span><span class="mi">35</span><span class="p">,</span> <span class="n">length</span> <span class="mi">28</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>监听容器外网卡vethDW1WMT，如上可知vethDW1WMT已经收到信息，但是没有把数据发给容器系统，本身vethDW1WMT是路由，没有提示ICMP echo reply，说明他把数据发到别的网卡了</p></li>
+</ul>
+</li>
+<li><p>sudo tcpdump -nnt -i wlan0</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tcpdump</span><span class="p">:</span> <span class="n">verbose</span> <span class="n">output</span> <span class="n">suppressed</span><span class="p">,</span> <span class="n">use</span> <span class="o">-</span><span class="n">v</span> <span class="ow">or</span> <span class="o">-</span><span class="n">vv</span> <span class="k">for</span> <span class="n">full</span> <span class="n">protocol</span> <span class="n">decode</span>
+<span class="n">listening</span> <span class="n">on</span> <span class="n">wlan0</span><span class="p">,</span> <span class="n">link</span><span class="o">-</span><span class="nb">type</span> <span class="n">EN10MB</span> <span class="p">(</span><span class="n">Ethernet</span><span class="p">),</span> <span class="n">capture</span> <span class="n">size</span> <span class="mi">262144</span> <span class="nb">bytes</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">522</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">523</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">524</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">525</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">526</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">527</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">528</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">ARP</span><span class="p">,</span> <span class="n">Request</span> <span class="n">who</span><span class="o">-</span><span class="n">has</span> <span class="mf">192.168.43.1</span> <span class="n">tell</span> <span class="mf">192.168.43.89</span><span class="p">,</span> <span class="n">length</span> <span class="mi">28</span>
+<span class="n">ARP</span><span class="p">,</span> <span class="n">Reply</span> <span class="mf">192.168.43.1</span> <span class="ow">is</span><span class="o">-</span><span class="n">at</span> <span class="n">c4</span><span class="p">:</span><span class="mi">9</span><span class="n">f</span><span class="p">:</span><span class="mi">4</span><span class="n">c</span><span class="p">:</span><span class="n">b3</span><span class="p">:</span><span class="mi">3</span><span class="n">b</span><span class="p">:</span><span class="mi">52</span><span class="p">,</span> <span class="n">length</span> <span class="mi">28</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">529</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+<span class="n">IP</span> <span class="mf">192.168.45.2</span> <span class="o">&gt;</span> <span class="mf">192.168.45.3</span><span class="p">:</span> <span class="n">ICMP</span> <span class="n">echo</span> <span class="n">reply</span><span class="p">,</span> <span class="nb">id</span> <span class="mi">15873</span><span class="p">,</span> <span class="n">seq</span> <span class="mi">530</span><span class="p">,</span> <span class="n">length</span> <span class="mi">64</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>监听容器外网卡wlan0，如上可知vethDW1WMT返回给容器内的信息发给了wlan0，判定为路由不对导致</p></li>
+</ul>
+</li>
+<li><p>ip route</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span> <span class="n">via</span> <span class="mf">192.168.43.1</span> <span class="n">dev</span> <span class="n">wlan0</span> <span class="n">proto</span> <span class="n">dhcp</span> <span class="n">src</span> <span class="mf">192.168.43.89</span> <span class="n">metric</span> <span class="mi">304</span>
+<span class="mf">169.254.0.0</span><span class="o">/</span><span class="mi">16</span> <span class="n">dev</span> <span class="n">vethDW1WMT</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">169.254.78.52</span> <span class="n">metric</span> <span class="mi">212</span>
+<span class="mf">192.168.43.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">dev</span> <span class="n">wlan0</span> <span class="n">proto</span> <span class="n">dhcp</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">192.168.43.89</span> <span class="n">metric</span> <span class="mi">304</span>
+<span class="mf">192.168.137.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">dev</span> <span class="n">usb0</span> <span class="n">proto</span> <span class="n">dhcp</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">192.168.137.2</span> <span class="n">metric</span> <span class="mi">203</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>169.254.0.0/16 dev vethDW1WMT scope link src 169.254.78.52 metric 212</p>
+<ul>
+<li><p>lxc默认网络路由和我们自己设置的默认网络路由不对，所以删除这个默认路由，添加我们自己的网络路由</p></li>
+</ul>
+</li>
+<li><p>sudo route del -net 169.254.0.0 netmask 255.255.0.0 vethDW1WMT</p>
+<ul>
+<li><p>貌似删不掉，暂时不管</p></li>
+</ul>
+</li>
+<li><p>sudo route add -net 192.168.45.0 netmask 255.255.255.0 vethDW1WMT</p></li>
+</ul>
+</li>
+<li><p>route -n</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Kernel</span> <span class="n">IP</span> <span class="n">routing</span> <span class="n">table</span>
+<span class="n">Destination</span>     <span class="n">Gateway</span>         <span class="n">Genmask</span>         <span class="n">Flags</span> <span class="n">Metric</span> <span class="n">Ref</span>    <span class="n">Use</span> <span class="n">Iface</span>
+<span class="mf">0.0.0.0</span>         <span class="mf">192.168.43.1</span>    <span class="mf">0.0.0.0</span>         <span class="n">UG</span>    <span class="mi">304</span>    <span class="mi">0</span>        <span class="mi">0</span> <span class="n">wlan0</span>
+<span class="mf">169.254.0.0</span>     <span class="mf">0.0.0.0</span>         <span class="mf">255.255.0.0</span>     <span class="n">U</span>     <span class="mi">208</span>    <span class="mi">0</span>        <span class="mi">0</span> <span class="n">vethDW1WMT</span>
+<span class="mf">192.168.43.0</span>    <span class="mf">0.0.0.0</span>         <span class="mf">255.255.255.0</span>   <span class="n">U</span>     <span class="mi">304</span>    <span class="mi">0</span>        <span class="mi">0</span> <span class="n">wlan0</span>
+<span class="mf">192.168.45.0</span>    <span class="mf">0.0.0.0</span>         <span class="mf">255.255.255.0</span>   <span class="n">U</span>     <span class="mi">0</span>      <span class="mi">0</span>        <span class="mi">0</span> <span class="n">vethDW1WMT</span>
+<span class="mf">192.168.137.0</span>   <span class="mf">0.0.0.0</span>         <span class="mf">255.255.255.0</span>   <span class="n">U</span>     <span class="mi">203</span>    <span class="mi">0</span>        <span class="mi">0</span> <span class="n">usb0</span>
+</pre></div>
+</div>
+</li>
+<li><p>容器系统内这个时候能够正常ping通了</p>
+<ul>
+<li><p>ping 220.181.38.148</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PING</span> <span class="mf">220.181.38.148</span> <span class="p">(</span><span class="mf">220.181.38.148</span><span class="p">):</span> <span class="mi">56</span> <span class="n">data</span> <span class="nb">bytes</span>
+<span class="mi">64</span> <span class="nb">bytes</span> <span class="kn">from</span> <span class="mf">220.181.38.148</span><span class="p">:</span> <span class="n">seq</span><span class="o">=</span><span class="mi">22</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">49</span> <span class="n">time</span><span class="o">=</span><span class="mf">111.632</span> <span class="n">ms</span>
+<span class="mi">64</span> <span class="nb">bytes</span> <span class="kn">from</span> <span class="mf">220.181.38.148</span><span class="p">:</span> <span class="n">seq</span><span class="o">=</span><span class="mi">23</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">49</span> <span class="n">time</span><span class="o">=</span><span class="mf">79.067</span> <span class="n">ms</span>
+<span class="mi">64</span> <span class="nb">bytes</span> <span class="kn">from</span> <span class="mf">220.181.38.148</span><span class="p">:</span> <span class="n">seq</span><span class="o">=</span><span class="mi">24</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">49</span> <span class="n">time</span><span class="o">=</span><span class="mf">84.337</span> <span class="n">ms</span>
+<span class="mi">64</span> <span class="nb">bytes</span> <span class="kn">from</span> <span class="mf">220.181.38.148</span><span class="p">:</span> <span class="n">seq</span><span class="o">=</span><span class="mi">25</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">49</span> <span class="n">time</span><span class="o">=</span><span class="mf">87.792</span> <span class="n">ms</span>
+<span class="mi">64</span> <span class="nb">bytes</span> <span class="kn">from</span> <span class="mf">220.181.38.148</span><span class="p">:</span> <span class="n">seq</span><span class="o">=</span><span class="mi">26</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">49</span> <span class="n">time</span><span class="o">=</span><span class="mf">150.535</span> <span class="n">ms</span>
+</pre></div>
+</div>
+</li>
+<li><p>wget 220.181.38.148</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Connecting</span> <span class="n">to</span> <span class="mf">220.181.38.148</span> <span class="p">(</span><span class="mf">220.181.38.148</span><span class="p">:</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">index</span><span class="o">.</span><span class="n">html</span>           <span class="mi">100</span><span class="o">%</span> <span class="o">|*****************************************************|</span>    <span class="mi">81</span>  <span class="mi">0</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="n">ETA</span>
+</pre></div>
+</div>
+</li>
+<li><p>cat index.html</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">html</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">meta</span> <span class="n">http</span><span class="o">-</span><span class="n">equiv</span><span class="o">=</span><span class="s2">&quot;refresh&quot;</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;0;url=http://www.baidu.com/&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">html</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>重置网卡名字<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>sudo ip link set vethDW1WMT down</p></li>
+<li><p>sudo ip link set vethDW1WMT name vm_host</p></li>
+<li><p>sudo ip link set vm_host up</p></li>
+</ul>
+</section>
+<section id="ip-route">
+<h1>ip route详细解释<a class="headerlink" href="#ip-route" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">192.168.42.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">dev</span> <span class="n">rndis0</span> <span class="n">proto</span> <span class="n">kernel</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">192.168.42.129</span>
+<span class="mf">192.168.43.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">dev</span> <span class="n">wlan0</span> <span class="n">proto</span> <span class="n">kernel</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">192.168.43.112</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>参考文档</p>
+<ul>
+<li><p><a class="reference external" href="https://zhuanlan.zhihu.com/p/43279912">路由条目的意义</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/8499b53eb0a5">Linux路由表</a></p></li>
+</ul>
+</li>
+<li><p>路由mask: 192.168.42.0/24</p></li>
+<li><p>后面的字段告诉我们通过哪个设备来和目的地址通信: dev rndis0</p></li>
+<li><p>对于广播地址来说，它的目标是整一个IP网络，所以目标地址的scope定义为了link</p></li>
+<li><p>最后一个字段的关键字是src，这个是告诉内核当使用这个设备往外路由信息时，选择的源地址是哪个。</p>
+<ul>
+<li><p>源IP是一个路由条目的重要组成部分，这个源IP的意义在于一个补充作用。匹配还是根据目的IP进行匹配，但是由于在查找路由条目的时候很可能源地址还没有指定。典型的就是没有进行bind的发送情况，通常是随机选择端口和按照一定的规则源地址。这个一定的规则就是在这里的路由条目的src域可以影响。也就是如果进程没有bind一个源地址，将会使用这里src域里面的源地址作为数据包的源地址进行发送。但是如果进程提前bind了，命中了这个条目，就仍然会使用进程bind的源地址作为数据包的源地址。所以说这里的src只是一个建议的作用。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

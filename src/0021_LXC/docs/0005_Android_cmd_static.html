@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android cmd static</a></li>
+<li><a class="reference internal" href="#android-bp">Android.bp示例</a></li>
+<li><a class="reference internal" href="#android-mk">Android.mk示例</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-cmd-static">
+<h1>Android cmd static<a class="headerlink" href="#android-cmd-static" title="Permalink to this headline"></a></h1>
+<p>Android编译static cmd命令可执行程序</p>
+</section>
+<section id="android-bp">
+<h1>Android.bp示例<a class="headerlink" href="#android-bp" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://github.com/LowLevelOfLogic/RaspberryPi/tree/servicemanager/Android.bp</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/frameworks/native/cmds/servicemanager/Android.bp b/frameworks/native/cmds/servicemanager/Android.bp</span><span class="w"></span>
+<span class="gh">index 428561bc8ae..0681cc9606a 100644</span><span class="w"></span>
+<span class="gd">--- a/frameworks/native/cmds/servicemanager/Android.bp</span><span class="w"></span>
+<span class="gi">+++ b/frameworks/native/cmds/servicemanager/Android.bp</span><span class="w"></span>
+<span class="gu">@@ -15,13 +15,31 @@ cc_defaults {</span><span class="w"></span>
+<span class="w"> </span>    shared_libs: [&quot;liblog&quot;],<span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+
+<span class="gi">+cc_defaults {</span><span class="w"></span>
+<span class="gi">+    name: &quot;servicemanager_static_flags&quot;,</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    cflags: [</span><span class="w"></span>
+<span class="gi">+        &quot;-Wall&quot;,</span><span class="w"></span>
+<span class="gi">+        &quot;-Wextra&quot;,</span><span class="w"></span>
+<span class="gi">+        &quot;-Werror&quot;,</span><span class="w"></span>
+<span class="gi">+    ],</span><span class="w"></span>
+<span class="gi">+    product_variables: {</span><span class="w"></span>
+<span class="gi">+        binder32bit: {</span><span class="w"></span>
+<span class="gi">+            cflags: [&quot;-DBINDER_IPC_32BIT=1&quot;],</span><span class="w"></span>
+<span class="gi">+        },</span><span class="w"></span>
+<span class="gi">+    },</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    static_libs: [&quot;liblog&quot;],</span><span class="w"></span>
+<span class="gi">+}</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>cc_binary {<span class="w"></span>
+<span class="w"> </span>    name: &quot;bctest&quot;,<span class="w"></span>
+<span class="gd">-    defaults: [&quot;servicemanager_flags&quot;],</span><span class="w"></span>
+<span class="gi">+    defaults: [&quot;servicemanager_static_flags&quot;],</span><span class="w"></span>
+<span class="w"> </span>    srcs: [<span class="w"></span>
+<span class="w"> </span>        &quot;bctest.c&quot;,<span class="w"></span>
+<span class="w"> </span>        &quot;binder.c&quot;,<span class="w"></span>
+<span class="w"> </span>    ],<span class="w"></span>
+<span class="gi">+       static_executable: true,</span><span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+
+<span class="w"> </span>cc_binary {<span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="android-mk">
+<h1>Android.mk示例<a class="headerlink" href="#android-mk" title="Permalink to this headline"></a></h1>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LOCAL_PATH</span><span class="o">:=</span> <span class="k">$(</span>call my-dir<span class="k">)</span>
+
+<span class="c"># static link</span>
+<span class="cp">include $(CLEAR_VARS)</span>
+<span class="nv">LOCAL_STATIC_LIBRARIES</span> <span class="o">:=</span> liblog
+<span class="nv">LOCAL_SRC_FILES</span> <span class="o">:=</span> android_10/client.c binder.c
+<span class="c"># LOCAL_CFLAGS += $(svc_c_flags)</span>
+<span class="nv">LOCAL_CFLAGS</span> <span class="o">+=</span> -Wno-unused-parameter -Wno-unused-variable
+<span class="nv">LOCAL_LDFLAGS</span> <span class="o">+=</span> -static
+<span class="nv">LOCAL_MODULE</span> <span class="o">:=</span> bclient
+<span class="nv">LOCAL_FORCE_STATIC_EXECUTABLE</span> <span class="o">:=</span> <span class="nb">true</span>
+<span class="cp">include $(BUILD_EXECUTABLE)</span>
+
+<span class="cp">include $(CLEAR_VARS)</span>
+<span class="nv">LOCAL_STATIC_LIBRARIES</span> <span class="o">:=</span> liblog
+<span class="nv">LOCAL_SRC_FILES</span> <span class="o">:=</span> android_10/service.c binder.c
+<span class="c"># LOCAL_CFLAGS += $(svc_c_flags)</span>
+<span class="nv">LOCAL_CFLAGS</span> <span class="o">+=</span> -Wno-unused-parameter -Wno-unused-variable
+<span class="nv">LOCAL_LDFLAGS</span> <span class="o">+=</span> -static
+<span class="nv">LOCAL_MODULE</span> <span class="o">:=</span> bservice
+<span class="nv">LOCAL_FORCE_STATIC_EXECUTABLE</span> <span class="o">:=</span> <span class="nb">true</span>
+<span class="cp">include $(BUILD_EXECUTABLE)</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

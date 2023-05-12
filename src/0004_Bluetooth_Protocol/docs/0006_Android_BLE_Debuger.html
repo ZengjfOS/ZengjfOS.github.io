@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android BLE Debuger</a></li>
+<li><a class="reference internal" href="#id1">获取蓝牙地址</a></li>
+<li><a class="reference internal" href="#android-ble-debuger-install">Android BLE Debuger Install</a></li>
+<li><a class="reference internal" href="#id2">使用方法</a></li>
+<li><a class="reference internal" href="#simple-gatt-profile-characteristic-table">Simple GATT Profile Characteristic Table</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-ble-debuger">
+<h1>Android BLE Debuger<a class="headerlink" href="#android-ble-debuger" title="Permalink to this headline"></a></h1>
+<p>使用Android BLE工具连接测试CC2541 BLE</p>
+</section>
+<section id="id1">
+<h1>获取蓝牙地址<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p><img alt="0006_Use_Flash_Programmer_Read_IEEE.png" src="../../../_images/0006_Use_Flash_Programmer_Read_IEEE.png" /></p>
+</section>
+<section id="android-ble-debuger-install">
+<h1>Android BLE Debuger Install<a class="headerlink" href="#android-ble-debuger-install" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><strong>BLE Scanner</strong>比blecore更好用</p></li>
+<li><p>https://github.com/fszeng2011/blecore</p></li>
+<li><p>华为手机可以直接在AppGallery检索安装：<code class="docutils literal notranslate"><span class="pre">BLE</span> <span class="pre">Debugger</span></code><br />
+<img alt="0006_BLECORE_Main_Page.jpg" src="../../../_images/0006_BLECORE_Main_Page.jpg" /></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>使用方法<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>烧录：<code class="docutils literal notranslate"><span class="pre">C:\Texas</span> <span class="pre">Instruments\BLE-CC254x-1.4.2.2\Accessories\HexFiles\CC2541_SmartRF_SimpleBLEPeripheral.hex</span></code></p></li>
+<li><p>按下<code class="docutils literal notranslate"><span class="pre">S1</span></code>按键，启动程序，一定要按下这个按键，然后Android软件能够检测到设备；<br />
+<img alt="0006_BLECORE_Detect_Device.jpg" src="../../../_images/0006_BLECORE_Detect_Device.jpg" /></p></li>
+<li><p>获取到的蓝牙广播：<br />
+<img alt="0006_BLECORE_Broadcast_Information.jpg" src="../../../_images/0006_BLECORE_Broadcast_Information.jpg" /></p></li>
+<li><p>连接设备，查看Profile：<br />
+<img alt="0006_BLECORE_Conect_And_Show_Profile.jpg" src="../../../_images/0006_BLECORE_Conect_And_Show_Profile.jpg" /></p></li>
+<li><p>获取、修改属性：<br />
+<img alt="0006_BLECORE_Read_Write_Attribute.jpg" src="../../../_images/0006_BLECORE_Read_Write_Attribute.jpg" /></p></li>
+</ul>
+</section>
+<section id="simple-gatt-profile-characteristic-table">
+<h1>Simple GATT Profile Characteristic Table<a class="headerlink" href="#simple-gatt-profile-characteristic-table" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>BTool Show:<br />
+<img alt="0006_Simple_GATT_Profile_Characteristic_Table_from_BTool.png" src="../../../_images/0006_Simple_GATT_Profile_Characteristic_Table_from_BTool.png" /></p></li>
+<li><p>BLECORE Show:<br />
+<img alt="0006_BLECORE_Simple_GATT_Profile_Characteristic_Table.jpg" src="../../../_images/0006_BLECORE_Simple_GATT_Profile_Characteristic_Table.jpg" /></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

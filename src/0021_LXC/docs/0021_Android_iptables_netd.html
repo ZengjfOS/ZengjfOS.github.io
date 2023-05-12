@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android iptables netd</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#table">Table</a></li>
+<li><a class="reference internal" href="#iptables">iptables 命令格式</a></li>
+<li><a class="reference internal" href="#netd-wpa-supplicant">netd wpa_supplicant</a></li>
+<li><a class="reference internal" href="#networkmanagementservice">NetworkManagementService</a></li>
+<li><a class="reference internal" href="#usbwlan0">usb热点到wlan0</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-iptables-netd">
+<h1>Android iptables netd<a class="headerlink" href="#android-iptables-netd" title="Permalink to this headline"></a></h1>
+<p>理解firewall整体架构及netd所处的位置</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://lixiaogang03.github.io/2019/08/23/Android-Iptables/">linux网络基础知识-简书</a></p></li>
+<li><p><a class="reference external" href="https://www.cnblogs.com/liuhongru/p/11422460.html">iptables中DNAT、SNAT和MASQUERADE</a></p></li>
+<li><p><a class="reference external" href="https://www.kancloud.cn/alex_wsc/android-wifi-nfc-gps/414026">2.3.1 iptables、tc和ip命令</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/zhangyongfeiyong/article/details/52524220">Android之防火墙功能的实现</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/mafei852213034/article/details/79236800?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-1&amp;spm=1001.2101.3001.4242">Android定制实现上网限制iptables</a></p></li>
+<li><p><a class="reference external" href="https://www.kancloud.cn/chunyu/php_basic_knowledge/2137339">ip route命令详解</a></p></li>
+</ul>
+</section>
+<section id="table">
+<h1>Table<a class="headerlink" href="#table" title="Permalink to this headline"></a></h1>
+<p>iptables内部（其实是Kernel的netfilter模块）维护着四个Table，分别是filter、nat、mangle和raw，它们对应着不同的功能，其作用域范围如下图：</p>
+<p><img alt="0021_Android_iptables_principle.png" src="../../../_images/0021_Android_iptables_principle.png" /></p>
+<p>路由判断，如果destination ip adress是本机地址，数据将会被转交给INPUT链。如果不是本机地址，则交给FORWARD链检测。</p>
+<p>各表格详细信息：</p>
+<p><img alt="0021_Android_iptables_rule.png" src="../../../_images/0021_Android_iptables_rule.png" /></p>
+<p>有些Table的默认Chain具有相同的名字，导致我们理解起来有些困难。为此，必须结合下图所示的iptables数据包处理流程图来理解前述内容。由图可知，不同Table和Chain在此处理流程中起着不同的作用。</p>
+<p><img alt="0021_Android_iptables_Call_Flow.jpg" src="../../../_images/0021_Android_iptables_Call_Flow.jpg" /></p>
+</section>
+<section id="iptables">
+<h1>iptables 命令格式<a class="headerlink" href="#iptables" title="Permalink to this headline"></a></h1>
+<p><img alt="0021_Android_iptables_rule_format.png" src="../../../_images/0021_Android_iptables_rule_format.png" /></p>
+<ul class="simple">
+<li><p>Table</p>
+<ul>
+<li><p>-t指定table，默认filter表</p></li>
+</ul>
+</li>
+<li><p>Commands</p>
+<ul>
+<li><p>-A 追加新的规则</p></li>
+<li><p>-D 删除旧的规则</p></li>
+<li><p>-R 替换旧的规则（链中根据编号）</p></li>
+</ul>
+</li>
+<li><p>Rule</p>
+<ul>
+<li><p>ACCEPT：接收数据包。</p></li>
+<li><p>DROP：直接丢弃数据包。没有任何信息会反馈给数据源端。</p></li>
+<li><p>RETURN：返回到调用Chain，略过后续的Rule处理。</p></li>
+<li><p>QUEUE：数据返回到用户空间去处理。</p></li>
+<li><p>目前只有INPUT、OUTPUT、FORWARD以及被这三个链调用的自定义链支持REJECT。</p></li>
+</ul>
+</li>
+<li><p>Options</p>
+<ul>
+<li><p>-i：指定接收数据包的网卡名，如eth0、eth1等。</p></li>
+<li><p>-o：指定发出数据包的网卡名。</p></li>
+<li><p>-p：指定协议，如tcp、udp等。</p></li>
+<li><p>-s，–source address[/mask]：指定数据包的源IP地址。</p></li>
+<li><p>-j，–jump target：跳转到指定目标，如ACCEPT、DROP等。</p></li>
+</ul>
+</li>
+<li><p>示例</p>
+<ul>
+<li><p>iptables -t nat -A PREROUTING -d 202.103.96.112 -j DNAT –to-destination 192.168.0.112<br />
+DNAT要在进入这个菱形转发区域之前，也就是在PREROUTING链中做，比如我们要把访问202.103.96.112的访问转发到192.168.0.112上。这个转换过程当中，其实就是将已经达到这台Linux网关（防火墙）上的数据包上的destination ip address从202.103.96.112修改为192.168.0.112然后交给系统路由进行转发。</p></li>
+<li><p>iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -j SNAT –to-source 58.20.51.66<br />
+SNAT自然是要在数据包流出这台机器之前的最后一个链也就是POSTROUTING链来进行操作，这个语句就是告诉系统把即将要流出本机的数据的source ip address修改成为58.20.51.66。这样，数据包在达到目的机器以后，目的机器会将包返回到58.20.51.66也就是本机。如果不做这个操作，那么你的数据包在传递的过程中，reply的包肯定会丢失。假如当前系统用的是ADSL/3G/4G动态拨号方式，那么每次拨号，出口IP都会改变，SNAT就会有局限性。</p></li>
+<li><p>iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE<br />
+重点在”MASQUERADE”！这个设定值就是”IP伪装成为封包出去(-o)的那块装置上的IP”！不管现在eth0的出口获得了怎样的动态ip，MASQUERADE会自动读取eth0现在的ip地址然后做SNAT出去，这样就实现了很好的动态SNAT地址转换。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="netd-wpa-supplicant">
+<h1>netd wpa_supplicant<a class="headerlink" href="#netd-wpa-supplicant" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Netd是Network Daemon 的缩写，表示Network守护进程。Netd负责跟一些涉及网络的配置，操作，管理，查询等相关的功能实现，比如，例如带宽控制（Bandwidth），流量统计，带宽控制，网络地址转换（NAT），个人局域网（pan），PPP链接，soft-ap，共享上网（Tether），配置路由表，interface配置管理，等等。</p></li>
+<li><p>Netd为开发者提供了一个用于管理的接口。就是ndc (native deamon connector)，通过adb可以直接使用CommandListener中定义的各类命令。相似的framework层的NativeDeamonConnector是为上层提供的接口；</p>
+<ul>
+<li><p>system/netd</p>
+<ul>
+<li><p>ndc.cpp</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>wpa_supplicant主要负责Wifi连接部分，连接完成之后就归netd管理了，iptables属于netd的一部分；</p></li>
+</ul>
+</section>
+<section id="networkmanagementservice">
+<h1>NetworkManagementService<a class="headerlink" href="#networkmanagementservice" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>获取网络接口</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/core/java/android/os/INetworkManagementService.aidl
+  ├── String[] listInterfaces();
+  │ frameworks/base/services/core/java/com/android/server/NetworkManagementService.java
+  └── public class NetworkManagementService extends INetworkManagementService.Stub
+      └── public String[] listInterfaces()
+          └── return mNetdService.interfaceGetList();
+              ├── 获取mNetdService服务
+              │   └── private void connectNativeNetdService()
+              │       └── mNetdService = mDeps.getNetd();
+              │           └── static class Dependencies
+              │               └── public INetd getNetd()
+              │                   └── return NetdService.get();
+              │                       └── frameworks/base/services/net/java/android/net/util/NetdService.java
+              │                           └── public static INetd get()
+              │                               └── return get(-1);
+              │                                   └── public static INetd get(long maxTimeoutMs)
+              │                                       └── final INetd netdInstance = getInstance();
+              │                                           └── public static INetd getInstance()
+              │                                               └── final INetd netdInstance = INetd.Stub.asInterface(ServiceManager.getService(Context.NETD_SERVICE));
+              └── system/netd/server/NetdNativeService.cpp
+                  └── binder::Status NetdNativeService::interfaceGetList(std::vector&lt;std::string&gt;* interfaceListResult)
+                      └── interfaceListResult-&gt;insert(end(*interfaceListResult), begin(ifaceList.value()), end(ifaceList.value()));
+</pre></div>
+</div>
+</li>
+<li><p>设置firewall UID</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/core/java/android/os/INetworkManagementService.aidl
+  ├── void setFirewallUidRule(int chain, int uid, int rule);
+  │ frameworks/base/services/core/java/com/android/server/NetworkManagementService.java
+  └── public class NetworkManagementService extends INetworkManagementService.Stub
+      └── public void setFirewallUidRule(int chain, int uid, int rule)
+          └── setFirewallUidRuleLocked(chain, uid, rule);
+              ├── final int ruleType = getFirewallRuleType(chain, rule);
+              └── mNetdService.firewallSetUidRule(chain, uid, ruleType);
+                  ├── 获取mNetdService服务
+                  │   └── private void connectNativeNetdService()
+                  │       └── mNetdService = mDeps.getNetd();
+                  │           └── static class Dependencies
+                  │               └── public INetd getNetd()
+                  │                   └── return NetdService.get();
+                  │                       └── frameworks/base/services/net/java/android/net/util/NetdService.java
+                  │                           └── public static INetd get()
+                  │                               └── return get(-1);
+                  │                                   └── public static INetd get(long maxTimeoutMs)
+                  │                                       └── final INetd netdInstance = getInstance();
+                  │                                           └── public static INetd getInstance()
+                  │                                               └── final INetd netdInstance = INetd.Stub.asInterface(ServiceManager.getService(Context.NETD_SERVICE));
+                  └── system/netd/server/NetdNativeService.cpp
+                      └── binder::Status NetdNativeService::firewallSetUidRule(int32_t childChain, int32_t uid, int32_t firewallRule)
+                          └── int res = gCtls-&gt;firewallCtrl.setUidRule(chain, uid, rule);
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="usbwlan0">
+<h1>usb热点到wlan0<a class="headerlink" href="#usbwlan0" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Android log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="n">netd</span>    <span class="p">:</span> <span class="n">tetherAddForward</span><span class="p">(</span><span class="s2">&quot;rndis0&quot;</span><span class="p">,</span> <span class="s2">&quot;wlan0&quot;</span><span class="p">)</span> <span class="o">&lt;</span><span class="mf">9.63</span><span class="n">ms</span><span class="o">&gt;</span>
+<span class="n">I</span> <span class="n">netd</span>    <span class="p">:</span> <span class="n">ipfwdAddInterfaceForward</span><span class="p">(</span><span class="s2">&quot;rndis0&quot;</span><span class="p">,</span> <span class="s2">&quot;wlan0&quot;</span><span class="p">)</span> <span class="o">&lt;</span><span class="mf">0.18</span><span class="n">ms</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>本地转发</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* system/netd/server/NetdNativeService.cpp
+  ├── binder::Status NetdNativeService::tetherAddForward(const std::string&amp; intIface, const std::string&amp; extIface)
+  │   └── int res = gCtls-&gt;tetherCtrl.enableNat(intIface.c_str(), extIface.c_str());
+  │       └── system/netd/server/TetherController.cpp
+  │           └── int TetherController::enableNat(const char* intIface, const char* extIface)
+  │               └── std::vector&lt;std::string&gt; v4Cmds = {&quot;*nat&quot;, StringPrintf(&quot;-A %s -o %s -j MASQUERADE&quot;, LOCAL_NAT_POSTROUTING, extIface), &quot;COMMIT\n&quot; };
+  │                   ├── iptablesRestoreFunction(V4, Join(v4Cmds, &#39;\n&#39;), nullptr)
+  │                   └── setForwardRules(true, intIface, extIface)
+  └── binder::Status NetdNativeService::ipfwdAddInterfaceForward(const std::string&amp; fromIface, const std::string&amp; toIface)
+      └── system/netd/server/RouteController.cpp
+          └── return modifyTetheredNetwork(RTM_NEWRULE, inputInterface, outputInterface);
+              ├── uint32_t table = getRouteTableForInterface(outputInterface);
+              └── return modifyIpRule(action, RULE_PRIORITY_TETHERING, table, MARK_UNSET, MARK_UNSET, inputInterface, OIF_NONE, INVALID_UID, INVALID_UID);
+</pre></div>
+</div>
+</li>
+<li><p>iptables -t nat -L</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Chain</span> <span class="n">PREROUTING</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+<span class="n">oem_nat_pre</span>  <span class="nb">all</span>  <span class="o">--</span>  <span class="n">anywhere</span>             <span class="n">anywhere</span>
+
+<span class="n">Chain</span> <span class="n">INPUT</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+
+<span class="n">Chain</span> <span class="n">OUTPUT</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+
+<span class="n">Chain</span> <span class="n">POSTROUTING</span> <span class="p">(</span><span class="n">policy</span> <span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+<span class="n">tetherctrl_nat_POSTROUTING</span>  <span class="nb">all</span>  <span class="o">--</span>  <span class="n">anywhere</span>             <span class="n">anywhere</span>
+
+<span class="n">Chain</span> <span class="n">oem_nat_pre</span> <span class="p">(</span><span class="mi">1</span> <span class="n">references</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+
+<span class="n">Chain</span> <span class="n">tetherctrl_nat_POSTROUTING</span> <span class="p">(</span><span class="mi">1</span> <span class="n">references</span><span class="p">)</span>
+<span class="n">target</span>     <span class="n">prot</span> <span class="n">opt</span> <span class="n">source</span>               <span class="n">destination</span>
+<span class="n">MASQUERADE</span>  <span class="nb">all</span>  <span class="o">--</span>  <span class="n">anywhere</span>             <span class="n">anywhere</span>
+</pre></div>
+</div>
+</li>
+<li><p>ip route</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">192.168.42.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">dev</span> <span class="n">rndis0</span> <span class="n">proto</span> <span class="n">kernel</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">192.168.42.129</span>
+<span class="mf">192.168.43.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">dev</span> <span class="n">wlan0</span> <span class="n">proto</span> <span class="n">kernel</span> <span class="n">scope</span> <span class="n">link</span> <span class="n">src</span> <span class="mf">192.168.43.112</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>参考文档</p>
+<ul>
+<li><p><a class="reference external" href="https://zhuanlan.zhihu.com/p/43279912">路由条目的意义</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/8499b53eb0a5">Linux路由表</a></p></li>
+</ul>
+</li>
+<li><p>路由mask: 192.168.42.0/24</p></li>
+<li><p>后面的字段告诉我们通过哪个设备来和目的地址通信: dev rndis0</p></li>
+<li><p>对于广播地址来说，它的目标是整一个IP网络，所以目标地址的scope定义为了link</p></li>
+<li><p>最后一个字段的关键字是src，这个是告诉内核当使用这个设备往外路由信息时，选择的源地址是哪个。</p>
+<ul>
+<li><p>源IP是一个路由条目的重要组成部分，这个源IP的意义在于一个补充作用。匹配还是根据目的IP进行匹配，但是由于在查找路由条目的时候很可能源地址还没有指定。典型的就是没有进行bind的发送情况，通常是随机选择端口和按照一定的规则源地址。这个一定的规则就是在这里的路由条目的src域可以影响。也就是如果进程没有bind一个源地址，将会使用这里src域里面的源地址作为数据包的源地址进行发送。但是如果进程提前bind了，命中了这个条目，就仍然会使用进程bind的源地址作为数据包的源地址。所以说这里的src只是一个建议的作用。</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

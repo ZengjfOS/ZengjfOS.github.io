@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Binder Native Services</a></li>
+<li><a class="reference internal" href="#thread-specific-data">Thread Specific Data</a></li>
+<li><a class="reference internal" href="#processstate">ProcessState</a></li>
+<li><a class="reference internal" href="#threadpool">ThreadPool</a></li>
+<li><a class="reference internal" href="#auto-spawn-binder-thread">auto spawn binder thread</a></li>
+<li><a class="reference internal" href="#defaultservicemanager">defaultServiceManager</a></li>
+<li><a class="reference internal" href="#add-service">add service</a></li>
+<li><a class="reference internal" href="#ontransact">onTransact如何被调用</a></li>
+<li><a class="reference internal" href="#transact">transact</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="binder-native-services">
+<h1>Binder Native Services<a class="headerlink" href="#binder-native-services" title="Permalink to this headline"></a></h1>
+<p>分析Binder通信Native服务区启动原理，ProcessState、IPCThreadState如何做到不同service的调用、处理</p>
+</section>
+<section id="thread-specific-data">
+<h1>Thread Specific Data<a class="headerlink" href="#thread-specific-data" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0010_Thread_Specific_Data.html"><span class="doc std std-doc">0010_Thread_Specific_Data.md</span></a></p>
+<ul>
+<li><p>多线程独立拥有全局变量</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="processstate">
+<h1>ProcessState<a class="headerlink" href="#processstate" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>每个进程只有一个ProcessState，所以它是独一无二的，由于ProcessState的惟一性，因此一个进程只打开设备一次</p></li>
+<li><p>ProcessState::self()创建ProcessState，一个进程只能打开一次binder文件节点</p></li>
+</ul>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// frameworks/native/libs/binder/ProcessState.cpp</span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">kDefaultDriver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/dev/binder&quot;</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// ...省略</span>
+
+<span class="n">sp</span><span class="o">&lt;</span><span class="n">ProcessState</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ProcessState</span><span class="o">::</span><span class="n">self</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Mutex</span><span class="o">::</span><span class="n">Autolock</span><span class="w"> </span><span class="nf">_l</span><span class="p">(</span><span class="n">gProcessMutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">gProcess</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">gProcess</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">gProcess</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ProcessState</span><span class="p">(</span><span class="n">kDefaultDriver</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">gProcess</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// ...省略</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">open_driver</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">driver</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">fd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">O_RDWR</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">O_CLOEXEC</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fd</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">vers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">status_t</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span><span class="w"> </span><span class="n">BINDER_VERSION</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">vers</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;Binder ioctl to obtain version failed: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">            </span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">fd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">vers</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">BINDER_CURRENT_PROTOCOL_VERSION</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;Binder driver protocol(%d) does not match user space protocol(%d)! ioctl() return value: %d&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">vers</span><span class="p">,</span><span class="w"> </span><span class="n">BINDER_CURRENT_PROTOCOL_VERSION</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">fd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="kt">size_t</span><span class="w"> </span><span class="n">maxThreads</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_MAX_BINDER_THREADS</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span><span class="w"> </span><span class="n">BINDER_SET_MAX_THREADS</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">maxThreads</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;Binder ioctl to set max threads failed: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGW</span><span class="p">(</span><span class="s">&quot;Opening &#39;%s&#39; failed: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">fd</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">ProcessState</span><span class="o">::</span><span class="n">ProcessState</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">driver</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">mDriverName</span><span class="p">(</span><span class="n">String8</span><span class="p">(</span><span class="n">driver</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mDriverFD</span><span class="p">(</span><span class="n">open_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mVMStart</span><span class="p">(</span><span class="n">MAP_FAILED</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mThreadCountLock</span><span class="p">(</span><span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mThreadCountDecrement</span><span class="p">(</span><span class="n">PTHREAD_COND_INITIALIZER</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mExecutingThreadsCount</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mMaxThreads</span><span class="p">(</span><span class="n">DEFAULT_MAX_BINDER_THREADS</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mStarvationStartTimeMs</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mManagesContexts</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mBinderContextCheckFunc</span><span class="p">(</span><span class="k">nullptr</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mBinderContextUserData</span><span class="p">(</span><span class="k">nullptr</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mThreadPoolStarted</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mThreadPoolSeq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">mCallRestriction</span><span class="p">(</span><span class="n">CallRestriction</span><span class="o">::</span><span class="n">NONE</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mDriverFD</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// mmap the binder, providing a chunk of virtual address space to receive transactions.</span>
+<span class="w">        </span><span class="n">mVMStart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mmap</span><span class="p">(</span><span class="k">nullptr</span><span class="p">,</span><span class="w"> </span><span class="n">BINDER_VM_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">PROT_READ</span><span class="p">,</span><span class="w"> </span><span class="n">MAP_PRIVATE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">MAP_NORESERVE</span><span class="p">,</span><span class="w"> </span><span class="n">mDriverFD</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mVMStart</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MAP_FAILED</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// *sigh*</span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;Using %s failed: unable to mmap transaction memory.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mDriverName</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span><span class="w"></span>
+<span class="w">            </span><span class="n">close</span><span class="p">(</span><span class="n">mDriverFD</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">mDriverFD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">mDriverName</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">LOG_ALWAYS_FATAL_IF</span><span class="p">(</span><span class="n">mDriverFD</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Binder driver could not be opened.  Terminating.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="threadpool">
+<h1>ThreadPool<a class="headerlink" href="#threadpool" title="Permalink to this headline"></a></h1>
+<p>最终分析结果感觉这个线程池的概念像是创建线程</p>
+<ul class="simple">
+<li><p>ProcessState::self()-&gt;startThreadPool();</p>
+<ul>
+<li><p>线程池只能创建一次；</p></li>
+<li><p>第一次主要是创建主线程；</p></li>
+<li><p>执行PoolThread的threadLoop；</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="c1">// frameworks/native/libs/binder/ProcessState.cpp</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PoolThread</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">Thread</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">explicit</span><span class="w"> </span><span class="n">PoolThread</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">isMain</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">mIsMain</span><span class="p">(</span><span class="n">isMain</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="k">protected</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">threadLoop</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">IPCThreadState</span><span class="o">::</span><span class="n">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">joinThreadPool</span><span class="p">(</span><span class="n">mIsMain</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">mIsMain</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">ProcessState::startThreadPool</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">AutoMutex</span><span class="w"> </span><span class="n">_l</span><span class="p">(</span><span class="n">mLock</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">mThreadPoolStarted</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">mThreadPoolStarted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">spawnPooledThread</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">String8</span><span class="w"> </span><span class="nf">ProcessState::makeBinderThreadName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">android_atomic_add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mThreadPoolSeq</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">pid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getpid</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">String8</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">name</span><span class="p">.</span><span class="n">appendFormat</span><span class="p">(</span><span class="s">&quot;Binder:%d_%X&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">pid</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">name</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">ProcessState::spawnPooledThread</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">isMain</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mThreadPoolStarted</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">String8</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">makeBinderThreadName</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGV</span><span class="p">(</span><span class="s">&quot;Spawning new pooled thread, name=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">.</span><span class="n">string</span><span class="p">());</span><span class="w"></span>
+<span class="w">        </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">Thread</span><span class="o">&gt;</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PoolThread</span><span class="p">(</span><span class="n">isMain</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">t</span><span class="o">-&gt;</span><span class="n">run</span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="n">string</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>IPCThreadState::self()</p>
+<ul>
+<li><p>采用Thread Specific Data机制，生成IPCThreadState数据，这样每个线程有自己的IPCThreadState</p></li>
+<li><p>new IPCThreadState的时候会调用pthread_setspecific(gTLS, this)</p></li>
+</ul>
+</li>
+<li><p>IPCThreadState::self()-&gt;joinThreadPool(mIsMain);</p>
+<ul>
+<li><p>mOut.writeInt32(isMain ? BC_ENTER_LOOPER : BC_REGISTER_LOOPER);</p>
+<ul>
+<li><p>BC_ENTER_LOOPER</p></li>
+<li><p>BC_REGISTER_LOOPER</p></li>
+</ul>
+</li>
+<li><p>if(result == TIMED_OUT &amp;&amp; !isMain)</p>
+<ul>
+<li><p>非主线程，直接退出break</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="n">IPCThreadState</span><span class="o">*</span><span class="w"> </span><span class="nf">IPCThreadState::self</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">gHaveTLS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="nl">restart</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">pthread_key_t</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gTLS</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">IPCThreadState</span><span class="o">*</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">IPCThreadState</span><span class="o">*</span><span class="p">)</span><span class="n">pthread_getspecific</span><span class="p">(</span><span class="n">k</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">st</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">st</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IPCThreadState</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">gShutdown</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGW</span><span class="p">(</span><span class="s">&quot;Calling IPCThreadState::self() during shutdown is dangerous, expect a crash.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gTLSMutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">gHaveTLS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">key_create_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pthread_key_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gTLS</span><span class="p">,</span><span class="w"> </span><span class="n">threadDestructor</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key_create_value</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gTLSMutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGW</span><span class="p">(</span><span class="s">&quot;IPCThreadState::self() unable to create TLS key, expect a crash: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">strerror</span><span class="p">(</span><span class="n">key_create_value</span><span class="p">));</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">gHaveTLS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">gTLSMutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">goto</span><span class="w"> </span><span class="n">restart</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">IPCThreadState::joinThreadPool</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">isMain</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">LOG_THREADPOOL</span><span class="p">(</span><span class="s">&quot;**** THREAD %p (PID %d) IS JOINING THE THREAD POOL</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pthread_self</span><span class="p">(),</span><span class="w"> </span><span class="n">getpid</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">mOut</span><span class="p">.</span><span class="n">writeInt32</span><span class="p">(</span><span class="n">isMain</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">BC_ENTER_LOOPER</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">BC_REGISTER_LOOPER</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">status_t</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">processPendingDerefs</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// now get the next command to be processed, waiting if necessary</span>
+<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getAndExecuteCommand</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">NO_ERROR</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">TIMED_OUT</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">ECONNREFUSED</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">EBADF</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;getAndExecuteCommand(fd=%d) returned unexpected error %d, aborting&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                  </span><span class="n">mProcess</span><span class="o">-&gt;</span><span class="n">mDriverFD</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">abort</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Let this thread exit the thread pool if it is no longer</span>
+<span class="w">        </span><span class="c1">// needed and it is not the main process thread.</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">TIMED_OUT</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">isMain</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">ECONNREFUSED</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">EBADF</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">LOG_THREADPOOL</span><span class="p">(</span><span class="s">&quot;**** THREAD %p (PID %d) IS LEAVING THE THREAD POOL err=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pthread_self</span><span class="p">(),</span><span class="w"> </span><span class="n">getpid</span><span class="p">(),</span><span class="w"> </span><span class="n">result</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">mOut</span><span class="p">.</span><span class="n">writeInt32</span><span class="p">(</span><span class="n">BC_EXIT_LOOPER</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">talkWithDriver</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">IPCThreadState</span><span class="o">::</span><span class="n">IPCThreadState</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">mProcess</span><span class="p">(</span><span class="n">ProcessState</span><span class="o">::</span><span class="n">self</span><span class="p">()),</span><span class="w"></span>
+<span class="w">      </span><span class="n">mWorkSource</span><span class="p">(</span><span class="n">kUnsetWorkSource</span><span class="p">),</span><span class="w"></span>
+<span class="w">      </span><span class="n">mPropagateWorkSource</span><span class="p">(</span><span class="nb">false</span><span class="p">),</span><span class="w"></span>
+<span class="w">      </span><span class="n">mStrictModePolicy</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">      </span><span class="n">mLastTransactionBinderFlags</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">      </span><span class="n">mCallRestriction</span><span class="p">(</span><span class="n">mProcess</span><span class="o">-&gt;</span><span class="n">mCallRestriction</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">pthread_setspecific</span><span class="p">(</span><span class="n">gTLS</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">clearCaller</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">mIn</span><span class="p">.</span><span class="n">setDataCapacity</span><span class="p">(</span><span class="mi">256</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">mOut</span><span class="p">.</span><span class="n">setDataCapacity</span><span class="p">(</span><span class="mi">256</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">mIPCThreadStateBase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IPCThreadStateBase</span><span class="o">::</span><span class="n">self</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>mIn、mOut是什么？Parcel类型的，可以认为是收发两个缓冲区；</p></li>
+<li><p>对应binder_write_read结构体的read_buffer、write_buffer；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">IPCThreadState</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">status_t</span> <span class="n">IPCThreadState</span><span class="p">::</span><span class="n">talkWithDriver</span><span class="p">(</span><span class="nb">bool</span> <span class="n">doReceive</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">bwr</span><span class="o">.</span><span class="n">write_size</span> <span class="o">=</span> <span class="n">outAvail</span><span class="p">;</span>
+    <span class="o">*</span> <span class="n">bwr</span><span class="o">.</span><span class="n">write_buffer</span> <span class="o">=</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">mOut</span><span class="o">.</span><span class="n">data</span><span class="p">();</span>
+    <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">ioctl</span><span class="p">(</span><span class="n">mProcess</span><span class="o">-&gt;</span><span class="n">mDriverFD</span><span class="p">,</span> <span class="n">BINDER_WRITE_READ</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bwr</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">mOut</span><span class="o">.</span><span class="n">setDataSize</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="o">*</span> <span class="n">processPostWriteDerefs</span><span class="p">();</span>
+    <span class="o">*</span> <span class="n">mIn</span><span class="o">.</span><span class="n">setDataSize</span><span class="p">(</span><span class="n">bwr</span><span class="o">.</span><span class="n">read_consumed</span><span class="p">);</span>
+    <span class="o">*</span> <span class="n">mIn</span><span class="o">.</span><span class="n">setDataPosition</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="auto-spawn-binder-thread">
+<h1>auto spawn binder thread<a class="headerlink" href="#auto-spawn-binder-thread" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.jianshu.com/p/18b42c5dc7ca">四问binder</a></p>
+<ul>
+<li><p>只要调用 spawnPooledThread()函数就创建了一个binder线程，因此从代码上来看除了第一个主binder线程由APP用户态主动创建外，其它的都是由Binder驱动主动向APP申请创建，也就是说binder线程的创建是看binder驱动是否很繁忙(这里的繁忙是与本进程相关的)，来决定是否需要向APP进程申请创建，也就是APP进程被动创建；</p></li>
+<li><p>binder最终的通信包括client和server双方。server方并不知道什么时候会有client的请求，client的有请求，它就直接丢给binder驱动，然后由binder驱动根据当前server的能力(是否有多余线程去处理)去看下是否需要新的线程来处理client的请求；</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">IPCThreadState</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">status_t</span> <span class="n">IPCThreadState</span><span class="p">::</span><span class="n">waitForResponse</span><span class="p">(</span><span class="n">Parcel</span> <span class="o">*</span><span class="n">reply</span><span class="p">,</span> <span class="n">status_t</span> <span class="o">*</span><span class="n">acquireResult</span><span class="p">)</span>
+    <span class="o">*</span> <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="o">*</span> <span class="n">err</span><span class="o">=</span><span class="n">talkWithDriver</span><span class="p">()</span>
+      <span class="o">*</span> <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint32_t</span><span class="p">)</span><span class="n">mIn</span><span class="o">.</span><span class="n">readInt32</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">switch</span> <span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">default</span><span class="p">:</span>
+          <span class="o">*</span> <span class="n">err</span> <span class="o">=</span> <span class="n">executeCommand</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">status_t</span> <span class="n">IPCThreadState</span><span class="p">::</span><span class="n">executeCommand</span><span class="p">(</span><span class="n">int32_t</span> <span class="n">cmd</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">switch</span> <span class="p">((</span><span class="n">uint32_t</span><span class="p">)</span><span class="n">cmd</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">case</span> <span class="n">BR_SPAWN_LOOPER</span><span class="p">:</span>
+                    <span class="o">*</span> <span class="n">mProcess</span><span class="o">-&gt;</span><span class="n">spawnPooledThread</span><span class="p">(</span><span class="n">false</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">String8</span> <span class="n">name</span> <span class="o">=</span> <span class="n">makeBinderThreadName</span><span class="p">();</span>
+                    <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">Thread</span><span class="o">&gt;</span> <span class="n">t</span> <span class="o">=</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">PoolThread</span><span class="o">&gt;</span><span class="p">::</span><span class="n">make</span><span class="p">(</span><span class="n">isMain</span><span class="p">);</span>
+                      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">ProcessState</span><span class="o">.</span><span class="n">cpp</span>
+                        <span class="o">*</span> <span class="k">class</span> <span class="nc">PoolThread</span> <span class="p">:</span> <span class="n">public</span> <span class="n">Thread</span>
+                          <span class="o">*</span> <span class="n">IPCThreadState</span><span class="p">::</span><span class="bp">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">joinThreadPool</span><span class="p">(</span><span class="n">mIsMain</span><span class="p">);</span>
+                            <span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">getAndExecuteCommand</span><span class="p">();</span>
+                              <span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">talkWithDriver</span><span class="p">();</span>
+                    <span class="o">*</span> <span class="n">t</span><span class="o">-&gt;</span><span class="n">run</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">string</span><span class="p">());</span>
+</pre></div>
+</div>
+</section>
+<section id="defaultservicemanager">
+<h1>defaultServiceManager<a class="headerlink" href="#defaultservicemanager" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">IServiceManager</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IServiceManager</span><span class="o">&gt;</span> <span class="n">defaultServiceManager</span><span class="p">()</span>
+    <span class="o">*</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">interface_cast</span><span class="o">&lt;</span><span class="n">AidlServiceManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ProcessState</span><span class="p">::</span><span class="bp">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getContextObject</span><span class="p">(</span><span class="n">nullptr</span><span class="p">));</span>
+      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">ProcessState</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;</span> <span class="n">context</span> <span class="o">=</span> <span class="n">getStrongProxyForHandle</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+          <span class="o">*</span> <span class="k">return</span> <span class="n">context</span><span class="p">;</span>
+    <span class="o">*</span> <span class="n">gDefaultServiceManager</span> <span class="o">=</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">ServiceManagerShim</span><span class="o">&gt;</span><span class="p">::</span><span class="n">make</span><span class="p">(</span><span class="n">sm</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">IServiceManager</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="k">class</span> <span class="nc">ServiceManagerShim</span> <span class="p">:</span> <span class="n">public</span> <span class="n">IServiceManager</span>
+          <span class="o">*</span> <span class="n">ServiceManagerShim</span><span class="p">::</span><span class="n">ServiceManagerShim</span><span class="p">(</span><span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">AidlServiceManager</span><span class="o">&gt;&amp;</span> <span class="n">impl</span><span class="p">)</span> <span class="p">:</span> <span class="n">mTheRealServiceManager</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">mTheRealServiceManager</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
+    <span class="o">*</span> <span class="k">return</span> <span class="n">gDefaultServiceManager</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="add-service">
+<h1>add service<a class="headerlink" href="#add-service" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jason--liu.github.io/2018/01/14/bindersystem/">Android Binder系统分析</a></p>
+<ul>
+<li><p>addService</p>
+<ul>
+<li><p>为每一个服务构造flat_binder_object结构体</p></li>
+<li><p>调用ioctl发送数据</p>
+<ul>
+<li><p>数据中有flat_binder_object</p></li>
+<li><p>服务的名字</p></li>
+<li><p>目的handle = 0(ServiceManager)</p></li>
+</ul>
+</li>
+<li><p>驱动程序为每一个flat_binder_object构造binder_node节点，一个binder_node节点代表一个服务。binder_node节点里面包含</p>
+<ul>
+<li><p>ptr: 对应函数处理方法</p></li>
+<li><p>cookie</p></li>
+<li><p>proc: 指向当前进</p></li>
+</ul>
+</li>
+<li><p>驱动程序根据handle = 0找到SM，并把数据发送给SM的todo链表，并构造binder_ref节点，即服务的引用。</p></li>
+</ul>
+</li>
+<li><p>ServiceManager</p>
+<ul>
+<li><p>驱动程序会在SM的内核态构造binder_ref节点，里面包含</p></li>
+<li><p>binder_ref:</p>
+<ul>
+<li><p>desc 一个数字，依据服务注册的顺序递增</p></li>
+<li><p>node 指向上面讲的binder_node节点</p></li>
+</ul>
+</li>
+<li><p>同时SM在用户态会构造一个serverlist链表，serverlist里面包含</p>
+<ul>
+<li><p>name 服务的名字</p></li>
+<li><p>handle 等于上面的desc</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>getService</p>
+<ul>
+<li><p>Client端获取服务过程</p>
+<ul>
+<li><p>构造数据，数据中包含想要获取的服务名称和目的即handle=0</p></li>
+<li><p>调用ioctl发送数据</p></li>
+<li><p>根据handle = 0找到SM</p></li>
+<li><p>SM从serverlist中根据name找到相应的handle,并返回flat_binder_object结构体，里面包含handle(想要获取服务的handle)</p></li>
+<li><p>驱动程序会创建一个binder_ref节点，里面的node指向SM中binnder_ref的node</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>服务的使用</p>
+<ul>
+<li><p>服务的使用过程，同样是先构造数据，code(想要调用哪个函数)，handle(对应服务的引用)，再调用ioctl发送数据</p></li>
+<li><p>驱动程序会设置ptr和cookie,驱动程序根据handle找到binder_ref–&gt;binder_node–&gt;binder_proc.Server端接收到数据后根据prt和cookie调用不用的服务。</p></li>
+<li><p>小结</p>
+<ul>
+<li><p>最核心的函数ioctl</p></li>
+<li><p>client端最核心的数据handle</p></li>
+<li><p>server端最核心的数据ptr/cookie</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>当我们add service的时候，其实是把服务的对象地址保存到了binder驱动，并映射成一个handle给client；</p></li>
+<li><p>这个指针又cookie字段保存；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">IServiceManager</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IServiceManager</span><span class="o">&gt;</span> <span class="n">defaultServiceManager</span><span class="p">()</span>
+    <span class="o">*</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">interface_cast</span><span class="o">&lt;</span><span class="n">AidlServiceManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ProcessState</span><span class="p">::</span><span class="bp">self</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">getContextObject</span><span class="p">(</span><span class="n">nullptr</span><span class="p">));</span>
+      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">ProcessState</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;</span> <span class="n">context</span> <span class="o">=</span> <span class="n">getStrongProxyForHandle</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+          <span class="o">*</span> <span class="k">return</span> <span class="n">context</span><span class="p">;</span>
+    <span class="o">*</span> <span class="n">gDefaultServiceManager</span> <span class="o">=</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">ServiceManagerShim</span><span class="o">&gt;</span><span class="p">::</span><span class="n">make</span><span class="p">(</span><span class="n">sm</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">IServiceManager</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="k">class</span> <span class="nc">ServiceManagerShim</span> <span class="p">:</span> <span class="n">public</span> <span class="n">IServiceManager</span>
+          <span class="o">*</span> <span class="n">ServiceManagerShim</span><span class="p">::</span><span class="n">ServiceManagerShim</span><span class="p">(</span><span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">AidlServiceManager</span><span class="o">&gt;&amp;</span> <span class="n">impl</span><span class="p">)</span> <span class="p">:</span> <span class="n">mTheRealServiceManager</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">mTheRealServiceManager</span><span class="p">(</span><span class="n">impl</span><span class="p">)</span>
+    <span class="o">*</span> <span class="k">return</span> <span class="n">gDefaultServiceManager</span><span class="p">;</span>
+  <span class="o">*</span> <span class="n">status_t</span> <span class="n">ServiceManagerShim</span><span class="p">::</span><span class="n">addService</span><span class="p">(</span><span class="n">const</span> <span class="n">String16</span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span> <span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;&amp;</span> <span class="n">service</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">allowIsolated</span><span class="p">,</span> <span class="nb">int</span> <span class="n">dumpsysPriority</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">Status</span> <span class="n">status</span> <span class="o">=</span> <span class="n">mTheRealServiceManager</span><span class="o">-&gt;</span><span class="n">addService</span><span class="p">(</span><span class="n">String8</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">service</span><span class="p">,</span> <span class="n">allowIsolated</span><span class="p">,</span> <span class="n">dumpsysPriority</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">out</span><span class="o">/</span><span class="n">soong</span><span class="o">/.</span><span class="n">intermediates</span><span class="o">/</span><span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">libbinder</span><span class="o">/</span><span class="n">android_arm_armv8</span><span class="o">-</span><span class="n">a_shared</span><span class="o">/</span><span class="n">gen</span><span class="o">/</span><span class="n">aidl</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">os</span><span class="o">/</span><span class="n">IServiceManager</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="p">::</span><span class="n">android</span><span class="p">::</span><span class="n">binder</span><span class="p">::</span><span class="n">Status</span> <span class="n">BpServiceManager</span><span class="p">::</span><span class="n">addService</span><span class="p">(</span><span class="n">const</span> <span class="p">::</span><span class="n">std</span><span class="p">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">name</span><span class="p">,</span> <span class="n">const</span> <span class="p">::</span><span class="n">android</span><span class="p">::</span><span class="n">sp</span><span class="o">&lt;</span><span class="p">::</span><span class="n">android</span><span class="p">::</span><span class="n">IBinder</span><span class="o">&gt;&amp;</span> <span class="n">service</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">allowIsolated</span><span class="p">,</span> <span class="n">int32_t</span> <span class="n">dumpPriority</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">_aidl_ret_status</span> <span class="o">=</span> <span class="n">_aidl_data</span><span class="o">.</span><span class="n">writeStrongBinder</span><span class="p">(</span><span class="n">service</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">Parcel</span><span class="o">.</span><span class="n">cpp</span>
+              <span class="o">*</span> <span class="n">status_t</span> <span class="n">Parcel</span><span class="p">::</span><span class="n">writeStrongBinder</span><span class="p">(</span><span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;&amp;</span> <span class="n">val</span><span class="p">)</span>
+                <span class="o">*</span> <span class="k">return</span> <span class="n">flattenBinder</span><span class="p">(</span><span class="n">val</span><span class="p">);</span>
+                  <span class="o">*</span> <span class="n">BBinder</span><span class="o">*</span> <span class="n">local</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+                  <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">binder</span><span class="p">)</span> <span class="n">local</span> <span class="o">=</span> <span class="n">binder</span><span class="o">-&gt;</span><span class="n">localBinder</span><span class="p">();</span>
+                  <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">local</span><span class="p">)</span> <span class="n">local</span><span class="o">-&gt;</span><span class="n">setParceled</span><span class="p">();</span>
+                  <span class="o">*</span> <span class="n">obj</span><span class="o">.</span><span class="n">cookie</span> <span class="o">=</span> <span class="n">reinterpret_cast</span><span class="o">&lt;</span><span class="n">uintptr_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">local</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">cookie中传的是指针</span>
+</pre></div>
+</div>
+</section>
+<section id="ontransact">
+<h1>onTransact如何被调用<a class="headerlink" href="#ontransact" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.jianshu.com/p/c72f4b16796a">Android底层：通熟易懂的分析binder–3. 探究binder全流程通信之请求篇</a></p>
+<ul>
+<li><p>tr.cookie其实就是BBinder对象，这时候开始调用BBinder的transact方法，这是通往上层的入口</p></li>
+<li><p>当我们add service的时候，其实是把服务的对象地址保存到了binder驱动，并映射成一个handle给client；</p></li>
+</ul>
+</li>
+<li><p>需要理解的是Binder通信是负责通信，Binder对象是对象，两者不能混淆，Binder对象调用，从驱动那边可以获取到Binder对象，所以可以调用到对象的transact函数，继而调用到对象的onTransact()</p></li>
+<li><p>virtual status_t onTransact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags = 0)</p>
+<ul>
+<li><p>接收数据</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/native/libs/binder/IPCThreadState.cpp
+  * status_t IPCThreadState::getAndExecuteCommand()
+    * result = talkWithDriver();
+    * cmd = mIn.readInt32();
+    * result = executeCommand(cmd);
+      * switch ((uint32_t)cmd)
+        * case BR_TRANSACTION:
+          * binder_transaction_data&amp; tr = tr_secctx.transaction_data;
+          * result = mIn.read(&amp;tr, sizeof(tr));
+            * 所有的数据是从驱动中读取的，tr.cookie，也就是当我们add service的时候，其实是把服务的对象地址保存到了binder驱动，并映射成一个handle给client；
+          * Parcel buffer;
+          * buffer.ipcSetDataReference(reinterpret_cast&lt;const uint8_t*&gt;(tr.data.ptr.buffer), tr.data_size, reinterpret_cast&lt;const binder_size_t*&gt;(tr.data.ptr.offsets), tr.offsets_size/sizeof(binder_size_t), freeBuffer);
+          * error = reinterpret_cast&lt;BBinder*&gt;(tr.cookie)-&gt;transact(tr.code, buffer, &amp;reply, tr.flags);
+            * frameworks/native/libs/binder/include/binder/Binder.h
+              * virtual status_t transact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags = 0) final;
+                * frameworks/native/libs/binder/Binder.cpp
+                  * status_t BBinder::transact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)
+                    * switch (code)
+                      * err = onTransact(code, data, reply, flags);
+                        * class SystoolService : public BBinder
+                          * virtual status_t onTransact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags = 0)
+                            * SystoolFunc func = getSystoolFunc(code);
+                            * (*func)(data, reply);
+</pre></div>
+</div>
+<p><img alt="0011_Binder_onTransact_Call_back.png" src="../../../_images/0011_Binder_onTransact_Call_back.png" /></p>
+</section>
+<section id="transact">
+<h1>transact<a class="headerlink" href="#transact" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>status_t IPCThreadState::transact(int32_t handle, uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)</p>
+<ul>
+<li><p>发送数据</p></li>
+</ul>
+</li>
+<li><p>virtual status_t onTransact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags = 0)</p>
+<ul>
+<li><p>接收数据</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/core/java/com/droid/os/NativeBinder.java
+  * public static int ExecShellCmd(String cmd)
+    * IBinder mRemote = getSystoolBinderService();
+    * mRemote.transact(IPC_FUNC_ExecShellCmd, data, reply, 0);
+      * frameworks/native/libs/binder/include/binder/IBinder.h
+        * class [[clang::lto_visibility_public]] IBinder : public virtual RefBase
+          * virtual status_t transact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags = 0) = 0;
+            * frameworks/native/libs/binder/BpBinder.cpp
+              * status_t BpBinder::transact(uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)
+                * status = IPCThreadState::self()-&gt;transact(binderHandle(), code, data, reply, flags);
+                  * frameworks/native/libs/binder/IPCThreadState.cpp
+                    * status_t IPCThreadState::transact(int32_t handle, uint32_t code, const Parcel&amp; data, Parcel* reply, uint32_t flags)
+                      * err = writeTransactionData(BC_TRANSACTION, flags, handle, code, data, nullptr);
+                      * err = waitForResponse(reply);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

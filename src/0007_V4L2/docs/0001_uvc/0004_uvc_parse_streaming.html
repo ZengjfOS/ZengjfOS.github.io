@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/login.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">uvc_parse_streaming</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uvc-parse-streaming">
+<h1>uvc_parse_streaming<a class="headerlink" href="#uvc-parse-streaming" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>最终VS被加载到<code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">uvc_device</span></code>的streams链表上去了；</p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">uvc_parse_streaming</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">usb_interface</span><span class="w"> </span><span class="o">*</span><span class="n">intf</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_streaming</span><span class="w"> </span><span class="o">*</span><span class="n">streaming</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_format</span><span class="w"> </span><span class="o">*</span><span class="n">format</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_frame</span><span class="w"> </span><span class="o">*</span><span class="n">frame</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">usb_host_interface</span><span class="w"> </span><span class="o">*</span><span class="n">alts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">intf</span><span class="o">-&gt;</span><span class="n">altsetting</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w">                         </span><span class="c1">// 获取第0个多选接口描述</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">_buffer</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">extra</span><span class="p">;</span><span class="w">                                  </span><span class="c1">// 获取接口UVC定义的数据，主要是为了解析它</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">_buflen</span><span class="p">,</span><span class="w"> </span><span class="n">buflen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">extralen</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">nformats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">nframes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">nintervals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">u32</span><span class="w"> </span><span class="o">*</span><span class="n">interval</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">u16</span><span class="w"> </span><span class="n">psize</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">intf</span><span class="o">-&gt;</span><span class="n">cur_altsetting</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceSubClass</span><span class="w">                               </span><span class="c1">// 视频流</span>
+<span class="w">        </span><span class="o">!=</span><span class="w"> </span><span class="n">UVC_SC_VIDEOSTREAMING</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d interface %d isn&#39;t a &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;video streaming interface</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">intf</span><span class="o">-&gt;</span><span class="n">altsetting</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">usb_driver_claim_interface</span><span class="p">(</span><span class="o">&amp;</span><span class="n">uvc_driver</span><span class="p">.</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">intf</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d interface %d is already &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;claimed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">intf</span><span class="o">-&gt;</span><span class="n">altsetting</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">streaming</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvc_stream_new</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">intf</span><span class="p">);</span><span class="w">                                          </span><span class="c1">// 创建视频流</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">streaming</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">usb_driver_release_interface</span><span class="p">(</span><span class="o">&amp;</span><span class="n">uvc_driver</span><span class="p">.</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">intf</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* The Pico iMage webcam has its class-specific interface descriptors</span>
+<span class="cm">     * after the endpoint descriptors.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buflen</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                                      </span><span class="c1">// 不等于0，暂不考虑</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bNumEndpoints</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">struct</span><span class="w"> </span><span class="nc">usb_host_endpoint</span><span class="w"> </span><span class="o">*</span><span class="n">ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">endpoint</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">extralen</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">extralen</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">extra</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">USB_DT_CS_INTERFACE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trying extra data &quot;</span><span class="w"></span>
+<span class="w">                    </span><span class="s">&quot;from endpoint %u.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">endpoint</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">extra</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">buflen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">endpoint</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">extralen</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Skip the standard interface descriptors. */</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">buflen</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">USB_DT_CS_INTERFACE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">buflen</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">buffer</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buflen</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;no class-specific streaming &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;interface descriptors found.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Parse the header descriptor. */</span><span class="w"></span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_OUTPUT_HEADER</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">V4L2_BUF_TYPE_VIDEO_OUTPUT</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_INPUT_HEADER</span><span class="p">:</span><span class="w">                                                   </span><span class="c1">// 摄像头，当然是输入</span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">V4L2_BUF_TYPE_VIDEO_CAPTURE</span><span class="p">;</span><span class="w">                          </span><span class="c1">// 这里指定了是V4L2类型的</span>
+<span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d videostreaming interface &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;%d HEADER descriptor not found.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buflen</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buflen</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="n">size</span><span class="mi">-1</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buflen</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span><span class="o">*</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d videostreaming &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;interface %d HEADER descriptor is invalid.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bNumFormats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bEndpointAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span><span class="w">                             </span><span class="c1">// 用来找后面的ep</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_VS_INPUT_HEADER</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bmInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bTerminalLink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bStillCaptureMethod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">9</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bTriggerSupport</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bTriggerUsage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">11</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bTerminalLink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bControlSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bmaControls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmemdup</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">[</span><span class="n">size</span><span class="p">],</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"></span>
+<span class="w">                        </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bmaControls</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">buflen</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="n">buffer</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buffer</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">_buflen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buflen</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Count the format and frame descriptors. */</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">_buflen</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">USB_DT_CS_INTERFACE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                      </span><span class="c1">// 统计支持的帧格式和帧尺寸</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">_buffer</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_UNCOMPRESSED</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_MJPEG</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_FRAME_BASED</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">nformats</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_DV</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/* DV format has no frame descriptor. We will create a</span>
+<span class="cm">             * dummy frame descriptor with a dummy frame interval.</span>
+<span class="cm">             */</span><span class="w"></span>
+<span class="w">            </span><span class="n">nformats</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">nframes</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">nintervals</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_MPEG2TS</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_STREAM_BASED</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d videostreaming &quot;</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;interface %d FORMAT %u is not supported.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">,</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FRAME_UNCOMPRESSED</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FRAME_MJPEG</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">nframes</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_buflen</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">25</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">nintervals</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">25</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FRAME_FRAME_BASED</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">nframes</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">_buflen</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">21</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">nintervals</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">_buflen</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">_buffer</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nformats</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d videostreaming interface &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;%d has no supported formats defined.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * 计算需要的信息保存空间：</span>
+<span class="cm">     *   [nformats size]|[nframes size]|[nintervals size]</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nformats</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">format</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nframes</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">frame</span><span class="p">)</span><span class="w"></span>
+<span class="w">         </span><span class="o">+</span><span class="w"> </span><span class="n">nintervals</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">interval</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kzalloc</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w">                                     </span><span class="c1">// 开始即为format空间</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">format</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_frame</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">format</span><span class="p">[</span><span class="n">nformats</span><span class="p">];</span><span class="w">                          </span><span class="c1">// frame地址开始的地方是format结束的地方</span>
+<span class="w">    </span><span class="n">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">u32</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">frame</span><span class="p">[</span><span class="n">nframes</span><span class="p">];</span><span class="w">                                      </span><span class="c1">// interval开始的地方是frame结束的地方</span>
+
+<span class="w">    </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">format</span><span class="p">;</span><span class="w">                                             </span><span class="c1">// 将format信息给streaming对象</span>
+<span class="w">    </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">nformats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nformats</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Parse the format descriptors. */</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">buflen</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">USB_DT_CS_INTERFACE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                </span><span class="c1">// 解析出format信息</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_UNCOMPRESSED</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_MJPEG</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_DV</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">UVC_VS_FORMAT_FRAME_BASED</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">format</span><span class="o">-&gt;</span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvc_parse_format</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">streaming</span><span class="p">,</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="o">&amp;</span><span class="n">interval</span><span class="p">,</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="n">buflen</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">error</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">frame</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">format</span><span class="o">-&gt;</span><span class="n">nframes</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">format</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">buflen</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">buffer</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">buflen</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">        </span><span class="n">buffer</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buflen</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_DESCR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;device %d videostreaming interface &quot;</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;%d has %u bytes of trailing descriptor garbage.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="o">-&gt;</span><span class="n">devnum</span><span class="p">,</span><span class="w"> </span><span class="n">alts</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">bInterfaceNumber</span><span class="p">,</span><span class="w"> </span><span class="n">buflen</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Parse the alternate settings to find the maximum bandwidth. */</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">intf</span><span class="o">-&gt;</span><span class="n">num_altsetting</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">usb_host_endpoint</span><span class="w"> </span><span class="o">*</span><span class="n">ep</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">alts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">intf</span><span class="o">-&gt;</span><span class="n">altsetting</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w">                                                    </span><span class="c1">// 当前循环选中的接口</span>
+<span class="w">        </span><span class="n">ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvc_find_endpoint</span><span class="p">(</span><span class="n">alts</span><span class="p">,</span><span class="w">                                                    </span><span class="c1">// 找到最大的端点传输包大小</span>
+<span class="w">                </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">bEndpointAddress</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ep</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">psize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">le16_to_cpu</span><span class="p">(</span><span class="n">ep</span><span class="o">-&gt;</span><span class="n">desc</span><span class="p">.</span><span class="n">wMaxPacketSize</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">psize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">psize</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x07ff</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="n">psize</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">11</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">3</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">psize</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">maxpsize</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">maxpsize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">psize</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">list_add_tail</span><span class="p">(</span><span class="o">&amp;</span><span class="n">streaming</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">streams</span><span class="p">);</span><span class="w">                                     </span><span class="c1">// 保存到streams链表中</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="nl">error</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">usb_driver_release_interface</span><span class="p">(</span><span class="o">&amp;</span><span class="n">uvc_driver</span><span class="p">.</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">intf</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">uvc_stream_delete</span><span class="p">(</span><span class="n">streaming</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

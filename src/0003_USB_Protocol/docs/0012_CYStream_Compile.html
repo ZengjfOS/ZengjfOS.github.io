@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">CYStream Compile</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">代码架构</a></li>
+<li><a class="reference internal" href="#id3">错误及解决方法</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cystream-compile">
+<h1>CYStream Compile<a class="headerlink" href="#cystream-compile" title="Permalink to this headline"></a></h1>
+<p>USB流模式示例编译</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cypress.com/file/139356/download">在EZ-USB® FX2™和FX2LP™上测试同步或批量端点的数据流</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>代码架构<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><img alt="0012_CYStream_Code_Arch.png" src="../../../_images/0012_CYStream_Code_Arch.png" /></p>
+</section>
+<section id="id3">
+<h1>错误及解决方法<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Error：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="o">***</span> <span class="n">FATAL</span> <span class="n">ERROR</span> <span class="n">L250</span><span class="p">:</span> <span class="n">CODE</span> <span class="n">SIZE</span> <span class="n">LIMIT</span> <span class="n">IN</span> <span class="n">RESTRICTED</span> <span class="n">VERSION</span> <span class="n">EXCEEDED</span>
+    <span class="n">MODULE</span><span class="p">:</span>  <span class="n">C</span><span class="p">:</span>\<span class="n">CYPRESS</span>\<span class="n">KEIL</span>\<span class="n">C51</span>\<span class="n">LIB</span>\<span class="n">C51S</span><span class="o">.</span><span class="n">LIB</span> <span class="p">(</span><span class="o">-----</span><span class="p">)</span>
+    <span class="n">LIMIT</span><span class="p">:</span>   <span class="mi">1000</span><span class="n">H</span> <span class="n">BYTES</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>错误原因：编译的代码超过了4K的允许编译大小；</p></li>
+<li><p>错误解决方向：</p>
+<ul class="simple">
+<li><p>使用全功能版Keil 2版本，买是不可能买的，破解版也不想用；</p></li>
+<li><p>精简代码，采用这个方案；</p></li>
+</ul>
+</li>
+<li><p>处理方法：</p>
+<ul class="simple">
+<li><p>去掉数码管显示代码；</p></li>
+<li><p>去掉I2C通信代码；</p></li>
+<li><p>与USB通信相关代码有全速设备和高速设备，全速设备不可能，这年代，只能是高速设备，所以去掉全速设备代码；</p></li>
+</ul>
+</li>
+<li><p>编译通过：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">Program</span> <span class="n">Size</span><span class="p">:</span> <span class="n">data</span><span class="o">=</span><span class="mf">51.5</span> <span class="n">xdata</span><span class="o">=</span><span class="mi">4473</span> <span class="n">code</span><span class="o">=</span><span class="mi">3994</span>
+<span class="n">creating</span> <span class="nb">hex</span> <span class="n">file</span> <span class="kn">from</span> <span class="s2">&quot;CYStream&quot;</span><span class="o">...</span>
+<span class="n">User</span> <span class="n">command</span> <span class="c1">#1: ..\..\Bin\hex2bix -i -f 0xC2 -o CYStream.iic CYStream.hex</span>
+<span class="n">Intel</span> <span class="n">Hex</span> <span class="n">file</span> <span class="n">to</span> <span class="n">EZ</span><span class="o">-</span><span class="n">USB</span> <span class="n">Binary</span> <span class="n">file</span> <span class="n">conversion</span> <span class="n">utility</span>
+<span class="n">Copyright</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="mi">2012</span><span class="o">-</span><span class="mi">2013</span><span class="p">,</span> <span class="n">Cypress</span> <span class="n">Semiconductor</span> <span class="n">Inc</span><span class="o">.</span>
+<span class="mi">4053</span> <span class="n">Bytes</span> <span class="n">written</span><span class="o">.</span>
+<span class="n">Total</span> <span class="n">Code</span> <span class="n">Bytes</span> <span class="o">=</span> <span class="mi">3988</span>
+<span class="n">Conversion</span> <span class="n">completed</span> <span class="n">successfully</span><span class="o">.</span>
+<span class="s2">&quot;CYStream&quot;</span> <span class="o">-</span> <span class="mi">0</span> <span class="n">Error</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="mi">3</span> <span class="ne">Warning</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>设备正常识别：<br />
+<img alt="0012_CYStream_Compile.png" src="../../../_images/0012_CYStream_Compile.png" /></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

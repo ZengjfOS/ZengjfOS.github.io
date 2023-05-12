@@ -1,0 +1,36 @@
+# SOC
+
+SOC: Status of charge，电池电量
+
+# 参考文档
+
+* [0001_SW6106_Register_Release_RG005_1_v1.2.pdf](refers/0001_SW6106_Register_Release_RG005_1_v1.2.pdf)
+
+# 处理程序
+
+```python
+#!/usr/bin/env python3
+
+from smbus import SMBus
+from time import sleep
+
+i2cbus = SMBus(1)  # Create a new I2C bus
+i2caddress = 0x3c  # Address of SW6106 device
+
+while True:
+    print("---------------------------------------")
+
+    soc = i2cbus.read_byte_data(i2caddress, 0x4f)
+
+    print("soc: %d" % (soc & 0x7f))
+
+    sleep(1)
+
+```
+
+# log
+
+```
+---------------------------------------
+soc: 64
+```

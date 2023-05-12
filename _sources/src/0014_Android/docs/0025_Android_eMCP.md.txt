@@ -1,0 +1,149 @@
+# Android eMCP
+
+eMMC、DRAM初始化
+
+# Makefile
+
+`vendor/mediatek/proprietary/bootable/bootloader/preloader/tools/emigen/emigen.mk`  
+利用perl脚本将`.xls`文件转换成配置文件，其会涉及到`custom_MemoryDevice.h`
+
+```Makefile
+ifndef EMIGEN_OUT
+EMIGEN_OUT := $(PRELOADER_OUT)
+endif
+ifndef PERL
+PERL := perl
+endif
+export EMIGEN_OUT
+
+ALL_EMIGEN_FILE := \
+        inc/custom_emi.h \
+        MTK_Loader_Info.tag
+
+ifeq ($(MTK_PLATFORM),MT2601)
+ALL_EMIGEN_FILE += \
+        custom_emi.c
+endif
+
+EMIGEN_FILE_LIST := $(addprefix $(EMIGEN_OUT)/,$(ALL_EMIGEN_FILE))
+CUSTOM_MEMORY_HDR := $(MTK_PATH_CUSTOM)/inc/custom_MemoryDevice.h
+ifeq ($(MACH_TYPE),mt6735m)
+MEMORY_DEVICE_XLS := $(D_ROOT)/tools/emigen/MT6735/MemoryDeviceList_MT6735M.xls
+else ifeq ($(MACH_TYPE),mt6753)
+MEMORY_DEVICE_XLS := $(D_ROOT)/tools/emigen/MT6735/MemoryDeviceList_MT6753.xls
+else ifeq ($(MACH_TYPE),mt6737t)
+MEMORY_DEVICE_XLS := $(D_ROOT)/tools/emigen/MT6735/MemoryDeviceList_MT6737T.xls
+else ifeq ($(MACH_TYPE),mt6737m)
+MEMORY_DEVICE_XLS := $(D_ROOT)/tools/emigen/MT6735/MemoryDeviceList_MT6737M.xls
+else
+MEMORY_DEVICE_XLS := $(D_ROOT)/tools/emigen/$(MTK_PLATFORM)/MemoryDeviceList_$(MTK_PLATFORM).xls          # MT6765
+endif
+EMIGEN_SCRIPT := $(D_ROOT)/tools/emigen/$(MTK_PLATFORM)/emigen.pl
+EMIGEN_PREBUILT_PATH := $(MTK_PATH_CUSTOM)
+EMIGEN_PREBUILT_CHECK := $(filter-out $(wildcard $(addprefix $(EMIGEN_PREBUILT_PATH)/,$(ALL_EMIGEN_FILE))),$(addprefix $(EMIGEN_PREBUILT_PATH)/,$(ALL_EMIGEN_FILE)))
+
+##############################################################
+# Emigen generate parameter for header and tag files
+#
+BUILD_EMI_H := 0
+BUILD_LOADER_TAG := 1
+export EMIGEN_TAG_OUT := $(EMIGEN_OUT)
+export EMIGEN_H_OUT := $(EMIGEN_OUT)/inc
+
+.PHONY: emigen
+emigen: $(EMIGEN_FILE_LIST)
+ifneq ($(EMIGEN_PREBUILT_CHECK),)
+$(EMIGEN_H_OUT)/custom_emi.h: $(EMIGEN_SCRIPT) $(CUSTOM_MEMORY_HDR) $(MEMORY_DEVICE_XLS)
+        @mkdir -p $(dir $@)
+        $(PERL) $(EMIGEN_SCRIPT) $(CUSTOM_MEMORY_HDR) $(MEMORY_DEVICE_XLS) $(MTK_PLATFORM) $(MTK_PROJECT) $(EMIGEN_H_OUT) $(BUILD_EMI_H) $(MACH_TYPE)
+
+$(EMIGEN_TAG_OUT)/MTK_Loader_Info.tag: $(EMIGEN_SCRIPT) $(CUSTOM_MEMORY_HDR) $(MEMORY_DEVICE_XLS)
+        @mkdir -p $(dir $@)
+        $(PERL) $(EMIGEN_SCRIPT) $(CUSTOM_MEMORY_HDR) $(MEMORY_DEVICE_XLS) $(MTK_PLATFORM) $(MTK_PROJECT) $(EMIGEN_TAG_OUT) $(BUILD_LOADER_TAG) $(MACH_TYPE)
+
+else
+$(EMIGEN_FILE_LIST): $(EMIGEN_OUT)/% : $(EMIGEN_PREBUILT_PATH)/%
+        @mkdir -p $(dir $@)
+        cp -f $< $@
+endif
+```
+
+# MemoryDeviceList_MT6765
+
+eMCP配置文件：`vendor/mediatek/proprietary/bootable/bootloader/preloader/tools/emigen/MT6765/MemoryDeviceList_MT6765.xls`  
+
+# custom_MemoryDevice
+
+`.xls`里面可能有很多行(一行一种eMCP)，这里相当于用于选择那些行(选择哪些eMCP)：`vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k62v1_64_bsp/inc/custom_MemoryDevice.h`  
+
+```C
+#ifndef __CUSTOM_MEMORYDEVICE__
+#define __CUSTOM_MEMORYDEVICE__
+
+/*
+ ****************************************************************************
+ [README , VERY IMPORTANT NOTICE]
+ --------------------------------
+ After user configured this C header file, not only C compiler compile it but
+ also auto-gen tool parse user's configure setting.
+ Here are recommend configure convention to make both work fine.
+
+ 1. All configurations in this file form as #define MACRO_NAME MACRO_VALUE format.
+    Note the #define must be the first non-space character of a line
+
+ 2. To disable the optional configurable item. Please use // before #define,
+    for example: //#define MEMORY_DEVICE_TYPE
+
+ 3. Please don't use #if , #elif , #else , #endif conditional macro key word here.
+    Such usage might cause compile result conflict with auto-gen tool parsing result.
+    Auto-Gen tool will show error and stop.
+    3.1.  any conditional keyword such as #if , #ifdef , #ifndef , #elif , #else detected.
+          execpt this #ifndef __CUSTOM_MEMORYDEVICE__
+    3.2.  any duplicated MACRO_NAME parsed. For example auto-gen tool got
+          2nd MEMORY_DEVICE_TYPE macro value.
+ ****************************************************************************
+*/
+
+/*
+ ****************************************************************************
+ Step 1: Specify memory device type and its complete part number
+         Possible memory device type: LPSDRAM (SDR, DDR)
+ ****************************************************************************
+*/
+
+#define BOARD_ID                MT6765_EVB
+
+#define CS_PART_NUMBER[0]       F0TQ26AAFTBCER
+#define CS_PART_NUMBER[1]       F0TQ27AAFTMCER
+
+#endif /* __CUSTOM_MEMORYDEVICE__ */
+```
+
+# output emi
+
+`target/product/k62v1_64_bsp/obj/PRELOADER_OBJ/inc/custom_emi.h`
+
+# DDR3 DDR4
+
+在CPU引脚上有引脚通过上下拉来确定当前使用的DDR3还是DDR4
+
+# eMCP示例
+
+* KMGX6001BA_B514
+* DDR认证信息可以从MTK Online ---> QVL(New)获取  
+  * 下载对应的eMCP参数
+* 将下载的eMCP参数拷贝到：vendor/mediatek/proprietary/bootable/bootloader/preloader/tools/emigen/MT6765/MemoryDeviceList_MT6765.xls
+* 添加内存支持
+  ```
+  diff --git a/vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k62v1_64_bsp/inc/custom_MemoryDevice.h b/vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k62v1_64_bsp/inc/custom_MemoryDevice.h
+  index 5470e81183d..b1cfc458f7a 100755
+  --- a/vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k62v1_64_bsp/inc/custom_MemoryDevice.h
+  +++ b/vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k62v1_64_bsp/inc/custom_MemoryDevice.h
+  @@ -108,6 +108,7 @@
+   #define CS_PART_NUMBER[0]       KMDD60018M_B320
+   #define CS_PART_NUMBER[1]       KMDH6001DA_B422
+   #define CS_PART_NUMBER[2]       KMDP6001DA_B425
+  +#define CS_PART_NUMBER[3]       KMGX6001BA_B514
+  
+   #endif /* __CUSTOM_MEMORYDEVICE__ */
+  ```

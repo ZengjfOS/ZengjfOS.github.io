@@ -1,0 +1,121 @@
+# Android gdb
+
+在Windows上通过gdb远程调试Android命令行程序
+
+# 参考文档
+
+* [gdb 调试利器](https://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/gdb.html)
+* [Android手机gdb调试](https://blog.csdn.net/u012188065/article/details/83785556)
+* [solib-absolute-prefix 和solib-search-path的区别](https://blog.csdn.net/CaspianSea/article/details/16798735)
+* [GDB动态库搜索路径](https://blog.csdn.net/qq_34488499/article/details/51870658?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-0&spm=1001.2101.3001.4242)
+* [GDB no such file or directory](https://stackoverflow.com/questions/27850335/gdb-no-such-file-or-directory/27851351)
+
+# gdb交互命令
+
+* run：简记为r，其作用是运行程序，当遇到断点后，程序会在断点处停止运行，等待用户输入下一步的命令。
+* continue（简写c）：继续执行，到下一个断点处（或运行结束）
+* next：（简写n），单步跟踪程序，当遇到函数调用时，也不进入此函数体；此命令同step的主要区别是，step遇到用户自定义的函数，将步进到函数中去运行，而next则直接调用函数，不会进入到函数体内。
+* step：（简写s）：单步调试如果有函数调用，则进入函数；与命令n不同，n是不进入调用的函数的
+* until：当你厌倦了在一个循环体内单步跟踪时，这个命令可以运行程序直到退出循环体。
+* until+行号：运行至某行，不仅仅用来跳出循环
+* finish：运行程序，直到当前函数完成返回，并打印函数返回时的堆栈地址和返回值及参数值等信息。
+* call 函数(参数)：调用程序中可见的函数，并传递"参数"，如：call gdb_test(55)
+* quit：简记为q，退出gdb
+
+# 设置断点
+
+* break func（break缩写为b）：在函数func()的入口处设置断点，如：break cb_button
+* break n （简写b n）:在第n行处设置断点（可以带上代码路径和代码名称： b OAGUPDATE.cpp:578）
+* info break：显示当前程序的断点设置情况
+* delete 断点号n：删除第n个断点
+
+# 查看运行信息
+
+* where：当前运行的堆栈列表；
+* backtrace/bt：显示当前调用堆栈
+* frame：当前执行的程序行
+* info program：来查看程序的是否在运行，进程号，被暂停的原因。
+
+# Android
+
+* Android
+  * adb shell
+  * gdbserver --version
+    ```
+    GNU gdbserver (GDB) 7.11
+    Copyright (C) 2016 Free Software Foundation, Inc.
+    gdbserver is free software, covered by the GNU General Public License.
+    This gdbserver was configured as "arm-eabi-linux"
+    ```
+  * gdbserver64 :1235 ls
+    * ps -A | grep gdbserver
+      ```
+      root           5083   5072    3652   1296 poll_schedule_timeout 0 S gdbserver
+      ```
+    * kill -9 5083
+* CMD
+  * adb forward tcp:1235 tcp:1235
+  * 跳转到NDK目录
+    * ndk\21.3.6528147\prebuilt\windows-x86_64\bin
+  * gdb
+    * 设置说明
+      * solib-absolute-prefix 和solib-search-path是gdb比较常用的选项，用来设置符号文件的位置。solib-absolute-prefix设置的是被搜索文件路径的前缀，solib-search-path设置的是被搜索文件的路径。solib-search-path可以有多个路径，中间按用:隔开， solib-absolute-prefix的值只能有一个。
+        * 不用设置这个，直接设置下面的sysroot
+        * set sysroot 与 set solib-absolute-prefix 是同一条命令，实际上，set sysroot是set solib-absolute-prefix 的别名。
+    * set sysroot X:\zengjf\android-project\out\target\product\k62v1_64_bsp\symbols
+    * dir X:/zengjf/android-project/
+      * [GDB no such file or directory](https://stackoverflow.com/questions/27850335/gdb-no-such-file-or-directory/27851351)
+      * 要用/，不能用\
+    * target remote localhost:1235
+    * all log
+      ```gdb
+      GNU gdb (GDB) 8.3
+      Copyright (C) 2019 Free Software Foundation, Inc.
+      License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+      This is free software: you are free to change and redistribute it.
+      There is NO WARRANTY, to the extent permitted by law.
+      Type "show copying" and "show warranty" for details.
+      This GDB was configured as "x86_64-w64-mingw32".
+      Type "show configuration" for configuration details.
+      For bug reporting instructions, please see:
+      <http://www.gnu.org/software/gdb/bugs/>.
+      Find the GDB manual and other documentation resources online at:
+          <http://www.gnu.org/software/gdb/documentation/>.
+
+      For help, type "help".
+      Type "apropos word" to search for commands related to "word".
+      (gdb) set sysroot X:\zengjf\MTK6762D-project\out\target\product\k62v1_64_bsp\symbols
+      (gdb) dir X:/zengjf/MTK6762D-project
+      Source directories searched: X:/zengjf/MTK6762D-project;$cdir;$cwd
+      (gdb) target remote localhost:1235
+      Remote debugging using localhost:1235
+      warning: A handler for the OS ABI "Cygwin" is not built into this configuration
+      of GDB.  Attempting to continue with the default aarch64 settings.
+
+      Reading symbols from X:\zengjf\MTK6762D-project\out\target\product\k62v1_64_bsp\symbols/system/bin/toybox...
+      warning: Unable to find dynamic linker breakpoint function.
+      GDB will be unable to debug shared library initializers
+      and track explicitly loaded dynamic code.
+      0x0000007ff7f52d10 in ?? ()
+      (gdb) b main
+      Breakpoint 1 at 0x5555588e5c: file external/toybox/main.c, line 220.
+      (gdb) continue
+      Continuing.
+      warning: Could not load shared library symbols for /system/bin/linker64.
+      Do you need "set solib-search-path" or "set sysroot"?
+
+      Breakpoint 1, main (argc=1, argv=0x7ffffff218) at external/toybox/main.c:220
+      220       if (!*argv) return 127;
+      (gdb) list
+      215     }
+      216
+      217     int main(int argc, char *argv[])
+      218     {
+      219       // don't segfault if our environment is crazy
+      220       if (!*argv) return 127;
+      221
+      222       // Snapshot stack location so we can detect recursion depth later.
+      223       // Nommu has special reentry path, !stacktop = "vfork/exec self happened"
+      224       if (!CFG_TOYBOX_FORK && (0x80 & **argv)) **argv &= 0x7f;
+      (gdb)
+      ```

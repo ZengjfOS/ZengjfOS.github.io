@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Parcelable</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#framework">Framework参考示例</a></li>
+<li><a class="reference internal" href="#parcelable">Parcelable</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-parcelable">
+<h1>Android Parcelable<a class="headerlink" href="#android-parcelable" title="Permalink to this headline"></a></h1>
+<p>理解Parcelable类实现原因</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/weixin_30339969/article/details/99769394">Android Parcelable 源码解析</a></p></li>
+<li><p><a class="reference external" href="https://www.jianshu.com/p/32a2ec8f35ae">详细介绍Android中Parcelable的原理和使用方法</a></p></li>
+</ul>
+</section>
+<section id="framework">
+<h1>Framework参考示例<a class="headerlink" href="#framework" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>frameworks/base</p>
+<ul>
+<li><p>telecomm/java/android/telecom/ParcelableCall.aidl</p></li>
+<li><p>telecomm/java/android/telecom/ParcelableCall.java</p></li>
+</ul>
+</li>
+<li><p>之前以为aidl可以直接替代java的实现，原来不行，理解上有偏差</p></li>
+</ul>
+</section>
+<section id="parcelable">
+<h1>Parcelable<a class="headerlink" href="#parcelable" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>介绍Parcelable不得不先提一下Serializable接口，Serializable是Java为我们提供的一个标准化的序列化接口，那什么是序列化呢? 简单来说就是将对象转换为可以传输的二进制流(二进制序列)的过程，这样我们就可以通过序列化，转化为可以在网络传输或者保存到本地的流(序列)，从而进行传输数据，那反序列化就是从二进制流(序列)转化为对象的过程；</p></li>
+<li><p>Parcelable是Android为我们提供的序列化的接口，Parcelable相对于Serializable的使用相对复杂一些，但Parcelable的效率相对Serializable也高很多，这一直是Google工程师引以为傲的，有时间的可以看一下Parcelable和Serializable的效率对比Parcelable vs Serializable号称快10倍的效率；</p></li>
+<li><p>Parcelable接口的实现类是可以通过Parcel写入和恢复数据的，并且必须要有一个非空的静态变量CREATOR；</p></li>
+<li><p>writeToParcel()将当前你需要保存的数据，写进Parcel 里；</p></li>
+<li><p>Creator, 用来恢复对象，如果没有实现这个Creator,那么恢复的时候，会报错；</p></li>
+</ul>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.droid.os</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">android.os.Parcel</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Parcelable</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Parcelable.Creator</span><span class="p">;</span>
+
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">WifiAccountInfo</span> <span class="kd">implements</span> <span class="n">Parcelable</span> <span class="p">{</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="n">networkId</span><span class="p">;</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">SSID</span><span class="p">;</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">password</span><span class="p">;</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="n">securityType</span><span class="p">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Creator</span><span class="o">&lt;</span><span class="n">WifiAccountInfo</span><span class="o">&gt;</span> <span class="n">CREATOR</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Creator</span><span class="o">&lt;</span><span class="n">WifiAccountInfo</span><span class="o">&gt;</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">public</span> <span class="n">WifiAccountInfo</span><span class="o">[]</span> <span class="nf">newArray</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="n">WifiAccountInfo</span><span class="o">[</span><span class="n">size</span><span class="o">]</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="n">WifiAccountInfo</span> <span class="nf">createFromParcel</span><span class="p">(</span><span class="n">Parcel</span> <span class="n">source</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">WifiAccountInfo</span> <span class="n">wifi_account_info</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WifiAccountInfo</span><span class="p">();</span>
+            <span class="n">wifi_account_info</span><span class="p">.</span><span class="na">networkId</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="na">readInt</span><span class="p">();</span>
+            <span class="n">wifi_account_info</span><span class="p">.</span><span class="na">SSID</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="na">readString</span><span class="p">();</span>
+            <span class="n">wifi_account_info</span><span class="p">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="na">readString</span><span class="p">();</span>
+            <span class="n">wifi_account_info</span><span class="p">.</span><span class="na">securityType</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="na">readInt</span><span class="p">();</span>
+            <span class="k">return</span> <span class="n">wifi_account_info</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="kd">public</span> <span class="nf">WifiAccountInfo</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="nf">WifiAccountInfo</span><span class="p">(</span><span class="kt">int</span> <span class="n">networkId</span><span class="p">,</span><span class="n">String</span> <span class="n">ssid</span><span class="p">,</span> <span class="n">String</span> <span class="n">password</span><span class="p">,</span> <span class="kt">int</span> <span class="n">security</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">networkId</span> <span class="o">=</span> <span class="n">networkId</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">SSID</span> <span class="o">=</span> <span class="n">ssid</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">securityType</span> <span class="o">=</span> <span class="n">security</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getNetworkId</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="n">networkId</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getSsid</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="n">SSID</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="n">password</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getSecurityType</span><span class="p">(){</span>
+        <span class="k">return</span> <span class="n">securityType</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">describeContents</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeToParcel</span><span class="p">(</span><span class="n">Parcel</span> <span class="n">dest</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">dest</span><span class="p">.</span><span class="na">writeInt</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">networkId</span><span class="p">);</span>
+        <span class="n">dest</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">SSID</span><span class="p">);</span>
+        <span class="n">dest</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">password</span><span class="p">);</span>
+        <span class="n">dest</span><span class="p">.</span><span class="na">writeInt</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">securityType</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Creator</span><span class="o">&lt;</span><span class="n">WifiAccountInfo</span><span class="o">&gt;</span> <span class="nf">getCreator</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">CREATOR</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

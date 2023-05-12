@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">widget-control-route Add To Card</a></li>
+<li><a class="reference internal" href="#widget">widget</a></li>
+<li><a class="reference internal" href="#control">control</a></li>
+<li><a class="reference internal" href="#route">route</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="widget-control-route-add-to-card">
+<h1>widget-control-route Add To Card<a class="headerlink" href="#widget-control-route-add-to-card" title="Permalink to this headline"></a></h1>
+<p>component中widget/contorl/route添加到Card中的流程</p>
+<p>主要分析前面提到的widget/control/route是怎么添加到Card上的；</p>
+<ul class="simple">
+<li><p>component-&gt;driver-&gt;dapm_widgets添加：(<span class="xref myst">dai widget类似</span>): <a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-dapm.c#L3592">snd_soc_dapm_new_controls Source Code</a></p></li>
+<li><p>component-&gt;driver-&gt;controls添加：<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L2383">snd_soc_add_component_controls Source Code</a></p></li>
+<li><p>component-&gt;driver-&gt;dapm_routes添加：<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-dapm.c#L2896">snd_soc_dapm_add_routes Source Code</a></p></li>
+</ul>
+<p>最终结果如下：</p>
+<ul class="simple">
+<li><p>widget –&gt; card-&gt;widgets</p></li>
+<li><p>control –&gt; card-&gt;controls</p></li>
+<li><p>route –&gt; card-&gt;paths</p></li>
+</ul>
+</section>
+<section id="widget">
+<h1>widget<a class="headerlink" href="#widget" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><span class="xref myst">Codec CS42888 widgets 示例</span></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * #define SND_SOC_DAPM_DAC(wname, stname, wreg, wshift, winvert) \</span>
+<span class="cm"> * {    .id = snd_soc_dapm_dac, .name = wname, .sname = stname, \</span>
+<span class="cm"> *     SND_SOC_DAPM_INIT_REG_VAL(wreg, wshift, winvert) }</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="n">SND_SOC_DAPM_DAC</span><span class="p">(</span><span class="s">&quot;DAC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_PWRCTL</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-dapm.c#L3421">snd_soc_dapm_new_control_unlocked分析</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="w"></span>
+<span class="n">snd_soc_dapm_new_control_unlocked</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_context</span><span class="w"> </span><span class="o">*</span><span class="n">dapm</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">widget</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">enum</span><span class="w"> </span><span class="n">snd_soc_dapm_direction</span><span class="w"> </span><span class="n">dir</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">prefix</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_cnew_widget</span><span class="p">(</span><span class="n">widget</span><span class="p">))</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w">                         </span><span class="c1">// 创建新的widget</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ERR_PTR</span><span class="p">(</span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                                    </span><span class="c1">// 第一次通过id来识别widget类型</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_regulator_supply</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">regulator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_regulator_get</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">regulator</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">regulator</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">request_failed</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">on_val</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">SND_SOC_DAPM_REGULATOR_BYPASS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regulator_allow_bypass</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">regulator</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">dev_warn</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                     </span><span class="s">&quot;ASoC: Failed to bypass %s: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                     </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_pinctrl</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">pinctrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_pinctrl_get</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">pinctrl</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">pinctrl</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">request_failed</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_clock_supply</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_clk_get</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">clk</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">clk</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">request_failed</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_dapm_prefix</span><span class="p">(</span><span class="n">dapm</span><span class="p">);</span><span class="w">                                         </span><span class="c1">// 之前没有注意到这个prefix，暂时不管</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kasprintf</span><span class="p">(</span><span class="n">GFP_KERNEL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">prefix</span><span class="p">,</span><span class="w"> </span><span class="n">widget</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kstrdup_const</span><span class="p">(</span><span class="n">widget</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">kfree</span><span class="p">(</span><span class="n">w</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ERR_PTR</span><span class="p">(</span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                                        </span><span class="c1">// 第二次通过id来识别不同的widget</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mic</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_DAPM_EP_SOURCE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_generic_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_input</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">fully_routed</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_DAPM_EP_SOURCE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_generic_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_spk</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_hp</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_DAPM_EP_SINK</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_generic_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_output</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">fully_routed</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_DAPM_EP_SINK</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_generic_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_vmid</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_siggen</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_DAPM_EP_SOURCE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_always_on_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_sink</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_ep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_DAPM_EP_SINK</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_always_on_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mux</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_demux</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_switch</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mixer</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mixer_named_ctl</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_adc</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_aif_out</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_dac</span><span class="p">:</span><span class="w">                                                  </span><span class="c1">// 这个就是前面的示例目标了</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_aif_in</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_pga</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_out_drv</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_micbias</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_line</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_dai_link</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_dai_out</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_dai_in</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_generic_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_supply</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_regulator_supply</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_pinctrl</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_clock_supply</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_kcontrol</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_supply_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">power_check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_always_on_check_power</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">dapm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">dirty</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">list_add_tail</span><span class="p">(</span><span class="o">&amp;</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">widgets</span><span class="p">);</span><span class="w">                          </span><span class="c1">// 添加到card-&gt;widgets中去</span>
+
+<span class="w">    </span><span class="n">snd_soc_dapm_for_each_direction</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">edges</span><span class="p">[</span><span class="n">dir</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">endpoints</span><span class="p">[</span><span class="n">dir</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* machine layer sets up unconnected pins and insertions */</span><span class="w"></span>
+<span class="w">    </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+
+<span class="nl">request_failed</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">EPROBE_DEFER</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: Failed to request %s: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ERR_PTR</span><span class="p">(</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="control">
+<h1>control<a class="headerlink" href="#control" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><span class="xref myst">Codec CS42888 controls 示例</span></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm">    * #define SOC_DOUBLE_R_TLV(xname, reg_left, reg_right, xshift, xmax, xinvert, tlv_array) \</span>
+<span class="cm">    * {    .iface = SNDRV_CTL_ELEM_IFACE_MIXER, .name = (xname),\</span>
+<span class="cm">    *     .access = SNDRV_CTL_ELEM_ACCESS_TLV_READ |\</span>
+<span class="cm">    *          SNDRV_CTL_ELEM_ACCESS_READWRITE,\</span>
+<span class="cm">    *     .tlv.p = (tlv_array), \</span>
+<span class="cm">    *     .info = snd_soc_info_volsw, \</span>
+<span class="cm">    *     .get = snd_soc_get_volsw, .put = snd_soc_put_volsw, \</span>
+<span class="cm">    *     .private_value = SOC_DOUBLE_R_VALUE(reg_left, reg_right, xshift, \</span>
+<span class="cm">    *                         xmax, xinvert) }</span>
+<span class="cm">    */</span><span class="w"></span>
+<span class="n">SOC_DOUBLE_R_TLV</span><span class="p">(</span><span class="s">&quot;DAC1 Playback Volume&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">CS42XX8_VOLAOUT1</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">CS42XX8_VOLAOUT2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">dac_tlv</span><span class="p">),</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L2337">snd_soc_add_controls分析</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_add_controls</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_kcontrol_new</span><span class="w"> </span><span class="o">*</span><span class="n">controls</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_controls</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">prefix</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">num_controls</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_kcontrol_new</span><span class="w"> </span><span class="o">*</span><span class="n">control</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">controls</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_ctl_add</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">snd_soc_cnew</span><span class="p">(</span><span class="n">control</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w">               </span><span class="c1">// &lt;--------创建并添加</span>
+<span class="w">                             </span><span class="n">control</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">prefix</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: Failed to add %s: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">control</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L2305">snd_soc_cnew</a>：通过<code class="docutils literal notranslate"><span class="pre">kcontrol</span> <span class="pre">=</span> <span class="pre">snd_ctl_new1(&amp;template,</span> <span class="pre">data);</span></code>创建一个<code class="docutils literal notranslate"><span class="pre">kcontrol</span></code>；</p></li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/core/control.c#L441"><code class="docutils literal notranslate"><span class="pre">snd_ctl_add</span></code></a>调用<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/core/control.c#L404"><code class="docutils literal notranslate"><span class="pre">snd_ctl_add_replace</span></code></a>再调用<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/core/control.c#L356"><code class="docutils literal notranslate"><span class="pre">__snd_ctl_add_replace</span></code></a>进行<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/core/control.c#L352"><code class="docutils literal notranslate"><span class="pre">CTL_ADD_EXCLUSIVE</span></code></a>添加替换，<code class="docutils literal notranslate"><span class="pre">kcontrol</span></code>保存在<code class="docutils literal notranslate"><span class="pre">card-&gt;controls</span></code>；</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* add/replace a new kcontrol object; call with card-&gt;controls_rwsem locked */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">__snd_ctl_add_replace</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">                 </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_kcontrol</span><span class="w"> </span><span class="o">*</span><span class="n">kcontrol</span><span class="p">,</span><span class="w"></span>
+<span class="w">                 </span><span class="k">enum</span><span class="w"> </span><span class="n">snd_ctl_add_mode</span><span class="w"> </span><span class="n">mode</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_ctl_elem_id</span><span class="w"> </span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_kcontrol</span><span class="w"> </span><span class="o">*</span><span class="n">old</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">.</span><span class="n">index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">UINT_MAX</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">old</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_ctl_find_id</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">id</span><span class="p">);</span><span class="w">                                 </span><span class="c1">// kcontrol保存在card-&gt;controls，查找当前的id是否存在</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">old</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">CTL_REPLACE</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">CTL_ADD_EXCLUSIVE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;control %i:%i:%i:%s:%i is already present</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">id</span><span class="p">.</span><span class="n">iface</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">device</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">subdevice</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">id</span><span class="p">.</span><span class="n">index</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EBUSY</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_ctl_remove</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">old</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">snd_ctl_find_hole</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">list_add_tail</span><span class="p">(</span><span class="o">&amp;</span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">controls</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 将当前的kcontrol添加到card-&gt;controls中去</span>
+<span class="w">    </span><span class="n">card</span><span class="o">-&gt;</span><span class="n">controls_count</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">.</span><span class="n">numid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">card</span><span class="o">-&gt;</span><span class="n">last_numid</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">card</span><span class="o">-&gt;</span><span class="n">last_numid</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kcontrol</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">idx</span><span class="o">++</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">index</span><span class="o">++</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">numid</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">snd_ctl_notify</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">SNDRV_CTL_EVENT_MASK_ADD</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">id</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="route">
+<h1>route<a class="headerlink" href="#route" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><span class="xref myst">Codec CS42888 routes 示例</span></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Playback */</span><span class="w"></span>
+<span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT1L&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC1&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">{</span><span class="w"> </span><span class="s">&quot;AOUT1R&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DAC1&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">{</span><span class="w"> </span><span class="s">&quot;DAC1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PWR&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-dapm.c#L2734">snd_soc_dapm_add_route分析</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_dapm_add_route</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_context</span><span class="w"> </span><span class="o">*</span><span class="n">dapm</span><span class="p">,</span><span class="w"></span>
+<span class="w">                  </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_route</span><span class="w"> </span><span class="o">*</span><span class="n">route</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">wsource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">wsink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">wtsource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">wtsink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">sink</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">prefixed_sink</span><span class="p">[</span><span class="mi">80</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">prefixed_source</span><span class="p">[</span><span class="mi">80</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">prefix</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_dapm_prefix</span><span class="p">(</span><span class="n">dapm</span><span class="p">);</span><span class="w">                                       </span><span class="c1">// 没关注这部分，暂时不管</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">snprintf</span><span class="p">(</span><span class="n">prefixed_sink</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">prefixed_sink</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;%s %s&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">prefix</span><span class="p">,</span><span class="w"> </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">sink</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">sink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prefixed_sink</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">snprintf</span><span class="p">(</span><span class="n">prefixed_source</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">prefixed_source</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;%s %s&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="n">prefix</span><span class="p">,</span><span class="w"> </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">source</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prefixed_source</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">                                                              </span><span class="c1">// 假装走的是这条线路</span>
+<span class="w">        </span><span class="n">sink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">sink</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">source</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">wsource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_wcache_lookup</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">path_source_cache</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">);</span><span class="w">       </span><span class="c1">// 查找card-&gt;widgets，比较w-&gt;name和source是否一致</span>
+<span class="w">    </span><span class="n">wsink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_wcache_lookup</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">path_sink_cache</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">);</span><span class="w">             </span><span class="c1">// 查找card-&gt;widgets，比较w-&gt;name和sink是否一致</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsink</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">wsource</span><span class="p">)</span><span class="w">                                                 </span><span class="c1">// 两者如果都存在，那就是找到了</span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">skip_search</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * find src and dest widgets over all widgets but favor a widget from</span>
+<span class="cm">     * current DAPM context</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">list_for_each_entry</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">widgets</span><span class="p">,</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">wsink</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">wtsink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">dapm</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">dapm</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">wsink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsource</span><span class="p">)</span><span class="w"></span>
+<span class="w">                    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">wsource</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">wtsource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">w</span><span class="o">-&gt;</span><span class="n">dapm</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">dapm</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">wsource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsink</span><span class="p">)</span><span class="w"></span>
+<span class="w">                    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* use widget from another DAPM context if not found from this */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">wsink</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">wsink</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wtsink</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">wsource</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">wsource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wtsource</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsource</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: no source widget found for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">source</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENODEV</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsink</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: no sink widget found for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">sink</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENODEV</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="nl">skip_search</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm_wcache_update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">path_sink_cache</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="p">);</span><span class="w">                            </span><span class="c1">// wcache-&gt;widget = w; 设定sink widget</span>
+<span class="w">    </span><span class="n">dapm_wcache_update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">path_source_cache</span><span class="p">,</span><span class="w"> </span><span class="n">wsource</span><span class="p">);</span><span class="w">                        </span><span class="c1">// wcache-&gt;widget = w; 设定source widget</span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_dapm_add_path</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"> </span><span class="n">wsource</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="p">,</span><span class="w"> </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">control</span><span class="p">,</span><span class="w">             </span><span class="c1">// 添加route，下面分析这个函数</span>
+<span class="w">        </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">connected</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="nl">err</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">dev_warn</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: no dapm match for %s --&gt; %s --&gt; %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">         </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">route</span><span class="o">-&gt;</span><span class="n">control</span><span class="p">,</span><span class="w"> </span><span class="n">sink</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-dapm.c#L2632">snd_soc_dapm_add_path分析</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_dapm_add_path</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_context</span><span class="w"> </span><span class="o">*</span><span class="n">dapm</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">wsource</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">wsink</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">control</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">connected</span><span class="p">)(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="p">,</span><span class="w"></span>
+<span class="w">             </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">sink</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">widgets</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="k">enum</span><span class="w"> </span><span class="n">snd_soc_dapm_direction</span><span class="w"> </span><span class="n">dir</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_path</span><span class="w"> </span><span class="o">*</span><span class="n">path</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsink</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;Connecting non-supply widget to supply widget is not supported (%s -&gt; %s)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">connected</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                               </span><span class="c1">// route不一定要由connected</span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;connected() callback only supported for supply widgets (%s -&gt; %s)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">control</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;Conditional paths are not supported for supply widgets (%s -&gt; [%s] -&gt; %s)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_dapm_check_dynamic_path</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"> </span><span class="n">wsource</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="p">);</span><span class="w">         </span><span class="c1">// 检查path的dynamic</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kzalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_path</span><span class="p">),</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w">                 </span><span class="c1">// 申请path结构体</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">path</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * enum snd_soc_dapm_direction {</span>
+<span class="cm">     *     SND_SOC_DAPM_DIR_IN,</span>
+<span class="cm">     *     SND_SOC_DAPM_DIR_OUT</span>
+<span class="cm">     * };</span>
+<span class="cm">     */</span><span class="w">  </span>
+<span class="w">    </span><span class="n">path</span><span class="o">-&gt;</span><span class="n">node</span><span class="p">[</span><span class="n">SND_SOC_DAPM_DIR_IN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wsource</span><span class="p">;</span><span class="w">                                    </span><span class="c1">// 设置输入源</span>
+<span class="w">    </span><span class="n">path</span><span class="o">-&gt;</span><span class="n">node</span><span class="p">[</span><span class="n">SND_SOC_DAPM_DIR_OUT</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wsink</span><span class="p">;</span><span class="w">                                     </span><span class="c1">// 设置输出目标</span>
+<span class="w">    </span><span class="n">widgets</span><span class="p">[</span><span class="n">SND_SOC_DAPM_DIR_IN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wsource</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">widgets</span><span class="p">[</span><span class="n">SND_SOC_DAPM_DIR_OUT</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">wsink</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">path</span><span class="o">-&gt;</span><span class="n">connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">connected</span><span class="p">;</span><span class="w">                                                  </span><span class="c1">// 设置path的connected</span>
+<span class="w">    </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">path</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">);</span><span class="w">                                                  </span><span class="c1">// 初始化path的list</span>
+<span class="w">    </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">path</span><span class="o">-&gt;</span><span class="n">list_kcontrol</span><span class="p">);</span><span class="w">                                         </span><span class="c1">// 初始化path的list_kcontrol</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">wsink</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">path</span><span class="o">-&gt;</span><span class="n">is_supply</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* connect static paths */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">control</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                            </span><span class="c1">// 如果control不存在，那么仅仅是设定path的connect = 1 </span>
+<span class="w">        </span><span class="n">path</span><span class="o">-&gt;</span><span class="n">connect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">                                                          </span><span class="c1">// control存在，那么就需要将source/sink添加到path中去</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">wsource</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_demux</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_connect_mux</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="p">,</span><span class="w"> </span><span class="n">wsource</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">wsink</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mux</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_connect_mux</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="p">,</span><span class="w"> </span><span class="n">wsink</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_switch</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mixer</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">snd_soc_dapm_mixer_named_ctl</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dapm_connect_mixer</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"> </span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">control</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define snd_soc_dapm_for_each_direction(dir) \</span>
+<span class="cm">     *     for ((dir) = SND_SOC_DAPM_DIR_IN; (dir) &lt;= SND_SOC_DAPM_DIR_OUT; \</span>
+<span class="cm">     *         (dir)++)</span>
+<span class="cm">     * </span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">list_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">path</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">paths</span><span class="p">);</span><span class="w">                        </span><span class="c1">// 将path添加到card的paths中去，主要是分析到这里</span>
+<span class="w">    </span><span class="n">snd_soc_dapm_for_each_direction</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">list_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">path</span><span class="o">-&gt;</span><span class="n">list_node</span><span class="p">[</span><span class="n">dir</span><span class="p">],</span><span class="w"> </span><span class="o">&amp;</span><span class="n">widgets</span><span class="p">[</span><span class="n">dir</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">edges</span><span class="p">[</span><span class="n">dir</span><span class="p">]);</span><span class="w">   </span><span class="c1">// 将path和wideget链接起来，目前不是很清楚这里用来做什么</span>
+
+<span class="w">    </span><span class="n">snd_soc_dapm_for_each_direction</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dapm_update_widget_flags</span><span class="p">(</span><span class="n">widgets</span><span class="p">[</span><span class="n">dir</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="n">dapm_mark_dirty</span><span class="p">(</span><span class="n">widgets</span><span class="p">[</span><span class="n">dir</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;Route added&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">instantiated</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">path</span><span class="o">-&gt;</span><span class="n">connect</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dapm_path_invalidate</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="nl">err</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">kfree</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

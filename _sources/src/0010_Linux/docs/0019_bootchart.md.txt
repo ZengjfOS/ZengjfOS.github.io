@@ -1,0 +1,18 @@
+# bootchart
+
+bootchart查看进程启动时序图
+
+# 参考文档
+
+* https://wiki.gentoo.org/wiki/Systemd/zh-cn
+  * systemd-bootchart
+
+# steps
+
+* sudo apt-get install systemd-bootchart
+* sudo systemctl enable systemd-bootchart
+* sudo reboot
+* cd /run/log
+* cp bootchart-20210819-0159.svg ~
+
+![0019_bootchart-20210819-0159.svg](images/0019_bootchart-20210819-0159.svg)

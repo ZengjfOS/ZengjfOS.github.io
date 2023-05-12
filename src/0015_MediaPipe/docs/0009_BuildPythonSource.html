@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Build Python Source</a></li>
+<li><a class="reference internal" href="#build-and-install">Build And Install</a></li>
+<li><a class="reference internal" href="#pip-conf">pip.conf</a></li>
+<li><a class="reference internal" href="#tflite">tflite</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="build-python-source">
+<h1>Build Python Source<a class="headerlink" href="#build-python-source" title="Permalink to this headline"></a></h1>
+<p>从源码编译制定Python版本，解决树莓派Python版本问题</p>
+</section>
+<section id="build-and-install">
+<h1>Build And Install<a class="headerlink" href="#build-and-install" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">scp</span> <span class="pre">~/Downloads/Python-3.7.0.tgz</span> <span class="pre">pi&#64;raspberrypi.local:~/zengjf</span></code></p></li>
+<li><p>ssh pi&#64;raspberrypi.local</p>
+<ul>
+<li><p>cd ~/zengjf</p></li>
+<li><p>sudo apt-get install libffi-dev</p>
+<ul class="simple">
+<li><p>如果没有安装没有ctypes</p></li>
+</ul>
+</li>
+<li><p>sudo apt-get install libssl-dev</p>
+<ul class="simple">
+<li><p>如果没有安装无法处理https</p></li>
+</ul>
+</li>
+<li><p>tar zxf Python-3.7.0.tgz</p></li>
+<li><p>cd Python-3.7.0</p></li>
+<li><p>./configure</p></li>
+<li><p>sudo make -j4</p></li>
+<li><p>sudo make install</p></li>
+<li><p>pip3.7 –version</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="mf">10.0.1</span> <span class="kn">from</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pip</span> <span class="p">(</span><span class="n">python</span> <span class="mf">3.7</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>python3.7 –version</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Python</span> <span class="mf">3.7.0</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Feb</span>  <span class="mi">9</span> <span class="mi">2022</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">14</span><span class="p">)</span> 
+<span class="p">[</span><span class="n">GCC</span> <span class="mf">10.2.1</span> <span class="mi">20210110</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="pip-conf">
+<h1>pip.conf<a class="headerlink" href="#pip-conf" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>vim ~/.config/pip/pip.conf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
+<span class="n">timeout</span> <span class="o">=</span> <span class="mi">600</span>
+<span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="o">=</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span>
+<span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="o">=</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span>
+</pre></div>
+</div>
+</li>
+<li><p>vim /etc/pip.conf</p></li>
+</ul>
+</section>
+<section id="tflite">
+<h1>tflite<a class="headerlink" href="#tflite" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><a class="reference external" href="https://www.tensorflow.org/lite/guide/python">安装 TensorFlow Lite 解释器</a></p>
+<ul>
+<li><p>sudo pip3.7 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_aarch64.whl</p></li>
+<li><p>或者另外下载安装</p>
+<ul>
+<li><p>sudo pip3.7 install tflite_runtime-2.1.0.post1-cp37-cp37m-linux_aarch64.whl</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple, https://pypi.tuna.tsinghua.edu.cn/simple
+Processing ./tflite_runtime-2.1.0.post1-cp37-cp37m-linux_aarch64.whl
+Collecting numpy&gt;=1.12.1 (from tflite-runtime==2.1.0.post1)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/c2/a8/a924a09492bdfee8c2ec3094d0a13f2799800b4fdc9c890738aeeb12c72e/numpy-1.21.5.zip (10.7MB)
+    100% |████████████████████████████████| 10.7MB 1.2MB/s 
+  Installing build dependencies ... done
+Installing collected packages: numpy, tflite-runtime
+  Running setup.py install for numpy ... done
+Successfully installed numpy-1.21.5 tflite-runtime-2.1.0.post1
+You are using pip version 10.0.1, however version 22.0.3 is available.
+You should consider upgrading via the &#39;pip install --upgrade pip&#39; command.
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

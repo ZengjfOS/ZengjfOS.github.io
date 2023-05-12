@@ -1,0 +1,198 @@
+# apksigner签名原理
+
+apk签名原理
+
+# 参考文档
+
+* [Android apk签名原理](https://blog.csdn.net/weixin_42600398/article/details/125042210)
+* [Android APK 签名原理](https://cloud.tencent.com/developer/article/1354380)
+* [Android V1签名与校验原理分析(全网最全最详细)](https://blog.csdn.net/qq_43278826/article/details/118677962)
+* [KeyStore简介和使用](https://blog.csdn.net/onelei1994/article/details/52096670)
+* [Android keystore简介、生成、查看](https://blog.csdn.net/qq_30304193/article/details/81781914?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-81781914-blog-52096670.pc_relevant_multi_platform_whitelistv3&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-81781914-blog-52096670.pc_relevant_multi_platform_whitelistv3&utm_relevant_index=1)
+* [keystore 使用](https://www.jianshu.com/p/49a664b8cff4)
+* [android debug.keystore 的默认密码](https://www.jianshu.com/p/75a6dd3a126a)
+
+# apk组成
+
+* dex：最终生成的Dalvik字节码。
+* res：存放资源文件的目录。
+* asserts：额外建立的资源文件夹。
+* lib：如果存在的话，存放的是ndk编出来的so库。
+* META-INF：存放签名信息
+  * MANIFEST.MF（清单文件）：其中每一个资源文件都有一个SHA-256-Digest签名，MANIFEST.MF文件的SHA256（SHA1）并base64编码的结果即为CERT.SF中的SHA256-Digest-Manifest值。
+  * CERT.SF（待签名文件）：除了开头处定义的SHA256（SHA1）-Digest-Manifest值，后面几项的值是对MANIFEST.MF文件中的每项再次SHA256并base64编码后的值。
+  * CERT.RSA（签名结果文件）：其中包含了公钥、加密算法等信息。首先对前一步生成的MANIFEST.MF使用了SHA256（SHA1）-RSA算法，用开发者私钥签名，然后在安装时使用公钥解密。最后，将其与未加密的摘要信息（MANIFEST.MF文件）进行对比，如果相符，则表明内容没有被修改。
+* androidManifest：程序的全局清单配置文件。
+* resources.arsc：编译后的二进制资源文件。
+
+# 签名流程
+
+![0013_android_v1_sign.png](images/0013_android_v1_sign.png)
+
+为了防止APK在传送的过程中被第三方篡改，Google引入了签名机制。签过名的APK文件比未签名的APK文件多了一个META-AF文件夹，包含以下三个文件。签名的信息就在这三个文件中。
+
+```
+MANIFEST.MF
+CERT.RSA
+CERT.SF
+```
+
+对APK文件夹中的文件逐一遍历进行SHA1（或者SHA256）算法计算文件的消息摘要，然后进行BASE64编码后，作为"SHA1-Digest"属性的值写入到MANIFEST.MF文件中的一个块中。该块有一个"Name"属性，其值就是该文件在APK包中的路径。
+
+```
+Manifest-Version: 1.0
+Built-By: Generated-by-ADT
+Created-By: Android Gradle 3.1.0
+
+Name: AndroidManifest.xml
+SHA1-Digest: 9hTSmRfzHEeQc7V2wxBbTT3DmCY=
+
+Name: META-INF/android.arch.core_runtime.version
+SHA1-Digest: BeF7ZGqBckDCBhhvlPj0xwl01dw=
+
+Name: META-INF/android.arch.lifecycle_livedata-core.version
+SHA1-Digest: BeF7ZGqBckDCBhhvlPj0xwl01dw=
+```
+
+计算这个MANIFEST.MF文件的整体SHA1值，再经过BASE64编码后，记录在CERT.SF主属性块（在文件头上）的"SHA1-Digest-Manifest"属性值值下。然后，再逐条计算MANIFEST.MF文件中每一个块的SHA1，并经过BASE64编码后，记录在CERT.SF中的同名块中，属性的名字是"SHA1-Digest"。
+
+```
+Signature-Version: 1.0
+Created-By: 1.0 (Android)
+SHA1-Digest-Manifest: MJQyZ0dc4dv7G9nlJPAMQLwEwbU=
+X-Android-APK-Signed: 2
+
+Name: AndroidManifest.xml
+SHA1-Digest: IJioMmfD693T4qnUJcPKhq9woHQ=
+
+Name: META-INF/android.arch.core_runtime.version
+SHA1-Digest: OPQCkzMXJVPQryHeMowVNZmfRMw=
+
+Name: META-INF/android.arch.lifecycle_livedata-core.version
+SHA1-Digest: TSBGEIW1zN2n2sraHWcuRYSO8JU=
+```
+
+把之前生成的CERT.SF文件，用私钥计算出签名, 然后将签名以及包含公钥信息的数字证书一同写入CERT.RSA中保存。
+
+```
+3082 02f9 0609 2a86 4886 f70d 0107 02a0
+8202 ea30 8202 e602 0101 310b 3009 0605
+2b0e 0302 1a05 0030 0b06 092a 8648 86f7
+0d01 0701 a082 01e1 3082 01dd 3082 0146
+0201 0130 0d06 092a 8648 86f7 0d01 0105
+0500 3037 3116 3014 0603 5504 030c 0d41
+6e64 726f 6964 2044 6562 7567 3110 300e
+0603 5504 0a0c 0741 6e64 726f 6964 310b
+3009 0603 5504 0613 0255 5330 1e17 0d31
+```
+
+# keystore简要说明
+
+keystore文件中包含了私钥、公钥和数字证书。根据编码不同，keystore文件分为很多种，Android使用的是Java标准keystore格式JKS(Java Key Storage)，所以通过Android Studio导出的keystore文件是以.jks结尾的。
+
+Keytool是一个有效的安全钥匙和证书的管理工具，Java 中的 keytool.exe （位于 JDK\Bin 目录下）可以用来创建数字证书。keystore数字证书，是一个存储了证书的文件。文件包含证书的私钥，公钥和对应的数字证书的信息。Keytool将密钥（key）和证书（certificates）存在一个称为keystore的文件中。 在keystore里，包含两种数据：
+
+* 密钥实体（Key entity）——密钥（secret key）又或者是私钥和配对公钥（采用非对称加密）
+* 可信任的证书实体（trusted certificate entries）——只包含公钥
+
+# 自建keystore
+
+* keytool -genkey -alias android.keystore -keyalg RSA -validity 20000 -keystore android.keystore
+* keytool -list -v -keystore [你的keystore路径] -storepass [密码]
+
+# macos keytool
+
+* export PATH=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:$PATH
+* keytool --help
+  ```
+  Key and Certificate Management Tool
+  
+  Commands:
+  
+   -certreq            Generates a certificate request
+   -changealias        Changes an entry's alias
+   -delete             Deletes an entry
+   -exportcert         Exports certificate
+   -genkeypair         Generates a key pair
+   -genseckey          Generates a secret key
+   -gencert            Generates certificate from a certificate request
+   -importcert         Imports a certificate or a certificate chain
+   -importpass         Imports a password
+   -importkeystore     Imports one or all entries from another keystore
+   -keypasswd          Changes the key password of an entry
+   -list               Lists entries in a keystore
+   -printcert          Prints the content of a certificate
+   -printcertreq       Prints the content of a certificate request
+   -printcrl           Prints the content of a CRL file
+   -storepasswd        Changes the store password of a keystore
+   -showinfo           Displays security-related information
+  
+  Use "keytool -?, -h, or --help" for this help message
+  Use "keytool -command_name --help" for usage of command_name.
+  Use the -conf <url> option to specify a pre-configured options file.
+  ```
+* 版本不对，不能直接使用
+
+# android studio keystore
+
+* 默认debug.keystore的信息如下：
+  ```
+  Keystore name: "debug.keystore"
+  Keystore password: "android"
+  Key alias: "androiddebugkey"
+  Key password: "android"
+  CN: "CN=Android Debug,O=Android,C=US"
+  ```
+* cd ~/.android
+* keytool -list -v -keystore debug.keystore
+  ```
+  Enter keystore password:  
+  Keystore type: PKCS12
+  Keystore provider: SUN
+  
+  Your keystore contains 1 entry
+  
+  Alias name: androiddebugkey
+  Creation date: Dec 7, 2021
+  Entry type: PrivateKeyEntry
+  Certificate chain length: 1
+  Certificate[1]:
+  Owner: C=US, O=Android, CN=Android Debug
+  Issuer: C=US, O=Android, CN=Android Debug
+  Serial number: 1
+  Valid from: Tue Dec 07 21:24:54 CST 2021 until: Thu Nov 30 21:24:54 CST 2051
+  Certificate fingerprints:
+  	 SHA1: F4:68:8C:99:2B:EC:43:5A:DA:1E:0C:2A:65:44:26:BF:89:89:C6:85
+  	 SHA256: 54:8E:C9:C3:74:08:7A:FA:18:3D:31:0B:7D:E6:DC:61:1B:FE:48:8E:B9:A3:A9:F9:21:07:46:37:4E:CA:FE:4A
+  Signature algorithm name: SHA1withRSA (weak)
+  Subject Public Key Algorithm: 2048-bit RSA key
+  Version: 1
+  ...省略
+  ```
+
+# CERT.RSA签名流程
+
+最终的加密处理由java.security.Signature加密库进行处理
+
+```
+* https://android.googlesource.com/platform/tools/apksig/+/refs/tags/android-12.1.0_r16
+  └── src/main/java/com/android/apksig/ApkSigner.java
+      └── public void sign()
+          └── sign(inputApk, outputApkOut, outputApkIn);
+              └── ApkSignerEngine.OutputJarSignatureRequest outputJarSignatureRequest = signerEngine.outputJarEntries();
+                  └── src/main/java/com/android/apksig/DefaultApkSignerEngine.java
+                      └── public OutputJarSignatureRequest outputJarEntries()
+                          └── signatureZipEntries = V1SchemeSigner.sign(mV1SignerConfigs, mV1ContentDigestAlgorithm, mOutputJarEntryDigests, apkSigningSchemeIds, inputJarManifest, mCreatedBy);
+                              └── src/main/java/com/android/apksig/internal/apk/v1/V1SchemeSigner.java
+                                  └── public static List<Pair<String, byte[]>> sign(List<SignerConfig> signerConfigs, DigestAlgorithm jarEntryDigestAlgorithm, Map<String, byte[]> jarEntryDigests, List<Integer> apkSigningSchemeIds, byte[] sourceManifestBytes, String createdBy)
+                                      └── return signManifest(signerConfigs, jarEntryDigestAlgorithm, apkSigningSchemeIds, createdBy, manifest);
+                                          └── for (SignerConfig signerConfig : signerConfigs)
+                                              └── signatureBlock = generateSignatureBlock(signerConfig, sfBytes);
+                                                  └── src/main/java/com/android/apksig/internal/apk/v1/V1SchemeSigner.java
+                                                      └── private static byte[] generateSignatureBlock(SignerConfig signerConfig, byte[] signatureFileBytes)
+                                                          ├── Signature signature = Signature.getInstance(jcaSignatureAlgorithm);
+                                                          ├── signature.initSign(signerConfig.privateKey);
+                                                          ├── signature.update(signatureFileBytes);
+                                                          ├── signatureBytes = signature.sign();
+                                                          └── return ApkSigningBlockUtils.generatePkcs7DerEncodedMessage(signatureBytes, null, signerCerts, digestAlgorithmId, signatureAlgorithmId);
+```

@@ -1,0 +1,9 @@
+# YUV format
+
+了解YUV存储格式
+
+# 参考文档
+
+* [YUV pixel formats](https://www.fourcc.org/yuv.php)
+* [YUY2 yuv pixel format](https://www.fourcc.org/pixel-format/yuv-yuy2/)
+* [UYVY yuv pixel format](https://www.fourcc.org/pixel-format/yuv-uyvy/)

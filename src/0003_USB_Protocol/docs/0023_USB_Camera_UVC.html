@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">USB Camera UVC</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#source">Source</a></li>
+<li><a class="reference internal" href="#usb">USB描述符</a></li>
+<li><a class="reference internal" href="#uvc">UVC</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usb-camera-uvc">
+<h1>USB Camera UVC<a class="headerlink" href="#usb-camera-uvc" title="Permalink to this headline"></a></h1>
+<p>USB Camera数据通信原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://community.cypress.com/docs/DOC-9329">Interfacing FX2LP™ with Image Sensor – KBA95736</a></p></li>
+<li><p><a class="reference external" href="https://community.cypress.com/docs/DOC-14406">USB2.0 Camera Interface Using FX2LP™ and Lattice CrossLink FPGA - KBA222479</a></p></li>
+<li><p><a class="reference external" href="https://www.cypress.com/file/202971/download">Create Your Own USB Vendor Commands Using FX2LP™</a></p></li>
+<li><p><a class="reference external" href="http://bbs.21ic.com/icview-828608-1-1.html">USB68013种的arm endpoint是什么意思</a></p>
+<ul>
+<li><p>arm相当于使Endpoint处于待命的状态，随时准备数据传输！</p></li>
+<li><p>re-arm就是再次待命。</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://github.com/ZengjfOS/V4L2/blob/master/docs/0001_uvc/README.md">UVC v4l2</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq160816/article/details/62419489">camera驱动部分视频数据流分析（uvc）</a></p></li>
+<li><p><a class="reference external" href="https://www.usb.org/document-library/video-class-v15-document-set">USB Video Class 1_5 Specification</a></p></li>
+</ul>
+</section>
+<section id="source">
+<h1>Source<a class="headerlink" href="#source" title="Permalink to this headline"></a></h1>
+<p>https://github.com/ZengjfOS/USB/tree/UVCCamera</p>
+</section>
+<section id="usb">
+<h1>USB描述符<a class="headerlink" href="#usb" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>lsusb</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bus</span> <span class="mi">003</span> <span class="n">Device</span> <span class="mi">001</span><span class="p">:</span> <span class="n">ID</span> <span class="mi">1</span><span class="n">d6b</span><span class="p">:</span><span class="mi">0002</span> <span class="n">Linux</span> <span class="n">Foundation</span> <span class="mf">2.0</span> <span class="n">root</span> <span class="n">hub</span>
+<span class="n">Bus</span> <span class="mi">002</span> <span class="n">Device</span> <span class="mi">001</span><span class="p">:</span> <span class="n">ID</span> <span class="mi">1</span><span class="n">d6b</span><span class="p">:</span><span class="mi">0003</span> <span class="n">Linux</span> <span class="n">Foundation</span> <span class="mf">3.0</span> <span class="n">root</span> <span class="n">hub</span>
+<span class="n">Bus</span> <span class="mi">001</span> <span class="n">Device</span> <span class="mi">003</span><span class="p">:</span> <span class="n">ID</span> <span class="mi">04</span><span class="n">b4</span><span class="p">:</span><span class="mi">0036</span> <span class="n">Cypress</span> <span class="n">Semiconductor</span> <span class="n">Corp</span><span class="o">.</span>
+<span class="n">Bus</span> <span class="mi">001</span> <span class="n">Device</span> <span class="mi">002</span><span class="p">:</span> <span class="n">ID</span> <span class="mi">2109</span><span class="p">:</span><span class="mi">3431</span> <span class="n">VIA</span> <span class="n">Labs</span><span class="p">,</span> <span class="n">Inc</span><span class="o">.</span> <span class="n">Hub</span>
+<span class="n">Bus</span> <span class="mi">001</span> <span class="n">Device</span> <span class="mi">001</span><span class="p">:</span> <span class="n">ID</span> <span class="mi">1</span><span class="n">d6b</span><span class="p">:</span><span class="mi">0002</span> <span class="n">Linux</span> <span class="n">Foundation</span> <span class="mf">2.0</span> <span class="n">root</span> <span class="n">hub</span>
+</pre></div>
+</div>
+</li>
+<li><p>lsusb -vd 04b4:0036</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bus</span> <span class="mi">001</span> <span class="n">Device</span> <span class="mi">005</span><span class="p">:</span> <span class="n">ID</span> <span class="mi">04</span><span class="n">b4</span><span class="p">:</span><span class="mi">0036</span> <span class="n">Cypress</span> <span class="n">Semiconductor</span> <span class="n">Corp</span><span class="o">.</span>
+<span class="n">Couldn</span><span class="s1">&#39;t open device, some information will be missing</span>
+<span class="n">Device</span> <span class="n">Descriptor</span><span class="p">:</span>
+  <span class="n">bLength</span>                <span class="mi">18</span>
+  <span class="n">bDescriptorType</span>         <span class="mi">1</span>
+  <span class="n">bcdUSB</span>               <span class="mf">2.00</span>
+  <span class="n">bDeviceClass</span>          <span class="mi">239</span> <span class="n">Miscellaneous</span> <span class="n">Device</span>
+  <span class="n">bDeviceSubClass</span>         <span class="mi">2</span>
+  <span class="n">bDeviceProtocol</span>         <span class="mi">1</span> <span class="n">Interface</span> <span class="n">Association</span>
+  <span class="n">bMaxPacketSize0</span>        <span class="mi">64</span>
+  <span class="n">idVendor</span>           <span class="mh">0x04b4</span> <span class="n">Cypress</span> <span class="n">Semiconductor</span> <span class="n">Corp</span><span class="o">.</span>
+  <span class="n">idProduct</span>          <span class="mh">0x0036</span>
+  <span class="n">bcdDevice</span>            <span class="mf">0.00</span>
+  <span class="n">iManufacturer</span>           <span class="mi">1</span>
+  <span class="n">iProduct</span>                <span class="mi">2</span>
+  <span class="n">iSerial</span>                 <span class="mi">0</span>
+  <span class="n">bNumConfigurations</span>      <span class="mi">1</span>
+  <span class="n">Configuration</span> <span class="n">Descriptor</span><span class="p">:</span>
+    <span class="n">bLength</span>                 <span class="mi">9</span>
+    <span class="n">bDescriptorType</span>         <span class="mi">2</span>
+    <span class="n">wTotalLength</span>       <span class="mh">0x00ce</span>
+    <span class="n">bNumInterfaces</span>          <span class="mi">2</span>
+    <span class="n">bConfigurationValue</span>     <span class="mi">1</span>
+    <span class="n">iConfiguration</span>          <span class="mi">0</span>
+    <span class="n">bmAttributes</span>         <span class="mh">0x80</span>
+      <span class="p">(</span><span class="n">Bus</span> <span class="n">Powered</span><span class="p">)</span>
+    <span class="n">MaxPower</span>              <span class="mi">500</span><span class="n">mA</span>
+    <span class="n">Interface</span> <span class="n">Association</span><span class="p">:</span>
+      <span class="n">bLength</span>                 <span class="mi">8</span>
+      <span class="n">bDescriptorType</span>        <span class="mi">11</span>
+      <span class="n">bFirstInterface</span>         <span class="mi">0</span>
+      <span class="n">bInterfaceCount</span>         <span class="mi">2</span>
+      <span class="n">bFunctionClass</span>         <span class="mi">14</span> <span class="n">Video</span>
+      <span class="n">bFunctionSubClass</span>       <span class="mi">3</span> <span class="n">Video</span> <span class="n">Interface</span> <span class="n">Collection</span>
+      <span class="n">bFunctionProtocol</span>       <span class="mi">0</span>
+      <span class="n">iFunction</span>               <span class="mi">2</span>
+    <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+      <span class="n">bLength</span>                 <span class="mi">9</span>
+      <span class="n">bDescriptorType</span>         <span class="mi">4</span>
+      <span class="n">bInterfaceNumber</span>        <span class="mi">0</span>
+      <span class="n">bAlternateSetting</span>       <span class="mi">0</span>
+      <span class="n">bNumEndpoints</span>           <span class="mi">1</span>
+      <span class="n">bInterfaceClass</span>        <span class="mi">14</span> <span class="n">Video</span>
+      <span class="n">bInterfaceSubClass</span>      <span class="mi">1</span> <span class="n">Video</span> <span class="n">Control</span>
+      <span class="n">bInterfaceProtocol</span>      <span class="mi">0</span>
+      <span class="n">iInterface</span>              <span class="mi">2</span>
+      <span class="n">VideoControl</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                <span class="mi">13</span>
+        <span class="n">bDescriptorType</span>        <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>      <span class="mi">1</span> <span class="p">(</span><span class="n">HEADER</span><span class="p">)</span>
+        <span class="n">bcdUVC</span>               <span class="mf">1.10</span>
+        <span class="n">wTotalLength</span>       <span class="mh">0x0051</span>
+        <span class="n">dwClockFrequency</span>       <span class="mf">48.000000</span><span class="n">MHz</span>
+        <span class="n">bInCollection</span>           <span class="mi">1</span>
+        <span class="n">baInterfaceNr</span><span class="p">(</span> <span class="mi">0</span><span class="p">)</span>       <span class="mi">1</span>
+      <span class="n">VideoControl</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                <span class="mi">18</span>
+        <span class="n">bDescriptorType</span>        <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>      <span class="mi">2</span> <span class="p">(</span><span class="n">INPUT_TERMINAL</span><span class="p">)</span>
+        <span class="n">bTerminalID</span>             <span class="mi">1</span>
+        <span class="n">wTerminalType</span>      <span class="mh">0x0201</span> <span class="n">Camera</span> <span class="n">Sensor</span>
+        <span class="n">bAssocTerminal</span>          <span class="mi">0</span>
+        <span class="n">iTerminal</span>               <span class="mi">0</span>
+        <span class="n">wObjectiveFocalLengthMin</span>      <span class="mi">0</span>
+        <span class="n">wObjectiveFocalLengthMax</span>      <span class="mi">0</span>
+        <span class="n">wOcularFocalLength</span>            <span class="mi">0</span>
+        <span class="n">bControlSize</span>                  <span class="mi">3</span>
+        <span class="n">bmControls</span>           <span class="mh">0x00000000</span>
+      <span class="n">VideoControl</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                <span class="mi">13</span>
+        <span class="n">bDescriptorType</span>        <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>      <span class="mi">5</span> <span class="p">(</span><span class="n">PROCESSING_UNIT</span><span class="p">)</span>
+        <span class="n">bUnitID</span>                 <span class="mi">2</span>
+        <span class="n">bSourceID</span>               <span class="mi">1</span>
+        <span class="n">wMaxMultiplier</span>      <span class="mi">16384</span>
+        <span class="n">bControlSize</span>            <span class="mi">3</span>
+        <span class="n">bmControls</span>     <span class="mh">0x00000000</span>
+        <span class="n">iProcessing</span>             <span class="mi">0</span>
+        <span class="n">bmVideoStandards</span>     <span class="mh">0x00</span>
+      <span class="n">VideoControl</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                <span class="mi">28</span>
+        <span class="n">bDescriptorType</span>        <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>      <span class="mi">6</span> <span class="p">(</span><span class="n">EXTENSION_UNIT</span><span class="p">)</span>
+        <span class="n">bUnitID</span>                 <span class="mi">3</span>
+        <span class="n">guidExtensionCode</span>         <span class="p">{</span><span class="n">ffffffff</span><span class="o">-</span><span class="n">ffff</span><span class="o">-</span><span class="n">ffff</span><span class="o">-</span><span class="n">ffff</span><span class="o">-</span><span class="n">ffffffffffff</span><span class="p">}</span>
+        <span class="n">bNumControl</span>             <span class="mi">0</span>
+        <span class="n">bNrPins</span>                 <span class="mi">1</span>
+        <span class="n">baSourceID</span><span class="p">(</span> <span class="mi">0</span><span class="p">)</span>          <span class="mi">2</span>
+        <span class="n">bControlSize</span>            <span class="mi">3</span>
+        <span class="n">bmControls</span><span class="p">(</span> <span class="mi">0</span><span class="p">)</span>       <span class="mh">0x00</span>
+        <span class="n">bmControls</span><span class="p">(</span> <span class="mi">1</span><span class="p">)</span>       <span class="mh">0x00</span>
+        <span class="n">bmControls</span><span class="p">(</span> <span class="mi">2</span><span class="p">)</span>       <span class="mh">0x00</span>
+        <span class="n">iExtension</span>              <span class="mi">0</span>
+      <span class="n">VideoControl</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                 <span class="mi">9</span>
+        <span class="n">bDescriptorType</span>        <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>      <span class="mi">3</span> <span class="p">(</span><span class="n">OUTPUT_TERMINAL</span><span class="p">)</span>
+        <span class="n">bTerminalID</span>             <span class="mi">4</span>
+        <span class="n">wTerminalType</span>      <span class="mh">0x0101</span> <span class="n">USB</span> <span class="n">Streaming</span>
+        <span class="n">bAssocTerminal</span>          <span class="mi">0</span>
+        <span class="n">bSourceID</span>               <span class="mi">3</span>
+        <span class="n">iTerminal</span>               <span class="mi">0</span>
+      <span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                 <span class="mi">7</span>
+        <span class="n">bDescriptorType</span>         <span class="mi">5</span>
+        <span class="n">bEndpointAddress</span>     <span class="mh">0x88</span>  <span class="n">EP</span> <span class="mi">8</span> <span class="n">IN</span>
+        <span class="n">bmAttributes</span>            <span class="mi">3</span>
+          <span class="n">Transfer</span> <span class="n">Type</span>            <span class="n">Interrupt</span>
+          <span class="n">Synch</span> <span class="n">Type</span>               <span class="kc">None</span>
+          <span class="n">Usage</span> <span class="n">Type</span>               <span class="n">Data</span>
+        <span class="n">wMaxPacketSize</span>     <span class="mh">0x0040</span>  <span class="mi">1</span><span class="n">x</span> <span class="mi">64</span> <span class="nb">bytes</span>
+        <span class="n">bInterval</span>               <span class="mi">8</span>
+    <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+      <span class="n">bLength</span>                 <span class="mi">9</span>
+      <span class="n">bDescriptorType</span>         <span class="mi">4</span>
+      <span class="n">bInterfaceNumber</span>        <span class="mi">1</span>
+      <span class="n">bAlternateSetting</span>       <span class="mi">0</span>
+      <span class="n">bNumEndpoints</span>           <span class="mi">1</span>
+      <span class="n">bInterfaceClass</span>        <span class="mi">14</span> <span class="n">Video</span>
+      <span class="n">bInterfaceSubClass</span>      <span class="mi">2</span> <span class="n">Video</span> <span class="n">Streaming</span>
+      <span class="n">bInterfaceProtocol</span>      <span class="mi">0</span>
+      <span class="n">iInterface</span>              <span class="mi">0</span>
+      <span class="n">VideoStreaming</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                            <span class="mi">14</span>
+        <span class="n">bDescriptorType</span>                    <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>                  <span class="mi">1</span> <span class="p">(</span><span class="n">INPUT_HEADER</span><span class="p">)</span>
+        <span class="n">bNumFormats</span>                         <span class="mi">1</span>
+        <span class="n">wTotalLength</span>                   <span class="mh">0x0047</span>
+        <span class="n">bEndPointAddress</span>                  <span class="mi">130</span>
+        <span class="n">bmInfo</span>                              <span class="mi">0</span>
+        <span class="n">bTerminalLink</span>                       <span class="mi">4</span>
+        <span class="n">bStillCaptureMethod</span>                 <span class="mi">1</span>
+        <span class="n">bTriggerSupport</span>                     <span class="mi">0</span>
+        <span class="n">bTriggerUsage</span>                       <span class="mi">0</span>
+        <span class="n">bControlSize</span>                        <span class="mi">1</span>
+        <span class="n">bmaControls</span><span class="p">(</span> <span class="mi">0</span><span class="p">)</span>                     <span class="mi">0</span>
+      <span class="n">VideoStreaming</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                            <span class="mi">27</span>
+        <span class="n">bDescriptorType</span>                    <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>                  <span class="mi">4</span> <span class="p">(</span><span class="n">FORMAT_UNCOMPRESSED</span><span class="p">)</span>
+        <span class="n">bFormatIndex</span>                        <span class="mi">1</span>
+        <span class="n">bNumFrameDescriptors</span>                <span class="mi">1</span>
+        <span class="n">guidFormat</span>                            <span class="p">{</span><span class="mi">32595559</span><span class="o">-</span><span class="mi">0000</span><span class="o">-</span><span class="mi">0010</span><span class="o">-</span><span class="mi">8000</span><span class="o">-</span><span class="mi">00</span><span class="n">aa00389b71</span><span class="p">}</span>
+        <span class="n">bBitsPerPixel</span>                      <span class="mi">16</span>
+        <span class="n">bDefaultFrameIndex</span>                  <span class="mi">1</span>
+        <span class="n">bAspectRatioX</span>                       <span class="mi">8</span>
+        <span class="n">bAspectRatioY</span>                       <span class="mi">6</span>
+        <span class="n">bmInterlaceFlags</span>                 <span class="mh">0x00</span>
+          <span class="n">Interlaced</span> <span class="n">stream</span> <span class="ow">or</span> <span class="n">variable</span><span class="p">:</span> <span class="n">No</span>
+          <span class="n">Fields</span> <span class="n">per</span> <span class="n">frame</span><span class="p">:</span> <span class="mi">2</span> <span class="n">fields</span>
+          <span class="n">Field</span> <span class="mi">1</span> <span class="n">first</span><span class="p">:</span> <span class="n">No</span>
+          <span class="n">Field</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">Field</span> <span class="mi">1</span> <span class="n">only</span>
+        <span class="n">bCopyProtect</span>                        <span class="mi">0</span>
+      <span class="n">VideoStreaming</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                            <span class="mi">30</span>
+        <span class="n">bDescriptorType</span>                    <span class="mi">36</span>
+        <span class="n">bDescriptorSubtype</span>                  <span class="mi">5</span> <span class="p">(</span><span class="n">FRAME_UNCOMPRESSED</span><span class="p">)</span>
+        <span class="n">bFrameIndex</span>                         <span class="mi">1</span>
+        <span class="n">bmCapabilities</span>                   <span class="mh">0x01</span>
+          <span class="n">Still</span> <span class="n">image</span> <span class="n">supported</span>
+        <span class="n">wWidth</span>                            <span class="mi">640</span>
+        <span class="n">wHeight</span>                           <span class="mi">480</span>
+        <span class="n">dwMinBitRate</span>                <span class="mi">147456000</span>
+        <span class="n">dwMaxBitRate</span>                <span class="mi">147456000</span>
+        <span class="n">dwMaxVideoFrameBufferSize</span>      <span class="mi">614400</span>
+        <span class="n">dwDefaultFrameInterval</span>         <span class="mi">333333</span>
+        <span class="n">bFrameIntervalType</span>                  <span class="mi">1</span>
+        <span class="n">dwFrameInterval</span><span class="p">(</span> <span class="mi">0</span><span class="p">)</span>            <span class="mi">333333</span>
+      <span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+        <span class="n">bLength</span>                 <span class="mi">7</span>
+        <span class="n">bDescriptorType</span>         <span class="mi">5</span>
+        <span class="n">bEndpointAddress</span>     <span class="mh">0x82</span>  <span class="n">EP</span> <span class="mi">2</span> <span class="n">IN</span>
+        <span class="n">bmAttributes</span>            <span class="mi">2</span>
+          <span class="n">Transfer</span> <span class="n">Type</span>            <span class="n">Bulk</span>
+          <span class="n">Synch</span> <span class="n">Type</span>               <span class="kc">None</span>
+          <span class="n">Usage</span> <span class="n">Type</span>               <span class="n">Data</span>
+        <span class="n">wMaxPacketSize</span>     <span class="mh">0x0200</span>  <span class="mi">1</span><span class="n">x</span> <span class="mi">512</span> <span class="nb">bytes</span>
+        <span class="n">bInterval</span>               <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="uvc">
+<h1>UVC<a class="headerlink" href="#uvc" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://github.com/ZengjfOS/V4L2/blob/master/docs/0002_v4l2_capture/README.md</p></li>
+<li><p>Kernel</p>
+<ul class="simple">
+<li><p>drivers/media/usb/uvc/uvc_video.c</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">void</span> <span class="pre">uvc_video_complete(struct</span> <span class="pre">urb</span> <span class="pre">*urb)</span></code>这个函数相当于MIPI CSI的帧中断函数；</p></li>
+<li><p>urb-&gt;complete = uvc_video_complete; (收到数据后此函数被调用,它又调用video-&gt;decode(urb, video, buf); ==&gt; uvc_video_decode_isoc/uvc_video_encode_bulk =&gt; uvc_queue_next_buffer =&gt; wake_up(&amp;buf-&gt;wait);)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>一帧图片的获取流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">drivers</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">usb</span><span class="o">/</span><span class="n">uvc</span><span class="o">/</span><span class="n">uvc_v4l2</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="n">const</span> <span class="n">struct</span> <span class="n">v4l2_ioctl_ops</span> <span class="n">uvc_ioctl_ops</span> 
+    <span class="o">*</span> <span class="o">.</span><span class="n">vidioc_streamon</span> <span class="o">=</span> <span class="n">uvc_ioctl_streamon</span>
+      <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">uvc_queue_streamon</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">queue</span><span class="p">,</span> <span class="nb">type</span><span class="p">);</span>
+        <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">vb2_streamon</span><span class="p">(</span><span class="o">&amp;</span><span class="n">queue</span><span class="o">-&gt;</span><span class="n">queue</span><span class="p">,</span> <span class="nb">type</span><span class="p">);</span>
+          <span class="o">*</span> <span class="n">drivers</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">videobuf2</span><span class="o">/</span><span class="n">videobuf2</span><span class="o">-</span><span class="n">v4l2</span><span class="o">.</span><span class="n">c</span>
+            <span class="o">*</span> <span class="n">vb2_core_streamon</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">type</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">vb2_start_streaming</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">call_qop</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">start_streaming</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">atomic_read</span><span class="p">(</span><span class="o">&amp;</span><span class="n">q</span><span class="o">-&gt;</span><span class="n">owned_by_drv_count</span><span class="p">));</span>
+                  <span class="o">*</span> <span class="n">drivers</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">usb</span><span class="o">/</span><span class="n">uvc</span><span class="o">/</span><span class="n">uvc_queue</span><span class="o">.</span><span class="n">c</span>
+                    <span class="o">*</span> <span class="n">static</span> <span class="n">const</span> <span class="n">struct</span> <span class="n">vb2_ops</span> <span class="n">uvc_queue_qops</span>
+                      <span class="o">*</span> <span class="o">.</span><span class="n">start_streaming</span> <span class="o">=</span> <span class="n">uvc_start_streaming</span>
+                        <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">uvc_video_enable</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+                          <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">uvc_commit_video</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">ctrl</span><span class="p">);</span>
+                          <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">uvc_init_video</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">GFP_KERNEL</span><span class="p">);</span>
+                            <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">uvc_init_video_isoc</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">best_ep</span><span class="p">,</span> <span class="n">gfp_flags</span><span class="p">);</span>
+                              <span class="o">*</span> <span class="n">urb</span><span class="o">-&gt;</span><span class="n">complete</span> <span class="o">=</span> <span class="n">uvc_video_complete</span><span class="p">;</span>
+                                <span class="o">*</span> <span class="n">stream</span><span class="o">-&gt;</span><span class="n">decode</span><span class="p">(</span><span class="n">urb</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">buf_meta</span><span class="p">);</span>
+                                  <span class="o">*</span> <span class="n">drivers</span><span class="o">/</span><span class="n">media</span><span class="o">/</span><span class="n">usb</span><span class="o">/</span><span class="n">uvc</span><span class="o">/</span><span class="n">uvc_video</span><span class="o">.</span><span class="n">c</span>
+                                    <span class="o">*</span> <span class="nb">int</span> <span class="n">uvc_video_init</span><span class="p">(</span><span class="n">struct</span> <span class="n">uvc_streaming</span> <span class="o">*</span><span class="n">stream</span><span class="p">)</span>
+                                      <span class="o">*</span> <span class="n">stream</span><span class="o">-&gt;</span><span class="n">decode</span> <span class="o">=</span> <span class="n">uvc_video_decode_isoc</span><span class="p">;</span>
+                                      <span class="o">*</span> <span class="n">stream</span><span class="o">-&gt;</span><span class="n">decode</span> <span class="o">=</span> <span class="n">uvc_video_decode_bulk</span><span class="p">;</span>
+                            <span class="o">*</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">uvc_init_video_bulk</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">gfp_flags</span><span class="p">);</span>
+                              <span class="o">*</span> <span class="n">usb_fill_bulk_urb</span><span class="p">(</span><span class="n">urb</span><span class="p">,</span> <span class="n">stream</span><span class="o">-&gt;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="p">,</span> <span class="n">pipe</span><span class="p">,</span> <span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">,</span> <span class="n">uvc_video_complete</span><span class="p">,</span> <span class="n">stream</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><img alt="0023_UVC_USB_Get_Buffer.svg" src="../../../_images/0023_UVC_USB_Get_Buffer.svg" /></p>
+</li>
+<li><p>uvc_video_decode_isoc，参考《USB_Video_Class_1.x.pdf》中”2.4.3.3 Video and Still Image Payload Headers”小节：
+Every Payload Transfer containing video or still-image sample data must start with a Payload Header.</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">uvc_video_decode_isoc</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">urb</span><span class="w"> </span><span class="o">*</span><span class="n">urb</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_streaming</span><span class="w"> </span><span class="o">*</span><span class="n">stream</span><span class="p">,</span><span class="w"></span>
+<span class="w">                        </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">meta_buf</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">u8</span><span class="w"> </span><span class="o">*</span><span class="n">mem</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">number_of_packets</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">iso_frame_desc</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">status</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_FRAME</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;USB isochronous frame &quot;</span><span class="w"></span>
+<span class="w">                                </span><span class="s">&quot;lost (%d).</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">iso_frame_desc</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="cm">/* Mark the buffer as faulty. */</span><span class="w"></span>
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buf</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">                                </span><span class="n">buf</span><span class="o">-&gt;</span><span class="n">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">                        </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">                </span><span class="cm">/* Decode the payload header. */</span><span class="w"></span>
+<span class="w">                </span><span class="n">mem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">transfer_buffer</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">iso_frame_desc</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">offset</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvc_video_decode_start</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">mem</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">iso_frame_desc</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">actual_length</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="n">EAGAIN</span><span class="p">)</span><span class="w"></span>
+<span class="w">                                </span><span class="n">uvc_video_next_buffers</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">meta_buf</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="n">EAGAIN</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">                </span><span class="n">uvc_video_decode_meta</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">meta_buf</span><span class="p">,</span><span class="w"> </span><span class="n">mem</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="cm">/* Decode the payload data. */</span><span class="w"></span>
+<span class="w">                </span><span class="n">uvc_video_decode_data</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">mem</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"></span>
+<span class="w">                        </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">iso_frame_desc</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">actual_length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="cm">/* Process the header again. */</span><span class="w"></span>
+<span class="w">                </span><span class="n">uvc_video_decode_end</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">mem</span><span class="p">,</span><span class="w"></span>
+<span class="w">                        </span><span class="n">urb</span><span class="o">-&gt;</span><span class="n">iso_frame_desc</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">actual_length</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buf</span><span class="o">-&gt;</span><span class="n">state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_BUF_STATE_READY</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="n">uvc_video_next_buffers</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">meta_buf</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>这个时候我们就会疑问，一帧结束了我们才调用complete，这是为什么呢？一张图片那么大，不可能一次传完，肯定分很多小帧，这个我们可能就要去找出<code class="docutils literal notranslate"><span class="pre">urb-&gt;number_of_packets</span></code>是谁决定的；</p>
+<ul class="simple">
+<li><p>static int uvc_init_video_isoc(struct uvc_streaming *stream, struct usb_host_endpoint *ep, gfp_t gfp_flags)</p>
+<ul>
+<li><p>urb-&gt;number_of_packets = npackets;</p></li>
+<li><p>npackets = uvc_alloc_urb_buffers(stream, size, psize, gfp_flags);</p>
+<ul>
+<li><p>npackets = DIV_ROUND_UP(size, psize);</p>
+<ul>
+<li><p>以上size是图片数据大小，psize是单次USB端点数据传输大小；</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>uvc_alloc_urb_buffers</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">uvc_alloc_urb_buffers</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_streaming</span><span class="w"> </span><span class="o">*</span><span class="n">stream</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">psize</span><span class="p">,</span><span class="w"> </span><span class="n">gfp_t</span><span class="w"> </span><span class="n">gfp_flags</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">npackets</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Buffers are already allocated, bail out. */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_size</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">psize</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Compute the number of packets. Bulk endpoints might transfer UVC</span>
+<span class="cm">         * payloads across multiple URBs.</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">npackets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DIV_ROUND_UP</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">psize</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">npackets</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">UVC_MAX_PACKETS</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">npackets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UVC_MAX_PACKETS</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Retry allocations until one succeed. */</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="n">npackets</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">npackets</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">UVC_URBS</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">psize</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">npackets</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#ifndef CONFIG_DMA_NONCOHERENT</span>
+<span class="w">                        </span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">usb_alloc_coherent</span><span class="p">(</span><span class="w"></span>
+<span class="w">                                </span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">udev</span><span class="p">,</span><span class="w"> </span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_size</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                </span><span class="n">gfp_flags</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">__GFP_NOWARN</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_dma</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">                        </span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">                            </span><span class="n">kmalloc</span><span class="p">(</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_size</span><span class="p">,</span><span class="w"> </span><span class="n">gfp_flags</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">__GFP_NOWARN</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">                        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">urb_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                                </span><span class="n">uvc_free_urb_buffers</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span><span class="w"></span>
+<span class="w">                                </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                        </span><span class="p">}</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_URBS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_VIDEO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Allocated %u URB buffers &quot;</span><span class="w"></span>
+<span class="w">                                </span><span class="s">&quot;of %ux%u bytes each.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">UVC_URBS</span><span class="p">,</span><span class="w"> </span><span class="n">npackets</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                </span><span class="n">psize</span><span class="p">);</span><span class="w"></span>
+<span class="w">                        </span><span class="k">return</span><span class="w"> </span><span class="n">npackets</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">uvc_trace</span><span class="p">(</span><span class="n">UVC_TRACE_VIDEO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Failed to allocate URB buffers (%u bytes &quot;</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;per packet).</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">psize</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>如上可知，获取一张UVC图片，本身是一个URB请求完成一帧图片的获取，在初始化URB的时候，会算好要请求多少次，完成一次请求；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

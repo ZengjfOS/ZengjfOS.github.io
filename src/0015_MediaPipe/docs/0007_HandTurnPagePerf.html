@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Hand Turn Page Performance</a></li>
+<li><a class="reference internal" href="#log-diff">log diff</a></li>
+<li><a class="reference internal" href="#capture-log">capture log</a></li>
+<li><a class="reference internal" href="#id1">数据分析</a></li>
+<li><a class="reference internal" href="#android-studio-profiler">Android Studio Profiler</a></li>
+<li><a class="reference internal" href="#id2">上下左右识别</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hand-turn-page-performance">
+<h1>Hand Turn Page Performance<a class="headerlink" href="#hand-turn-page-performance" title="Permalink to this headline"></a></h1>
+<p>Hand Turn Page的性能分析，有些机型没有GPU，有些没有NPU</p>
+</section>
+<section id="log-diff">
+<h1>log diff<a class="headerlink" href="#log-diff" title="Permalink to this headline"></a></h1>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gu">@@ -82,7 +102,10 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    if (inputSource == InputSource.CAMERA) {<span class="w"></span>
+<span class="w"> </span>      // Restarts the camera and the opengl surface rendering.<span class="w"></span>
+<span class="w"> </span>      cameraInput = new CameraInput(this);<span class="w"></span>
+<span class="gd">-      cameraInput.setNewFrameListener(textureFrame -&gt; hands.send(textureFrame));</span><span class="w"></span>
+<span class="gi">+      cameraInput.setNewFrameListener(textureFrame -&gt; {</span><span class="w"></span>
+<span class="gi">+        Log.e(&quot;HandTurnPagePerformance&quot;, &quot;Get Frame From Camera Over&quot;);</span><span class="w"></span>
+<span class="gi">+        hands.send(textureFrame);</span><span class="w"></span>
+<span class="gi">+      });</span><span class="w"></span>
+<span class="w"> </span>      glSurfaceView.post(this::startCamera);<span class="w"></span>
+<span class="w"> </span>      glSurfaceView.setVisibility(View.VISIBLE);<span class="w"></span>
+<span class="w"> </span>    } else if (inputSource == InputSource.VIDEO) {<span class="w"></span>
+<span class="gu">@@ -277,7 +300,10 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+
+<span class="w"> </span>    if (inputSource == InputSource.CAMERA) {<span class="w"></span>
+<span class="w"> </span>      cameraInput = new CameraInput(this);<span class="w"></span>
+<span class="gd">-      cameraInput.setNewFrameListener(textureFrame -&gt; hands.send(textureFrame));</span><span class="w"></span>
+<span class="gi">+      cameraInput.setNewFrameListener(textureFrame -&gt; {</span><span class="w"></span>
+<span class="gi">+        Log.e(&quot;HandTurnPagePerformance&quot;, &quot;Get Frame From Camera Over&quot;);</span><span class="w"></span>
+<span class="gi">+        hands.send(textureFrame);</span><span class="w"></span>
+<span class="gi">+      });</span><span class="w"></span>
+<span class="w"> </span>    } else if (inputSource == InputSource.VIDEO) {<span class="w"></span>
+<span class="w"> </span>      videoInput = new VideoInput(this);<span class="w"></span>
+<span class="w"> </span>      videoInput.setNewFrameListener(textureFrame -&gt; hands.send(textureFrame));<span class="w"></span>
+<span class="gu">@@ -290,9 +316,11 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    glSurfaceView.setRenderInputImage(true);<span class="w"></span>
+<span class="w"> </span>    hands.setResultListener(<span class="w"></span>
+<span class="w"> </span>        handsResult -&gt; {<span class="w"></span>
+<span class="gi">+          Log.e(&quot;HandTurnPagePerformance&quot;, &quot;End Of MediaPipe Processed&quot;);</span><span class="w"></span>
+<span class="w"> </span>          logWristLandmark(handsResult, /*showPixelValues=*/ false);<span class="w"></span>
+<span class="w"> </span>          glSurfaceView.setRenderData(handsResult);<span class="w"></span>
+<span class="w"> </span>          glSurfaceView.requestRender();<span class="w"></span>
+<span class="gi">+          Log.e(&quot;HandTurnPagePerformance&quot;, &quot;End Of HandTurnPage Processed&quot;);</span><span class="w"></span>
+<span class="w"> </span>        });<span class="w"></span>
+
+<span class="w"> </span>    // The runnable to start camera after the gl surface view is attached.<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="capture-log">
+<h1>capture log<a class="headerlink" href="#capture-log" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>获取数据</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adb</span> <span class="n">shell</span> <span class="n">logcat</span> <span class="o">-</span><span class="n">s</span> <span class="n">HandTurnPagePerformance</span>
+</pre></div>
+</div>
+</li>
+<li><p>数据保存到：default/HandTurnPagePerformance.txt</p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>数据分析<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p>logcat log分析脚本：<a class="reference download internal" download="" href="../../../_downloads/2b6119faec249e26536d310f228cce05/0007_HandTurnPagePerformance.py"><span class="xref download myst">0007_HandTurnPagePerformance.py</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">LogTools</span><span class="o">.</span><span class="n">py</span> <span class="n">HandTurnPagePerformance</span>
+</pre></div>
+</div>
+<p>使用荣耀手机，并加入训练的HandTurnPage功能，绘图效率如下</p>
+<p><img alt="0007_HonorPhonePerformance.png" src="../../../_images/0007_HonorPhonePerformance.png" /></p>
+<p>使用荣耀手机，不加入训练的HandTurnPage功能，绘图效率如下</p>
+<p><img alt="0007_M8Performance.png" src="../../../_images/0007_M8Performance.png" /></p>
+<ul class="simple">
+<li><p>红点表示处理一张摄像头获取的图片耗时</p></li>
+<li><p>对比发现，后面这台机器的性能差，和摄像头没关系，是摄像头数据处理慢</p></li>
+<li><p>另外也可以通过Android Studio的Profiler的CPU中的函数栈分析进行查看</p></li>
+</ul>
+</section>
+<section id="android-studio-profiler">
+<h1>Android Studio Profiler<a class="headerlink" href="#android-studio-profiler" title="Permalink to this headline"></a></h1>
+<p>Record</p>
+<p><img alt="0007_AndroidStudioProfilerCPU.png" src="../../../_images/0007_AndroidStudioProfilerCPU.png" /></p>
+<p>Choreographer调用出现严重延迟</p>
+<p><img alt="0007_AndroidStudioProfilerCPURecord.png" src="../../../_images/0007_AndroidStudioProfilerCPURecord.png" /></p>
+<p>函数调用栈</p>
+<p><img alt="0007_AndroidStudioProfileCPURecoradFunction.png" src="../../../_images/0007_AndroidStudioProfileCPURecoradFunction.png" /></p>
+</section>
+<section id="id2">
+<h1>上下左右识别<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>添加layout</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;LinearLayout</span>
+    <span class="na">android:id=</span><span class="s">&quot;@+id/directions&quot;</span>
+    <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
+    <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+    <span class="na">style=</span><span class="s">&quot;?android:attr/buttonBarStyle&quot;</span> <span class="na">android:gravity=</span><span class="s">&quot;center&quot;</span>
+    <span class="na">android:orientation=</span><span class="s">&quot;horizontal&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;Button</span>
+        <span class="na">android:id=</span><span class="s">&quot;@+id/left&quot;</span>
+        <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:text=</span><span class="s">&quot;left&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;Button</span>
+        <span class="na">android:id=</span><span class="s">&quot;@+id/up&quot;</span>
+        <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:text=</span><span class="s">&quot;up&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;Button</span>
+        <span class="na">android:id=</span><span class="s">&quot;@+id/down&quot;</span>
+        <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:text=</span><span class="s">&quot;down&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;Button</span>
+        <span class="na">android:id=</span><span class="s">&quot;@+id/right&quot;</span>
+        <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+        <span class="na">android:text=</span><span class="s">&quot;right&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/LinearLayout&gt;</span>
+</pre></div>
+</div>
+<p>修改Camera预览居中，主要是有些机型是横屏的</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>&lt;FrameLayout
+    android:id=&quot;@+id/preview_display_layout&quot;
+    android:layout_gravity=&quot;center&quot;
+    android:layout_width=&quot;wrap_content&quot;
+    android:layout_height=&quot;wrap_content&quot;&gt;
+    &lt;TextView
+        android:id=&quot;@+id/no_view&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:gravity=&quot;center&quot;
+        android:text=&quot;@string/instruction&quot; /&gt;
+&lt;/FrameLayout
+</pre></div>
+</div>
+<p>完整MidiaPipe处理diff</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/mediapipe/examples/android/solutions/hands/build.gradle b/mediapipe/examples/android/solutions/hands/build.gradle</span><span class="w"></span>
+<span class="gh">index 6c21109..76457d5 100644</span><span class="w"></span>
+<span class="gd">--- a/mediapipe/examples/android/solutions/hands/build.gradle</span><span class="w"></span>
+<span class="gi">+++ b/mediapipe/examples/android/solutions/hands/build.gradle</span><span class="w"></span>
+<span class="gu">@@ -38,4 +38,6 @@ dependencies {</span><span class="w"></span>
+<span class="w"> </span>    // MediaPipe Hands Solution.<span class="w"></span>
+<span class="w"> </span>    implementation &#39;com.google.mediapipe:solution-core:latest.release&#39;<span class="w"></span>
+<span class="w"> </span>    implementation &#39;com.google.mediapipe:hands:latest.release&#39;<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    implementation &#39;org.tensorflow:tensorflow-lite:2.7.0&#39;</span><span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+<span class="gh">diff --git a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gh">index d93f9b1..bbc4652 100644</span><span class="w"></span>
+<span class="gd">--- a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gi">+++ b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gu">@@ -15,15 +15,20 @@</span><span class="w"></span>
+<span class="w"> </span>package com.google.mediapipe.examples.hands;<span class="w"></span>
+
+<span class="w"> </span>import android.content.Intent;<span class="w"></span>
+<span class="gi">+import android.content.res.AssetFileDescriptor;</span><span class="w"></span>
+<span class="w"> </span>import android.graphics.Bitmap;<span class="w"></span>
+<span class="gi">+import android.graphics.Color;</span><span class="w"></span>
+<span class="w"> </span>import android.graphics.Matrix;<span class="w"></span>
+<span class="w"> </span>import android.os.Bundle;<span class="w"></span>
+<span class="w"> </span>import android.provider.MediaStore;<span class="w"></span>
+<span class="w"> </span>import androidx.appcompat.app.AppCompatActivity;<span class="w"></span>
+<span class="w"> </span>import android.util.Log;<span class="w"></span>
+<span class="w"> </span>import android.view.View;<span class="w"></span>
+<span class="gi">+import android.view.ViewGroup;</span><span class="w"></span>
+<span class="w"> </span>import android.widget.Button;<span class="w"></span>
+<span class="w"> </span>import android.widget.FrameLayout;<span class="w"></span>
+<span class="gi">+import android.widget.RelativeLayout;</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>import androidx.activity.result.ActivityResultLauncher;<span class="w"></span>
+<span class="w"> </span>import androidx.activity.result.contract.ActivityResultContracts;<span class="w"></span>
+<span class="w"> </span>import androidx.exifinterface.media.ExifInterface;<span class="w"></span>
+<span class="gu">@@ -37,14 +42,28 @@ import com.google.mediapipe.solutions.hands.HandLandmark;</span><span class="w"></span>
+<span class="w"> </span>import com.google.mediapipe.solutions.hands.Hands;<span class="w"></span>
+<span class="w"> </span>import com.google.mediapipe.solutions.hands.HandsOptions;<span class="w"></span>
+<span class="w"> </span>import com.google.mediapipe.solutions.hands.HandsResult;<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+import org.tensorflow.lite.Interpreter;</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+import java.io.FileInputStream;</span><span class="w"></span>
+<span class="w"> </span>import java.io.IOException;<span class="w"></span>
+<span class="w"> </span>import java.io.InputStream;<span class="w"></span>
+<span class="gi">+import java.nio.ByteBuffer;</span><span class="w"></span>
+<span class="gi">+import java.nio.FloatBuffer;</span><span class="w"></span>
+<span class="gi">+import java.nio.channels.FileChannel;</span><span class="w"></span>
+<span class="gi">+import java.util.ArrayList;</span><span class="w"></span>
+<span class="gi">+import java.util.Arrays;</span><span class="w"></span>
+
+<span class="w"> </span>/** Main activity of MediaPipe Hands app. */<span class="w"></span>
+<span class="w"> </span>public class MainActivity extends AppCompatActivity {<span class="w"></span>
+<span class="w"> </span>  private static final String TAG = &quot;MainActivity&quot;;<span class="w"></span>
+
+<span class="w"> </span>  private Hands hands;<span class="w"></span>
+<span class="gi">+  public Interpreter interpreter = null;</span><span class="w"></span>
+<span class="gi">+  public String[] label = {&quot;fist&quot;, &quot;palm&quot;};</span><span class="w"></span>
+<span class="gi">+  public ArrayList&lt;Button&gt; buttons = new ArrayList&lt;&gt;();</span><span class="w"></span>
+<span class="gi">+  public MotionData preMotionData = null;</span><span class="w"></span>
+<span class="gi">+  public int maxAt = 0;</span><span class="w"></span>
+<span class="w"> </span>  // Run the pipeline and the model inference on GPU or CPU.<span class="w"></span>
+<span class="w"> </span>  private static final boolean RUN_ON_GPU = true;<span class="w"></span>
+
+<span class="gu">@@ -74,6 +93,22 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    setupStaticImageDemoUiComponents();<span class="w"></span>
+<span class="w"> </span>    setupVideoDemoUiComponents();<span class="w"></span>
+<span class="w"> </span>    setupLiveDemoUiComponents();<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    try {</span><span class="w"></span>
+<span class="gi">+      interpreter = new Interpreter(loadModelFile(&quot;HandTurnPage&quot;));</span><span class="w"></span>
+<span class="gi">+      interpreter.allocateTensors();</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+      buttons.add(findViewById(R.id.up));</span><span class="w"></span>
+<span class="gi">+      buttons.add(findViewById(R.id.left));</span><span class="w"></span>
+<span class="gi">+      buttons.add(findViewById(R.id.right));</span><span class="w"></span>
+<span class="gi">+      buttons.add(findViewById(R.id.down));</span><span class="w"></span>
+<span class="gi">+      for (Button button : buttons) {</span><span class="w"></span>
+<span class="gi">+          button.setBackgroundColor(Color.WHITE);</span><span class="w"></span>
+<span class="gi">+      }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    } catch (IOException e) {</span><span class="w"></span>
+<span class="gi">+      e.printStackTrace();</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="w"> </span>  }<span class="w"></span>
+
+<span class="w"> </span>  @Override<span class="w"></span>
+<span class="gu">@@ -82,7 +117,10 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    if (inputSource == InputSource.CAMERA) {<span class="w"></span>
+<span class="w"> </span>      // Restarts the camera and the opengl surface rendering.<span class="w"></span>
+<span class="w"> </span>      cameraInput = new CameraInput(this);<span class="w"></span>
+<span class="gd">-      cameraInput.setNewFrameListener(textureFrame -&gt; hands.send(textureFrame));</span><span class="w"></span>
+<span class="gi">+      cameraInput.setNewFrameListener(textureFrame -&gt; {</span><span class="w"></span>
+<span class="gi">+        Log.e(&quot;HandTurnPagePerformance&quot;, &quot;Get Frame From Camera Over&quot;);</span><span class="w"></span>
+<span class="gi">+        hands.send(textureFrame);</span><span class="w"></span>
+<span class="gi">+      });</span><span class="w"></span>
+<span class="w"> </span>      glSurfaceView.post(this::startCamera);<span class="w"></span>
+<span class="w"> </span>      glSurfaceView.setVisibility(View.VISIBLE);<span class="w"></span>
+<span class="w"> </span>    } else if (inputSource == InputSource.VIDEO) {<span class="w"></span>
+<span class="gu">@@ -277,7 +315,10 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+
+<span class="w"> </span>    if (inputSource == InputSource.CAMERA) {<span class="w"></span>
+<span class="w"> </span>      cameraInput = new CameraInput(this);<span class="w"></span>
+<span class="gd">-      cameraInput.setNewFrameListener(textureFrame -&gt; hands.send(textureFrame));</span><span class="w"></span>
+<span class="gi">+      cameraInput.setNewFrameListener(textureFrame -&gt; {</span><span class="w"></span>
+<span class="gi">+        Log.e(&quot;HandTurnPagePerformance&quot;, &quot;Get Frame From Camera Over&quot;);</span><span class="w"></span>
+<span class="gi">+        hands.send(textureFrame);</span><span class="w"></span>
+<span class="gi">+      });</span><span class="w"></span>
+<span class="w"> </span>    } else if (inputSource == InputSource.VIDEO) {<span class="w"></span>
+<span class="w"> </span>      videoInput = new VideoInput(this);<span class="w"></span>
+<span class="w"> </span>      videoInput.setNewFrameListener(textureFrame -&gt; hands.send(textureFrame));<span class="w"></span>
+<span class="gu">@@ -290,9 +331,11 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    glSurfaceView.setRenderInputImage(true);<span class="w"></span>
+<span class="w"> </span>    hands.setResultListener(<span class="w"></span>
+<span class="w"> </span>        handsResult -&gt; {<span class="w"></span>
+<span class="gi">+          Log.e(&quot;HandTurnPagePerformance&quot;, &quot;End Of MediaPipe Processed&quot;);</span><span class="w"></span>
+<span class="w"> </span>          logWristLandmark(handsResult, /*showPixelValues=*/ false);<span class="w"></span>
+<span class="w"> </span>          glSurfaceView.setRenderData(handsResult);<span class="w"></span>
+<span class="w"> </span>          glSurfaceView.requestRender();<span class="w"></span>
+<span class="gi">+          Log.e(&quot;HandTurnPagePerformance&quot;, &quot;End Of HandTurnPage Processed&quot;);</span><span class="w"></span>
+<span class="w"> </span>        });<span class="w"></span>
+
+<span class="w"> </span>    // The runnable to start camera after the gl surface view is attached.<span class="w"></span>
+<span class="gu">@@ -307,6 +350,12 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    frameLayout.removeAllViewsInLayout();<span class="w"></span>
+<span class="w"> </span>    frameLayout.addView(glSurfaceView);<span class="w"></span>
+<span class="w"> </span>    glSurfaceView.setVisibility(View.VISIBLE);<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    ViewGroup.LayoutParams params = glSurfaceView.getLayoutParams();</span><span class="w"></span>
+<span class="gi">+    params.width = 480;</span><span class="w"></span>
+<span class="gi">+    params.height = 640;</span><span class="w"></span>
+<span class="gi">+    glSurfaceView.setLayoutParams(params);</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>    frameLayout.requestLayout();<span class="w"></span>
+<span class="w"> </span>  }<span class="w"></span>
+
+<span class="gu">@@ -369,5 +418,99 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>            &quot;MediaPipe Hand wrist world coordinates (in meters with the origin at the hand&#39;s&quot;<span class="w"></span>
+<span class="w"> </span>                + &quot; approximate geometric center): x=%f m, y=%f m, z=%f m&quot;,<span class="w"></span>
+<span class="w"> </span>            wristWorldLandmark.getX(), wristWorldLandmark.getY(), wristWorldLandmark.getZ()));<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    Log.i(&quot;MonitorLandMark&quot;, &quot;start capture data&quot;);</span><span class="w"></span>
+<span class="gi">+    float[] inputs = new float[21 * 3];</span><span class="w"></span>
+<span class="gi">+    int i = 0;</span><span class="w"></span>
+<span class="gi">+    for (Landmark landmark : result.multiHandWorldLandmarks().get(0).getLandmarkList()) {</span><span class="w"></span>
+<span class="gi">+      Log.i(&quot;MonitorLandMark&quot;, String.format(&quot;x=%f, y=%f, z=%f&quot;, landmark.getX(), landmark.getY(), landmark.getZ()));</span><span class="w"></span>
+<span class="gi">+      inputs[i] = landmark.getX() * -1;</span><span class="w"></span>
+<span class="gi">+      inputs[i + 21] = landmark.getY();</span><span class="w"></span>
+<span class="gi">+      inputs[i + 21 + 21] = landmark.getZ();</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+      i++;</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+    Log.i(&quot;MonitorLandMark&quot;, &quot;end capture data&quot;);</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    FloatBuffer input = FloatBuffer.allocate(interpreter.getInputTensor(0).numElements());</span><span class="w"></span>
+<span class="gi">+    input.put(inputs);</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    FloatBuffer output = FloatBuffer.allocate(interpreter.getOutputTensor(0).numElements());</span><span class="w"></span>
+<span class="gi">+    interpreter.run(inputs, output);</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    float[] outputs = output.array();</span><span class="w"></span>
+<span class="gi">+    for (int j = 0; j &lt; outputs.length; j++) {</span><span class="w"></span>
+<span class="gi">+      maxAt = outputs[j] &gt; outputs[maxAt] ? j : maxAt;</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    Log.e(TAG, Arrays.toString(output.array()) + &quot; -&gt; &quot; + maxAt + &quot; -&gt; &quot; + label[maxAt]);</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    int width = result.inputBitmap().getWidth();</span><span class="w"></span>
+<span class="gi">+    int height = result.inputBitmap().getHeight();</span><span class="w"></span>
+<span class="gi">+    MotionData motionData = new MotionData();</span><span class="w"></span>
+<span class="gi">+    for (NormalizedLandmark landmark : result.multiHandLandmarks().get(0).getLandmarkList()) {</span><span class="w"></span>
+<span class="gi">+      motionData.x += wristLandmark.getX() * width;</span><span class="w"></span>
+<span class="gi">+      motionData.y += wristLandmark.getY() * height;</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+    motionData.x /= 21;</span><span class="w"></span>
+<span class="gi">+    motionData.y /= 21;</span><span class="w"></span>
+<span class="gi">+    motionData.motion = label[maxAt];</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    if (preMotionData == null) {</span><span class="w"></span>
+<span class="gi">+      preMotionData = motionData;</span><span class="w"></span>
+<span class="gi">+    } else {</span><span class="w"></span>
+<span class="gi">+      if (preMotionData.motion == &quot;palm&quot; &amp;&amp; motionData.motion == &quot;palm&quot;) {</span><span class="w"></span>
+<span class="gi">+        int xOffset = motionData.x - preMotionData.x;</span><span class="w"></span>
+<span class="gi">+        int yOffset = motionData.y - preMotionData.y;</span><span class="w"></span>
+<span class="gi">+        String direction = &quot;static&quot;;</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        Log.e(TAG, &quot;x offset: &quot; + (motionData.x - preMotionData.x));</span><span class="w"></span>
+<span class="gi">+        Log.e(TAG, &quot;y offset: &quot; + (motionData.y - preMotionData.y));</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        if (xOffset &gt; 50 &amp;&amp; xOffset &gt; yOffset + 15) {</span><span class="w"></span>
+<span class="gi">+          direction = &quot;right&quot;;</span><span class="w"></span>
+<span class="gi">+        } else if (xOffset &lt; -50 &amp;&amp; xOffset &lt; yOffset - 15) {</span><span class="w"></span>
+<span class="gi">+          direction = &quot;left&quot;;</span><span class="w"></span>
+<span class="gi">+        } else if (yOffset &gt; 50 &amp;&amp; xOffset + 15 &lt; yOffset) {</span><span class="w"></span>
+<span class="gi">+          direction = &quot;down&quot;;</span><span class="w"></span>
+<span class="gi">+        } else if (yOffset &lt; -50 &amp;&amp; xOffset - 15 &gt; yOffset) {</span><span class="w"></span>
+<span class="gi">+          direction = &quot;up&quot;;</span><span class="w"></span>
+<span class="gi">+        }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        String finalDirection = direction;</span><span class="w"></span>
+<span class="gi">+        runOnUiThread(() -&gt; {</span><span class="w"></span>
+<span class="gi">+            setTitle(finalDirection);</span><span class="w"></span>
+<span class="gi">+        });</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        for (Button button : buttons) {</span><span class="w"></span>
+<span class="gi">+          if (button.getText().equals(direction)) {</span><span class="w"></span>
+<span class="gi">+            runOnUiThread(() -&gt; {</span><span class="w"></span>
+<span class="gi">+              button.setBackgroundColor(Color.YELLOW);</span><span class="w"></span>
+<span class="gi">+            });</span><span class="w"></span>
+<span class="gi">+          } else {</span><span class="w"></span>
+<span class="gi">+            runOnUiThread(() -&gt; {</span><span class="w"></span>
+<span class="gi">+              button.setBackgroundColor(Color.WHITE);</span><span class="w"></span>
+<span class="gi">+            });</span><span class="w"></span>
+<span class="gi">+          }</span><span class="w"></span>
+<span class="gi">+        }</span><span class="w"></span>
+<span class="gi">+      }</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    preMotionData = motionData;</span><span class="w"></span>
+<span class="gi">+  }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+  private ByteBuffer loadModelFile(String model) throws IOException {</span><span class="w"></span>
+<span class="gi">+    AssetFileDescriptor fileDescriptor = getApplicationContext().getAssets().openFd(model + &quot;.tflite&quot;);</span><span class="w"></span>
+<span class="gi">+    FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());</span><span class="w"></span>
+<span class="gi">+    FileChannel fileChannel = inputStream.getChannel();</span><span class="w"></span>
+<span class="gi">+    long startOffset = fileDescriptor.getStartOffset();</span><span class="w"></span>
+<span class="gi">+    long declaredLength = fileDescriptor.getDeclaredLength();</span><span class="w"></span>
+<span class="gi">+    return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);</span><span class="w"></span>
+<span class="gi">+  }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+  public class MotionData {</span><span class="w"></span>
+<span class="gi">+    public String motion = &quot;fist&quot;;</span><span class="w"></span>
+<span class="gi">+    public int x = 0;</span><span class="w"></span>
+<span class="gi">+    public int y = 0;</span><span class="w"></span>
+<span class="w"> </span>  }<span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

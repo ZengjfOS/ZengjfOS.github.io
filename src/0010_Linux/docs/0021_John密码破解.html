@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">John</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#source">Source</a></li>
+<li><a class="reference internal" href="#compile">compile</a></li>
+<li><a class="reference internal" href="#id2">性能测试</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="john">
+<h1>John<a class="headerlink" href="#john" title="Permalink to this headline"></a></h1>
+<p>学习John破解密码怎么做的</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://klionsec.github.io/2017/04/26/use-john/">快速破解各种散列hash [ john入门篇 ]</a></p></li>
+</ul>
+</section>
+<section id="source">
+<h1>Source<a class="headerlink" href="#source" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://www.openwall.com/john/</p></li>
+<li><p>https://github.com/magnumripper/JohnTheRipper</p></li>
+</ul>
+</section>
+<section id="compile">
+<h1>compile<a class="headerlink" href="#compile" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>cd JohnTheRipper-bleeding-jumbo/src</p></li>
+<li><p>./configure</p></li>
+<li><p>make -s clean &amp;&amp; make -sj4</p></li>
+<li><p>./JohnTheRipper-bleeding-jumbo/run/john</p>
+<ul>
+<li><p>查看帮助信息</p></li>
+</ul>
+</li>
+<li><p>./JohnTheRipper-bleeding-jumbo/run/john passwd.txt</p></li>
+<li><p>./JohnTheRipper-bleeding-jumbo/run/john –show passwd.txt</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>性能测试<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>百度云BCC最低配</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>root@instance-xezfkc6l:~# john --test
+Benchmarking: descrypt, traditional crypt<span class="o">(</span><span class="m">3</span><span class="o">)</span> <span class="o">[</span>DES <span class="m">128</span>/128 SSE2-16<span class="o">]</span>... DONE
+Many salts:     2032K c/s real, 2052K c/s virtual
+Only one salt:  2242K c/s real, 2260K c/s virtual
+
+Benchmarking: bsdicrypt, BSDI crypt<span class="o">(</span><span class="m">3</span><span class="o">)</span> <span class="o">(</span><span class="s2">&quot;_J9..&quot;</span>, <span class="m">725</span> iterations<span class="o">)</span> <span class="o">[</span>DES <span class="m">128</span>/128 SSE2-16<span class="o">]</span>... DONE
+Many salts:     <span class="m">74163</span> c/s real, <span class="m">74912</span> c/s virtual
+Only one salt:  <span class="m">72243</span> c/s real, <span class="m">73120</span> c/s virtual
+
+Benchmarking: md5crypt <span class="o">[</span>MD5 <span class="m">32</span>/64 X2<span class="o">]</span>... DONE
+Raw:    <span class="m">6476</span> c/s real, <span class="m">6582</span> c/s virtual
+
+Benchmarking: bcrypt <span class="o">(</span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">a</span><span class="nv">$05</span><span class="s2">&quot;</span>, <span class="m">32</span> iterations<span class="o">)</span> <span class="o">[</span>Blowfish <span class="m">32</span>/64 X2<span class="o">]</span>... DONE
+Raw:    <span class="m">481</span> c/s real, <span class="m">485</span> c/s virtual
+
+Benchmarking: LM <span class="o">[</span>DES <span class="m">128</span>/128 SSE2-16<span class="o">]</span>... DONE
+Raw:    28157K c/s real, 28384K c/s virtual
+
+Benchmarking: AFS, Kerberos AFS <span class="o">[</span>DES <span class="m">48</span>/64 4K<span class="o">]</span>... DONE
+Short:  <span class="m">315136</span> c/s real, <span class="m">317677</span> c/s virtual
+Long:   <span class="m">780697</span> c/s real, <span class="m">788583</span> c/s virtual
+
+Benchmarking: tripcode <span class="o">[</span>DES <span class="m">128</span>/128 SSE2-16<span class="o">]</span>... DONE
+Raw:    1741K c/s real, 1769K c/s virtual
+
+Benchmarking: dummy <span class="o">[</span>N/A<span class="o">]</span>... DONE
+Raw:    42135K c/s real, 42733K c/s virtual
+
+Benchmarking: crypt, generic crypt<span class="o">(</span><span class="m">3</span><span class="o">)</span> <span class="o">[</span>?/64<span class="o">]</span>... DONE
+Many salts:     <span class="m">191212</span> c/s real, <span class="m">193144</span> c/s virtual
+Only one salt:  <span class="m">189484</span> c/s real, <span class="m">191012</span> c/s virtual
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

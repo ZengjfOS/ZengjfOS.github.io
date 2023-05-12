@@ -1,0 +1,17 @@
+# 鼠标移动缩放
+
+在图形界面上直接使用鼠标滚轮缩放、左键移动，更方便查看数据
+
+# 参考代码
+
+* https://gist.github.com/t20100/e5a9ba1196101e618883
+* https://github.com/PeterJust/panzoom
+
+# MatplotlibZoomExample
+
+* [0006_MatplotlibZoom.py](refers/0006_MatplotlibZoom.py)
+  * 独立的文件便于代码复用
+* [0006_MatplotlibZoomExample.py](refers/0006_MatplotlibZoomExample.py)
+  * 调用MatplotlibZoom.py的示例
+
+![0006_pan_zoom.gif](images/0006_pan_zoom.gif)

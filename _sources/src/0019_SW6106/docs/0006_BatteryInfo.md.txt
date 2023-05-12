@@ -1,0 +1,37 @@
+# Battery Info
+
+电池电量、电压、充放电电流信息
+
+# 参考文档
+
+* [0001_SW6106_Register_Release_RG005_1_v1.2.pdf](refers/0001_SW6106_Register_Release_RG005_1_v1.2.pdf)
+
+# 处理程序
+
+* [0006_BatteryInfo.py](refers/0006_BatteryInfo.py)
+
+# log
+
+shell
+
+```
+---------------------------------------
+batLow, voutBatHigh, voutLow: 0xb0, 0x5b, 0x5
+bat, batVoltage, 0xbb0, 3590.400000
+vout, voutVoltage, 0x505, 5140.000000
+chargeCurrentLow, dischargeChargeCurrentHigh, dischargCurrentLow: 0x0, 0x0, 0xd4                                               
+charge, batVoltage, 0x0, 0.000000
+discharge, voutVoltage, 0xd4, 757.142857
+soc: 36
+```
+
+文件数据
+
+```
+...省略
+2022-10-02 14:09:43, soc: 30, bat: 3562.800000, vout: 5132.000000, charge: 0.000000, discharge: 789.285714                     
+2022-10-02 14:09:44, soc: 30, bat: 3562.800000, vout: 5152.000000, charge: 0.000000, discharge: 785.714286
+2022-10-02 14:09:45, soc: 30, bat: 3564.000000, vout: 5144.000000, charge: 0.000000, discharge: 767.857143
+2022-10-02 14:09:46, soc: 30, bat: 3564.000000, vout: 5144.000000, charge: 0.000000, discharge: 775.000000
+2022-10-02 14:09:47, soc: 30, bat: 3565.200000, vout: 5140.000000, charge: 0.000000, discharge: 767.857143
+```

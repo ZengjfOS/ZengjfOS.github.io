@@ -1,0 +1,23 @@
+# user版本抓取串口log
+
+默认user版本不会从串口输出log
+
+# user版本
+
+按Vol UP持续输出log
+
+```
+mtk_kpd_gpio_set Already!
+key 0 is pressed
+Vol Up detected. Log Keep on.
+```
+
+不按就会关闭log输出
+
+```
+mtk_kpd_gpio_set Already!
+Log Turned Off.
+```
+
+* 注意大概看到PL输出log就要放手了，因为LK也会检测Vol Up，从而导致LK进Meta或者Fastboot模式
+* 多练几次，把握时间，一两秒就放手

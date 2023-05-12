@@ -1,0 +1,32 @@
+# 终端字符宽度
+
+终端中一个中文占两个字符宽度
+
+# 参考文档
+
+* [Python中计算字符宽度](https://blog.csdn.net/zhangxinrun/article/details/7526044)
+* [UNICODE CHARACTER DATABASE](http://www.unicode.org/reports/tr44/tr44-4.html)
+
+# 说明
+
+* [Unicode Character Database](http://www.unicode.org/reports/tr44/tr44-4.html)标准中有East_Asian_Width 属性
+* 其中除A不确定外，F/H/N/Na/W都能很明确的知道宽度，如果保守起见，将A视为宽度为2的话，则很容易给出单个字符的宽度
+
+```
+# East_Asian_Width (ea)
+ 
+ea ; A         ; Ambiguous    不确定
+ea ; F         ; Fullwidth    全宽
+ea ; H         ; Halfwidth    半宽
+ea ; N         ; Neutral      中性
+ea ; Na        ; Narrow       窄
+ea ; W         ; Wide         宽
+```
+
+# example
+
+* [0005_strWidth.py](refers/0005_strWidth.py)
+  ```
+  W
+  6
+  ```

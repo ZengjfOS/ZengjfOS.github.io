@@ -1,0 +1,44 @@
+# build cmd for Android
+
+树莓派的busybox可以在Android上使用，那么树莓派编译的static程序应该也能在Android上使用
+
+# Source
+
+main.c
+
+```c
+#include <stdio.h>
+
+int main(void) {
+	printf("hello world\n");
+}
+```
+
+Makefile
+
+```Makefile
+all:
+	gcc main.c -o helloworld -static
+
+clean:
+	rm helloworld
+```
+
+# Steps
+
+* make
+* file helloworld
+  ```
+  helloworld: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), statically linked, for GNU/Linux 3.2.0, BuildID[sha1]=8695093aae080f8c67b416ff0362328645aa42bd, not stripped
+  ```
+* 拷贝编译的程序到Android系统
+  * adb push \<path to file\> /vendor/bin
+  * adb shell
+  * file /vendor/bin/helloworld
+    ```
+    /vendor/bin/helloworld: ELF executable, 32-bit LSB arm, static, BuildID=8695093aae080f8c67b416ff0362328645aa42bd, not stripped
+    ```
+  * helloworld
+    ```
+    hello world
+    ```

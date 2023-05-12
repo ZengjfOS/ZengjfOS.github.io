@@ -1,0 +1,27 @@
+# Discharge
+
+充电后放电数据
+
+# 参考文档
+
+* [0001_SW6106_Datasheet_V1.0.pdf](refers/0001_SW6106_Datasheet_V1.0.pdf)
+* [0001_SW6106_Register_Release_RG005_1_v1.2.pdf](refers/0001_SW6106_Register_Release_RG005_1_v1.2.pdf)
+
+# 实际充电数据
+
+充电数据 
+
+* [0008_discharge_batteryInfo_20221004034502.txt](refers/0008_discharge_batteryInfo_20221004034502.txt)
+
+放电数据可视化（有些毛刺数据可能不准）：
+
+* 输出功率固定
+* 输出电压固定
+* 电池电压减少
+* 电池放电电流一直在增加
+
+![0008_discharge.png](images/0008_discharge.png)
+
+# 可视化代码参考
+
+* [0008_BatteryInfoDischarge.py](refers/0008_BatteryInfoDischarge.py)

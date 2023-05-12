@@ -1,0 +1,57 @@
+# 微雪电池扩展板
+
+微雪电池扩展板采用SW6106芯片
+
+# 参考文档
+
+* [树莓派锂电池扩展板 SW6106移动电源方案 内置保护电路 带3000mAh大电量锂电池](https://www.waveshare.net/shop/Li-polymer-Battery-HAT.htm)
+* [SW6106官网](http://www.ismartware.com/details-2-33.html)
+  * 用邮箱、手机号获取资料包
+  * 官网资料包，含寄存器描述
+    * [0001_202207211609549053.zip](refers/0001_202207211609549053.zip)
+* [0001_Li-polymer_Battery_HAT.pdf](refers/0001_Li-polymer_Battery_HAT.pdf)
+* [0001_SW6106_Datasheet_V1.0.pdf](refers/0001_SW6106_Datasheet_V1.0.pdf)
+* [0001_Li-polymer_Battery_HAT_manual_CN.pdf](refers/0001_Li-polymer_Battery_HAT_manual_CN.pdf)
+
+# PIN
+
+移除LED，引出I2C引脚
+
+![0001_I2C_PIN_ACCESS.png](images/0001_I2C_PIN_ACCESS.png)
+
+叠板安装，这种方式可以让电池给树莓派供电，让树莓派耗电
+
+![0001_HAT_Connector.png](images/0001_HAT_Connector.png)
+
+杜邦连接，用于测试充电电流，因为芯片内的电流计不是专门到电池的，而是整个系统的电流，如果用叠板，那么有一部分电流会到树莓派，不知道到电池的电流
+
+![0001_dubang_Connector.png](images/0001_dubang_Connector.png)
+
+# 电池电压
+
+参考设计
+
+![0001_battery_default_voltage.png](images/0001_battery_default_voltage.png)
+
+实际电路为NC电路，也就是4.2V电池
+
+![0001_battery_voltage_4v2.png](images/0001_battery_voltage_4v2.png)
+
+# I2C
+
+* i2cdetect -y 1
+  ```
+      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+  00:          -- -- -- -- -- -- -- -- -- -- -- -- -- 
+  10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+  20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+  30: -- -- -- -- -- -- -- -- -- -- -- -- 3c -- -- -- 
+  40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+  50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+  60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+  70: -- -- -- -- -- -- -- -- 
+  ```
+* i2cget -f -y 1 0x3c 0x1b
+  ```
+  0x28
+  ```

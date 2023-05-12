@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">开机自动发IP信息邮件</a></li>
+<li><a class="reference internal" href="#smtp">163 SMTP授权密码</a></li>
+<li><a class="reference internal" href="#automail">automail</a></li>
+<li><a class="reference internal" href="#rc-local">rc.local</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ip">
+<h1>开机自动发IP信息邮件<a class="headerlink" href="#ip" title="Permalink to this headline"></a></h1>
+<p>Python3自动发邮件</p>
+</section>
+<section id="smtp">
+<h1>163 SMTP授权密码<a class="headerlink" href="#smtp" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>[设置] -&gt; [POP3/SMTP/IMAP] -&gt; [开启服务] -&gt; [IMAP/SMTP服务]</p></li>
+</ul>
+</section>
+<section id="automail">
+<h1>automail<a class="headerlink" href="#automail" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>automail/main.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">smtplib</span>
+<span class="kn">from</span> <span class="nn">email.mime.text</span> <span class="kn">import</span> <span class="n">MIMEText</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">def</span> <span class="nf">check_ping</span><span class="p">():</span>
+    <span class="n">hostname</span> <span class="o">=</span> <span class="s2">&quot;www.baidu.com&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;ping -c 1 &quot;</span> <span class="o">+</span> <span class="n">hostname</span><span class="p">)</span>
+
+    <span class="c1"># and then check the response...</span>
+    <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pingstatus</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pingstatus</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">pingstatus</span>
+
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">check_ping</span><span class="p">():</span>
+        <span class="k">break</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Change to your own account information</span>
+<span class="c1"># Account Information</span>
+<span class="n">to</span>            <span class="o">=</span> <span class="s1">&#39;zengjf42@163.com&#39;</span>           <span class="c1"># Email to send to.</span>
+<span class="n">mail_user</span>     <span class="o">=</span> <span class="s1">&#39;zengjf42@163.com&#39;</span>           <span class="c1"># Email to send from.</span>
+<span class="n">mail_password</span> <span class="o">=</span> <span class="s1">&#39;&lt;your smtp passwd&gt;&#39;</span>          <span class="c1"># Email password.</span>
+<span class="n">smtpserver</span>    <span class="o">=</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="s1">&#39;smtp.163.com&#39;</span><span class="p">)</span> <span class="c1"># Server to use.</span>
+
+<span class="n">smtpserver</span><span class="o">.</span><span class="n">ehlo</span><span class="p">()</span>                            <span class="c1"># Says &#39;hello&#39; to the server</span>
+<span class="n">smtpserver</span><span class="o">.</span><span class="n">starttls</span><span class="p">()</span>                        <span class="c1"># Start TLS encryption</span>
+<span class="n">smtpserver</span><span class="o">.</span><span class="n">ehlo</span><span class="p">()</span>
+<span class="n">smtpserver</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">mail_user</span><span class="p">,</span> <span class="n">mail_password</span><span class="p">)</span>   <span class="c1"># Log in to server</span>
+<span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>                <span class="c1"># Get current time/date</span>
+
+<span class="n">arg</span><span class="o">=</span><span class="s1">&#39;ifconfig -a&#39;</span>                            <span class="c1"># Linux command to retrieve ip addresses.</span>
+<span class="c1"># Runs &#39;arg&#39; in a &#39;hidden terminal&#39;.</span>
+<span class="n">p</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>                       <span class="c1"># Get data from &#39;p terminal&#39;.</span>
+<span class="c1"># print(data)</span>
+
+<span class="c1"># get ip data</span>
+<span class="n">ip_lines</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+<span class="n">ips</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ip_lines</span><span class="p">:</span>
+    <span class="n">ips</span> <span class="o">+=</span> <span class="n">ip</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+
+<span class="c1"># Creates the text, subject, &#39;from&#39;, and &#39;to&#39; of the message.</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">ips</span><span class="p">)</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;IPs For RaspberryPi on </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">today</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1"> %Y&#39;</span><span class="p">)</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">&#39;From&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mail_user</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">&#39;To&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to</span>
+
+<span class="c1"># Sends the message</span>
+<span class="n">smtpserver</span><span class="o">.</span><span class="n">sendmail</span><span class="p">(</span><span class="n">mail_user</span><span class="p">,</span> <span class="p">[</span><span class="n">to</span><span class="p">],</span> <span class="n">msg</span><span class="o">.</span><span class="n">as_string</span><span class="p">())</span>
+
+<span class="c1"># Closes the smtp server.</span>
+<span class="n">smtpserver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="rc-local">
+<h1>rc.local<a class="headerlink" href="#rc-local" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo vim /etc/rc.local</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh -e</span>
+<span class="c1">#</span>
+<span class="c1"># rc.local</span>
+<span class="c1">#</span>
+<span class="c1"># This script is executed at the end of each multiuser runlevel.</span>
+<span class="c1"># Make sure that the script will &quot;exit 0&quot; on success or any other</span>
+<span class="c1"># value on error.</span>
+<span class="c1">#</span>
+<span class="c1"># In order to enable or disable this script just change the execution</span>
+<span class="c1"># bits.</span>
+<span class="c1">#</span>
+<span class="c1"># By default this script does nothing.</span>
+
+<span class="c1"># Print the IP address</span>
+<span class="nv">_IP</span><span class="o">=</span><span class="k">$(</span>hostname -I<span class="k">)</span> <span class="o">||</span> <span class="nb">true</span>
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$_IP</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="nb">printf</span> <span class="s2">&quot;My IP address is %s\n&quot;</span> <span class="s2">&quot;</span><span class="nv">$_IP</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+sleep <span class="m">10</span>
+<span class="k">if</span> <span class="o">[</span> -f <span class="s2">&quot;/boot/email&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    python3 /home/pi/zengjf/automail/main.py
+<span class="k">fi</span>
+
+<span class="nb">exit</span> <span class="m">0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><img alt="0013_auto_send_mail.png" src="../../../_images/0013_auto_send_mail.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Capturing USB Traffic</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#free-usb-analyzer">Free USB Analyzer</a></li>
+<li><a class="reference internal" href="#wireshark">Wireshark</a></li>
+<li><a class="reference internal" href="#id2">枚举流程分析</a></li>
+<li><a class="reference internal" href="#urb-usb-request-block">URB(USB Request Block)</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="capturing-usb-traffic">
+<h1>Capturing USB Traffic<a class="headerlink" href="#capturing-usb-traffic" title="Permalink to this headline"></a></h1>
+<p>USB抓包工具</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://wenku.baidu.com/view/ffa4f33a227916888486d7a4.html">USB枚举过程详细分析</a></p></li>
+<li><p><a class="reference external" href="https://superuser.com/questions/873896/wireshark-usb-traces-explanations">wireshark usb traces explanations</a></p></li>
+<li><p><a class="reference external" href="https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/communicating-with-a-usb-device">USB Request Blocks (URBs)</a></p></li>
+</ul>
+</section>
+<section id="free-usb-analyzer">
+<h1>Free USB Analyzer<a class="headerlink" href="#free-usb-analyzer" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Download：https://freeusbanalyzer.com/</p></li>
+</ul>
+<p><img alt="0004_USB_Analyzer.png" src="../../../_images/0004_USB_Analyzer.png" /></p>
+</section>
+<section id="wireshark">
+<h1>Wireshark<a class="headerlink" href="#wireshark" title="Permalink to this headline"></a></h1>
+<p>Download：https://www.wireshark.org/download.html</p>
+<p><strong>Note</strong>：安装的时候要选择安装USB支持包，默认不安装USB支持包</p>
+<p><img alt="0004_WireShark_USB_Capture.png" src="../../../_images/0004_WireShark_USB_Capture.png" /></p>
+</section>
+<section id="id2">
+<h1>枚举流程分析<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>USB枚举阶段分三个过程：</p>
+<ul>
+<li><p>获取设备描述符；</p></li>
+<li><p>设置地址；</p></li>
+<li><p>获取所有描述符；</p></li>
+</ul>
+</li>
+<li><p>从目前的抓包工具获取的数据来看，能抓到的都是第三个阶段的数据，前面两个阶段的数据目前貌似无法通过工具获取到；</p></li>
+</ul>
+</section>
+<section id="urb-usb-request-block">
+<h1>URB(USB Request Block)<a class="headerlink" href="#urb-usb-request-block" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>A USB URB is like an IP packet and a USB endpoint is like an IP port. USB endpoints 0x00-0x7F are on the host, and the endpoints 0x80-0xFF are on the device. Therefore, the endpoint encodes the direction of the transfer;</p></li>
+<li><p>一个urb包含了执行usb传输所需要的所有信息。当要进行数据传输时，需要分配一个urb结构体，对其进行初始化，然后将其提交给usb核心。USB核心对urb进行解析，将控制信息提交给主机控制器，由主机控制器负责数据到设备的传输。这时，驱动程序只需等待，当数据回传到主机控制器后，会转发给USB核心，唤醒等待的驱动程序，由驱动程序完成剩下的工作；</p></li>
+<li><p>一个URB相当于一次USB总线实际数据传输，不过在设备总，能看到的不过是中断/IN/OUT端点数据；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

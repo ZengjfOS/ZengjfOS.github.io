@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">HostTestRelease</a></li>
+<li><a class="reference internal" href="#source-code">Source Code</a></li>
+<li><a class="reference internal" href="#id1">简要说明</a></li>
+<li><a class="reference internal" href="#id2">外部命令数据流</a></li>
+<li><a class="reference internal" href="#code-hacking">Code Hacking</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hosttestrelease">
+<h1>HostTestRelease<a class="headerlink" href="#hosttestrelease" title="Permalink to this headline"></a></h1>
+<p>这部分可以跟的代码貌似不对，很多代码都是在库里调用，没有源代码</p>
+</section>
+<section id="source-code">
+<h1>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline"></a></h1>
+<p>HostTestRelease网络处理器工程：<code class="docutils literal notranslate"><span class="pre">C:\Texas</span> <span class="pre">Instruments\BLE-CC254x-1.4.2.2\Projects\ble\HostTest</span></code></p>
+</section>
+<section id="id1">
+<h1>简要说明<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>实现了网络处理器配置，即HCI控制器一部分在CC254x上运行，而应用程序和其他协议在PC机上运行；</p></li>
+<li><p>应用程序通过厂商特定的HCI命令与CC254x通信，这一过程需要通过串口或者虚拟串口来读写CC254x运行的HCI；</p></li>
+<li><p>可以认为HCI分为PC机部分和CC254x部分，分别有数据编解码程序，然后通过串口进行物理数据通信；</p></li>
+<li><p>HostTestRelease工程中的hci_ext_app.c将PC发送的消息转化为调用协议栈的API功能，任何从协议栈收到的消息都会发送给外部PC；</p></li>
+<li><p>以上并不是说HostTestRelease就没有了蓝牙的其他部分协议，HCI解析出来的数据还是要通过其他层的协议来做控制。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>外部命令数据流<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://processors.wiki.ti.com/index.php/BLE_HostTest_Add_Cmds">BLE HostTest Add Cmds</a></p></li>
+<li><p><a class="reference external" href="https://e2echina.ti.com/question_answer/wireless_connectivity/hw_rf_proprietary/f/45/t/24401">NPI_InitTransport在什么情况下被调用</a></p></li>
+</ul>
+<p><img alt="0011_HCI_External_Command_Data_Flow.jpg" src="../../../_images/0011_HCI_External_Command_Data_Flow.jpg" /></p>
+</section>
+<section id="code-hacking">
+<h1>Code Hacking<a class="headerlink" href="#code-hacking" title="Permalink to this headline"></a></h1>
+<p>HCI命令解析每个厂家都可能不一样，所以移植Linux驱动的时候这部分驱动是需要移植或者修改的；</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span>uint16 HCI_EXT_App_ProcessEvent( uint8 task_id, uint16 events )
+{
+    if ( events &amp; SYS_EVENT_MSG )
+    {
+        hciPacket_t *pMsg;
+
+        if ( (pMsg = ( hciPacket_t *)osal_msg_receive( hciExtApp_TaskID )) != NULL )
+        {
+            uint8 dealloc = TRUE;
+
+            // Process incoming messages
+            switch ( pMsg-&gt;hdr.event )
+            {
+                // Incoming HCI extension message
+                case HCI_EXT_CMD_EVENT:
+                    dealloc = processExtMsg( pMsg );                    &lt;------------------貌似只有这里面可以自己修改、定制
+                    break;
+
+                case HCI_GAP_EVENT_EVENT:
+                    {
+                        if ( pMsg-&gt;hdr.status == HCI_COMMAND_COMPLETE_EVENT_CODE )
+                        {
+                            hciEvt_CmdComplete_t *pkt = (hciEvt_CmdComplete_t *)pMsg;
+                            osal_msg_hdr_t *msgHdr;
+                            uint8 len;
+
+                            msgHdr = (osal_msg_hdr_t *)pMsg;
+                            msgHdr--; // Backup to the msg header
+
+                            len = (uint8)(msgHdr-&gt;len - sizeof ( hciEvt_CmdComplete_t ));
+
+                            HCI_SendCommandCompleteEvent( HCI_COMMAND_COMPLETE_EVENT_CODE, pkt-&gt;cmdOpcode, len, pkt-&gt;pReturnParam );
+                        }
+                        else if ( pMsg-&gt;hdr.status == HCI_VE_EVENT_CODE )
+                        {
+                            hciEvt_VSCmdComplete_t *pkt = (hciEvt_VSCmdComplete_t *)pMsg;
+
+                            HCI_SendCommandCompleteEvent(HCI_VE_EVENT_CODE, pkt-&gt;cmdOpcode,
+                                    pkt-&gt;length, pkt-&gt;pEventParam);
+                        }
+                    }
+                    break;
+
+                default:
+                    dealloc = processEvents( (osal_event_hdr_t *)pMsg );
+                    break;
+            }
+
+            // Release the OSAL message
+            if ( dealloc )
+            {
+                VOID osal_msg_deallocate( (uint8 *)pMsg );
+            }
+        }
+
+        // return unprocessed events
+        return (events ^ SYS_EVENT_MSG);
+    }
+
+    if ( events &amp; GAP_EVENT_SIGN_COUNTER_CHANGED )
+    {
+        // Sign counter changed, save it to NV
+        VOID osal_snv_write( BLE_NVID_SIGNCOUNTER, sizeof( uint32 ), &amp;hciExtSignCounter );
+
+        return ( events ^ GAP_EVENT_SIGN_COUNTER_CHANGED );
+    }
+
+    // Discard unknown events
+    return 0;
+}
+
+/*********************************************************************
+ * @fn      processExtMsg
+ *
+ * @brief   Parse and process incoming HCI extension messages.
+ *
+ * @param   pMsg - incoming HCI extension message.
+ *
+ * @return  none
+ */
+static uint8 processExtMsg( hciPacket_t *pMsg )
+{
+    uint8 deallocateIncoming;
+    bStatus_t stat = SUCCESS;
+    uint8 rspDataLen = 0;
+    hciExtCmd_t msg;
+    uint8 *pBuf = pMsg-&gt;pData;
+
+    // Parse the header
+    msg.pktType = *pBuf++;
+    msg.opCode = BUILD_UINT16( pBuf[0], pBuf[1] );
+    pBuf += 2;
+
+    msg.len = *pBuf++;
+    msg.pData = pBuf;
+
+    switch( msg.opCode &gt;&gt; 7 )
+    {
+        case HCI_EXT_L2CAP_SUBGRP:
+            stat = processExtMsgL2CAP( (msg.opCode &amp; 0x007F), &amp;msg, &amp;rspDataLen );
+            break;
+
+        case HCI_EXT_ATT_SUBGRP:
+            stat = processExtMsgATT( (msg.opCode &amp; 0x007F), &amp;msg );
+            break;
+
+        case HCI_EXT_GATT_SUBGRP:
+            stat = processExtMsgGATT( (msg.opCode &amp; 0x007F), &amp;msg, &amp;rspDataLen );
+            break;
+
+        case HCI_EXT_GAP_SUBGRP:
+            stat = processExtMsgGAP( (msg.opCode &amp; 0x007F), &amp;msg, &amp;rspDataLen );
+            break;
+
+        case HCI_EXT_UTIL_SUBGRP:
+            stat = processExtMsgUTIL( (msg.opCode &amp; 0x007F), &amp;msg, &amp;rspDataLen );
+            break;
+
+        default:
+            stat = FAILURE;
+            break;
+    }
+
+    // Deallocate here to free up heap space for the serial message set out HCI.
+    VOID osal_msg_deallocate( (uint8 *)pMsg );
+    deallocateIncoming = FALSE;
+
+    // Send back an immediate response
+    rspBuf[0] = LO_UINT16( HCI_EXT_GAP_CMD_STATUS_EVENT );
+    rspBuf[1] = HI_UINT16( HCI_EXT_GAP_CMD_STATUS_EVENT );
+    rspBuf[2] = stat;
+    rspBuf[3] = LO_UINT16( 0xFC00 | msg.opCode );
+    rspBuf[4] = HI_UINT16( 0xFC00 | msg.opCode );
+    rspBuf[5] = rspDataLen;
+
+    // IMPORTANT!! Fill in Payload (if needed) in case statement
+
+    HCI_SendControllerToHostEvent( HCI_VE_EVENT_CODE, (6 + rspDataLen), rspBuf );
+
+    return ( deallocateIncoming );
+}
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

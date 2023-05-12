@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Bulkloop Example</a></li>
+<li><a class="reference internal" href="#code-position">Code Position</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">修改源代码</a></li>
+<li><a class="reference internal" href="#device-bulkloop-test">Device Bulkloop Test</a></li>
+<li><a class="reference internal" href="#dscr-a51">设备描述符dscr.a51</a></li>
+<li><a class="reference internal" href="#id3">寄存器定义头文件</a></li>
+<li><a class="reference internal" href="#autopointers">Autopointers</a></li>
+<li><a class="reference internal" href="#bulkloop">Bulkloop</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bulkloop-example">
+<h1>Bulkloop Example<a class="headerlink" href="#bulkloop-example" title="Permalink to this headline"></a></h1>
+<p>USB Bulk传输示例</p>
+</section>
+<section id="code-position">
+<h1>Code Position<a class="headerlink" href="#code-position" title="Permalink to this headline"></a></h1>
+<p>代码位置（根据自己的安装目录查看）：<code class="docutils literal notranslate"><span class="pre">C:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Firmware\Bulkloop</span></code></p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>文档位置（根据自己的安装目录查看）：<code class="docutils literal notranslate"><span class="pre">C:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Documentation\EZ-USB(R)</span> <span class="pre">Development</span> <span class="pre">Kit</span> <span class="pre">User</span> <span class="pre">Guide.pdf</span></code></p></li>
+<li><p><a class="reference external" href="https://community.cypress.com/thread/13140">Getting Start with example Bulkloop fail</a>: To avoid this problem, the following two lines implemented in the firmware must be commented out.</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">EZUSB_WriteI2C</span><span class="p">(</span><span class="n">LED_ADDR</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="p">(</span><span class="n">Digit</span><span class="p">[</span><span class="n">AlternateSetting</span><span class="p">]));</span><span class="w"></span>
+<span class="n">EZUSB_WaitForEEPROMWrite</span><span class="p">(</span><span class="n">LED_ADDR</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="http://www.keil.com/support/man/docs/c51/c51_le_absvarloc.htm">Absolute Variable Location</a></p></li>
+<li><p><a class="reference external" href="https://www.cypress.com/file/202956/download">EZ-USB® FX2LP™中的中断处理</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>修改源代码<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">C:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Firmware\Bulkloop\Fx2.h</span></code>：不知道为什么Keil编辑器里打不开，要另外用文本编辑器打开</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="c1">// #define ENABLE_7_SEG_DISPLAY</span>
+<span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">start_7_seg_display</span><span class="p">;</span><span class="w">  </span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="device-bulkloop-test">
+<h1>Device Bulkloop Test<a class="headerlink" href="#device-bulkloop-test" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>设备管理器查看设备<br />
+<img alt="0007_Keil_Bulk_Example_Sample_Device.png" src="../../../_images/0007_Keil_Bulk_Example_Sample_Device.png" /></p></li>
+<li><p>查看设备枚举信息<br />
+<img alt="0007_Keil_Bulk_Example_Sample_Device_In_Control_Center.png" src="../../../_images/0007_Keil_Bulk_Example_Sample_Device_In_Control_Center.png" /></p></li>
+<li><p>Bulk Out
+<img alt="0007_Keil_Bulk_Example_Sample_Device_In_Control_Center_Out.png" src="../../../_images/0007_Keil_Bulk_Example_Sample_Device_In_Control_Center_Out.png" /></p></li>
+<li><p>Bulk In
+<img alt="0007_Keil_Bulk_Example_Sample_Device_In_Control_Center_In.png" src="../../../_images/0007_Keil_Bulk_Example_Sample_Device_In_Control_Center_In.png" /></p></li>
+</ul>
+</section>
+<section id="dscr-a51">
+<h1>设备描述符dscr.a51<a class="headerlink" href="#dscr-a51" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Descriptor Info</p>
+<div class="highlight-XML notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;DEVICE&gt;</span>
+    FriendlyName=&quot;Cypress FX2LP Sample Device&quot;
+    Manufacturer=&quot;Cypress&quot;
+    Product=&quot;EZ-USB&quot;
+    SerialNumber=&quot;&quot;
+    Configurations=&quot;1&quot;
+    MaxPacketSize=&quot;64&quot;
+    VendorID=&quot;04 B4&quot;
+    ProductID=&quot;10 04&quot;
+    Class=&quot;00h&quot;
+    SubClass=&quot;00h&quot;
+    Protocol=&quot;00h&quot;
+    BcdDevice=&quot;00 00&quot;
+    BcdUSB=&quot;02 00&quot;
+    <span class="nt">&lt;CONFIGURATION&gt;</span>
+        Configuration=&quot;0&quot;
+        ConfigurationValue=&quot;1&quot;
+        Attributes=&quot;80h&quot;
+        Interfaces=&quot;1&quot;
+        DescriptorType=&quot;2&quot;
+        DescriptorLength=&quot;9&quot;
+        TotalLength=&quot;32&quot;
+        MaxPower=&quot;50&quot;
+        <span class="nt">&lt;INTERFACE&gt;</span>
+            Interface=&quot;0&quot;
+            InterfaceNumber=&quot;0&quot;
+            AltSetting=&quot;0&quot;
+            Class=&quot;FFh&quot;
+            Subclass=&quot;00h&quot;
+            Protocol=&quot;0&quot;
+            Endpoints=&quot;2&quot;
+            DescriptorType=&quot;4&quot;
+            DescriptorLength=&quot;9&quot;
+            <span class="nt">&lt;ENDPOINT&gt;</span>
+                Type=&quot;BULK&quot;
+                Direction=&quot;OUT&quot;
+                Address=&quot;02h&quot;
+                Attributes=&quot;02h&quot;
+                MaxPktSize=&quot;512&quot;
+                DescriptorType=&quot;5&quot;
+                DescriptorLength=&quot;7&quot;
+                Interval=&quot;0&quot;
+            <span class="nt">&lt;/ENDPOINT&gt;</span>
+            <span class="nt">&lt;ENDPOINT&gt;</span>
+                Type=&quot;BULK&quot;
+                Direction=&quot;IN&quot;
+                Address=&quot;86h&quot;
+                Attributes=&quot;02h&quot;
+                MaxPktSize=&quot;512&quot;
+                DescriptorType=&quot;5&quot;
+                DescriptorLength=&quot;7&quot;
+                Interval=&quot;0&quot;
+            <span class="nt">&lt;/ENDPOINT&gt;</span>
+        <span class="nt">&lt;/INTERFACE&gt;</span>
+    <span class="nt">&lt;/CONFIGURATION&gt;</span>
+<span class="nt">&lt;/DEVICE&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Source Code</p>
+<div class="highlight-ASM notranslate"><div class="highlight"><pre><span></span>;;-----------------------------------------------------------------------------
+;;   File:      dscr.a51
+;;   Contents:  This file contains descriptor data tables.
+;;
+;; $Archive: /USB/Examples/Fx2lp/bulkloop/dscr.a51 $
+;; $Date: 9/01/03 8:51p $
+;; $Revision: 3 $
+;;
+;;
+;;-----------------------------------------------------------------------------
+;; Copyright 2003, Cypress Semiconductor Corporation
+;;-----------------------------------------------------------------------------;;-----------------------------------------------------------------------------
+   
+;; 相当于是宏定义
+DSCR_DEVICE   equ   1   ;; Descriptor type: Device
+DSCR_CONFIG   equ   2   ;; Descriptor type: Configuration
+DSCR_STRING   equ   3   ;; Descriptor type: String
+DSCR_INTRFC   equ   4   ;; Descriptor type: Interface
+DSCR_ENDPNT   equ   5   ;; Descriptor type: Endpoint
+DSCR_DEVQUAL  equ   6   ;; Descriptor type: Device Qualifier
+
+DSCR_DEVICE_LEN   equ   18
+DSCR_CONFIG_LEN   equ    9
+DSCR_INTRFC_LEN   equ    9
+DSCR_ENDPNT_LEN   equ    7
+DSCR_DEVQUAL_LEN  equ   10
+
+ET_CONTROL   equ   0   ;; Endpoint type: Control
+ET_ISO       equ   1   ;; Endpoint type: Isochronous
+ET_BULK      equ   2   ;; Endpoint type: Bulk
+ET_INT       equ   3   ;; Endpoint type: Interrupt
+
+public      DeviceDscr, DeviceQualDscr, HighSpeedConfigDscr, FullSpeedConfigDscr, StringDscr, UserDscr
+
+DSCR   SEGMENT   CODE PAGE
+
+;;-----------------------------------------------------------------------------
+;; Global Variables
+;;-----------------------------------------------------------------------------
+      rseg DSCR      ;; locate the descriptor table in on-part memory.
+
+;; db/dw解释
+;;     http://www.keil.com/support/man/docs/a51/a51_st_db.htm
+DeviceDscr:   
+      db   DSCR_DEVICE_LEN      ;; Descriptor length
+      db   DSCR_DEVICE   ;; Decriptor type
+      dw   0002H      ;; Specification Version (BCD)
+      db   00H        ;; Device class
+      db   00H         ;; Device sub-class
+      db   00H         ;; Device sub-sub-class
+      db   64         ;; Maximum packet size
+      dw   0B404H      ;; Vendor ID
+      dw   0410H      ;; Product ID (Sample Device)
+      dw   0000H      ;; Product version ID
+      db   1         ;; Manufacturer string index
+      db   2         ;; Product string index
+      db   0         ;; Serial number string index
+      db   1         ;; Number of configurations
+
+DeviceQualDscr:
+      db   DSCR_DEVQUAL_LEN   ;; Descriptor length
+      db   DSCR_DEVQUAL   ;; Decriptor type
+      dw   0002H      ;; Specification Version (BCD)
+      db   00H        ;; Device class
+      db   00H         ;; Device sub-class
+      db   00H         ;; Device sub-sub-class
+      db   64         ;; Maximum packet size
+      db   1         ;; Number of configurations
+      db   0         ;; Reserved
+
+HighSpeedConfigDscr:   
+      db   DSCR_CONFIG_LEN               ;; Descriptor length
+      db   DSCR_CONFIG                  ;; Descriptor type
+      db   (HighSpeedConfigDscrEnd-HighSpeedConfigDscr) mod 256 ;; Total Length (LSB)
+      db   (HighSpeedConfigDscrEnd-HighSpeedConfigDscr)  /  256 ;; Total Length (MSB)
+      db   1      ;; Number of interfaces
+      db   1      ;; Configuration number
+      db   0      ;; Configuration string
+      db   10000000b   ;; Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu)
+      db   50      ;; Power requirement (div 2 ma)
+
+;; Interface Descriptor
+      db   DSCR_INTRFC_LEN      ;; Descriptor length
+      db   DSCR_INTRFC         ;; Descriptor type
+      db   0               ;; Zero-based index of this interface
+      db   0               ;; Alternate setting
+      db   2               ;; Number of end points 
+      db   0ffH            ;; Interface class
+      db   00H               ;; Interface sub class
+      db   00H               ;; Interface sub sub class
+      db   0               ;; Interface descriptor string index
+      
+;; Endpoint Descriptor
+      db   DSCR_ENDPNT_LEN      ;; Descriptor length
+      db   DSCR_ENDPNT         ;; Descriptor type
+      db   02H               ;; Endpoint number, and direction
+      db   ET_BULK            ;; Endpoint type
+      db   00H               ;; Maximun packet size (LSB)
+      db   02H               ;; Max packect size (MSB)
+      db   00H               ;; Polling interval
+
+;; Endpoint Descriptor
+      db   DSCR_ENDPNT_LEN      ;; Descriptor length
+      db   DSCR_ENDPNT         ;; Descriptor type
+      db   86H               ;; Endpoint number, and direction
+      db   ET_BULK            ;; Endpoint type
+      db   00H               ;; Maximun packet size (LSB)
+      db   02H               ;; Max packect size (MSB)
+      db   00H               ;; Polling interval
+
+HighSpeedConfigDscrEnd:   
+
+FullSpeedConfigDscr:   
+      db   DSCR_CONFIG_LEN               ;; Descriptor length
+      db   DSCR_CONFIG                  ;; Descriptor type
+      db   (FullSpeedConfigDscrEnd-FullSpeedConfigDscr) mod 256 ;; Total Length (LSB)
+      db   (FullSpeedConfigDscrEnd-FullSpeedConfigDscr)  /  256 ;; Total Length (MSB)
+      db   1      ;; Number of interfaces
+      db   1      ;; Configuration number
+      db   0      ;; Configuration string
+      db   10000000b   ;; Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu)
+      db   50      ;; Power requirement (div 2 ma)
+
+;; Interface Descriptor
+      db   DSCR_INTRFC_LEN      ;; Descriptor length
+      db   DSCR_INTRFC         ;; Descriptor type
+      db   0               ;; Zero-based index of this interface
+      db   0               ;; Alternate setting
+      db   2               ;; Number of end points 
+      db   0ffH            ;; Interface class
+      db   00H               ;; Interface sub class
+      db   00H               ;; Interface sub sub class
+      db   0               ;; Interface descriptor string index
+      
+;; Endpoint Descriptor
+      db   DSCR_ENDPNT_LEN      ;; Descriptor length
+      db   DSCR_ENDPNT         ;; Descriptor type
+      db   02H               ;; Endpoint number, and direction
+      db   ET_BULK            ;; Endpoint type
+      db   40H               ;; Maximun packet size (LSB)
+      db   00H               ;; Max packect size (MSB)
+      db   00H               ;; Polling interval
+
+;; Endpoint Descriptor
+      db   DSCR_ENDPNT_LEN      ;; Descriptor length
+      db   DSCR_ENDPNT         ;; Descriptor type
+      db   86H               ;; Endpoint number, and direction
+      db   ET_BULK            ;; Endpoint type
+      db   40H               ;; Maximun packet size (LSB)
+      db   00H               ;; Max packect size (MSB)
+      db   00H               ;; Polling interval
+
+FullSpeedConfigDscrEnd:   
+
+StringDscr:
+
+StringDscr0:   
+      db   StringDscr0End-StringDscr0      ;; String descriptor length
+      db   DSCR_STRING
+      db   09H,04H
+StringDscr0End:
+
+StringDscr1:   
+      db   StringDscr1End-StringDscr1      ;; String descriptor length
+      db   DSCR_STRING
+      db   &#39;C&#39;,00
+      db   &#39;y&#39;,00
+      db   &#39;p&#39;,00
+      db   &#39;r&#39;,00
+      db   &#39;e&#39;,00
+      db   &#39;s&#39;,00
+      db   &#39;s&#39;,00
+StringDscr1End:
+
+StringDscr2:   
+      db   StringDscr2End-StringDscr2      ;; Descriptor length
+      db   DSCR_STRING
+      db   &#39;E&#39;,00
+      db   &#39;Z&#39;,00
+      db   &#39;-&#39;,00
+      db   &#39;U&#39;,00
+      db   &#39;S&#39;,00
+      db   &#39;B&#39;,00
+StringDscr2End:
+
+UserDscr:      
+      dw   0000H
+      end
+      
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h1>寄存器定义头文件<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>代码位置（根据自己的安装目录查看）：<code class="docutils literal notranslate"><span class="pre">C:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Target\Inc\fx2regs.h</span></code></p></li>
+<li><p>寄存器定义说明：<a class="reference external" href="http://www.keil.com/support/man/docs/c51/c51_le_absvarloc.htm">Absolute Variable Location</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">volatile</span></code>用于防止相关变量被优化，防止编译器对寄存器读写操作优化导致数据写入过程被忽略。</p></li>
+<li><p>示例 CPUCS寄存器：<br />
+<img alt="0007_CPU_Control_and_Status_Register.png" src="../../../_images/0007_CPU_Control_and_Status_Register.png" /></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="n">EXTERN</span><span class="w"> </span><span class="n">xdata</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="n">BYTE</span><span class="w"> </span><span class="n">CPUCS</span><span class="w">             </span><span class="n">_AT_</span><span class="w"> </span><span class="mh">0xE600</span><span class="p">;</span><span class="w">  </span><span class="c1">// Control &amp; Status</span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="cm">/* CPU Control &amp; Status Register (CPUCS) */</span><span class="w"></span>
+<span class="cp">#define bmPRTCSTB    bmBIT5</span>
+<span class="cp">#define bmCLKSPD     (bmBIT4 | bmBIT3)</span>
+<span class="cp">#define bmCLKSPD1    bmBIT4</span>
+<span class="cp">#define bmCLKSPD0    bmBIT3</span>
+<span class="cp">#define bmCLKINV     bmBIT2</span>
+<span class="cp">#define bmCLKOE      bmBIT1</span>
+<span class="cp">#define bm8051RES    bmBIT0</span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="autopointers">
+<h1>Autopointers<a class="headerlink" href="#autopointers" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>《EZ-USB(R) Technical Reference Manual.pdf》 —— 8.8 Autopointers(Page 96)</p></li>
+</ul>
+<p><img alt="0007_Autopointers.png" src="../../../_images/0007_Autopointers.png" /></p>
+</section>
+<section id="bulkloop">
+<h1>Bulkloop<a class="headerlink" href="#bulkloop" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="c1">//-----------------------------------------------------------------------------</span>
+<span class="c1">// Task Dispatcher hooks</span>
+<span class="c1">//   The following hooks are called by the task dispatcher.</span>
+<span class="c1">//-----------------------------------------------------------------------------</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">TD_Init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">             </span><span class="c1">// Called once at startup</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="n">BYTE</span><span class="w"> </span><span class="n">dum</span><span class="p">;</span><span class="w">                    </span><span class="c1">// For the LEDS</span>
+<span class="w">   </span><span class="n">CPUCS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">CPUCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">~</span><span class="n">bmCLKSPD</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">bmCLKSPD1</span><span class="p">)</span><span class="w"> </span><span class="p">;</span><span class="w">    </span><span class="c1">// 48 MHz CPU clock</span>
+<span class="w">   </span>
+<span class="w">   </span>
+<span class="w">   </span><span class="c1">// Turn off all 4 LEDS</span>
+<span class="w">   </span><span class="n">dum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D2OFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="n">dum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D3OFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="n">dum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D4OFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="n">dum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D5OFF</span><span class="p">;</span><span class="w"></span>
+
+<span class="c1">// EP2CFG &amp; EP6CFG configure our two endpoints, EP2-OUT and EP6-IN</span>
+<span class="c1">// b7:        Valid</span>
+<span class="c1">// b6:        DIR (0=OUT, 1=IN)</span>
+<span class="c1">// b[5:4]    Type (01=ISO, 10=BULK, 11=INT)</span>
+<span class="c1">// b3:        Size (0=512, 1=1024 bytes)</span>
+<span class="c1">// b2:        0</span>
+<span class="c1">// b[1:0]    Buffering (00=quad, 10=double, 11=triple)        </span>
+<span class="c1">//</span>
+
+<span class="w">  </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xA2</span><span class="p">;</span><span class="w">    </span><span class="c1">// Valid, BULK-OUT, 512 byte buffer, double-buffered</span>
+<span class="w">  </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w">        </span><span class="c1">// Some regs take longer to update, see TRM Section 15.14.                    </span>
+<span class="w">  </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xE2</span><span class="p">;</span><span class="w">    </span><span class="c1">// Valid, BULK-IN, 512 byte buffer, double-buffered</span>
+<span class="w">  </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w">                    </span>
+
+<span class="w">  </span><span class="c1">// OUT endpoints do not come up armed</span>
+<span class="w">  </span><span class="c1">// Since the endpoint is double buffered we must write dummy byte counts twice</span>
+<span class="w">  </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w">      </span><span class="c1">// arm EP2OUT by writing byte count w/skip.</span>
+<span class="w">  </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w">                    </span>
+<span class="w">  </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w">    </span><span class="c1">// again</span>
+<span class="w">  </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w">                    </span>
+<span class="w">  </span><span class="c1">// enable dual autopointer feature</span>
+<span class="w">  </span><span class="n">AUTOPTRSETUP</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">USBIE</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">bmSOF</span><span class="p">;</span><span class="w">                </span><span class="c1">// Enable the SOF IRQ to serve as LED timers</span>
+<span class="w">  </span><span class="n">EPIE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bmEP6IRQ</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">bmEP2IRQ</span><span class="p">;</span><span class="w">    </span><span class="c1">// Enable EP6 and EP2 Interrupts to turn on transfer LEDS</span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">TD_Poll</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">              </span><span class="c1">// Called repeatedly while the device is idle</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">WORD</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">WORD</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="c1">//  BYTE dummy_LED2;        // ***For the LED</span>
+<span class="w">  </span><span class="n">BYTE</span><span class="w"> </span><span class="n">waiting_inpkts</span><span class="p">;</span><span class="w"></span>
+
+<span class="cp">#ifdef ENABLE_7_SEG_DISPLAY</span>
+<span class="k">if</span><span class="p">(</span><span class="n">start_7_seg_display</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="c1">// update 7-seg readout with number of IN packets waiting for transfer to the host</span>
+<span class="w">  </span><span class="n">waiting_inpkts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP6CS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xF0</span><span class="p">)</span><span class="o">&gt;&gt;</span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">EZUSB_WriteI2C</span><span class="p">(</span><span class="n">LED_ADDR</span><span class="p">,</span><span class="w"> </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="p">(</span><span class="n">Digit</span><span class="p">[</span><span class="n">waiting_inpkts</span><span class="p">]));</span><span class="w"></span>
+<span class="w">  </span><span class="n">EZUSB_WaitForEEPROMWrite</span><span class="p">(</span><span class="n">LED_ADDR</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="c1">// Transfer EP6-OUT buffer to EP2-IN buffer when there is a packet in one of the EP6-OUT buffers, AND</span>
+<span class="c1">// there is an available EP2-IN buffer. The FIFO status flags update after full packets are transferred.</span>
+<span class="c1">// Therefore EP2-OUT &quot;Not Empty&quot; means a packet is available, and &quot;EP6-IN &quot;Not Full&quot; means there is an</span>
+<span class="c1">// available buffer. Using the flags this way handles any packet size and takes multiple buffering</span>
+<span class="c1">// into account.   </span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">EP2468STAT</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEP2EMPTY</span><span class="p">))</span><span class="w">        </span><span class="c1">// Is EP2-OUT buffer not empty (has at least one packet)?</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">EP2468STAT</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEP6FULL</span><span class="p">))</span><span class="w">    </span><span class="c1">// YES: Is EP6-IN buffer not full (room for at least 1 pkt)?</span>
+<span class="w">         </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">        #define AUTOPTR1H AUTOPTRH1 // for backwards compatibility with examples</span>
+<span class="cm">        #define AUTOPTR1L AUTOPTRL1 // for backwards compatibility with examples</span>
+<span class="cm">        #define APTR1H AUTOPTRH1 // for backwards compatibility with examples</span>
+<span class="cm">        #define APTR1L AUTOPTRL1 // for backwards compatibility with examples</span>
+<span class="cm">            </span>
+<span class="cm">        // this is how they are defined in the TRM</span>
+<span class="cm">        sfr AUTOPTRH1     = 0x9A; </span>
+<span class="cm">        sfr AUTOPTRL1     = 0x9B; </span>
+<span class="cm">        sfr AUTOPTRH2     = 0x9D;</span>
+<span class="cm">        sfr AUTOPTRL2     = 0x9E; </span>
+<span class="cm">        */</span><span class="w"></span>
+<span class="w">        </span><span class="n">APTR1H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MSB</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">EP2FIFOBUF</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">APTR1L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LSB</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">EP2FIFOBUF</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">AUTOPTRH2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MSB</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">EP6FIFOBUF</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">AUTOPTRL2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LSB</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">EP6FIFOBUF</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP2BCH</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EP2BCL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// loop EP2OUT buffer data to EP6IN</span>
+<span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/*</span>
+<span class="cm">            EXTERN xdata volatile BYTE XAUTODAT1         _AT_ 0xE67B;  // Autoptr1 MOVX access</span>
+<span class="cm">            EXTERN xdata volatile BYTE XAUTODAT2         _AT_ 0xE67C;  // Autoptr2 MOVX access</span>
+
+<span class="cm">            #define EXTAUTODAT1 XAUTODAT1</span>
+<span class="cm">            #define EXTAUTODAT2 XAUTODAT2</span>
+<span class="cm">            */</span><span class="w"></span>
+<span class="w">            </span><span class="n">EXTAUTODAT2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EXTAUTODAT1</span><span class="p">;</span><span class="w">    </span><span class="c1">// Autopointers make block transfers easy...</span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP6BCH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP2BCH</span><span class="p">;</span><span class="w">        </span><span class="c1">// Send the same number of bytes as received  </span>
+<span class="w">        </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w">  </span>
+<span class="w">        </span><span class="n">EP6BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP2BCL</span><span class="p">;</span><span class="w">        </span><span class="c1">// arm EP6IN</span>
+<span class="w">        </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w">                    </span>
+<span class="w">        </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w">          </span><span class="c1">// arm EP2OUT</span>
+<span class="w">     </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

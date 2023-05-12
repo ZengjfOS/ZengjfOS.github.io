@@ -1,0 +1,8 @@
+# Terminal Color
+
+默认终端输出没有颜色，比较难受
+
+## steps
+
+* `export CLICOLOR=1`
+  * `~/.zshrc`

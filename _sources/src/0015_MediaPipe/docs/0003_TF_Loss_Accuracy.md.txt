@@ -1,0 +1,58 @@
+# TF Loss Accuracy
+
+损失、准确度曲线，便于判断训练效果
+
+# 参考代码
+
+```python
+import numpy as np
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+# ...省略
+
+history = model.fit(
+    X_train,
+    y_train,
+    epochs=1000,
+    batch_size=128,
+    validation_data=(X_test, y_test),
+    callbacks=[cp_callback, es_callback]
+)
+
+# ...省略
+
+print(history.history.keys())
+
+loss = history.history["loss"]
+acc = history.history["accuracy"]
+val_loss = history.history["val_loss"]
+val_acc = history.history["val_accuracy"]
+
+plt.subplot(1, 2, 1)
+plt.plot(acc, label="Training Accuracy")
+plt.plot(val_acc, label="Validataion Accuracy")
+plt.title("Training and Validation Accuracy")
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(loss, label="Training Loss")
+plt.plot(val_loss, label="Validataion Loss")
+plt.title("Training and Validation Loss")
+plt.legend()
+
+# 设置绘图尺寸
+plt.rcParams['figure.figsize'] = [20, 10]
+plt.show()
+```
+
+history含有的字段
+
+```
+dict_keys(['loss', 'accuracy', 'val_loss', 'val_accuracy'])
+```
+
+绘图
+
+![0003_TF_Loss_Accuracy.png](images/0003_TF_Loss_Accuracy.png)

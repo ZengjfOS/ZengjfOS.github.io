@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">spi tools</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">基本操作</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="spi-tools">
+<h1>spi tools<a class="headerlink" href="#spi-tools" title="Permalink to this headline"></a></h1>
+<p>测试SPI基本通信</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_29344757/article/details/76855350">SPI通讯协议介绍</a></p></li>
+<li><p><a class="reference external" href="http://www.waveshare.net/study/article-625-1.html">树莓派系列教程18：SPI</a></p></li>
+<li><p><a class="reference external" href="https://www.mobibrw.com/2018/13291">树莓派2B调试SPI接口</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>基本操作<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>在<code class="docutils literal notranslate"><span class="pre">raspi-config</span></code>命令中打开SPI功能就行了，树莓派Linux系统会利用设备树Overlays将SPI引脚进行复用选择，注意需要重启；</p></li>
+<li><p>树莓派上会生成2个SPI的设备节点，对应两个SPI片选设备：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~ $ ls /dev/spi*
+/dev/spidev0.0  /dev/spidev0.1
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://github.com/cpb-/spi-tools">spi-tools</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~/zengjf/spi-tools-master $ autoreconf -fim
+configure.ac:13: installing &#39;./compile&#39;
+configure.ac:7: installing &#39;./install-sh&#39;
+configure.ac:7: installing &#39;./missing&#39;
+src/Makefile.am: installing &#39;./depcomp&#39;
+pi@raspberrypi:~/zengjf/spi-tools-master $ ./configure
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking whether make sets $(MAKE)... (cached) yes
+checking for gcc... gcc
+[...省略]
+configure: Debug Mode off.
+checking for help2man... echo No help2man
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating src/Makefile
+config.status: creating man/Makefile
+config.status: creating src/config.h
+config.status: executing depfiles commands
+pi@raspberrypi:~/zengjf/spi-tools-master $ make
+Making all in src
+make[1]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+make  all-am
+make[2]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+gcc -DHAVE_CONFIG_H -I.     -O0  -MT spi-config.o -MD -MP -MF .deps/spi-config.Tpo -c -o spi-config.o spi-config.c
+mv -f .deps/spi-config.Tpo .deps/spi-config.Po
+gcc  -O0    -o spi-config spi-config.o
+gcc -DHAVE_CONFIG_H -I.     -O0  -MT spi-pipe.o -MD -MP -MF .deps/spi-pipe.Tpo -c -o spi-pipe.o spi-pipe.c
+mv -f .deps/spi-pipe.Tpo .deps/spi-pipe.Po
+gcc  -O0    -o spi-pipe spi-pipe.o
+make[2]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+make[1]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+Making all in man
+make[1]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/man&#39;
+make[1]: Nothing to be done for &#39;all&#39;.
+make[1]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/man&#39;
+make[1]: Entering directory &#39;/home/pi/zengjf/spi-tools-master&#39;
+make[1]: Nothing to be done for &#39;all-am&#39;.
+make[1]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master&#39;
+pi@raspberrypi:~/zengjf/spi-tools-master $ sudo make install
+Making install in src
+make[1]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+make[2]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+ /bin/mkdir -p &#39;/usr/local/bin&#39;
+  /usr/bin/install -c spi-config spi-pipe &#39;/usr/local/bin&#39;
+make[2]: Nothing to be done for &#39;install-data-am&#39;.
+make[2]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+make[1]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/src&#39;
+Making install in man
+make[1]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/man&#39;
+make[2]: Entering directory &#39;/home/pi/zengjf/spi-tools-master/man&#39;
+make[2]: Nothing to be done for &#39;install-exec-am&#39;.
+ /bin/mkdir -p &#39;/usr/local/share/man/man1&#39;
+ /usr/bin/install -c -m 644 spi-config.1 spi-pipe.1 &#39;/usr/local/share/man/man1&#39;
+make[2]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/man&#39;
+make[1]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master/man&#39;
+make[1]: Entering directory &#39;/home/pi/zengjf/spi-tools-master&#39;
+make[2]: Entering directory &#39;/home/pi/zengjf/spi-tools-master&#39;
+make[2]: Nothing to be done for &#39;install-exec-am&#39;.
+make[2]: Nothing to be done for &#39;install-data-am&#39;.
+make[2]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master&#39;
+make[1]: Leaving directory &#39;/home/pi/zengjf/spi-tools-master&#39;
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spi-config</span></code>帮助：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~/zengjf/spi-tools-master $ spi-config -h
+usage: spi-config options...
+  options:
+    -d --device=&lt;dev&gt;  use the given spi-dev character device.
+    -q --query         print the current configuration.
+    -m --mode=[0-3]    use the selected spi mode:
+             0: low idle level, sample on leading edge,
+             1: low idle level, sample on trailing edge,
+             2: high idle level, sample on leading edge,
+             3: high idle level, sample on trailing edge.
+    -l --lsb={0,1}     LSB first (1) or MSB first (0).
+    -b --bits=[7...]   bits per word.
+    -s --speed=&lt;int&gt;   set the speed in Hz.
+    -r --spirdy={0,1}  consider SPI_RDY signal (1) or ignore it (0).
+    -w --wait          block keeping the file descriptor open to avoid speed reset.
+    -h --help          this screen.
+    -v --version       display the version number.
+</pre></div>
+</div>
+</li>
+<li><p>获取当前SPI接口信息：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~/zengjf/spi-tools-master $ spi-config -d /dev/spidev0.0 -q
+/dev/spidev0.0: mode=0, lsb=0, bits=8, speed=125000000, spiready=0
+</pre></div>
+</div>
+</li>
+<li><p><strong>Note</strong>: on some platforms, the speed is reset to a default value when the file descriptor is closed. To avoid this, one can use the -w option that keep the file descriptor open.</p></li>
+<li><p>树莓派的SPI在关闭SPI设备描述符之后会恢复原来的值，所以需要使用上面的打开文件描述符后台运行的方式解决；</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~/zengjf/spi-tools-master $ spi-config -d /dev/spidev0.0 -s 10000000 -w &amp;
+[1] 3416
+pi@raspberrypi:~/zengjf/spi-tools-master $ spi-config -d /dev/spidev0.0 -q
+/dev/spidev0.0: mode=0, lsb=0, bits=8, speed=10000000, spiready=0
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spi-pipe</span></code>帮助：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~/zengjf/spi-tools-master $ spi-pipe -h
+usage: spi-pipe options...
+  options:
+    -d --device=&lt;dev&gt;    use the given spi-dev character device.
+    -s --speed=&lt;speed&gt;   Maximum SPI clock rate (in Hz).
+    -b --blocksize=&lt;int&gt; transfer block size in byte.
+    -n --number=&lt;int&gt;    number of blocks to transfer (-1 = infinite).
+    -h --help            this screen.
+    -v --version         display the version number.
+</pre></div>
+</div>
+</li>
+<li><p>解读<code class="docutils literal notranslate"><span class="pre">spi-pipe</span></code>发送数据部分代码：</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="c1">// int           blocksize   =  1;</span>
+<span class="c1">// int           blocknumber = -1;</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">blocknumber</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">blocknumber</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">                                  </span><span class="c1">// 循环多少个块</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">blocksize</span><span class="p">;</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">nb</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">nb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="n">STDIN_FILENO</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">tx_buffer</span><span class="p">[</span><span class="n">offset</span><span class="p">]),</span><span class="w"> </span><span class="n">blocksize</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">offset</span><span class="p">);</span><span class="w">         </span><span class="c1">// 从标准输入读取一块字节</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nb</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nb</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ioctl</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span><span class="w"> </span><span class="n">SPI_IOC_MESSAGE</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">transfer</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                            </span><span class="c1">// 发送数据块</span>
+<span class="w">        </span><span class="n">perror</span><span class="p">(</span><span class="s">&quot;SPI_IOC_MESSAGE&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">write</span><span class="p">(</span><span class="n">STDOUT_FILENO</span><span class="p">,</span><span class="w"> </span><span class="n">rx_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">blocksize</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">                            </span><span class="c1">// 将当前块数据写到标准输出</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">blocknumber</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">blocknumber</span><span class="w"> </span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>如上，如果需要发送二进制数据，参考: <a class="reference external" href="https://stackoverflow.com/questions/43214001/how-to-write-binary-data-in-bash">How to write binary data in bash</a></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="nb">printf</span> <span class="s1">&#39;\x03&#39;</span> &gt; file   <span class="c1"># Hex</span>
+<span class="nb">printf</span> <span class="s1">&#39;\003&#39;</span> &gt; file   <span class="c1"># Octal</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">printf</span> <span class="pre">'\x55'</span> <span class="pre">|</span> <span class="pre">spi-pipe</span> <span class="pre">-d</span> <span class="pre">/dev/spidev0.1</span> <span class="pre">-s</span> <span class="pre">1000</span></code><br />
+<img alt="0027_RPI_SPI_Send_Binary_Data.jpg" src="../../../_images/0027_RPI_SPI_Send_Binary_Data.jpg" /></p></li>
+<li><p>硬件上短接MOSI/MISO，在使用的时候数据能收到，只是貌似spi-pipe往标准输出打印内容的时候有点问题，将下面语句放在脚本内执行是可行的；</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">printf</span> <span class="pre">&quot;\x55&quot;</span> <span class="pre">|</span> <span class="pre">./spi-pipe</span> <span class="pre">-d</span> <span class="pre">/dev/spidev0.0</span> <span class="pre">-s</span> <span class="pre">100</span> <span class="pre">|</span> <span class="pre">hexdump</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0000000</span> <span class="mi">0055</span>
+<span class="mi">0000001</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

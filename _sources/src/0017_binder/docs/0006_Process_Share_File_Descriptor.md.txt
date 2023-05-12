@@ -1,0 +1,74 @@
+# Process Share File Descriptor
+
+进程间传递文件描述符
+
+# 参考文档
+
+* [Linux进程间如何传递文件描述符？](https://www.zhihu.com/question/35156527)
+* [Can I share a file descriptor to another process on linux or are they local to the process?](https://stackoverflow.com/questions/2358684/can-i-share-a-file-descriptor-to-another-process-on-linux-or-are-they-local-to-t)
+* [如何在进程之间传递文件描述符（file discriptor）](https://blog.csdn.net/win_lin/article/details/7760951)
+* [eventfd + SCM_RIGHTS 在进程间通信中的运用](https://switch-router.gitee.io/blog/scm_rights/)
+* https://man7.org/linux/man-pages/man7/unix.7.html
+  * Ancillary messages
+    * SCM_RIGHTS
+      * Send or receive a set of open file descriptors from another process.  The data portion contains an integer array of the file descriptors.
+
+# 能够传递fd原因
+
+主要还是内核支持，通过设置SCM_RIGHTS参数达到目的：`cmptr->cmsg_type = SCM_RIGHTS; // we are sending fd. 告诉内核传递的是fd。`
+
+# steps
+
+* [0006_Process_Share_File_Descriptor](refers/0006_Process_Share_File_Descriptor)
+  * make
+  * 注意：**要用g++编译**
+* ./server
+  ```
+  Ready for client connect().
+  250 bytes of data were received
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61
+  spty[5]
+  ``` 
+* ./client
+  ```
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
+   61 61 61 61 61 61 61 61 61 61
+  Get a pty pair, FD -- master[4] slave[5]
+  Slave name is:/dev/pts/6
+  -----------------------------------
+  Message from slave:
+  zengjf
+  
+  ------7 bytes------
+  ```

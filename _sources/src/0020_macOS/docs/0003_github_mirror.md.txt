@@ -1,0 +1,25 @@
+# github mirror
+
+快速下载github代码
+
+## 参考文档
+
+* [Github国内加速克隆及下载](https://blog.csdn.net/networken/article/details/105122778)
+
+## submodule sync
+
+* `git submodule update --init --recursive`
+
+## github.com
+
+* 将github.com 换为github.com.cnpmjs.org即可实现加速 
+  * https://github.com.cnpmjs.org/
+  * https://hub.fastgit.org/
+  * https://github.wuyanzheshui.workers.dev/
+* `git config --global url."https://github.com.cnpmjs.org/".insteadof https://github.com/`
+* `git config --global --unset url."https://github.com.cnpmjs.org/".insteadof https://github.com/`
+
+## boringssl.googlesource.com
+
+* `git config --global url."https://github.com.cnpmjs.org/google/".insteadof https://boringssl.googlesource.com/`
+* `git config --global --unset url."https://github.com.cnpmjs.org/google/".insteadof https://boringssl.googlesource.com/`

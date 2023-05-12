@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">DTS</a></li>
+<li><a class="reference internal" href="#audio-dts">audio dts</a></li>
+<li><a class="reference internal" href="#esai">esai</a></li>
+<li><a class="reference internal" href="#asrc">asrc</a></li>
+<li><a class="reference internal" href="#codec">codec</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dts">
+<h1>DTS<a class="headerlink" href="#dts" title="Permalink to this headline"></a></h1>
+<p>CS42888声卡设备树示例</p>
+</section>
+<section id="audio-dts">
+<h1>audio dts<a class="headerlink" href="#audio-dts" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sound</span><span class="o">-</span><span class="n">cs42888</span> <span class="p">{</span>
+    <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;fsl,imx6-sabreauto-cs42888&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fsl,imx-audio-cs42888&quot;</span><span class="p">;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;imx-cs42888&quot;</span><span class="p">;</span>
+    <span class="n">audio</span><span class="o">-</span><span class="n">cpu</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">esai</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">audio</span><span class="o">-</span><span class="n">asrc</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">asrc</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">audio</span><span class="o">-</span><span class="n">codec</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">codec</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">audio</span><span class="o">-</span><span class="n">routing</span> <span class="o">=</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT1L&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT1R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT2L&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT2R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT3L&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT3R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT4L&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT4R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AIN1L&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AIN1R&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AIN2L&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AIN2R&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><span class="xref myst">&amp;esai</span></p></li>
+<li><p><span class="xref myst">&amp;asrc</span></p></li>
+<li><p><span class="xref myst">&amp;codec</span></p></li>
+</ul>
+</section>
+<section id="esai">
+<h1>esai<a class="headerlink" href="#esai" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">esai</span><span class="p">:</span> <span class="n">esai</span><span class="o">@</span><span class="mi">2024000</span> <span class="p">{</span>
+  <span class="c1">#sound-dai-cells = &lt;0&gt;;</span>
+  <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;fsl,imx35-esai&quot;</span><span class="p">;</span>
+  <span class="n">reg</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mh">0x02024000</span> <span class="mh">0x4000</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">interrupts</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mi">0</span> <span class="mi">51</span> <span class="n">IRQ_TYPE_LEVEL_HIGH</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">clocks</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ESAI_IPG</span><span class="o">&gt;</span><span class="p">,</span>
+          <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ESAI_MEM</span><span class="o">&gt;</span><span class="p">,</span>
+          <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ESAI_EXTAL</span><span class="o">&gt;</span><span class="p">,</span>
+          <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ESAI_IPG</span><span class="o">&gt;</span><span class="p">,</span>
+          <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_SPBA</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">clock</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;core&quot;</span><span class="p">,</span> <span class="s2">&quot;mem&quot;</span><span class="p">,</span> <span class="s2">&quot;extal&quot;</span><span class="p">,</span> <span class="s2">&quot;fsys&quot;</span><span class="p">,</span> <span class="s2">&quot;spba&quot;</span><span class="p">;</span>
+  <span class="n">dmas</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">23</span> <span class="mi">21</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">24</span> <span class="mi">21</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">dma</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="s2">&quot;tx&quot;</span><span class="p">;</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;disabled&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="asrc">
+<h1>asrc<a class="headerlink" href="#asrc" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">asrc</span><span class="p">:</span> <span class="n">asrc</span><span class="o">@</span><span class="mi">2034000</span> <span class="p">{</span>
+  <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;fsl,imx53-asrc&quot;</span><span class="p">;</span>
+  <span class="n">reg</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mh">0x02034000</span> <span class="mh">0x4000</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">interrupts</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mi">0</span> <span class="mi">50</span> <span class="n">IRQ_TYPE_LEVEL_HIGH</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">clocks</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ASRC_IPG</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ASRC_MEM</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_ASRC</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">clks</span> <span class="n">IMX6QDL_CLK_SPBA</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">clock</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;mem&quot;</span><span class="p">,</span> <span class="s2">&quot;ipg&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_0&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asrck_1&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_2&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_3&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_4&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asrck_5&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_6&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_7&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_8&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asrck_9&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_a&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_b&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_c&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asrck_d&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_e&quot;</span><span class="p">,</span> <span class="s2">&quot;asrck_f&quot;</span><span class="p">,</span> <span class="s2">&quot;spba&quot;</span><span class="p">;</span>
+  <span class="n">dmas</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">17</span> <span class="mi">23</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">18</span> <span class="mi">23</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">19</span> <span class="mi">23</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">20</span> <span class="mi">23</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">21</span> <span class="mi">23</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">sdma</span> <span class="mi">22</span> <span class="mi">23</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">dma</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;rxa&quot;</span><span class="p">,</span> <span class="s2">&quot;rxb&quot;</span><span class="p">,</span> <span class="s2">&quot;rxc&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;txa&quot;</span><span class="p">,</span> <span class="s2">&quot;txb&quot;</span><span class="p">,</span> <span class="s2">&quot;txc&quot;</span><span class="p">;</span>
+  <span class="n">fsl</span><span class="p">,</span><span class="n">asrc</span><span class="o">-</span><span class="n">rate</span>  <span class="o">=</span> <span class="o">&lt;</span><span class="mi">48000</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">fsl</span><span class="p">,</span><span class="n">asrc</span><span class="o">-</span><span class="n">width</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;okay&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="codec">
+<h1>codec<a class="headerlink" href="#codec" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&amp;</span><span class="n">i2c2</span> <span class="p">{</span>
+  <span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+  <span class="n">codec</span><span class="p">:</span> <span class="n">cs42888</span><span class="o">@</span><span class="mi">48</span> <span class="p">{</span>
+    <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;cirrus,cs42888&quot;</span><span class="p">;</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mh">0x48</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">clocks</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">codec_osc</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">clock</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;mclk&quot;</span><span class="p">;</span>
+    <span class="n">VA</span><span class="o">-</span><span class="n">supply</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">reg_audio</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">VD</span><span class="o">-</span><span class="n">supply</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">reg_audio</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">VLS</span><span class="o">-</span><span class="n">supply</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">reg_audio</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">VLC</span><span class="o">-</span><span class="n">supply</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">reg_audio</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

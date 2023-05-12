@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">GPIF</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">硬件连接器</a></li>
+<li><a class="reference internal" href="#id3">源代码</a></li>
+<li><a class="reference internal" href="#id4">调试方法</a></li>
+<li><a class="reference internal" href="#id5">系统框图</a></li>
+<li><a class="reference internal" href="#fifo-connect">FIFO Connect</a></li>
+<li><a class="reference internal" href="#id6">操作方法</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gpif">
+<h1>GPIF<a class="headerlink" href="#gpif" title="Permalink to this headline"></a></h1>
+<p>GPIF接口使用</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cypress.com/file/134606/download">通过 GPIF 使 SRAM 与 FX2LP 相互连接</a></p></li>
+<li><p><a class="reference external" href="https://www.cypress.com/documentation/application-notes/an63787-ez-usb-fx2lp-gpif-and-slave-fifo-configuration-examples">AN63787 - EZ-USB® FX2LP™ GPIF and Slave FIFO Configuration Examples Using an 8-Bit Asynchronous Interface</a></p>
+<ul>
+<li><p><a class="reference external" href="https://www.cypress.com/file/202291/download">EZ-USB FX2LP GPIF And Slave FIFO Configuration Examples Using An 8-Bit Asynchronous Interface</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://www.cypress.com/documentation/application-notes/an66806-getting-started-ez-usb-fx2lp-gpif">AN66806 - Getting Started with EZ-USB® FX2LP™ GPIF</a></p>
+<ul>
+<li><p><a class="reference external" href="https://www.cypress.com/file/135391/download">EZ-USB® FX2LP™ GPIF 入门</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="0022_Vendor_Command.html"><span class="doc std std-doc">0022_Vendor_Command.md</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>硬件连接器<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>https://github.com/ZengjfOS/DebugHAT/tree/CY7C68013ACombinor</p>
+<p><img alt="0021_CY7C68013A_Combinor.jpg" src="../../../_images/0021_CY7C68013A_Combinor.jpg" /></p>
+</section>
+<section id="id3">
+<h1>源代码<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>参考源代码: <a class="reference external" href="https://www.cypress.com/file/44776/download">AN63787 EZ-USB FX2LP GPIF and Slave FIFO Configuration Examples Using an 8-Bit Asynchronous Interface.zip</a></p></li>
+<li><p>https://github.com/ZengjfOS/USB/blob/GPIF_FIFO</p></li>
+</ul>
+</section>
+<section id="id4">
+<h1>调试方法<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<p>由于以前的个人经验都是使用UART口进行调试，在调试USB的通信方面经验不多，所以一直在思考怎么调试才能方便，在无意中注意到，可以用发送setup包，例如Vendor Command来获取51单片机内部寄存器的值，从而解决调试难的问题；</p>
+<p><img alt="0021_CY7C68013A_Register_Debug.png" src="../../../_images/0021_CY7C68013A_Register_Debug.png" /></p>
+</section>
+<section id="id5">
+<h1>系统框图<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<p><img alt="0021_GPIF_Back2Back_System_ARCH.png" src="../../../_images/0021_GPIF_Back2Back_System_ARCH.png" /></p>
+<ul class="simple">
+<li><p>两个 FX2LP 芯片相连：一个工作于 GPIF 模式，另一个工作于 Slave FIFO 模式。</p></li>
+<li><p>EP2 — BULK OUT、512 个字节、四缓冲</p></li>
+<li><p>EP6 — BULK IN、512 个字节，四缓冲</p></li>
+</ul>
+</section>
+<section id="fifo-connect">
+<h1>FIFO Connect<a class="headerlink" href="#fifo-connect" title="Permalink to this headline"></a></h1>
+<p><img alt="0021_GPIF_Back2Back_FIFO_Connect.png" src="../../../_images/0021_GPIF_Back2Back_FIFO_Connect.png" /></p>
+<ul class="simple">
+<li><p>主设备引脚：</p>
+<ul>
+<li><p>CTL[5:0]是可编程的控制输出，可将它们作为选通，读/写线或其他输出使用。该应用程序使用的控制信号（CTL0、CTL1 和 CTL2）连接到从设备的 SLRD、SLWR 和 SLOE。</p></li>
+<li><p>RDY[5:0]为“就绪”输入，可对它们进行采样，并允许数据传输等待（插入等待状态）、继续或重复，直到该信号处于合适的电平为止。该过程使用了 RDY0 和 RDY1 来控制数据流。RDY0 连接着从设备的 FLAGC（EP2 空标志），而 RDY1 连接着从设备的 FLAGB（EP6 满标志）。</p></li>
+<li><p>主设备 FX2LP 使用端口 A 引脚[6, 7]来驱动由主设
+备访问的 Slave FIFO 地址。</p></li>
+<li><p>PC2（SLAVEREADY）是从设备到主设备的输入，表示目前从设备已经复位，其固件准备就绪。这是为了防止主设备在从设备复位前或在复位过程中读取其 EP6 FIFO 中任何无效值。</p></li>
+<li><p>对于手动操作模式，从设备和主设备间进行的交换需要其他两条线来实现主出从入的传输。PC0（Txn_Over）和 PC1（Pkt_Committed）用于实现此目的。后面各章节说明了更多有关这些引脚使用情况的信息。</p></li>
+</ul>
+</li>
+<li><p>从设备引脚：</p>
+<ul>
+<li><p>FLAGB 和 FLAGC 用于报告 Slave FIFO 的状态。</p></li>
+<li><p>FLAGB — EP6FF（端点 6 满标志）表示 EP6 FIFO 的“满”状态。</p></li>
+<li><p>FLAGC — EP6FF（端点 2 空标志）表示 EP2 FIFO 的“空”状态。</p></li>
+<li><p>所使用的 Slave FIFO 控制引脚分别是 SLOE（从设备输出使能）、SLRD（从设备读取）、SLWR（从设备写入）和 FIFOADR[1:0]（FIFO 选择）。</p></li>
+<li><p>FIFOADR[1:0]引脚用于选择与数据总线相连接的四个 FIFO（由外部主设备控制）。</p></li>
+<li><p>PC2 是从设备的输出，在从设备复位后它被设置为高电平，因此准备好了它的固件。</p></li>
+<li><p>FD[0:7] 这是被配置为 8 位数据总线的端口 B。如果设置任意 EPxFIFOCG 寄存器的 WORDWIDE（EPxFIFOCG.0）位 ， 那么端口 D 将被配置为 FD[8:15] 。 所有四个 WORLDWIDE 位的或操作，会导致 PORTD 成为 PORTD 或者 FD[15：8]。每一个单独的 WORLDWIDE 位指示每个单独的端点数据如何传递。这种传递使用 8-bit 接口如何该过程使用了一个 8 位的接口。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id6">
+<h1>操作方法<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>由Slave往Master发数据，没什么问题；</p></li>
+<li><p>由Master往Slave发数据，需要Master先上电，Slave后上电，可以按Slave的reset按键，主要原因是Master发数据的时候，需要Slave的一个引脚的信号翻转；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

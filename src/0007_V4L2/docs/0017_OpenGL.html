@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">OpenGL</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#tutorials">Tutorials指令集修改内容</a></li>
+<li><a class="reference internal" href="#id2">简要介绍</a></li>
+<li><a class="reference internal" href="#id3">数据适配、解析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="opengl">
+<h1>OpenGL<a class="headerlink" href="#opengl" title="Permalink to this headline"></a></h1>
+<p>OpenGL Android绘图</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://arm-software.github.io/opengl-es-sdk-for-android/index.html">OpenGL ES SDK for Android Documentation</a></p></li>
+<li><p><a class="reference external" href="https://github.com/learnopengles/Learn-OpenGLES-Tutorials">Learn-OpenGLES-Tutorials</a></p></li>
+<li><p><a class="reference external" href="https://www.learnopengles.com/android-lesson-one-getting-started/">Android Lesson One: Getting Started</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/u010223072/article/details/80641050">OpenGL–使用Shader</a></p></li>
+<li><p><a class="reference external" href="https://learnopengl-cn.github.io/">OpenGL中文教程</a></p></li>
+</ul>
+</section>
+<section id="tutorials">
+<h1>Tutorials指令集修改内容<a class="headerlink" href="#tutorials" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ndk</span><span class="p">{</span>
+    <span class="n">abiFilters</span> <span class="s2">&quot;arm64-v8a&quot;</span>
+<span class="p">}</span>
+
+<span class="n">externalNativeBuild</span> <span class="p">{</span>
+    <span class="n">cmake</span> <span class="p">{</span>
+        <span class="n">cppFlags</span> <span class="s2">&quot;-frtti -fexceptions&quot;</span>
+        <span class="n">arguments</span> <span class="s2">&quot;-DANDROID_PLATFORM_LEVEL=$</span><span class="si">{platformVersion}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s1">&#39;-DANDROID_TOOLCHAIN=clang&#39;</span><span class="p">,</span> <span class="s1">&#39;-DANDROID_STL=c++_shared&#39;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>简要介绍<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* public class LessonOneActivity extends Activity
+  * mGLSurfaceView = new GLSurfaceView(this);
+  * mGLSurfaceView.setRenderer(new LessonOneNativeRenderer());
+    * public void onSurfaceCreated(GL10 gl, EGLConfig config)
+      * public static native void nativeSurfaceCreate();
+        * extern &quot;C&quot; JNIEXPORT void JNICALL Java_com_learnopengles_android_lesson1_LessonOneNativeRenderer_nativeSurfaceCreate( JNIEnv *env, jclass type)
+          * native1Lesson = new Native1Lesson();
+            * native1Lesson-&gt;create();
+              * mProgram = GLUtils::createProgram(&amp;VERTEX_SHADER, &amp;FRAGMENT_SHADER);
+                * GLuint vertexShader = loadShader(GL_VERTEX_SHADER, vertexSource);
+                  * GLuint shader = glCreateShader(shaderType);
+                  * glShaderSource(shader, 1, source, NULL);
+                  * glCompileShader(shader);
+                * GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentSource);
+                  * GLuint shader = glCreateShader(shaderType);
+                  * glShaderSource(shader, 1, source, NULL);
+                  * glCompileShader(shader);
+                * GLuint program = glCreateProgram();
+                * glAttachShader(program, vertexShader);
+                * glAttachShader(program, fragmentShader);
+                * glLinkProgram(program);
+              * mModelMatrix = new Matrix();
+              * mMVPMatrix = new Matrix();
+              * mViewMatrix = Matrix::newLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+    * public void onSurfaceChanged(GL10 gl, int width, int height)
+      * public static native void nativeSurfaceChange(int width, int height);
+        * extern &quot;C&quot; JNIEXPORT void JNICALL Java_com_learnopengles_android_lesson1_LessonOneNativeRenderer_nativeSurfaceChange( JNIEnv *env, jclass type, jint width, jint height)
+          * native1Lesson-&gt;change(width, height);
+            * glViewport(0, 0, width, height);
+            * mProjectionMatrix = Matrix::newFrustum(left, right, bottom, top, near, far);
+    * public void onDrawFrame(GL10 gl)
+      * public static native void nativeDrawFrame();
+        * extern &quot;C&quot; JNIEXPORT void JNICALL Java_com_learnopengles_android_lesson1_LessonOneNativeRenderer_nativeDrawFrame( JNIEnv *env, jclass type)
+          * native1Lesson-&gt;draw();
+            * glUseProgram(mProgram); // 激活指定的Program，接下来的绘制会使用指定的Program进行渲染
+            * mMVPMatrixHandle = (GLuint) glGetUniformLocation(mProgram, &quot;u_MVPMatrix&quot;);
+            * mPositionHandle = (GLuint) glGetAttribLocation(mProgram, &quot;a_Position&quot;);
+            * mColorHandle = (GLuint) glGetAttribLocation(mProgram, &quot;a_Color&quot;);
+            * drawTriangle(triangle1VerticesData);
+              * glVertexAttribPointer( (GLuint) mPositionHandle, 3, GL_FLOAT, GL_FALSE, 4 * 7, verticesData);
+              * glEnableVertexAttribArray((GLuint) mPositionHandle);
+              * glUniformMatrix4fv(mMVPMatrixHandle, 1, GL_FALSE, mMVPMatrix-&gt;mData);
+              * glDrawArrays(GL_TRIANGLES, 0, 3);
+</pre></div>
+</div>
+<p><img alt="images/OpenGL_Android_APK_Hack.svg" src="../../../_images/OpenGL_Android_APK_Hack.svg" /></p>
+</section>
+<section id="id3">
+<h1>数据适配、解析<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Shader</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">VERTEX_SHADER</span> <span class="o">=</span>
+        <span class="s2">&quot;uniform mat4 u_MVPMatrix;        </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">A</span> <span class="n">constant</span> <span class="n">representing</span> <span class="n">the</span> <span class="n">combined</span> <span class="n">model</span><span class="o">/</span><span class="n">view</span><span class="o">/</span><span class="n">projection</span> <span class="n">matrix</span><span class="o">.</span>
+                <span class="s2">&quot;attribute vec4 a_Position;     </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">Per</span><span class="o">-</span><span class="n">vertex</span> <span class="n">position</span> <span class="n">information</span> <span class="n">we</span> <span class="n">will</span> <span class="k">pass</span> <span class="ow">in</span><span class="o">.</span>
+                <span class="s2">&quot;attribute vec4 a_Color;        </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">Per</span><span class="o">-</span><span class="n">vertex</span> <span class="n">color</span> <span class="n">information</span> <span class="n">we</span> <span class="n">will</span> <span class="k">pass</span> <span class="ow">in</span><span class="o">.</span>
+                <span class="s2">&quot;varying vec4 v_Color;          </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">This</span> <span class="n">will</span> <span class="n">be</span> <span class="n">passed</span> <span class="n">into</span> <span class="n">the</span> <span class="n">fragment</span> <span class="n">shader</span><span class="o">.</span>
+                <span class="s2">&quot;void main()                    </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">The</span> <span class="n">entry</span> <span class="n">point</span> <span class="k">for</span> <span class="n">our</span> <span class="n">vertex</span> <span class="n">shader</span><span class="o">.</span>
+                <span class="s2">&quot;{                              </span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;   v_Color = a_Color;          </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">Pass</span> <span class="n">the</span> <span class="n">color</span> <span class="n">through</span> <span class="n">to</span> <span class="n">the</span> <span class="n">fragment</span> <span class="n">shader</span><span class="o">.</span>
+                <span class="s2">&quot;   gl_Position = u_MVPMatrix * a_Position; </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">gl_Position</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">special</span> <span class="n">variable</span> <span class="n">used</span> <span class="n">to</span> <span class="n">store</span> <span class="n">the</span> <span class="n">final</span> <span class="n">position</span><span class="o">.</span>
+                <span class="s2">&quot;}                              </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>    <span class="o">//</span> <span class="n">normalized</span> <span class="n">screen</span> <span class="n">coordinates</span><span class="o">.</span>
+
+
+<span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">FRAGMENT_SHADER</span> <span class="o">=</span> <span class="s2">&quot;precision mediump float;         </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">Set</span> <span class="n">the</span> <span class="n">default</span> <span class="n">precision</span> <span class="n">to</span> <span class="n">medium</span><span class="o">.</span> <span class="n">We</span> <span class="n">don</span><span class="s1">&#39;t need as high of a</span>
+        <span class="s2">&quot;varying vec4 v_Color;          </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">color</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">vertex</span> <span class="n">shader</span> <span class="n">interpolated</span> <span class="n">across</span> <span class="n">the</span>
+        <span class="s2">&quot;void main()                    </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">The</span> <span class="n">entry</span> <span class="n">point</span> <span class="k">for</span> <span class="n">our</span> <span class="n">fragment</span> <span class="n">shader</span><span class="o">.</span>
+        <span class="s2">&quot;{                              </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;   gl_FragColor = v_Color;     </span><span class="se">\n</span><span class="s2">&quot;</span>     <span class="o">//</span> <span class="n">Pass</span> <span class="n">the</span> <span class="n">color</span> <span class="n">directly</span> <span class="n">through</span> <span class="n">the</span> <span class="n">pipeline</span><span class="o">.</span>
+        <span class="s2">&quot;}                              </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Vertices</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">This</span> <span class="n">triangle</span> <span class="ow">is</span> <span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="ow">and</span> <span class="n">blue</span><span class="o">.</span>
+<span class="n">GLfloat</span> <span class="n">triangle1VerticesData</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">//</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span>
+        <span class="o">//</span> <span class="n">R</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">A</span>
+        <span class="o">-</span><span class="mf">0.5</span><span class="n">f</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span>              <span class="o">//</span> <span class="n">attribute</span> <span class="n">vec4</span> <span class="n">a_Position</span><span class="p">;</span>
+        <span class="mf">1.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">,</span>           <span class="o">//</span> <span class="n">attribute</span> <span class="n">vec4</span> <span class="n">a_Color</span><span class="p">;</span>
+
+        <span class="mf">0.5</span><span class="n">f</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">,</span>
+
+        <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.559016994</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="n">f</span><span class="p">,</span> <span class="mf">1.0</span><span class="n">f</span><span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p>Data adaptation format</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">glVertexAttribPointer</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">GLuint</span><span class="p">)</span> <span class="n">mPositionHandle</span><span class="p">,</span>
+        <span class="mi">3</span><span class="p">,</span>                    <span class="o">//</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span>
+        <span class="n">GL_FLOAT</span><span class="p">,</span>
+        <span class="n">GL_FALSE</span><span class="p">,</span>
+        <span class="mi">4</span> <span class="o">*</span> <span class="mi">7</span><span class="p">,</span>                <span class="o">//</span> <span class="mi">4</span> <span class="n">byte</span><span class="p">(</span><span class="nb">float</span> <span class="n">size</span><span class="p">)</span> <span class="o">*</span> <span class="mi">7</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span> 
+        <span class="n">verticesData</span>
+<span class="p">);</span>
+<span class="n">glEnableVertexAttribArray</span><span class="p">((</span><span class="n">GLuint</span><span class="p">)</span> <span class="n">mPositionHandle</span><span class="p">);</span>
+<span class="n">glVertexAttribPointer</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">GLuint</span><span class="p">)</span> <span class="n">mColorHandle</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">,</span>                    <span class="o">//</span> <span class="n">R</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">A</span>
+        <span class="n">GL_FLOAT</span><span class="p">,</span>
+        <span class="n">GL_FALSE</span><span class="p">,</span>
+        <span class="mi">4</span> <span class="o">*</span> <span class="mi">7</span><span class="p">,</span>                <span class="o">//</span> <span class="mi">4</span> <span class="n">byte</span><span class="p">(</span><span class="nb">float</span> <span class="n">size</span><span class="p">)</span> <span class="o">*</span> <span class="mi">7</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">verticesData</span> <span class="o">+</span> <span class="mi">3</span>      <span class="o">//</span> <span class="mi">3</span> <span class="nb">float</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span> <span class="n">offset</span>
+<span class="p">);</span>
+<span class="n">glEnableVertexAttribArray</span><span class="p">((</span><span class="n">GLuint</span><span class="p">)</span> <span class="n">mColorHandle</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

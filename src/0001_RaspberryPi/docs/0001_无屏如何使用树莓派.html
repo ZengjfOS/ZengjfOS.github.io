@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">无屏怎么使用树莓派？</a></li>
+<li><a class="reference internal" href="#id2">一、什么是树莓派</a></li>
+<li><a class="reference internal" href="#id3">二、安装树莓派官方系统</a></li>
+<li><a class="reference internal" href="#wifissh">三、配置树莓派Wifi并开启SSH</a></li>
+<li><a class="reference internal" href="#mobaxterm-ssh">四、MobaXterm SSH连接树莓派</a></li>
+<li><a class="reference internal" href="#id4">五、远程桌面</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>无屏怎么使用树莓派？<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p>一个屏比一个树莓派还贵，不大可能为了玩个树莓派还单独买个屏，并不是每个人都有屏的需求</p>
+<ul class="simple">
+<li><p><span class="xref myst">一、什么是树莓派</span></p></li>
+<li><p><span class="xref myst">二、安装树莓派官方系统</span></p></li>
+<li><p><span class="xref myst">三、配置树莓派Wifi并开启SSH</span></p></li>
+<li><p><span class="xref myst">四、MobaXterm SSH连接树莓派</span></p></li>
+<li><p><span class="xref myst">五、远程桌面</span></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>一、什么是树莓派<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>官方网址：https://www.raspberrypi.org/</p></li>
+<li><p>Raspberry Pi 4 Model B</p></li>
+</ul>
+<p><img alt="0001_NO_Screen_RPI_4B_Interfaces.png" src="../../../_images/0001_NO_Screen_RPI_4B_Interfaces.png" /></p>
+<p><img alt="0001_NO_Screen_RPI_4B_40P.png" src="../../../_images/0001_NO_Screen_RPI_4B_40P.png" /></p>
+</section>
+<section id="id3">
+<h1>二、安装树莓派官方系统<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>官方下载工具网址：https://www.raspberrypi.org/software/</p></li>
+<li><p>Raspberry Pi Imager<br />
+<img alt="0001_NO_Screen_RPI_SD_Burning.png" src="../../../_images/0001_NO_Screen_RPI_SD_Burning.png" /></p></li>
+<li><p><strong>在刷系统的时候可以通过【设置】来指定用户名和密码</strong><br />
+<img alt="0001_create_user_and_password.png" src="../../../_images/0001_create_user_and_password.png" /></p></li>
+</ul>
+</section>
+<section id="wifissh">
+<h1>三、配置树莓派Wifi并开启SSH<a class="headerlink" href="#wifissh" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>系统安装完成后重新插拔USB SD读卡器，会挂在FAT格式的boot分区</p></li>
+<li><p>在boot分区根目录创建<code class="docutils literal notranslate"><span class="pre">wpa_supplicant.conf</span></code>文件，并写入</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ctrl_interface</span><span class="o">=</span><span class="n">DIR</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">wpa_supplicant</span> <span class="n">GROUP</span><span class="o">=</span><span class="n">netdev</span>
+<span class="n">update_config</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">country</span><span class="o">=</span><span class="n">CN</span>
+
+<span class="n">network</span><span class="o">=</span><span class="p">{</span>
+        <span class="n">ssid</span><span class="o">=</span><span class="s2">&quot;your wifi ssid&quot;</span>
+        <span class="n">psk</span><span class="o">=</span><span class="s2">&quot;your wifi password&quot;</span>
+        <span class="n">key_mgmt</span><span class="o">=</span><span class="n">WPA</span><span class="o">-</span><span class="n">PSK</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>在boot分区根目录创建ssh.txt文件，空文件就行</p></li>
+<li><p>为什么这么做可以配置Wifi和SSH，原因后续解读</p></li>
+</ul>
+</section>
+<section id="mobaxterm-ssh">
+<h1>四、MobaXterm SSH连接树莓派<a class="headerlink" href="#mobaxterm-ssh" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>查看树莓派IP</p>
+<ul>
+<li><p>登陆路由器查看新登录的设备IP，等一小会</p></li>
+</ul>
+</li>
+<li><p>登陆树莓派</p>
+<ul>
+<li><p>用户：pi</p></li>
+<li><p>密码：raspberry</p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="0001_NO_Screen_RPI_SSH.png" src="../../../_images/0001_NO_Screen_RPI_SSH.png" /></p>
+</section>
+<section id="id4">
+<h1>五、远程桌面<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>sudo apt-get update</p></li>
+<li><p>sudo apt-get install xrdp</p></li>
+<li><p>Windows远程桌面输入账号密码登录</p>
+<ul>
+<li><p>用户：pi</p></li>
+<li><p>密码：raspberry</p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

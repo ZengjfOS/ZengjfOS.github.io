@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">HID Compliant Deivce</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#modify-keyboard-to-unknow-device">Modify Keyboard to Unknow Device</a></li>
+<li><a class="reference internal" href="#modify-hid-report-dscr">Modify HID Report Dscr</a></li>
+<li><a class="reference internal" href="#modify-hid-report-dscr-with-report-id">Modify HID Report Dscr With Report ID</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hid-compliant-deivce">
+<h1>HID Compliant Deivce<a class="headerlink" href="#hid-compliant-deivce" title="Permalink to this headline"></a></h1>
+<p>HID兼容设备</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://domoticx.com/usb-hid-sniffer-software-windows/">USB HID sniffer – Software (windows)</a></p>
+<ul>
+<li><p>Download 1: https://github.com/downloads/bbeardsley/BuzzIO/0011_SimpleHIDWrite3.zip</p></li>
+<li><p>Download 2: <a class="reference download internal" download="" href="../../../_downloads/1090ed2c2286378c92caa1330f6be7a7/0011_SimpleHIDWrite3.zip"><span class="xref download myst">0011_SimpleHIDWrite3.zip</span></a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/">Tutorial about USB HID Report Descriptors</a>: 需要理解Report id，可以主要看Report id要怎么操作；</p></li>
+</ul>
+</section>
+<section id="modify-keyboard-to-unknow-device">
+<h1>Modify Keyboard to Unknow Device<a class="headerlink" href="#modify-keyboard-to-unknow-device" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>仅将HID Keyboard声明改成HID Unknow设备：</p>
+<div class="highlight-ASM notranslate"><div class="highlight"><pre><span></span><span class="nl">HIDReportDscr:</span><span class="w"></span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Generic Desktop)</span>
+<span class="w">    </span><span class="c1">;db 09h, 06h   ;    Usage (Keyboard)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">09</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage (undefine)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">A1h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">   </span><span class="c1">;    Collection (Application)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">07</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Key codes)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E0h</span><span class="w">   </span><span class="c1">;    Usage minimum (234)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E7h</span><span class="w">   </span><span class="c1">;    Usage maximum (231)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">15</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical minimum (0)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">25</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical maximum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (data, variable, absolute)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (constant)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (LED)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage minimum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage maximum (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (data, variable, absolute)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">03</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (3)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (constant)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">03</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (3)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">15</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical minimum (0)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">25</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical maximum (101)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">07</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage page (key codes)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage minimum (0)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage maximum (101)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (data, array)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">C0h</span><span class="w">        </span><span class="c1">;    End Collection</span>
+<span class="nl">HIDReportDscrEnd:</span><span class="w"></span>
+</pre></div>
+</div>
+<p><img alt="0011_HID_Keyboard_To_HID_Compliant_Device.png" src="../../../_images/0011_HID_Keyboard_To_HID_Compliant_Device.png" /></p>
+</li>
+<li><p>SimpleHIDWrite读写：
+<img alt="0011_HID_Keyboard_To_HID_Compliant_Device_Read_Write.png" src="../../../_images/0011_HID_Keyboard_To_HID_Compliant_Device_Read_Write.png" /></p></li>
+</ul>
+</section>
+<section id="modify-hid-report-dscr">
+<h1>Modify HID Report Dscr<a class="headerlink" href="#modify-hid-report-dscr" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>HID Report Dscr</p>
+<div class="highlight-ASM notranslate"><div class="highlight"><pre><span></span><span class="nl">HIDReportDscr:</span><span class="w"></span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Generic Desktop)</span>
+<span class="w">    </span><span class="c1">;db 09h, 06h   ;    Usage (Keyboard)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">09</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage (undefine)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">A1h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">   </span><span class="c1">;    Collection (Application)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">07</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Key codes)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E0h</span><span class="w">   </span><span class="c1">;    Usage minimum (234)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E7h</span><span class="w">   </span><span class="c1">;    Usage maximum (231)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">15</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical minimum (0)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">25</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical maximum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (data, variable, absolute)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (LED)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage minimum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage maximum (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (data, variable, absolute)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">03</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (3)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (constant)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">C0h</span><span class="w">        </span><span class="c1">;    End Collection</span>
+<span class="nl">HIDReportDscrEnd:</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Deal With Report</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">TD_Poll</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">             </span><span class="c1">// Called repeatedly while the device is idle</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1INCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">    </span><span class="c1">// Is the IN1BUF available,</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">buttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PB0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">keyStatus</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PB0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">    </span><span class="c1">//Change in button state</span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_DOWN</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">keyStatus</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">KEY_DOWN</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PB0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)){</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">              </span>
+<span class="w">            </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buttons</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1OUTCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">    </span><span class="c1">// Is there something available</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">PB2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">PB2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">EP1OUTBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">                </span><span class="c1">//Rearm endpoint buffer</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Data Transfer
+<img alt="0011_HID_Keyboard_To_HID_Compliant_Device_2_Byte.png" src="../../../_images/0011_HID_Keyboard_To_HID_Compliant_Device_2_Byte.png" /></p></li>
+<li><p>从上可知，貌似我们没有设置Report id，接下来处理一下指定Report id；</p></li>
+</ul>
+</section>
+<section id="modify-hid-report-dscr-with-report-id">
+<h1>Modify HID Report Dscr With Report ID<a class="headerlink" href="#modify-hid-report-dscr-with-report-id" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>HID Report Dscr</p>
+<div class="highlight-ASM notranslate"><div class="highlight"><pre><span></span><span class="nl">HIDReportDscr:</span><span class="w"></span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Generic Desktop)</span>
+<span class="w">    </span><span class="c1">;db 09h, 06h   ;    Usage (Keyboard)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">09</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage (undefine)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">A1h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">   </span><span class="c1">;    Collection (Application)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">85</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report id(1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">07</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Key codes)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E0h</span><span class="w">   </span><span class="c1">;    Usage minimum (234)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E7h</span><span class="w">   </span><span class="c1">;    Usage maximum (231)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">15</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical minimum (0)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">25</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical maximum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (data, variable, absolute)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (LED)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage minimum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage maximum (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (data, variable, absolute)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">03</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (3)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (constant)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">C0h</span><span class="w">        </span><span class="c1">;    End Collection</span>
+<span class="nl">HIDReportDscrEnd:</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Deal With Report</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">TD_Poll</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">             </span><span class="c1">// Called repeatedly while the device is idle</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1INCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">   </span><span class="c1">// Is the IN1BUF available,</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">buttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PB0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">keyStatus</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PB0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">   </span><span class="c1">//Change in button state</span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_DOWN</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">keyStatus</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">KEY_DOWN</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PB0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)){</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">           </span>
+<span class="w">            </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span>
+<span class="w">        </span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buttons</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1OUTCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">   </span><span class="c1">// Is there something available</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">PB2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">PB2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">EP1OUTBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">            </span><span class="c1">//Rearm endpoint buffer</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Data Transfer
+<img alt="0011_HID_Keyboard_To_HID_Compliant_Device_With_Report_ID.png" src="../../../_images/0011_HID_Keyboard_To_HID_Compliant_Device_With_Report_ID.png" /></p></li>
+<li><p>结论：</p>
+<ul class="simple">
+<li><p>如果没有设定Report id，那么第一个字节可以当作数据字节，不过系统会自动补这个字节；</p></li>
+<li><p>如果设定了Report id，那么第一个字节是Report id，后面在跟数据，Report id需要手动填写；</p></li>
+<li><p>Report id相当于对数据进行分类。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

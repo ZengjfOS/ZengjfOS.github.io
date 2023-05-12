@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">bitbake Hello-World</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">源代码</a></li>
+<li><a class="reference internal" href="#layer">创建layer</a></li>
+<li><a class="reference internal" href="#recipetoolrecipe">recipetool创建recipe</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bitbake-hello-world">
+<h1>bitbake Hello-World<a class="headerlink" href="#bitbake-hello-world" title="Permalink to this headline"></a></h1>
+<p>添加Hello World bb</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/2.7.1/bitbake-user-manual/bitbake-user-manual.html#hello-world-example">A.4. The Hello World Example</a></p></li>
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/2.7.1/bitbake-user-manual/bitbake-user-manual.html#obtaining-bitbake">1.4. Obtaining BitBake</a></p></li>
+<li><p><a class="reference external" href="http://yi-jyun.blogspot.com/2018/02/yocto-2-recipe.html">yocto recipe : (1) 撰寫 recipe</a></p></li>
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#new-recipe-writing-a-new-recipe">3.3.2. Locate or Automatically Create a Base Recipe</a></p></li>
+<li><p><a class="reference external" href="https://github.com/DynamicDevices/meta-example">DynamicDevices meta-example</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>源代码<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ZengjfOS/Yocto/tree/helloworld">helloworld源代码</a></p></li>
+<li><p><a class="reference external" href="https://github.com/ZengjfOS/Yocto/tree/_Setup_Env">meta-layer源代码</a></p></li>
+</ul>
+</section>
+<section id="layer">
+<h1>创建layer<a class="headerlink" href="#layer" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake-layers</span> <span class="pre">create-layer</span> <span class="pre">meta-example</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imx8-build-wayland/conf/bblayers.conf</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>zengjf@UbuntuServer:imx8-build-wayland$ cat conf/bblayers.conf
+LCONF_VERSION = &quot;7&quot;
+
+BBPATH = &quot;${TOPDIR}&quot;
+BSPDIR := &quot;${@os.path.abspath(os.path.dirname(d.getVar(&#39;FILE&#39;, True)) + &#39;/../..&#39;)}&quot;
+
+BBFILES ?= &quot;&quot;
+BBLAYERS = &quot; \
+  ${BSPDIR}/sources/poky/meta \
+  ${BSPDIR}/sources/poky/meta-poky \
+  \
+  ${BSPDIR}/sources/meta-openembedded/meta-oe \
+  ${BSPDIR}/sources/meta-openembedded/meta-multimedia \
+  \
+  ${BSPDIR}/sources/meta-freescale \
+  ${BSPDIR}/sources/meta-freescale-3rdparty \
+  ${BSPDIR}/sources/meta-freescale-distro \
+&quot;
+
+# i.MX Yocto Project Release layers
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-bsp &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-fsl-bsp-release/imx/meta-sdk &quot;
+
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-browser &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-gnome &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-networking &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-python &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-openembedded/meta-filesystems &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-qt5 &quot;
+BBLAYERS += &quot; ${BSPDIR}/sources/meta-example &quot;                                # add your layer
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sources/meta-example/recipes-example/example/example_0.1.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SUMMARY</span> <span class="o">=</span> <span class="s2">&quot;bitbake-layers recipe&quot;</span>
+<span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Recipe created by bitbake-layers&quot;</span>
+<span class="n">LICENSE</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+
+<span class="n">python</span> <span class="n">do_build</span><span class="p">()</span> <span class="p">{</span>                                                   <span class="c1">#  尝试过很多次，这个build不会给执行，暂时不知道为什么</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;***********************************************&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*                                             *&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*  Example recipe created by bitbake-layers   *&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*                                             *&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;***********************************************&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">python</span> <span class="n">do_compile</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*****************do_compile********************&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*                                             *&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*  Example recipe created by bitbake-layers   *&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;*                                             *&quot;</span><span class="p">);</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">plain</span><span class="p">(</span><span class="s2">&quot;***********************************************&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>bitbake example -c compile -DD -f</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">logging</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">base</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Stampfile</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">wayland</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">stamps</span><span class="o">/</span><span class="n">aarch64</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="mf">0.1</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">do_compile</span><span class="o">.</span><span class="n">ba1917feed47dfea38fb990ca5447d00</span> <span class="ow">not</span> <span class="n">available</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">openembedded</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">gnome</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">sanity</span><span class="o">-</span><span class="n">meta</span><span class="o">-</span><span class="n">gnome</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">machine</span><span class="o">-</span><span class="n">overrides</span><span class="o">-</span><span class="n">extender</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">freescale</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">dynamic</span><span class="o">-</span><span class="n">packagearch</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">poky</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">poky</span><span class="o">-</span><span class="n">sanity</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">package_rpm</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">package_rpm</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">packagedata</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">41</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">chrpath</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">insane</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">buildstats</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">image</span><span class="o">-</span><span class="n">mklibs</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">linuxloader</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">image</span><span class="o">-</span><span class="n">mklibs</span><span class="o">.</span><span class="n">bbclass</span><span class="p">:</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">image</span><span class="o">-</span><span class="n">prelink</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">debian</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">devshell</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">sstate</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">license</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">remove</span><span class="o">-</span><span class="n">libtool</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">blacklist</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Inheriting</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">poky</span><span class="o">/</span><span class="n">meta</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">sanity</span><span class="o">.</span><span class="n">bbclass</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">configuration</span> <span class="n">INHERITs</span><span class="p">:</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Using</span> <span class="n">cache</span> <span class="ow">in</span> <span class="s1">&#39;/home/zengjf/imx8-yocto-ga/imx8-build-wayland/cache/bb_codeparser.dat&#39;</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Parsing</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">example</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example_0</span><span class="mf">.1</span><span class="o">.</span><span class="n">bb</span> <span class="p">(</span><span class="n">full</span><span class="p">)</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">task</span> <span class="n">do_compile</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">example</span><span class="o">-</span><span class="mf">0.1</span><span class="o">-</span><span class="n">r0</span> <span class="n">do_compile</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">do_compile</span>
+<span class="o">*****************</span><span class="n">do_compile</span><span class="o">********************</span>
+<span class="o">*</span>                                             <span class="o">*</span>
+<span class="o">*</span>  <span class="n">Example</span> <span class="n">recipe</span> <span class="n">created</span> <span class="n">by</span> <span class="n">bitbake</span><span class="o">-</span><span class="n">layers</span>   <span class="o">*</span>
+<span class="o">*</span>                                             <span class="o">*</span>
+<span class="o">***********************************************</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">example</span><span class="o">-</span><span class="mf">0.1</span><span class="o">-</span><span class="n">r0</span> <span class="n">do_compile</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">do_compile</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Teardown</span> <span class="k">for</span> <span class="n">bitbake</span><span class="o">-</span><span class="n">worker</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Tasks</span> <span class="n">Summary</span><span class="p">:</span> <span class="n">Attempted</span> <span class="mi">258</span> <span class="n">tasks</span> <span class="n">of</span> <span class="n">which</span> <span class="mi">257</span> <span class="n">didn</span><span class="s1">&#39;t need to be rerun and all succeeded.</span>
+
+<span class="n">Summary</span><span class="p">:</span> <span class="n">There</span> <span class="n">were</span> <span class="mi">4</span> <span class="n">WARNING</span> <span class="n">messages</span> <span class="n">shown</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="recipetoolrecipe">
+<h1>recipetool创建recipe<a class="headerlink" href="#recipetoolrecipe" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">recipetool</span> <span class="pre">create</span> <span class="pre">--help</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">sources/meta-example</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">recipes-helloworld/helloworld</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recipetool</span> <span class="pre">create</span> <span class="pre">-N</span> <span class="pre">helloworld</span> <span class="pre">-B</span> <span class="pre">helloworld</span> <span class="pre">-o</span> <span class="pre">recipes-helloworld/helloworld/helloworld_0.1.bb</span> <span class="pre">https://github.com/ZengjfOS/Yocto</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">recipes-helloworld/helloworld/helloworld_0.1.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Recipe created by recipetool</span>
+<span class="c1"># This is the basis of a recipe and may need further editing in order to be fully functional.</span>
+<span class="c1"># (Feel free to remove these comments when editing.)</span>
+<span class="c1"># Unable to find any files that looked like license statements. Check the accompanying</span>
+<span class="c1"># documentation and source headers and set LICENSE and LIC_FILES_CHKSUM accordingly.</span>
+<span class="c1">#</span>
+<span class="c1"># NOTE: LICENSE is being set to &quot;CLOSED&quot; to allow you to at least start building - if</span>
+<span class="c1"># this is not accurate with respect to the licensing of the software being built (it</span>
+<span class="c1"># will not be in most cases) you must specify the correct value before using this</span>
+<span class="c1"># recipe for anything other than initial testing/development!</span>
+<span class="n">LICENSE</span> <span class="o">=</span> <span class="s2">&quot;CLOSED&quot;</span>
+<span class="n">LIC_FILES_CHKSUM</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">SRC_URI</span> <span class="o">=</span> <span class="s2">&quot;git://github.com/ZengjfOS/Yocto;protocol=https;branch=helloworld&quot;</span>
+<span class="c1"># Modify these as desired</span>
+<span class="n">PV</span> <span class="o">=</span> <span class="s2">&quot;0.1+git$</span><span class="si">{SRCPV}</span><span class="s2">&quot;</span>
+<span class="n">SRCREV</span> <span class="o">=</span> <span class="s2">&quot;1da23ae3b40b9081cc2e6d9621c8d6cf32c50494&quot;</span>
+<span class="n">S</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{WORKDIR}</span><span class="s2">/git&quot;</span>
+<span class="c1"># NOTE: no Makefile found, unable to determine what needs to be done</span>
+<span class="n">do_configure</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="c1"># Specify any needed configure commands here</span>
+        <span class="p">:</span>
+<span class="p">}</span>
+<span class="n">do_compile</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="c1"># Specify compilation commands here</span>
+        <span class="p">:</span>
+<span class="p">}</span>
+<span class="n">do_install</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="c1"># Specify install commands here</span>
+        <span class="p">:</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+</li>
+<li><p>修改<code class="docutils literal notranslate"><span class="pre">recipes-helloworld/helloworld/helloworld_0.1.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># will not be in most cases) you must specify the correct value before using this
+# recipe for anything other than initial testing/development!
+LICENSE = &quot;CLOSED&quot;
+LIC_FILES_CHKSUM = &quot;&quot;
+
+SRC_URI = &quot;git://github.com/ZengjfOS/Yocto;protocol=https;branch=helloworld&quot;
+
+inherit deploy
+
+# Modify these as desired
+PV = &quot;0.1+git${SRCPV}&quot;
+SRCREV = &quot;8892d685573f8b7d75e0d9d2755fef697b35df58&quot;
+
+S = &quot;${WORKDIR}/git&quot;
+
+# NOTE: no Makefile found, unable to determine what needs to be done
+
+do_configure () {
+        # Specify any needed configure commands here
+        :
+}
+
+do_compile () {
+        # Specify compilation commands here
+        oe_runmake
+}
+
+do_install () {
+        # Specify install commands here
+        bbdebug 2 ${D}
+        oe_runmake install &#39;DESTDIR=${D}&#39;
+}
+
+do_deploy () {
+        bbdebug 2 &quot;DEPLOYDIR: ${DEPLOYDIR}&quot;
+        install -d &quot;${DEPLOYDIR}&quot;
+}
+addtask deploy after do_populate_sysroot
+</pre></div>
+</div>
+</li>
+<li><p>编译、安装：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">helloworld</span> <span class="pre">-DD</span> <span class="pre">-c</span> <span class="pre">compile</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">helloworld</span> <span class="pre">-DD</span> <span class="pre">-c</span> <span class="pre">install</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">helloworld</span> <span class="pre">-DD</span> <span class="pre">-c</span> <span class="pre">deploy</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/aarch64-poky-linux/helloworld/0.1+gitAUTOINC+8892d68557-r0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imx8-build-wayland/conf/local.conf</span></code>中添加<code class="docutils literal notranslate"><span class="pre">helloworld</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">fsl-image-qt5-validation-imx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-qt5-validation-imx/1.0-r0/rootfs/usr/bin/hello</span></code></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

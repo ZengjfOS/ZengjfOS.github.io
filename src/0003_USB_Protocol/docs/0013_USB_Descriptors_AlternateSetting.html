@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">USB Descriptors AlternateSetting</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">总结</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#id3">接口切换选择实现方法</a></li>
+<li><a class="reference internal" href="#wireshark-capture">Wireshark Capture</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usb-descriptors-alternatesetting">
+<h1>USB Descriptors AlternateSetting<a class="headerlink" href="#usb-descriptors-alternatesetting" title="Permalink to this headline"></a></h1>
+<p>USB描述符备用选择</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.beyondlogic.org/usbnutshell/usb5.shtml">USB Descriptors</a></p></li>
+<li><p><a class="reference external" href="https://www.beyondlogic.org/usbnutshell/usb5.shtml#AlternateSetting">AlternateSetting</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>总结<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>一个配置描述符中可以有多个接口，如果一个接口对应一个接口描述符，那么那个唯一的接口描述符就可以认为是接口；</p></li>
+<li><p>另外同一个接口又可以有多种接口描述符，通过接口描述符中的Alternate Settings字段来区分；</p></li>
+<li><p>注意上面的接口和接口描述符，接口是指接口描述符中的InterfaceNumber字段指定的索引号来确定；</p></li>
+</ul>
+</section>
+<section id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline"></a></h1>
+<p>一个接口中包含七种接口描述符，也就是一个接口有其中功能可以切换，在配置描述符种，也是表明只有一个接口，而不是七个。</p>
+<div class="highlight-ASM notranslate"><div class="highlight"><pre><span></span>HighSpeedConfigDscr:   
+    db   DSCR_CONFIG_LEN               ;; Descriptor length
+    db   DSCR_CONFIG                  ;; Descriptor type
+    db   (HighSpeedConfigDscrEnd-HighSpeedConfigDscr) mod 256 ;; Total Length (LSB)
+    db   (HighSpeedConfigDscrEnd-HighSpeedConfigDscr)  /  256 ;; Total Length (MSB)
+    db   1      ;; Number of interfaces
+    db   1      ;; Configuration number
+    db   0      ;; Configuration string
+    db   10100000b   ;; Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu)
+    db   50      ;; Power requirement (div 2 ma)
+
+;; Alt Interface 0 Descriptor - Bulk IN
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   0                 ;; Alternate setting
+    db   1                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index This would be nice to add!
+    
+;; Bulk IN Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   82H               ;; Endpoint 2 and direction IN
+    db   ET_BULK           ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB)
+    db   02H               ;; Max packect size (MSB)  512 byte packets/uFrame
+    db   00H               ;; Polling interval
+
+;; Alt Interface 1 Descriptor - Bulk OUT
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   1                 ;; Alternate setting
+    db   1                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index This would be nice to add!
+    
+;; Bulk OUT Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   2H                ;; Endpoint 2 and direction OUT
+    db   ET_BULK           ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 
+    db   02H               ;; Max packect size (MSB) 512 byte packets/uFrame
+    db   00H               ;; Polling interval
+
+;; Alt Interface 2 Descriptor - Bulk IN-OUT
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   2                 ;; Alternate setting
+    db   2                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index This would be nice to add!
+    
+;; Bulk IN Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   82H               ;; Endpoint 2 and direction IN
+    db   ET_BULK           ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 512 byte packets/uFrame
+    db   02H               ;; Max packect size (MSB)
+    db   00H               ;; Polling interval
+
+;; Bulk OUT Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   06H               ;; Endpoint 6 and direction OUT
+    db   ET_BULK           ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 
+    db   02H               ;; Max packect size (MSB) 512 byte packets/uFrame
+    db   00H               ;; Polling interval
+
+
+;; Alt. Interface 3 Descriptor - Isoc IN 3x1024 byte packets/uFrame
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   3                 ;; Alternate setting
+    db   1                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index. This would be nice to add!
+
+;; Isoc IN Endpoint Descriptor 
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   82H               ;; Endpoint 2 and direction IN
+    db   ET_ISO            ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB)
+    db   14H               ;; Max packect size (MSB) 10100b 3x1024 byte packets/uFrame
+    db   01H               ;; Polling interval
+
+;; Alt. Interface 4 Descriptor - Isoc OUT 3x1024 byte packets/uFrame
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   4                 ;; Alternate setting
+    db   1                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index This would be nice to add!
+    
+;; Isoc OUT Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   02H               ;; Endpoint 2 and direction OUT
+    db   ET_ISO            ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 
+    db   14H               ;; Max packect size (MSB) 10100b 3x1024 byte packets/uFrame
+    db   01H               ;; Polling interval
+
+;; Alt. Interface 5 Descriptor - Isoc IN 1x1024 byte packets/uFrame
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   5                 ;; Alternate setting
+    db   1                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index. This would be nice to add!
+
+;; Isoc IN Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   82H               ;; Endpoint 2 and direction IN
+    db   ET_ISO            ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 
+    db   04H               ;; Max packect size (MSB) 00100b 1x1024 byte packets/uFrame
+    db   01H               ;; Polling interval
+
+;; Alt. Interface 6 Descriptor - Isoc IN OUT 1x1024 byte packets/uFrame
+    db   DSCR_INTRFC_LEN   ;; Descriptor length
+    db   DSCR_INTRFC       ;; Descriptor type
+    db   0                 ;; Zero-based index of this interface
+    db   6                 ;; Alternate setting
+    db   2                 ;; Number of end points 
+    db   0ffH              ;; Interface class
+    db   00H               ;; Interface sub class
+    db   00H               ;; Interface sub sub class
+    db   0                 ;; Interface descriptor string index. This would be nice to add!
+
+;; Isoc IN Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   82H               ;; Endpoint 2 and direction IN
+    db   ET_ISO            ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 
+    db   04H               ;; Max packect size (MSB) 00100b 1x1024 byte packets/uFrame
+    db   01H               ;; Polling interval
+
+;; Isoc OUT Endpoint Descriptor
+    db   DSCR_ENDPNT_LEN   ;; Descriptor length
+    db   DSCR_ENDPNT       ;; Descriptor type
+    db   06H               ;; Endpoint 6 and direction OUT
+    db   ET_ISO            ;; Endpoint type
+    db   00H               ;; Maximun packet size (LSB) 
+    db   04H               ;; Max packect size (MSB) 00100b 1x1024 byte packets/uFrame
+    db   01H               ;; Polling interval
+
+HighSpeedConfigDscrEnd:   
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h1>接口切换选择实现方法<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">BOOL</span><span class="w"> </span><span class="nf">DR_SetInterface</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">       </span><span class="c1">// Called when a Set Interface command is received</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">AlternateSetting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SETUPDAT</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// ...FX2 in high speed mode    // 由于代码精简，所以删除了后面全速模式的代码</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">EZUSB_HIGHSPEED</span><span class="p">(</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="c1">// Change configuration based upon the Alt. Interface selected </span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">AlternateSetting</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt0_BulkIN</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Only using endpoint 2, zero the valid bit on all others</span>
+<span class="w">                </span><span class="c1">// Just using endpoint 2, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xE0</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 is DIR=IN, TYPE=BULK, SIZE=512, BUF=4x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Clear out any committed packets</span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Reset data toggle to 0</span>
+<span class="w">                </span><span class="n">TOGCTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x12</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 IN</span>
+<span class="w">                </span><span class="n">TOGCTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x32</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 IN Reset</span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt1_BulkOUT</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Only using endpoint 2, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xA0</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 is DIR=OUT, TYPE=BULK, SIZE=512, BUF=4x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">               </span>
+<span class="w">                </span><span class="c1">// OUT endpoints do NOT come up armed</span>
+<span class="w">                </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm first buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm second buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm third buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm fourth buffer by writing BC w/skip=1</span>
+<span class="w">                </span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt2_BulkINOUT</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Using endpoints 2 &amp; 6, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xE0</span><span class="p">;</span><span class="w"> </span><span class="c1">// EP2 is DIR=IN, TYPE=BULK, SIZE=512, BUF=4x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xA0</span><span class="p">;</span><span class="w"> </span><span class="c1">// EP6 is DIR=OUT, TYPE=BULK, SIZE=512, BUF=4x   </span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x7F</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Clear out any committed packets</span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Reset data toggle to 0</span>
+<span class="w">                </span><span class="n">TOGCTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x12</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 IN</span>
+<span class="w">                </span><span class="n">TOGCTL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x32</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 IN Reset</span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// OUT endpoints do NOT come up armed</span>
+<span class="w">                </span><span class="n">EP6BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm first buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP6BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm second buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt3_IsocIN</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Only using endpoint 2, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xD8</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 is DIR=IN, TYPE=ISOC, SIZE=1024, BUF=4x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"> </span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Clear out any committed packets</span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// This register sets the number of Isoc packets to send per</span>
+<span class="w">                </span><span class="c1">// uFrame.  This register is only valid in high speed.</span>
+<span class="w">                </span><span class="n">EP2ISOINPKTS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x03</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt4_IsocOUT</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Only using endpoint 2, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"> </span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x98</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 is DIR=OUT, TYPE=ISOC, SIZE=1024, BUF=4x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// OUT endpoints do NOT come up armed</span>
+<span class="w">                </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm first buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm second buffer by writing BC w/skip=1        break;</span>
+<span class="w">    </span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt5_IsocIN</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Only using endpoint 2, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xD8</span><span class="p">;</span><span class="w">  </span><span class="c1">// EP2 is DIR=IN, TYPE=ISOC, SIZE=1024, BUF=4x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"> </span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Clear out any committed packets</span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// This register sets the number of Isoc packets to send per</span>
+<span class="w">                </span><span class="c1">// uFrame.  This register is only valid in high speed.</span>
+<span class="w">                </span><span class="n">EP2ISOINPKTS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="nl">Alt6_IsocINOUT</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Using endpoints 2 &amp; 6, zero the valid bit on all others</span>
+<span class="w">                </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xDA</span><span class="p">;</span><span class="w"> </span><span class="c1">// EP2 is DIR=IN, TYPE=ISOC, SIZE=1024, BUF=2x</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x9A</span><span class="p">;</span><span class="w"> </span><span class="c1">// EP6 is DIR=OUT, TYPE=ISOC, SIZE=1024, BUF=2x   </span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"> </span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// Clear out any committed packets</span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x02</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">FIFORESET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// This register sets the number of Isoc packets to send per</span>
+<span class="w">                </span><span class="c1">// uFrame.  This register is only valid in high speed.</span>
+<span class="w">                </span><span class="n">EP2ISOINPKTS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">                </span><span class="c1">// OUT endpoints do NOT come up armed</span>
+<span class="w">                </span><span class="n">EP6BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm first buffer by writing BC w/skip=1</span>
+<span class="w">                </span><span class="n">SYNCDELAY</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">EP6BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w"> </span><span class="c1">// arm second buffer by writing BC w/skip=1</span>
+<span class="w">     </span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="n">TRUE</span><span class="p">);</span><span class="w">            </span><span class="c1">// Handled by user code</span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">BOOL</span><span class="w"> </span><span class="nf">DR_GetInterface</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">       </span><span class="c1">// Called when a Set Interface command is received</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">EP0BUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AlternateSetting</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">EP0BCH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">EP0BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="p">(</span><span class="n">TRUE</span><span class="p">);</span><span class="w">            </span><span class="c1">// Handled by user code</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="wireshark-capture">
+<h1>Wireshark Capture<a class="headerlink" href="#wireshark-capture" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Capture Interface Alternate Setting<br />
+<img alt="0013_AlternateStting_Interface_Request.png" src="../../../_images/0013_AlternateStting_Interface_Request.png" /></p></li>
+<li><p>Set Alternate Setting
+<img alt="0013_AlternateStting_Interface_Request_With_USB_Control_Center.png" src="../../../_images/0013_AlternateStting_Interface_Request_With_USB_Control_Center.png" /></p></li>
+<li><p>由于自己在PB2上接了一个LED，通过观察LED的亮灭可以看到通信确实是OK的；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

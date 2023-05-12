@@ -1,0 +1,11 @@
+# TF Incomes
+
+使用pandas读取csv数据，训练: ax + b = y
+
+# Training Model
+
+* [TFIncomes.py](refers/0002_TFIncomes/TFIncomes.py)
+
+# jupyter notebook
+
+* [tf_incomes.ipynb](refers/0002_TFIncomes/tf_incomes.ipynb)

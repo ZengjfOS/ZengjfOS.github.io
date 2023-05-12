@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android init cmdline parse</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#cmdline">内核cmdline解析</a></li>
+<li><a class="reference internal" href="#pincmdline">获取pin值传递cmdline</a></li>
+<li><a class="reference internal" href="#id2">内核驱动解析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-init-cmdline-parse">
+<h1>Android init cmdline parse<a class="headerlink" href="#android-init-cmdline-parse" title="Permalink to this headline"></a></h1>
+<p>LK传递设置Android property</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/weixin_42135087/article/details/103365655">在linux kernel或android中解析cmdline参数</a></p></li>
+<li><p><a class="reference external" href="https://juejin.im/post/5d8405b7518825485e227eb2">深入研究源码：Android10.0系统启动流程（二）init进程</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_24622489/article/details/100080846?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3">根据cmdline在驱动中加载不同硬件配置</a></p></li>
+<li><p>https://github.com/Iscle/OrangePi_4G-IOT_Android_8.1_BSP</p></li>
+</ul>
+</section>
+<section id="cmdline">
+<h1>内核cmdline解析<a class="headerlink" href="#cmdline" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">init</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="nb">int</span> <span class="n">SecondStageMain</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">process_kernel_cmdline</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">import_kernel_cmdline</span><span class="p">(</span><span class="n">false</span><span class="p">,</span> <span class="n">import_kernel_nv</span><span class="p">);</span>
+        <span class="o">*</span> <span class="n">import_kernel_nv</span>
+          <span class="o">*</span> <span class="n">static</span> <span class="n">void</span> <span class="n">import_kernel_nv</span><span class="p">(</span><span class="n">const</span> <span class="n">std</span><span class="p">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">key</span><span class="p">,</span> <span class="n">const</span> <span class="n">std</span><span class="p">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">,</span> <span class="nb">bool</span> <span class="n">for_emulator</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">android</span><span class="p">::</span><span class="n">base</span><span class="p">::</span><span class="n">StartsWith</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;androidboot.&quot;</span><span class="p">)</span>
+              <span class="o">*</span> <span class="n">property_set</span><span class="p">(</span><span class="s2">&quot;ro.boot.&quot;</span> <span class="o">+</span> <span class="n">key</span><span class="o">.</span><span class="n">substr</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">value</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;import_kernel_nv ro.boot.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">key</span><span class="o">.</span><span class="n">substr</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">value</span><span class="p">;</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">import_kernel_cmdline</span><span class="p">(</span><span class="nb">bool</span> <span class="n">in_qemu</span><span class="p">,</span> <span class="n">const</span> <span class="n">std</span><span class="p">::</span><span class="n">function</span><span class="o">&lt;</span><span class="n">void</span><span class="p">(</span><span class="n">const</span> <span class="n">std</span><span class="p">::</span><span class="n">string</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">const</span> <span class="n">std</span><span class="p">::</span><span class="n">string</span><span class="o">&amp;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span><span class="o">&gt;&amp;</span> <span class="n">fn</span><span class="p">)</span> 
+          <span class="o">*</span> <span class="n">android</span><span class="p">::</span><span class="n">base</span><span class="p">::</span><span class="n">ReadFileToString</span><span class="p">(</span><span class="s2">&quot;/proc/cmdline&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cmdline</span><span class="p">);</span>
+          <span class="o">*</span> <span class="n">fn</span><span class="p">(</span><span class="n">pieces</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pieces</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">in_qemu</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>lk传递给内核的cmdline</p>
+<p><code class="docutils literal notranslate"><span class="pre">console=tty0</span> <span class="pre">console=ttyS0,921600n1</span> <span class="pre">vmalloc=400M</span> <span class="pre">slub_debug=OFZPU</span> <span class="pre">page_owner=on</span> <span class="pre">swiotlb=noforce</span> <span class="pre">androidboot.hardware=mt6765</span> <span class="pre">maxcpus=8</span> <span class="pre">loop.max_part=7</span> <span class="pre">firmware_class.path=/vendor/firmware</span> <span class="pre">earlycon=uart8250,mmio32,0x11002000,</span> <span class="pre">has_battery_removed=0</span> <span class="pre">android</span> <span class="pre">boot.boot_devices=bootdevice,11230000.mmc</span> <span class="pre">root=/dev/ram</span> <span class="pre">androidboot.vbmeta.device=PARTUUID=a4da8f1b-fe07-433b-95cb-84a5f23e477b</span> <span class="pre">androidboot.vbmeta.avb_version=1.1</span> <span class="pre">androidboot.vbmeta.device_state=locked</span> <span class="pre">androidboot.veritymode=disabled</span> <span class="pre">androidboot.veritymode.managed=yes</span> <span class="pre">androidboot.verifiedbootstate=green</span> <span class="pre">bootopt=64S3,32N2,64N2</span> <span class="pre">buildvariant=eng</span> <span class="pre">androidboot.atm=disabled</span> <span class="pre">androidboot.meta_log_disable=0</span> <span class="pre">printk.disable_uart=0</span> <span class="pre">ddebug_query=&quot;file</span> <span class="pre">*mediatek*</span> <span class="pre">+p</span> <span class="pre">;</span> <span class="pre">file</span> <span class="pre">*gpu*</span> <span class="pre">=_&quot;</span> <span class="pre">bootprof.pl_t=1127</span> <span class="pre">bootprof.lk_t=3430</span> <span class="pre">bootprof.logo_t=1159</span> <span class="pre">androidboot.serialno=0123456789ABCDEF</span> <span class="pre">androidboot.bootreason=PowerKey</span> <span class="pre">gpt=1</span> <span class="pre">initcall_debug=1</span> <span class="pre">usb2jtag_mode=0</span> <span class="pre">mrdump_ddrsv=yes</span> <span class="pre">mrdump_cb=0x10e800,0x1400</span> <span class="pre">mrdump.lk=MRDUMP08</span> <span class="pre">androidboot.dtb_idx=0</span> <span class="pre">androidboot.dtbo_idx=0</span></code></p>
+<p>以<code class="docutils literal notranslate"><span class="pre">androidboot.hardware=mt6765</span></code>为例，adb执行<code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">shell</span> <span class="pre">getprop</span> <span class="pre">ro.boot.hardware</span></code>，结果是<code class="docutils literal notranslate"><span class="pre">mt6762</span></code>，哪里又重新设定了<code class="docutils literal notranslate"><span class="pre">androidboot.hardware=mt6762</span></code></p>
+<p>查看启动log信息发现：</p>
+<p><code class="docutils literal notranslate"><span class="pre">[</span>&#160;&#160; <span class="pre">15.442543]</span> <span class="pre">.(1)[1:init]init</span> <span class="pre">3:</span> <span class="pre">Init</span> <span class="pre">cannot</span> <span class="pre">set</span> <span class="pre">'ro.boot.hardware'</span> <span class="pre">to</span> <span class="pre">'mt6765':</span> <span class="pre">Read-only</span> <span class="pre">property</span> <span class="pre">was</span> <span class="pre">already</span> <span class="pre">set</span></code></p>
+</section>
+<section id="pincmdline">
+<h1>获取pin值传递cmdline<a class="headerlink" href="#pincmdline" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>mtk6739_q0_mp1/out/target/product/k62v1_64_bsp/obj/PRELOADER_OBJ/inc/cust_gpio_usage.h</p>
+<ul class="simple">
+<li><p>#define GPIO_RT9465_PWR_EN_PIN                  (GPIO176 | 0x80000000)</p></li>
+</ul>
+</li>
+<li><p>diff</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/bootargs.c b/vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/bootargs.c</span><span class="w"></span>
+<span class="gh">index 34e235dab38..8714ce43e37 100644</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/bootargs.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/bootargs.c</span><span class="w"></span>
+<span class="gu">@@ -39,6 +39,7 @@</span><span class="w"></span>
+<span class="w"> </span>#include &lt;kernel/thread.h&gt;<span class="w"></span>
+<span class="w"> </span>#include &lt;video.h&gt;<span class="w"></span>
+<span class="w"> </span>#include &lt;libfdt.h&gt;<span class="w"></span>
+<span class="gi">+#include &lt;platform/mt_gpio.h&gt;</span><span class="w"></span>
+
+<span class="w"> </span>#define CMDLINE_OVERFLOW_STR   &quot;[ERROR] CMDLINE overflow&quot;<span class="w"></span>
+
+<span class="gu">@@ -61,6 +62,7 @@ static inline void validate_cmdline_boundary(const char *tail, const char *end)</span><span class="w"></span>
+<span class="w"> </span>               panic(CMDLINE_OVERFLOW_STR);<span class="w"></span>
+<span class="w"> </span>       }<span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>void bootargs_init(void *fdt)<span class="w"></span>
+<span class="w"> </span>{<span class="w"></span>
+<span class="w"> </span>#ifdef DEVICE_TREE_SUPPORT<span class="w"></span>
+<span class="gu">@@ -108,6 +110,8 @@ void bootargs_init(void *fdt)</span><span class="w"></span>
+<span class="w"> </span>       if (temp_ptr != 0)<span class="w"></span>
+<span class="w"> </span>               cmdline_tail += snprintf(cmdline_tail, cmdline_end - cmdline_tail, &quot;%s&quot;, temp_ptr);<span class="w"></span>
+
+<span class="gi">+       cmdline_tail += snprintf(cmdline_tail, CMDLINE_LEN, &quot; androidboot.boardid=%d &quot;, getBoardIDVals());</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>       bootargs_inited = 1;<span class="w"></span>
+<span class="w"> </span>exit:<span class="w"></span>
+<span class="w"> </span>       if (temp_ptr)<span class="w"></span>
+<span class="gh">diff --git a/vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/mt_gpio.c b/vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/mt_gpio.c</span><span class="w"></span>
+<span class="gh">index 92646973340..6574c2d28d1 100644</span><span class="w"></span>
+<span class="gd">--- a/vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/mt_gpio.c</span><span class="w"></span>
+<span class="gi">+++ b/vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/mt_gpio.c</span><span class="w"></span>
+<span class="gu">@@ -979,6 +979,25 @@ S32 mt_get_gpio_value(int gpio)</span><span class="w"></span>
+<span class="w"> </span>       return value_down | (value_up &lt;&lt; 0x01);<span class="w"></span>
+<span class="w"> </span>}<span class="w"></span>
+
+<span class="gi">+u32 getBoardIDVals(void)</span><span class="w"></span>
+<span class="gi">+{</span><span class="w"></span>
+<span class="gi">+       u32 i = 0;</span><span class="w"></span>
+<span class="gi">+       u32 ret = 0;</span><span class="w"></span>
+<span class="gi">+       u32 pins[8] = {GPIO16, GPIO15, GPIO14, GPIO13, GPIO18, GPIO17, GPIO20, GPIO19};</span><span class="w"></span>
+<span class="gi">+       u32 gpio = 0;</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+       for(i = 0; i &lt; 8; i++) {</span><span class="w"></span>
+<span class="gi">+               gpio = pins[i] | 0x80000000;</span><span class="w"></span>
+<span class="gi">+               ret &lt;&lt;= 1;</span><span class="w"></span>
+<span class="gi">+               mt_set_gpio_mode(gpio, GPIO_MODE_00);</span><span class="w"></span>
+<span class="gi">+               mt_set_gpio_dir(gpio, GPIO_DIR_IN);</span><span class="w"></span>
+<span class="gi">+               mt_set_gpio_pull_enable(gpio, GPIO_PULL_DISABLE);</span><span class="w"></span>
+<span class="gi">+               ret |= (mt_get_gpio_in(gpio) &amp; 0x01);</span><span class="w"></span>
+<span class="gi">+       }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+       return ret;</span><span class="w"></span>
+<span class="gi">+}</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>/*****************************************************************************/<span class="w"></span>
+<span class="w"> </span>/* sysfs operation                                                           */<span class="w"></span>
+<span class="w"> </span>/*****************************************************************************/<span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>source build/envsetup.sh</p></li>
+<li><p>lunch full_k62v1_64_bsp-eng</p></li>
+<li><p>make 2&gt;&amp;1 | tee build-log.txt</p></li>
+<li><p>cat /proc/cmdline</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">console</span><span class="o">=</span><span class="n">tty0</span> <span class="n">console</span><span class="o">=</span><span class="n">ttyS0</span><span class="p">,</span><span class="mi">921600</span><span class="n">n1</span> <span class="n">vmalloc</span><span class="o">=</span><span class="mi">400</span><span class="n">M</span> <span class="n">slub_debug</span><span class="o">=</span><span class="n">OFZPU</span> <span class="n">page_owner</span><span class="o">=</span><span class="n">on</span> <span class="n">swiotlb</span><span class="o">=</span><span class="n">noforce</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">hardware</span><span class="o">=</span><span class="n">mt6765</span> <span class="n">maxcpus</span><span class="o">=</span><span class="mi">8</span> <span class="n">loop</span><span class="o">.</span><span class="n">max_part</span><span class="o">=</span><span class="mi">7</span> <span class="n">firmware_class</span><span class="o">.</span><span class="n">path</span><span class="o">=/</span><span class="n">vendor</span><span class="o">/</span><span class="n">firmware</span>  <span class="n">earlycon</span><span class="o">=</span><span class="n">uart8250</span><span class="p">,</span><span class="n">mmio32</span><span class="p">,</span><span class="mh">0x11002000</span><span class="p">,</span> <span class="n">has_battery_removed</span><span class="o">=</span><span class="mi">1</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">boot_devices</span><span class="o">=</span><span class="n">bootdevice</span><span class="p">,</span><span class="mf">11230000.</span><span class="n">mmc</span> <span class="n">root</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">ram</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">vbmeta</span><span class="o">.</span><span class="n">device</span><span class="o">=</span><span class="n">PARTUUID</span><span class="o">=</span><span class="n">a4da8f1b</span><span class="o">-</span><span class="n">fe07</span><span class="o">-</span><span class="mi">433</span><span class="n">b</span><span class="o">-</span><span class="mi">95</span><span class="n">cb</span><span class="o">-</span><span class="mi">84</span><span class="n">a5f23e477b</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">vbmeta</span><span class="o">.</span><span class="n">avb_version</span><span class="o">=</span><span class="mf">1.1</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">vbmeta</span><span class="o">.</span><span class="n">device_state</span><span class="o">=</span><span class="n">locked</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">veritymode</span><span class="o">=</span><span class="n">disabled</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">veritymode</span><span class="o">.</span><span class="n">managed</span><span class="o">=</span><span class="n">yes</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">verifiedbootstate</span><span class="o">=</span><span class="n">green</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">boardid</span><span class="o">=</span><span class="mi">0</span>  <span class="n">bootopt</span><span class="o">=</span><span class="mi">64</span><span class="n">S3</span><span class="p">,</span><span class="mi">32</span><span class="n">N2</span><span class="p">,</span><span class="mi">64</span><span class="n">N2</span> <span class="n">buildvariant</span><span class="o">=</span><span class="n">eng</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">atm</span><span class="o">=</span><span class="n">disabled</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">meta_log_disable</span><span class="o">=</span><span class="mi">0</span> <span class="n">printk</span><span class="o">.</span><span class="n">disable_uart</span><span class="o">=</span><span class="mi">0</span> <span class="n">ddebug_query</span><span class="o">=</span><span class="s2">&quot;file *mediatek* +p ; file *gpu* =_&quot;</span> <span class="n">bootprof</span><span class="o">.</span><span class="n">pl_t</span><span class="o">=</span><span class="mi">1132</span> <span class="n">bootprof</span><span class="o">.</span><span class="n">lk_t</span><span class="o">=</span><span class="mi">3431</span> <span class="n">bootprof</span><span class="o">.</span><span class="n">logo_t</span><span class="o">=</span><span class="mi">1160</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">serialno</span><span class="o">=</span><span class="mi">0123456789</span><span class="n">ABCDEF</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">bootreason</span><span class="o">=</span><span class="n">PowerKey</span> <span class="n">gpt</span><span class="o">=</span><span class="mi">1</span> <span class="n">initcall_debug</span><span class="o">=</span><span class="mi">1</span> <span class="n">usb2jtag_mode</span><span class="o">=</span><span class="mi">0</span> <span class="n">mrdump_ddrsv</span><span class="o">=</span><span class="n">yes</span> <span class="n">mrdump_cb</span><span class="o">=</span><span class="mh">0x10e800</span><span class="p">,</span><span class="mh">0x1400</span> <span class="n">mrdump</span><span class="o">.</span><span class="n">lk</span><span class="o">=</span><span class="n">MRDUMP08</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">dtb_idx</span><span class="o">=</span><span class="mi">0</span> <span class="n">androidboot</span><span class="o">.</span><span class="n">dtbo_idx</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>getprop ro.boot.boardid</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>内核驱动解析<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">get_board_version</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">	</span><span class="kt">char</span><span class="w"> </span><span class="n">boot</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="sc">&#39;\0&#39;</span><span class="p">};</span><span class="w"></span>
+<span class="w">	</span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">	</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">strnstr</span><span class="p">(</span><span class="n">saved_command_line</span><span class="p">,</span><span class="w"></span>
+<span class="w">				</span><span class="s">&quot;androidboot.hwid=&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">				</span><span class="n">strlen</span><span class="p">(</span><span class="n">saved_command_line</span><span class="p">));</span><span class="w"></span>
+<span class="w">	</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">match</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">		</span><span class="n">memcpy</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">match</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="s">&quot;androidboot.hwid=&quot;</span><span class="p">)),</span><span class="w"></span>
+<span class="w">			</span><span class="k">sizeof</span><span class="p">(</span><span class="n">boot</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">		</span><span class="n">printk</span><span class="p">(</span><span class="s">&quot;%s: hwid is %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">boot</span><span class="p">);</span><span class="w"></span>
+<span class="w">		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">strncmp</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;P1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="s">&quot;P1&quot;</span><span class="p">)))</span><span class="w"></span>
+<span class="w">			</span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">		</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">strncmp</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;P2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="s">&quot;P2&quot;</span><span class="p">)))</span><span class="w"></span>
+<span class="w">			</span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">		</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">strncmp</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;P3&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="s">&quot;P3&quot;</span><span class="p">)))</span><span class="w"></span>
+<span class="w">			</span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">		</span><span class="k">else</span><span class="w"></span>
+<span class="w">			</span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">	</span><span class="p">}</span><span class="w"></span>
+<span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

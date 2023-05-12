@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">HandGesture</a></li>
+<li><a class="reference internal" href="#training-model">Training Model</a></li>
+<li><a class="reference internal" href="#predict-test-data">predict test data</a></li>
+<li><a class="reference internal" href="#live-predict">live predict</a></li>
+<li><a class="reference internal" href="#local-jupyter">Local Jupyter</a></li>
+<li><a class="reference internal" href="#android">Android</a></li>
+<li><a class="reference internal" href="#id1">图片绘制手指检测结果</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="handgesture">
+<h1>HandGesture<a class="headerlink" href="#handgesture" title="Permalink to this headline"></a></h1>
+<p>基于MediaPipe的手势识别</p>
+</section>
+<section id="training-model">
+<h1>Training Model<a class="headerlink" href="#training-model" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/2c766027e59254bef547d6265d8f4472/HandGesture_Colab.ipynb"><span class="xref download myst">HandGesture_Colab.ipynb</span></a></p>
+<ul>
+<li><p>https://colab.research.google.com/</p>
+<ul>
+<li><p>上传</p></li>
+<li><p>上传完就回进入Google提供的模型训练虚拟环境，在里面执行、修改程序</p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/6118bb1f2db28af7499217837a4e948b/HandGesture.csv"><span class="xref download myst">Training data</span></a></p></li>
+<li><p>[修改] -&gt; [清除所有输出项]</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="predict-test-data">
+<h1>predict test data<a class="headerlink" href="#predict-test-data" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><a class="reference internal" href="refers/0005_HandGesture/HandGesture.html"><span class="doc std std-doc">HandGesture.txt</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">-</span><span class="mf">1.3194e-02</span>  <span class="mf">6.8620e-03</span>  <span class="mf">1.5590e-02</span>  <span class="mf">2.8740e-02</span>  <span class="mf">2.7185e-02</span>  <span class="mf">1.2828e-02</span>
+  <span class="mf">4.0429e-02</span>  <span class="mf">4.1205e-02</span>  <span class="mf">2.6742e-02</span>  <span class="mf">2.5640e-03</span>  <span class="mf">3.0143e-02</span>  <span class="mf">2.9686e-02</span>
+  <span class="mf">1.0562e-02</span> <span class="o">-</span><span class="mf">8.3320e-03</span>  <span class="mf">2.6354e-02</span>  <span class="mf">2.3919e-02</span>  <span class="mf">6.1170e-03</span> <span class="o">-</span><span class="mf">4.2540e-03</span>
+  <span class="mf">1.9591e-02</span>  <span class="mf">2.3045e-02</span>  <span class="mf">5.7310e-03</span>  <span class="mf">1.4447e-02</span> <span class="o">-</span><span class="mf">3.1540e-03</span> <span class="o">-</span><span class="mf">1.7755e-02</span>
+ <span class="o">-</span><span class="mf">4.1493e-02</span> <span class="o">-</span><span class="mf">6.2809e-02</span> <span class="o">-</span><span class="mf">1.4507e-02</span> <span class="o">-</span><span class="mf">4.1340e-03</span> <span class="o">-</span><span class="mf">3.1030e-03</span> <span class="o">-</span><span class="mf">5.4180e-03</span>
+ <span class="o">-</span><span class="mf">4.1090e-03</span>  <span class="mf">2.8040e-03</span>  <span class="mf">3.3470e-03</span> <span class="o">-</span><span class="mf">3.8670e-03</span>  <span class="mf">7.5990e-03</span>  <span class="mf">1.8592e-02</span>
+  <span class="mf">1.2670e-02</span>  <span class="mf">1.0060e-02</span>  <span class="mf">2.6096e-02</span>  <span class="mf">2.9950e-02</span>  <span class="mf">2.7247e-02</span>  <span class="mf">2.4915e-02</span>
+  <span class="mf">8.8800e-02</span>  <span class="mf">6.4944e-02</span>  <span class="mf">4.6603e-02</span>  <span class="mf">2.5458e-02</span>  <span class="mf">6.7000e-04</span> <span class="o">-</span><span class="mf">1.7520e-03</span>
+ <span class="o">-</span><span class="mf">1.1990e-02</span>  <span class="mf">6.7540e-03</span>  <span class="mf">2.9948e-02</span> <span class="o">-</span><span class="mf">2.7240e-03</span> <span class="o">-</span><span class="mf">1.2755e-02</span>  <span class="mf">1.2018e-02</span>
+  <span class="mf">2.8365e-02</span> <span class="o">-</span><span class="mf">2.8000e-05</span> <span class="o">-</span><span class="mf">6.1790e-03</span>  <span class="mf">1.5845e-02</span>  <span class="mf">4.0248e-02</span>  <span class="mf">1.1887e-02</span>
+  <span class="mf">3.4740e-03</span>  <span class="mf">1.7685e-02</span>  <span class="mf">3.8312e-02</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">4.5349663e-07</span> <span class="mf">2.6038929e-08</span> <span class="mf">9.9999952e-01</span><span class="p">]</span>
+<span class="mi">2</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>将上面的测试数据写入上面的文件，程序只读一行，数据调成单行数据</p></li>
+</ul>
+</li>
+<li><p>python3 LogTools.py HandGesture -mode predict</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/273e30c42714c8fd1009b05cdd0b7800/HandGesture.py"><span class="xref download myst">HandGesture.py</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="live-predict">
+<h1>live predict<a class="headerlink" href="#live-predict" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>python3 LogTools.py MediaPipeHands -mode live</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/bef2d667bfdefe5e95c86136df7dc0a4/MediaPipeHands.py"><span class="xref download myst">MediaPipeHands.py</span></a></p></li>
+<li><p>MediaPipeHands可以用于数据采集</p>
+<ul>
+<li><p>z: open data file</p></li>
+<li><p>x: close data file</p></li>
+<li><p>a: start or stop write to file</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>python3 LogTools.py HandGesture -mode live</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/273e30c42714c8fd1009b05cdd0b7800/HandGesture.py"><span class="xref download myst">HandGesture.py</span></a></p></li>
+<li><p>在MediaPipeHands基础上加了predict代码，也就是加了通过MediaPipeHands采集的数据训练的模型</p>
+<ul>
+<li><p>握拳大拇指向右 -&gt; left</p></li>
+<li><p>握拳大拇指向左 -&gt; right</p></li>
+<li><p>握拳大拇指向上 -&gt; ok</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>需要注意，TensorFlow Lite和正常版本的TensorFlow使用上是有差异的</p></li>
+</ul>
+</section>
+<section id="local-jupyter">
+<h1>Local Jupyter<a class="headerlink" href="#local-jupyter" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/58696b77a64c6376dfb462150de3da7d/HandGesture_Local.ipynb"><span class="xref download myst">HandGesture_Local.ipynb</span></a></p>
+<ul>
+<li><p>不在Google Colab上训练模型，在本地电脑直接训练模型</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="android">
+<h1>Android<a class="headerlink" href="#android" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>tensorflow-lite的版本需要和训练模型的版本保持一致，都用最新的版本应该就好了</p></li>
+<li><p>为了便于查看3D手势，所以对X轴取了对称值，也就是乘以负一</p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/c31eb02d34453a8a51f7f78389127ba4/support-left-right-ok-hand-gesture.patch"><span class="xref download myst">support-left-right-ok-hand-gesture.patch</span></a></p></li>
+</ul>
+<p>logcat</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2022</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">01</span> <span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mf">56.071</span> <span class="mi">15189</span><span class="o">-</span><span class="mi">15274</span><span class="o">/</span><span class="n">com</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">mediapipe</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">hands</span> <span class="n">E</span><span class="o">/</span><span class="n">MainActivity</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.1813193E-4</span><span class="p">,</span> <span class="mf">0.9975777</span><span class="p">,</span> <span class="mf">0.0021041732</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="mi">1</span> <span class="o">-&gt;</span> <span class="n">right</span>
+</pre></div>
+</div>
+<p>video</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/ab20d6cc6c7eb8f55a78f9cca3c0dd0d/HandGesture.mp4"><span class="xref download myst">HandGesture.mp4</span></a></p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>图片绘制手指检测结果<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>视频流渲染结果由MediaPipe库处理，回调HandsResultGlRenderer.java中的OpenGL ES处理方法，可以处理绘框</p></li>
+<li><p>单张图片的渲染有Canvas绘图源代码，可以修改查看结果，所以在这个基础上可以画一个框，显示手指范围</p></li>
+<li><p>最终是通过Canvas进行处理的</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
+  ├── private void setupStreamingModePipeline(InputSource inputSource)
+  │   ├── hands = new Hands(...);
+  │   ├── glSurfaceView = new SolutionGlSurfaceView&lt;&gt;(this, hands.getGlContext(), hands.getGlMajorVersion());
+  │   ├── glSurfaceView.setSolutionResultRenderer(new HandsResultGlRenderer());
+  │   │   └── src/main/java/com/google/mediapipe/examples/hands/HandsResultGlRenderer.java
+  │   │       └── public void renderResult(HandsResult result, float[] projectionMatrix)
+  │   │           └── 视频流调用这里的OpenGL ES进行图像渲染，画框操作可以在这里进行处理
+  │   └── hands.setResultListener(...)
+  │       └── handsResult -&gt; {...}
+  │           ├── logWristLandmark(handsResult, /*showPixelValues=*/ false);
+  │           ├── glSurfaceView.setRenderData(handsResult);
+  │           │   └── SolutionGlSurfaceView.class
+  │           │       └── 没有源代码，转为分析单张图片的，因为有直接处理的源代码，这里会回调上面的HandsResultGlRenderer.java类中的处理方法
+  │           └── glSurfaceView.requestRender();
+  └── private void setupStaticImageModePipeline()
+      ├── hands = new Hands(...);
+      └── hands.setResultListener(...)
+          └── handsResult -&gt; {...}
+              ├── logWristLandmark(handsResult, /*showPixelValues=*/ true);
+              ├── imageView.setHandsResult(handsResult);
+              │   └── src/main/java/com/google/mediapipe/examples/hands/HandsResultImageView.java
+              │       └── public void setHandsResult(HandsResult result)
+              │           ├── Bitmap bmInput = result.inputBitmap();
+              │           ├── latest = Bitmap.createBitmap(width, height, bmInput.getConfig());
+              │           ├── Canvas canvas = new Canvas(latest);
+              │           ├── canvas.drawBitmap(bmInput, new Matrix(), null);
+              │           └── drawLandmarksOnCanvas(...)
+              │               └── 实际绘图操作原理
+              └── runOnUiThread(() -&gt; imageView.update());
+                  └── 貌似这个更新UI的方法不错的样子，省的写handler
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

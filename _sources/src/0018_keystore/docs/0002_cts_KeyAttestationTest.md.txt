@@ -1,0 +1,18 @@
+# cts KeyAttestationTest
+
+Key Attestation Test
+
+# 参考文档
+
+* [KeyAttestationTest.java](https://cs.android.com/android/platform/superproject/+/master:cts/tests/tests/keystore/src/android/keystore/cts/KeyAttestationTest.java)
+  * [0002_KeyAttestationTest.java](refers/0002_KeyAttestationTest.java)
+    * [public void testRsaAttestation()](https://cs.android.com/android/platform/superproject/+/master:cts/tests/tests/keystore/src/android/keystore/cts/KeyAttestationTest.java;l=545)
+* [KeyAttestationTest#testEcAttestation](https://blog.csdn.net/qq_23452385/article/details/87539961)
+* [检索和验证硬件支持的密钥对](https://developer.android.com/training/articles/security-key-attestation.html#verifying)
+* [密钥认证和 ID 认证](https://source.android.com/security/keystore/attestation)
+
+# 认证密钥是如何工作的
+
+* 在应用程序ask keymaster gen密钥对之后
+* 应用程序可以要求keymaster提供证书链（证书由认证密钥签名，而根证书来自Google），并验证证书链是否有效
+* 应用程序应该自己进行证书验证

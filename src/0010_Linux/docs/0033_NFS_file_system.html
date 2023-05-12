@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">NFS file system</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#steps">steps</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nfs-file-system">
+<h1>NFS file system<a class="headerlink" href="#nfs-file-system" title="Permalink to this headline"></a></h1>
+<p>支持NFS文件系统</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.htpcguides.com/configure-nfs-server-and-nfs-client-raspberry-pi/">Configure NFS Server and NFS Client Raspberry Pi</a></p></li>
+</ul>
+</section>
+<section id="steps">
+<h1>steps<a class="headerlink" href="#steps" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">nfs-common</span> <span class="pre">nfs-server</span> <span class="pre">-y</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">mkdir</span> <span class="pre">/mnt/nfsserver</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">chmod</span> <span class="pre">-R</span> <span class="pre">777</span> <span class="pre">/mnt/nfsserver</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">/etc/exports</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># /etc/exports: the access control list for filesystems which may be exported</span>
+<span class="c1">#               to NFS clients.  See exports(5).</span>
+<span class="c1">#</span>
+<span class="c1"># Example for NFSv2 and NFSv3:</span>
+<span class="c1"># /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)</span>
+<span class="c1">#</span>
+<span class="c1"># Example for NFSv4:</span>
+<span class="c1"># /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)</span>
+<span class="c1"># /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)</span>
+<span class="c1">#</span>
+<span class="o">/</span><span class="n">mnt</span><span class="o">/</span><span class="n">nfsserver</span> <span class="o">*</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">sync</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">exportfs</span></code>：测试的时候发现无效，最好还是重启一下；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">mkdir</span> <span class="pre">-p</span> <span class="pre">/mnt/nfs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">mount</span> <span class="pre">192.168.20.96:/mnt/nfsserver</span> <span class="pre">/mnt/nfs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mount</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="mf">192.168.20.96</span><span class="p">:</span><span class="o">/</span><span class="n">mnt</span><span class="o">/</span><span class="n">nfsserver</span> <span class="n">on</span> <span class="o">/</span><span class="n">mnt</span><span class="o">/</span><span class="n">nfs</span> <span class="nb">type</span> <span class="n">nfs4</span> <span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">relatime</span><span class="p">,</span><span class="n">vers</span><span class="o">=</span><span class="mf">4.1</span><span class="p">,</span><span class="n">rsize</span><span class="o">=</span><span class="mi">131072</span><span class="p">,</span><span class="n">wsize</span><span class="o">=</span><span class="mi">131072</span><span class="p">,</span><span class="n">namlen</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span><span class="n">hard</span><span class="p">,</span><span class="n">proto</span><span class="o">=</span><span class="n">tcp</span><span class="p">,</span><span class="n">timeo</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span><span class="n">retrans</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">sec</span><span class="o">=</span><span class="n">sys</span><span class="p">,</span><span class="n">clientaddr</span><span class="o">=</span><span class="mf">192.168.20.96</span><span class="p">,</span><span class="n">local_lock</span><span class="o">=</span><span class="n">none</span><span class="p">,</span><span class="n">addr</span><span class="o">=</span><span class="mf">192.168.20.96</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">/mnt/nfs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">zengjf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">zengjf/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">touch</span> <span class="pre">file</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">/mnt</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tree</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.
+├── nfs
+│   └── zengjf
+│       └── file
+└── nfsserver
+    └── zengjf
+        └── file
+
+4 directories, 2 files
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

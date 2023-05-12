@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">HID Keyboard Modify</a></li>
+<li><a class="reference internal" href="#hardware-modify">Hardware Modify</a></li>
+<li><a class="reference internal" href="#code-example">Code Example</a></li>
+<li><a class="reference internal" href="#wireshark-capture">Wireshark Capture</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hid-keyboard-modify">
+<h1>HID Keyboard Modify<a class="headerlink" href="#hid-keyboard-modify" title="Permalink to this headline"></a></h1>
+<p>USB控制器会采用伪中断进行对设备进行轮询，Wireshare只有在有数据传输才会在总线上有Interrupt IN包，也就是说如果设备没有准备好数据，那么USB控制器是不会去轮询的。</p>
+</section>
+<section id="hardware-modify">
+<h1>Hardware Modify<a class="headerlink" href="#hardware-modify" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PB0</span></code>引脚接一个插件跳冒，因为没找到按钮，用跳冒来模拟按键按下；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PB2</span></code>引脚用于点亮灯，用于指示一些信息；</p></li>
+</ul>
+<p><img alt="0010_PB02_As_INPUT_Background.jpg" src="../../../_images/0010_PB02_As_INPUT_Background.jpg" />
+<img alt="0010_PB02_As_OUTPUT_Background.jpg" src="../../../_images/0010_PB02_As_OUTPUT_Background.jpg" /></p>
+</section>
+<section id="code-example">
+<h1>Code Example<a class="headerlink" href="#code-example" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="cp">#define KEY_DOWN            0x01</span>
+<span class="cp">#define KEY_UP              0x02</span>
+
+<span class="c1">//-----------------------------------------------------------------------------</span>
+<span class="c1">// Task Dispatcher hooks</span>
+<span class="c1">//   The following hooks are called by the task dispatcher.</span>
+<span class="c1">//-----------------------------------------------------------------------------</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">TD_Init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">                          </span><span class="c1">// Called once at startup</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">leds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">;</span><span class="w">                     </span><span class="c1">// current key status</span>
+
+<span class="w">    </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xB0</span><span class="p">;</span><span class="w">                       </span><span class="c1">// valid, interrupt</span>
+<span class="w">    </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0XB0</span><span class="p">;</span><span class="w">                        </span><span class="c1">// valid, interrupt</span>
+
+<span class="w">    </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1">// disable unused endpoints</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">OEB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x04</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">IOB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// init button status</span>
+<span class="w">    </span><span class="n">buttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IOB</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buttons</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">TD_Poll</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">                          </span><span class="c1">// Called repeatedly while the device is idle</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1INCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">    </span><span class="c1">// Is the IN1BUF available,</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">buttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PB0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">keyStatus</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PB0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">    </span><span class="c1">//Change in button state</span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_DOWN</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(((</span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">keyStatus</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">KEY_DOWN</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">PB0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)){</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="w">             </span>
+<span class="w">            </span><span class="n">keyStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_UP</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">buttons</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1OUTCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">    </span><span class="c1">// Is there something available</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">PB2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">PB2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">EP1OUTBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">                </span><span class="c1">//Rearm endpoint buffer</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="wireshark-capture">
+<h1>Wireshark Capture<a class="headerlink" href="#wireshark-capture" title="Permalink to this headline"></a></h1>
+<p><img alt="0010_HID_Keyboard_Interrupt_IN_Data.png" src="../../../_images/0010_HID_Keyboard_Interrupt_IN_Data.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

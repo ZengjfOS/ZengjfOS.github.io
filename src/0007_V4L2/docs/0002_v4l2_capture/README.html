@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/login.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">V4L2 Capture</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简要说明</a></li>
+<li><a class="reference internal" href="#v4l2">V4L2摄像头获取照片工作原理</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="v4l2-capture">
+<h1>V4L2 Capture<a class="headerlink" href="#v4l2-capture" title="Permalink to this headline"></a></h1>
+<p>命令行V4L2获取图片工具</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/aiwangtingyun/article/details/79834959">使用v4l2编程操作摄像头设备获取图片</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/aiwangtingyun/article/details/79834235">使用V4L2编程获取摄像头设备信息</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/dancer__sky/article/details/76724292">yuyv图像转rgb后转bmp的一个简单demo</a></p></li>
+<li><p>https://gist.github.com/piec/8791163</p></li>
+<li><p><a class="reference external" href="https://www.cnblogs.com/silence-hust/p/4464291.html">v4l2的学习建议和流程解析</a></p></li>
+<li><p><a class="reference external" href="http://wentao1213.com/2016/11/25/linux-v4l2-usb/">基于V4l2的USB摄像头视频采集原理</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简要说明<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>源代码：<span class="xref myst">sample</span></p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../../_downloads/3c2e92f0e90d140bdb9aaa04d5d7671c/Android.mk"><span class="xref download myst">Android.mk</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../../_downloads/fd6ec429aa8a20b75ab842ad10552f9d/Makefile"><span class="xref download myst">Makefile</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="v4l2">
+<h1>V4L2摄像头获取照片工作原理<a class="headerlink" href="#v4l2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>打开视频设备文件：<code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">fd=open(&quot;/dev/video0&quot;,O_RDWR)</span></code></p></li>
+<li><p>查询视频设备的能力，比如是否具有视频输入,或者音频输入输出等：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_QUERYCAP,</span> <span class="pre">&amp;cap)</span></code></p></li>
+<li><p>设置视频采集的参数</p>
+<ul>
+<li><p>设置视频的制式，制式包括PAL/NTSC，使用：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_S_STD,</span> <span class="pre">&amp;std_id)</span></code></p></li>
+<li><p>设置视频图像的采集窗口的大小，使用：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_S_CROP,</span> <span class="pre">&amp;crop)</span></code></p></li>
+<li><p>设置视频帧格式，包括帧的点阵格式，宽度和高度等，使用：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_S_FMT,</span> <span class="pre">&amp;fmt)</span></code></p></li>
+<li><p>设置视频的帧率，使用：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_S_PARM,</span> <span class="pre">&amp;parm)</span></code></p></li>
+<li><p>设置视频的旋转方式，使用：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_S_CTRL,</span> <span class="pre">&amp;ctrl)</span></code></p></li>
+</ul>
+</li>
+<li><p>向驱动申请视频流数据的帧缓冲区</p>
+<ul>
+<li><p>请求/申请若干个帧缓冲区，一般为不少于3个，使用：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_REQBUFS,</span> <span class="pre">&amp;req)</span></code></p></li>
+<li><p>查询帧缓冲区在内核空间中的长度和偏移量：<code class="docutils literal notranslate"><span class="pre">ioctl(fd_v4l,</span> <span class="pre">VIDIOC_QUERYBUF,</span> <span class="pre">&amp;buf)</span></code></p></li>
+</ul>
+</li>
+<li><p>应用程序通过内存映射，将帧缓冲区的地址映射到用户空间，这样就可以直接操作采集到的帧了，而不必去复制；</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">buffers[i].start</span> <span class="pre">=</span> <span class="pre">mmap</span> <span class="pre">(NULL,</span> <span class="pre">buffers[i].length,</span> <span class="pre">PROT_READ</span> <span class="pre">|</span> <span class="pre">PROT_WRITE,</span> <span class="pre">MAP_SHARED,</span> <span class="pre">fd_v4l,</span> <span class="pre">buffers[i].offset)</span></code></p></li>
+</ul>
+</li>
+<li><p>将申请到的帧缓冲全部放入视频采集输入队列，以便存放采集的数据：<code class="docutils literal notranslate"><span class="pre">ioctl</span> <span class="pre">(fd_v4l,</span> <span class="pre">VIDIOC_QBUF,</span> <span class="pre">&amp;buf)</span></code></p></li>
+<li><p>开始视频流数据的采集 ：<code class="docutils literal notranslate"><span class="pre">ioctl</span> <span class="pre">(fd_v4l,</span> <span class="pre">VIDIOC_STREAMON,</span> <span class="pre">&amp;type)</span></code></p></li>
+<li><p>驱动将采集到的一帧视频数据存入输入队列第一个帧缓冲区，存完后将该帧缓冲区移至视频采集输出队列。</p></li>
+<li><p>应用程序从视频采集输出队列中取出已含有采集数据的帧缓冲区。：<code class="docutils literal notranslate"><span class="pre">ioctl</span> <span class="pre">(fd_v4l,</span> <span class="pre">VIDIOC_DQBUF,</span> <span class="pre">&amp;buf)</span></code></p></li>
+<li><p>应用程序处理该帧缓冲区的原始视频数据。</p></li>
+<li><p>处理完后，应用程序的将该帧缓冲区重新排入输入队列,这样便可以循环采集数据。：<code class="docutils literal notranslate"><span class="pre">ioctl</span> <span class="pre">(fd_v4l,</span> <span class="pre">VIDIOC_QBUF,</span> <span class="pre">&amp;buf)</span></code></p></li>
+<li><p>重复上述步骤取出、采集过程，直到停止采集数据。
+<img alt="images/ImageInOutBuffers.jpg" src="../../../../_images/ImageInOutBuffers.jpg" /></p></li>
+<li><p>停止视频的采集。：<code class="docutils literal notranslate"><span class="pre">ioctl</span> <span class="pre">(fd_v4l,</span> <span class="pre">VIDIOC_STREAMOFF,</span> <span class="pre">&amp;type)</span></code></p></li>
+<li><p>释放申请的视频帧缓冲区<code class="docutils literal notranslate"><span class="pre">unmap</span></code>，关闭视频设备文件：<code class="docutils literal notranslate"><span class="pre">close(fd_v4l)</span></code></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

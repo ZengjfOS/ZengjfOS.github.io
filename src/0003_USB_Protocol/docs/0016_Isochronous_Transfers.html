@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Isochronous Transfers</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#isochronous-in">Isochronous IN</a></li>
+<li><a class="reference internal" href="#isochronous-out">Isochronous OUT</a></li>
+<li><a class="reference internal" href="#buffer-data">Buffer Data</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="isochronous-transfers">
+<h1>Isochronous Transfers<a class="headerlink" href="#isochronous-transfers" title="Permalink to this headline"></a></h1>
+<p>一步传输示例</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.keil.com/pack/doc/mw/USB/html/_u_s_b__isochronous__transfers.html">Isochronous Transfers</a>:<br />
+An Isochronous pipe sends a new data packet in <strong>every frame</strong>, regardless of the success or failure of the last packet.</p></li>
+<li><p><a class="reference external" href="https://www.keil.com/pack/doc/mw/USB/html/_u_s_b__protocol.html">USB Protocol</a></p></li>
+</ul>
+<p>A special packet is the Start-of-Frame packet (SOF) that splits the USB bus into time segments. Each pipe is allocated a slot in each frame. The Start-of-Frame packet is sent every 1ms on full speed links. At high speed, the 1ms frame is divided into 8 microframes of 125μs each. A Start-of-Frame packet is sent at the beginning of each microframe using the same frame number. The frame number increments every 1ms.</p>
+</section>
+<section id="isochronous-in">
+<h1>Isochronous IN<a class="headerlink" href="#isochronous-in" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>处理同步数据方法</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="k">case</span><span class="w"> </span><span class="nl">Alt6_IsocINOUT</span><span class="p">:</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Send data on EP2</span>
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">EP2468STAT</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEP2FULL</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LSB</span><span class="p">(</span><span class="n">mycount</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MSB</span><span class="p">(</span><span class="n">mycount</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">USBFRAMEL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">USBFRAMEH</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MICROFRAME</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">EP2BCH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x04</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">EP2BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x00</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">mycount</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// check EP6 EMPTY(busy) bit in EP2468STAT (SFR), core set&#39;s this bit when FIFO is empty</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">EP2468STAT</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEP6EMPTY</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="n">EP6BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x80</span><span class="p">;</span><span class="w">          </span><span class="c1">// re(arm) EP6OUT</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>运行效果<br />
+<img alt="0016_Isochronous_Data_IN.png" src="../../../_images/0016_Isochronous_Data_IN.png" /></p></li>
+<li><p>目前不知道为什么端点缓冲区是1k Byte，但是发送的数据却至少要8k Byte的倍数，难道是因为至少用1ms来算？暂不追查原理。</p></li>
+<li><p>StreamExample采用的是16k Byte的参数；</p></li>
+</ul>
+</section>
+<section id="isochronous-out">
+<h1>Isochronous OUT<a class="headerlink" href="#isochronous-out" title="Permalink to this headline"></a></h1>
+<p><img alt="0016_Isochronous_Data_OUT.png" src="../../../_images/0016_Isochronous_Data_OUT.png" /></p>
+</section>
+<section id="buffer-data">
+<h1>Buffer Data<a class="headerlink" href="#buffer-data" title="Permalink to this headline"></a></h1>
+<p>初始化端点2的4个buffer中的数据</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">void</span> <span class="n">TD_Init</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>             <span class="o">//</span> <span class="n">Called</span> <span class="n">once</span> <span class="n">at</span> <span class="n">startup</span>
+<span class="p">{</span>
+   <span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+
+   <span class="o">//</span> <span class="n">Prepare</span> <span class="n">data</span>
+   <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+   <span class="p">{</span>
+      <span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">LSB</span><span class="p">(</span><span class="n">mycount</span><span class="p">);</span>
+      <span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">MSB</span><span class="p">(</span><span class="n">mycount</span><span class="p">);</span>
+      <span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">USBFRAMEL</span><span class="p">;</span>
+      <span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">USBFRAMEH</span><span class="p">;</span>
+      <span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">MICROFRAME</span><span class="p">;</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">5</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">1024</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="n">EP2FIFOBUF</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="n">EP2BCH</span> <span class="o">=</span> <span class="mh">0x02</span><span class="p">;</span>
+      <span class="n">EP2BCL</span> <span class="o">=</span> <span class="mh">0x00</span><span class="p">;</span>
+   <span class="p">}</span>
+
+   <span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

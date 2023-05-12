@@ -1,0 +1,420 @@
+info: can't find this cmd: /Users/zengjf/miniforge3/bin/python /Users/zengjf/zengjf/github/anpp/tools/adbtoolsv1.py
+error cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+
+adb: no devices/emulators found
+------------cmd device stderr------------
+
+------------cmd device stdout------------
+error cmd: device
+error cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error cmd: adb shell at device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+info: can't find this cmd: deivce
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+info: can't find this cmd: devices
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+info: can't find this cmd: abc
+info: can't find this cmd: 12
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+info: can't find this cmd: fafsd
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: device
+------------cmd device stdout------------
+
+------------cmd device stderr------------
+adb: no devices/emulators found
+
+info: can't find this cmd: Usersengjfminiforge3binpythonUsersengjfengjfgithubanpptoolsadbtoolspy
+info: can't find this cmd: Usersengjfminiforge3binpythonUsersengjfengjfgithubanpptoolsadbtoolspy
+info: can't find this cmd: Usersengjfminiforge3binpythonUsersengjfengjfgithubanpptoolsadbtoolspy
+cmd: ls Success
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+cmd: device Success
+cmd: ls Success
+
+------------cmd test stderr------------
+
+------------cmd test stdout------------
+cmd: ls Success
+
+------------cmd test stderr------------
+
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+info: can't find this cmd: 0
+cmd: ls Success
+info: can't find this cmd: 0
+cmd: ls Success
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+cmd: device Success
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+cmd: ls Success
+error shell: 'test' in cmd: test
+------------cmd test stdout------------
+
+------------cmd test stderr------------
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+------------cmd shell stdout------------
+
+------------cmd shell stderr------------
+adb: no devices/emulators found
+
+cmd: ls Success
+LICENSE
+Makefile
+README.md
+androiddir.bash
+androiddir.bash.template
+config.json
+custom.sh
+docs
+generator.py
+tools
+cmd: ls Success
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+LICENSE
+Makefile
+README.md
+androiddir.bash
+androiddir.bash.template
+config.json
+custom.sh
+docs
+generator.py
+tools
+cmd: ls Success
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+info: can't find this cmd: 4
+error shell: 'adb shell' in cmd: shell
+info: can't find this cmd: Userszengjfminiforge3binpythonUserszengjfzengjfgithubanpptoolsadbtoolspy
+cmd: ls Success
+tools
+generator.py
+docs
+custom.sh
+config.json
+androiddir.bash.template
+androiddir.bash
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+info: can't find this cmd: Userszengjfminiforge3binpythonUserszengjfzengjfgithubanpptoolsadbtoolspy
+error shell: 'ssh baidu.com' in cmd: ssh
+cmd: ls Success
+tools
+generator.py
+docs
+custom.sh
+config.json
+androiddir.bash.template
+androiddir.bash
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'adb shell' in cmd: shell
+error shell: 'ssh baidu.com' in cmd: ssh
+error shell: 'adb shell' in cmd: shell
+info: can't find this cmd: Userszengjfminiforge3binpythonUserszengjfzengjfgithubanpptoolsadbtoolspy
+cmd: ls Success
+tools
+generator.py
+docs
+custom.sh
+config.json
+androiddir.bash.template
+androiddir.bash
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'ssh baidu.com' in cmd: ssh
+cmd: ls Success
+tools
+generator.py
+docs
+custom.sh
+config.json
+androiddir.bash.template
+androiddir.bash
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'ssh baidu.com' in cmd: ssh
+error shell: 'adb shell' in cmd: shell
+cmd: ls Success
+tools
+generator.py
+docs
+custom.sh
+config.json
+cmd: ls Success
+tools
+generator.py
+docs
+custom.sh
+config.json
+error shell: 'test' in cmd: test
+List of devices attached
+
+cmd: device Success
+error shell: 'ssh baidu.com' in cmd: ssh
+error shell: 'adb shell' in cmd: shell
+error shell: 'adb shell' in cmd: shell
+error shell: 'adb shell' in cmd: shell
+error shell: 'adb shell' in cmd: shell
+error shell: 'adb shell' in cmd: shell
+error shell: 'test' in cmd: test
+error shell: 'adb shell' in cmd: shell
+error shell: 'ssh baidu.com' in cmd: ssh
+error shell: 'adb shell' in cmd: shell
+error shell: 'fastboot devices' in cmd: fastboot
+error shell: 'adb shell' in cmd: shell

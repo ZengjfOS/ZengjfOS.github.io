@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Hand Turn Page</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#capture-data">capture data</a></li>
+<li><a class="reference internal" href="#train">Train</a></li>
+<li><a class="reference internal" href="#predict">predict</a></li>
+<li><a class="reference internal" href="#android">Android</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hand-turn-page">
+<h1>Hand Turn Page<a class="headerlink" href="#hand-turn-page" title="Permalink to this headline"></a></h1>
+<p>训练翻页手势</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/kinivi/hand-gesture-recognition-mediapipe">hand-gesture-recognition-using-mediapipe</a></p></li>
+</ul>
+</section>
+<section id="capture-data">
+<h1>capture data<a class="headerlink" href="#capture-data" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>python3 LogTools.py HandTurnPage -mode live</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/f02b797ddf5bf66078fc21b528d70d02/HandTurnPage.py"><span class="xref download myst">HandTurnPage.py</span></a></p>
+<ul>
+<li><p>z: open data file</p></li>
+<li><p>x: close data file</p></li>
+<li><p>a: start or stop write to file</p></li>
+<li><p>加入了结果预测代码，如果是第一次采集数据，可以用</p>
+<ul>
+<li><p><a class="reference internal" href="0004_MediaPipeHands.html"><span class="doc std std-doc">0004_MediaPipeHands.md</span></a></p>
+<ul>
+<li><p>这里的程序可以单独用于数据采集，帧率比较小，可以调快</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="train">
+<h1>Train<a class="headerlink" href="#train" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><span class="xref myst">0006_HandTurnPage</span></p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/c53f66e48e72361a2608767970ff073b/HandTurnPage_Colab.ipynb"><span class="xref download myst">HandTurnPage_Colab.ipynb</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/126c9784af152bd8fd916bb725ae3937/HandTurnPage_Local.ipynb"><span class="xref download myst">HandTurnPage_Local.ipynb</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="predict">
+<h1>predict<a class="headerlink" href="#predict" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/f02b797ddf5bf66078fc21b528d70d02/HandTurnPage.py"><span class="xref download myst">HandTurnPage.py</span></a></p>
+<ul>
+<li><p>python3 LogTools.py HandTurnPage -mode live</p></li>
+<li><p>python3 LogTools.py HandTurnPage -mode predict</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="android">
+<h1>Android<a class="headerlink" href="#android" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>基于patch</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/c31eb02d34453a8a51f7f78389127ba4/support-left-right-ok-hand-gesture.patch"><span class="xref download myst">support-left-right-ok-hand-gesture.patch</span></a></p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gh">index 421cfb1..e5ed7b9 100644</span><span class="w"></span>
+<span class="gd">--- a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gi">+++ b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java</span><span class="w"></span>
+<span class="gu">@@ -57,7 +57,9 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>  private Hands hands;<span class="w"></span>
+<span class="w"> </span>  public Interpreter interpreter = null;<span class="w"></span>
+<span class="gd">-  public String[] label = {&quot;left&quot;, &quot;right&quot;, &quot;ok&quot;};</span><span class="w"></span>
+<span class="gi">+  // public String[] label = {&quot;left&quot;, &quot;right&quot;, &quot;ok&quot;};</span><span class="w"></span>
+<span class="gi">+  public String[] label = {&quot;fist&quot;, &quot;palm&quot;};</span><span class="w"></span>
+<span class="gi">+  public MotionData preMotionData = null;</span><span class="w"></span>
+<span class="w"> </span>  public int maxAt = 0;<span class="w"></span>
+<span class="w"> </span>  public Handler mHandler = new Handler() {<span class="w"></span>
+<span class="w"> </span>    @Override<span class="w"></span>
+<span class="gu">@@ -99,7 +101,8 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>    setupLiveDemoUiComponents();<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>    try {<span class="w"></span>
+<span class="gd">-      interpreter = new Interpreter(loadModelFile(&quot;HandGesture&quot;));</span><span class="w"></span>
+<span class="gi">+      // interpreter = new Interpreter(loadModelFile(&quot;HandGesture&quot;));</span><span class="w"></span>
+<span class="gi">+      interpreter = new Interpreter(loadModelFile(&quot;HandTurnPage&quot;));</span><span class="w"></span>
+<span class="w"> </span>      interpreter.allocateTensors();<span class="w"></span>
+<span class="w"> </span>    } catch (IOException e) {<span class="w"></span>
+<span class="w"> </span>      e.printStackTrace();<span class="w"></span>
+<span class="gu">@@ -424,11 +427,49 @@ public class MainActivity extends AppCompatActivity {</span><span class="w"></span>
+<span class="w"> </span>      maxAt = outputs[j] &gt; outputs[maxAt] ? j : maxAt;<span class="w"></span>
+<span class="w"> </span>    }<span class="w"></span>
+<span class="w"> </span>
+<span class="gd">-    Message message = new Message();</span><span class="w"></span>
+<span class="gd">-    message.what = 1;</span><span class="w"></span>
+<span class="gd">-    mHandler.sendMessage(message);</span><span class="w"></span>
+<span class="gd">-</span><span class="w"></span>
+<span class="w"> </span>    Log.e(TAG, Arrays.toString(output.array()) + &quot; -&gt; &quot; + maxAt + &quot; -&gt; &quot; + label[maxAt]);<span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    int width = result.inputBitmap().getWidth();</span><span class="w"></span>
+<span class="gi">+    int height = result.inputBitmap().getHeight();</span><span class="w"></span>
+<span class="gi">+    MotionData motionData = new MotionData();</span><span class="w"></span>
+<span class="gi">+    for (NormalizedLandmark landmark : result.multiHandLandmarks().get(0).getLandmarkList()) {</span><span class="w"></span>
+<span class="gi">+      motionData.x += wristLandmark.getX() * width;</span><span class="w"></span>
+<span class="gi">+      motionData.y += wristLandmark.getY() * height;</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+    motionData.x /= 21;</span><span class="w"></span>
+<span class="gi">+    motionData.y /= 21;</span><span class="w"></span>
+<span class="gi">+    motionData.motion = label[maxAt];</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    if (preMotionData == null) {</span><span class="w"></span>
+<span class="gi">+      preMotionData = motionData;</span><span class="w"></span>
+<span class="gi">+    } else {</span><span class="w"></span>
+<span class="gi">+      if (preMotionData.motion == &quot;palm&quot; &amp;&amp; motionData.motion == &quot;palm&quot;) {</span><span class="w"></span>
+<span class="gi">+        int xOffset = motionData.x - preMotionData.x;</span><span class="w"></span>
+<span class="gi">+        int yOffset = motionData.x - preMotionData.x;</span><span class="w"></span>
+<span class="gi">+        String direction = &quot;static&quot;;</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        Log.e(TAG, &quot;x offset: &quot; + (motionData.x - preMotionData.x));</span><span class="w"></span>
+<span class="gi">+        Log.e(TAG, &quot;y offset: &quot; + (motionData.y - preMotionData.y));</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        if (xOffset &gt; 20)</span><span class="w"></span>
+<span class="gi">+          direction = &quot;right&quot;;</span><span class="w"></span>
+<span class="gi">+        if (xOffset &lt; -20)</span><span class="w"></span>
+<span class="gi">+          direction = &quot;left&quot;;</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+        String finalDirection = direction;</span><span class="w"></span>
+<span class="gi">+        runOnUiThread(() -&gt; {</span><span class="w"></span>
+<span class="gi">+            setTitle(finalDirection);</span><span class="w"></span>
+<span class="gi">+        });</span><span class="w"></span>
+<span class="gi">+      }</span><span class="w"></span>
+<span class="gi">+    }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+    preMotionData = motionData;</span><span class="w"></span>
+<span class="gi">+  }</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+  public class MotionData {</span><span class="w"></span>
+<span class="gi">+    public String motion = &quot;fist&quot;;</span><span class="w"></span>
+<span class="gi">+    public int x = 0;</span><span class="w"></span>
+<span class="gi">+    public int y = 0;</span><span class="w"></span>
+<span class="w"> </span>  }<span class="w"></span>
+<span class="w"> </span>
+<span class="w"> </span>  private ByteBuffer loadModelFile(String model) throws IOException {<span class="w"></span>
+</pre></div>
+</div>
+<p>程序运行效果，视频转换</p>
+<ul class="simple">
+<li><p>320xAUTO</p></li>
+<li><p>10 FPS</p></li>
+</ul>
+<p><img alt="0006_HandTurnPage.gif" src="../../../_images/0006_HandTurnPage.gif" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

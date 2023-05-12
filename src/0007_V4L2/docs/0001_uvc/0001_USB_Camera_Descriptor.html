@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/login.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">USB Camera Descriptor</a><ul>
+<li><a class="reference internal" href="#id1">工具</a></li>
+<li><a class="reference internal" href="#id2">简述</a></li>
+<li><a class="reference internal" href="#id3">参考文档</a></li>
+<li><a class="reference internal" href="#linux-lsusb-dump-camera-usb-descriptor">Linux lsusb Dump Camera USB Descriptor</a></li>
+<li><a class="reference internal" href="#windows-dump-camera-usb-descriptor">Windows Dump Camera USB Descriptor</a></li>
+<li><a class="reference internal" href="#vc">VC架构</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usb-camera-descriptor">
+<h1>USB Camera Descriptor<a class="headerlink" href="#usb-camera-descriptor" title="Permalink to this headline"></a></h1>
+<section id="id1">
+<h2>工具<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lsusb</span></code>： Linux工具</p></li>
+<li><p><a class="reference external" href="https://www.thesycon.de/eng/usb_descriptordumper.shtml">Thesycon USB Descriptor Dumper</a>：Windows工具</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>简述<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>基本上UVC跟CDC-ACM類似，它一定要支援兩個Interface，一個用來控制用，一個用來傳資料。控制用的Interface叫做Video Control Interface，另一個叫Video Streaming Interface。這兩個Interface得用IAD把他們接合在一起。</p></li>
+<li><p>UVC支援兩種資料傳輸模式，第一個是Isochronous模式，第二個是bulk模式。這邊不講bulk模式，因為市面上99.9999%的UVC裝置都是用Isochronous模式。</p></li>
+<li><p>Isochronous模式有個特點，就是必須使用Alternate Setting，如果你忘了Alternate Setting的話，記得再去瞄一下USB2.0規格。基本上只要宣告Alternate Setting 0跟1就可以了。其中Alternate Setting 0是不包含任何Endpoint宣告的，而Alternate Setting 1則會包含一個Isochronous Endpoint宣告。當HOST想要接收影像資料時，會用Set Interface去選擇Alternate Setting 1，而這時DEVICE就得開始輸出資料。相同地，Alternate Setting 0就是不要傳資料。</p></li>
+<li><p>資料的格式部分，因為UVC目的是支援大部分的裝置，所以裝置端必須提供它支援的格式。資料格式分兩種，第一種是Video Format，其下又分Video Frame。這很好理解，基本上你得先讓HOST選擇影像格式，才能再選擇它的解析度、bitrate跟frame rate。Video Format對應的就是影像格式，而Video Frame則是對應到解析度、bitrate跟frame rate。這樣做的好處是每個裝置可以支援多種影像格式，像是RGB或 MJPEG。</p></li>
+<li><p>UVC要支援MJPEG或H264的原因很簡單，因為傳統的RGB格式真的佔用太多USB頻寬了，加上現在沒有HD賣不動，用RGB格式根本沒辦法達到720p30。1280<em>720</em>30*3 = 82,944,000 bytes，直接爆掉USB頻寬，所以你會看到有些Webcam號稱支援720p或1080p RGB格式，但是它的frame rate是可憐的1或5，這有意義嗎？</p></li>
+<li><p>从后面Linux代码解读来看，其实Widnows工具获取的数据是更贴切的，因为UVC部分的描述符是在驱动中单独分析出来的；</p></li>
+<li><p>一个VC控制接口描述符；</p></li>
+<li><p>一个VS流接口描述符，多选一模式的；</p></li>
+<li><p>IDA（usb_interface_assoc_descriptor）在usb_host_config描述符中，UVC设备值关心usb_interface_assoc_descriptor数组的第一个，也就是VC接口描述符，所以在Linux驱动中probe传入的interface就是VC接口描述符；</p></li>
+<li><p>VC和VS的描述符信息在各自的usb_interface-&gt;cur_altsetting-&gt;extra中，长度是extralen，所有的UVC自定义的描述符都在这，Linux驱动解析VC就是解析extra数据；</p></li>
+<li><p>设备描述符</p>
+<ul>
+<li><p>配置描述符</p>
+<ul>
+<li><p>IAD接口描述符(VC和VS接口的个数等信息在IAD描述符中的bInterfaceCount表示)</p>
+<ul>
+<li><p>VC接口描述符</p>
+<ul>
+<li><p>HEADER描述符</p>
+<ul>
+<li><p>OUTPUT_TERMINAL描述符</p></li>
+<li><p>EXTENSION_UNIT描述符</p></li>
+<li><p>INPUT_TERMINAL描述符</p></li>
+<li><p>PROCESSING_UNIT描述符</p></li>
+</ul>
+</li>
+<li><p>端点描述符</p></li>
+</ul>
+</li>
+<li><p>VS接口描述符(bAlternateSetting = 0)</p>
+<ul>
+<li><p>INPUT_HEADER描述符(bNumFormats表示包含多少种帧格式)</p>
+<ul>
+<li><p>FORMAT_MJPEG描述符(bFormatIndex表示当前是第几种帧格式，bNumFrameDescriptors当前这种帧格式有多少种尺寸)</p></li>
+<li><p>FRAME描述符(bFrameIndex表示当前帧格式是第几个)</p></li>
+<li><p>STILL_IMAGE_FRAME描述符</p></li>
+<li><p>COLORFORMAT描述符</p></li>
+</ul>
+</li>
+<li><p>Video Streaming接口描述符(bAlternateSetting &gt; 0)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id3">
+<h2>参考文档<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/LinuxWorking/article/details/78419631">UVC（USB Video Class）协议讲解</a></p></li>
+<li><p><a class="reference external" href="https://www.cnblogs.com/liusiluandzhangkun/p/8729528.html">从零写UVC驱动之分析描述符</a></p></li>
+<li><p><a class="reference external" href="http://pollos-blog.blogspot.com/2014/10/usb-video-class.html">USB Video Class 簡介</a></p></li>
+</ul>
+</section>
+<section id="linux-lsusb-dump-camera-usb-descriptor">
+<h2>Linux lsusb Dump Camera USB Descriptor<a class="headerlink" href="#linux-lsusb-dump-camera-usb-descriptor" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~ $ lsusb
+Bus 001 Device 002: ID 057e:030a Nintendo Co., Ltd
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+pi@raspberrypi:~ $ lsusb -vd 057e:030a
+
+Bus 001 Device 002: ID 057e:030a Nintendo Co., Ltd
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          239 Miscellaneous Device
+  bDeviceSubClass         2 ?
+  bDeviceProtocol         1 Interface Association
+  bMaxPacketSize0        64
+  idVendor           0x057e Nintendo Co., Ltd
+  idProduct          0x030a
+  bcdDevice            9.24
+  iManufacturer          48
+  iProduct               96
+  iSerial                 0
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength          777
+    bNumInterfaces          2
+    bConfigurationValue     1
+    iConfiguration         48
+    bmAttributes         0x80
+      (Bus Powered)
+    MaxPower              500mA
+    Interface Association:
+      bLength                 8
+      bDescriptorType        11
+      bFirstInterface         0
+      bInterfaceCount         2
+      bFunctionClass         14 Video
+      bFunctionSubClass       3 Video Interface Collection
+      bFunctionProtocol       0
+      iFunction              96
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      1 Video Control
+      bInterfaceProtocol      0
+      iInterface             96
+      VideoControl Interface Descriptor:
+        bLength                13
+        bDescriptorType        36
+        bDescriptorSubtype      1 (HEADER)
+        bcdUVC               1.00
+        wTotalLength           77
+        dwClockFrequency       15.000000MHz
+        bInCollection           1
+        baInterfaceNr( 0)       1
+      VideoControl Interface Descriptor:
+        bLength                 9
+        bDescriptorType        36
+        bDescriptorSubtype      3 (OUTPUT_TERMINAL)
+        bTerminalID             2
+        wTerminalType      0x0101 USB Streaming
+        bAssocTerminal          0
+        bSourceID               4
+        iTerminal               0
+      VideoControl Interface Descriptor:
+        bLength                26
+        bDescriptorType        36
+        bDescriptorSubtype      6 (EXTENSION_UNIT)
+        bUnitID                 4
+        guidExtensionCode         {f07735d1-898d-0047-812e-7dd5e2fdb898}
+        bNumControl             8
+        bNrPins                 1
+        baSourceID( 0)          3
+        bControlSize            1
+        bmControls( 0)       0xff
+        iExtension              0
+      VideoControl Interface Descriptor:
+        bLength                18
+        bDescriptorType        36
+        bDescriptorSubtype      2 (INPUT_TERMINAL)
+        bTerminalID             1
+        wTerminalType      0x0201 Camera Sensor
+        bAssocTerminal          0
+        iTerminal               0
+        wObjectiveFocalLengthMin      0
+        wObjectiveFocalLengthMax      0
+        wOcularFocalLength            0
+        bControlSize                  3
+        bmControls           0x0000020a
+          Auto-Exposure Mode
+          Exposure Time (Absolute)
+          Zoom (Absolute)
+      VideoControl Interface Descriptor:
+        bLength                11
+        bDescriptorType        36
+        bDescriptorSubtype      5 (PROCESSING_UNIT)
+      Warning: Descriptor too short
+        bUnitID                 3
+        bSourceID               1
+        wMaxMultiplier          0
+        bControlSize            2
+        bmControls     0x0000157f
+          Brightness
+          Contrast
+          Hue
+          Saturation
+          Sharpness
+          Gamma
+          White Balance Temperature
+          Backlight Compensation
+          Power Line Frequency
+          White Balance Temperature, Auto
+        iProcessing             0
+        bmVideoStandards     0x 0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval               6
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           0
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      VideoStreaming Interface Descriptor:
+        bLength                            15
+        bDescriptorType                    36
+        bDescriptorSubtype                  1 (INPUT_HEADER)
+        bNumFormats                         2
+        wTotalLength                      557
+        bEndPointAddress                  129
+        bmInfo                              0
+        bTerminalLink                       2
+        bStillCaptureMethod                 2
+        bTriggerSupport                     1
+        bTriggerUsage                       0
+        bControlSize                        1
+        bmaControls( 0)                    11
+        bmaControls( 1)                    11
+      VideoStreaming Interface Descriptor:
+        bLength                            11
+        bDescriptorType                    36
+        bDescriptorSubtype                  6 (FORMAT_MJPEG)
+        bFormatIndex                        1
+        bNumFrameDescriptors                5
+        bFlags                              1
+          Fixed-size samples: Yes
+        bDefaultFrameIndex                  1
+        bAspectRatioX                       0
+        bAspectRatioY                       0
+        bmInterlaceFlags                 0x00
+          Interlaced stream or variable: No
+          Fields per frame: 1 fields
+          Field 1 first: No
+          Field pattern: Field 1 only
+          bCopyProtect                      0
+      VideoStreaming Interface Descriptor:
+        bLength                            38
+        bDescriptorType                    36
+        bDescriptorSubtype                  7 (FRAME_MJPEG)
+        bFrameIndex                         1
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            640
+        wHeight                           480
+        dwMinBitRate                   128000
+        dwMaxBitRate                 11059200
+        dwMaxVideoFrameBufferSize      460800
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  0
+        dwMinFrameInterval             333333
+        dwMaxFrameInterval            9999990
+        dwFrameIntervalStep            333333
+      VideoStreaming Interface Descriptor:
+        bLength                            38
+        bDescriptorType                    36
+        bDescriptorSubtype                  7 (FRAME_MJPEG)
+        bFrameIndex                         2
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            320
+        wHeight                           240
+        dwMinBitRate                   128000
+        dwMaxBitRate                  2764800
+        dwMaxVideoFrameBufferSize      115200
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  0
+        dwMinFrameInterval             333333
+        dwMaxFrameInterval            9999990
+        dwFrameIntervalStep            333333
+      VideoStreaming Interface Descriptor:
+        bLength                            38
+        bDescriptorType                    36
+        bDescriptorSubtype                  7 (FRAME_MJPEG)
+        bFrameIndex                         3
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            160
+        wHeight                           120
+        dwMinBitRate                   128000
+        dwMaxBitRate                   691200
+        dwMaxVideoFrameBufferSize       28800
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  0
+        dwMinFrameInterval             333333
+        dwMaxFrameInterval            9999990
+        dwFrameIntervalStep            333333
+      VideoStreaming Interface Descriptor:
+        bLength                            38
+        bDescriptorType                    36
+        bDescriptorSubtype                  7 (FRAME_MJPEG)
+        bFrameIndex                         4
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            176
+        wHeight                           144
+        dwMinBitRate                   128000
+        dwMaxBitRate                   912384
+        dwMaxVideoFrameBufferSize       38016
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  0
+        dwMinFrameInterval             333333
+        dwMaxFrameInterval            9999990
+        dwFrameIntervalStep            333333
+      VideoStreaming Interface Descriptor:
+        bLength                            38
+        bDescriptorType                    36
+        bDescriptorSubtype                  7 (FRAME_MJPEG)
+        bFrameIndex                         5
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            352
+        wHeight                           288
+        dwMinBitRate                   128000
+        dwMaxBitRate                  3649536
+        dwMaxVideoFrameBufferSize      152064
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  0
+        dwMinFrameInterval             333333
+        dwMaxFrameInterval            9999990
+        dwFrameIntervalStep            333333
+      VideoStreaming Interface Descriptor:
+        bLength                            26
+        bDescriptorType                    36
+        bDescriptorSubtype                  3 (STILL_IMAGE_FRAME)
+        bEndpointAddress                    0
+        bNumImageSizePatterns               5
+        wWidth( 0)                        640
+        wHeight( 0)                       480
+        wWidth( 1)                        320
+        wHeight( 1)                       240
+        wWidth( 2)                        160
+        wHeight( 2)                       120
+        wWidth( 3)                        176
+        wHeight( 3)                       144
+        wWidth( 4)                        352
+        wHeight( 4)                       288
+        bNumCompressionPatterns             5
+      VideoStreaming Interface Descriptor:
+        bLength                             6
+        bDescriptorType                    36
+        bDescriptorSubtype                 13 (COLORFORMAT)
+        bColorPrimaries                     1 (BT.709,sRGB)
+        bTransferCharacteristics            1 (BT.709)
+        bMatrixCoefficients                 4 (SMPTE 170M (BT.601))
+      VideoStreaming Interface Descriptor:
+        bLength                            27
+        bDescriptorType                    36
+        bDescriptorSubtype                  4 (FORMAT_UNCOMPRESSED)
+        bFormatIndex                        2
+        bNumFrameDescriptors                5
+        guidFormat                            {59555932-0000-1000-8000-00aa00389b71}
+        bBitsPerPixel                      16
+        bDefaultFrameIndex                  1
+        bAspectRatioX                       0
+        bAspectRatioY                       0
+        bmInterlaceFlags                 0x00
+          Interlaced stream or variable: No
+          Fields per frame: 2 fields
+          Field 1 first: No
+          Field pattern: Field 1 only
+          bCopyProtect                      0
+      VideoStreaming Interface Descriptor:
+        bLength                            50
+        bDescriptorType                    36
+        bDescriptorSubtype                  5 (FRAME_UNCOMPRESSED)
+        bFrameIndex                         1
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            640
+        wHeight                           480
+        dwMinBitRate                   614400
+        dwMaxBitRate                 18432000
+        dwMaxVideoFrameBufferSize      614400
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  6
+        dwFrameInterval( 0)            333333
+        dwFrameInterval( 1)            500000
+        dwFrameInterval( 2)            666666
+        dwFrameInterval( 3)           1000000
+        dwFrameInterval( 4)           2000000
+        dwFrameInterval( 5)          10000000
+      VideoStreaming Interface Descriptor:
+        bLength                            50
+        bDescriptorType                    36
+        bDescriptorSubtype                  5 (FRAME_UNCOMPRESSED)
+        bFrameIndex                         2
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            320
+        wHeight                           240
+        dwMinBitRate                   153600
+        dwMaxBitRate                  4608000
+        dwMaxVideoFrameBufferSize      153600
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  6
+        dwFrameInterval( 0)            333333
+        dwFrameInterval( 1)            500000
+        dwFrameInterval( 2)            666666
+        dwFrameInterval( 3)           1000000
+        dwFrameInterval( 4)           1016960
+        dwFrameInterval( 5)          10000000
+      VideoStreaming Interface Descriptor:
+        bLength                            50
+        bDescriptorType                    36
+        bDescriptorSubtype                  5 (FRAME_UNCOMPRESSED)
+        bFrameIndex                         3
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            160
+        wHeight                           120
+        dwMinBitRate                    38400
+        dwMaxBitRate                  1152000
+        dwMaxVideoFrameBufferSize       38400
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  6
+        dwFrameInterval( 0)            333333
+        dwFrameInterval( 1)            500000
+        dwFrameInterval( 2)            666666
+        dwFrameInterval( 3)           1000000
+        dwFrameInterval( 4)           1016960
+        dwFrameInterval( 5)          10000000
+      VideoStreaming Interface Descriptor:
+        bLength                            50
+        bDescriptorType                    36
+        bDescriptorSubtype                  5 (FRAME_UNCOMPRESSED)
+        bFrameIndex                         4
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            176
+        wHeight                           144
+        dwMinBitRate                    50688
+        dwMaxBitRate                  1520640
+        dwMaxVideoFrameBufferSize       50688
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  6
+        dwFrameInterval( 0)            333333
+        dwFrameInterval( 1)            500000
+        dwFrameInterval( 2)            666666
+        dwFrameInterval( 3)           1000000
+        dwFrameInterval( 4)           1016960
+        dwFrameInterval( 5)          10000000
+      VideoStreaming Interface Descriptor:
+        bLength                            50
+        bDescriptorType                    36
+        bDescriptorSubtype                  5 (FRAME_UNCOMPRESSED)
+        bFrameIndex                         5
+        bmCapabilities                   0x00
+          Still image unsupported
+        wWidth                            352
+        wHeight                           288
+        dwMinBitRate                   202752
+        dwMaxBitRate                  6082560
+        dwMaxVideoFrameBufferSize      202752
+        dwDefaultFrameInterval         333333
+        bFrameIntervalType                  6
+        dwFrameInterval( 0)            333333
+        dwFrameInterval( 1)            500000
+        dwFrameInterval( 2)            666666
+        dwFrameInterval( 3)           1000000
+        dwFrameInterval( 4)           1016960
+        dwFrameInterval( 5)          10000000
+      VideoStreaming Interface Descriptor:
+        bLength                            26
+        bDescriptorType                    36
+        bDescriptorSubtype                  3 (STILL_IMAGE_FRAME)
+        bEndpointAddress                    0
+        bNumImageSizePatterns               5
+        wWidth( 0)                        640
+        wHeight( 0)                       480
+        wWidth( 1)                        320
+        wHeight( 1)                       240
+        wWidth( 2)                        160
+        wHeight( 2)                       120
+        wWidth( 3)                        176
+        wHeight( 3)                       144
+        wWidth( 4)                        352
+        wHeight( 4)                       288
+        bNumCompressionPatterns             5
+      VideoStreaming Interface Descriptor:
+        bLength                             6
+        bDescriptorType                    36
+        bDescriptorSubtype                 13 (COLORFORMAT)
+        bColorPrimaries                     1 (BT.709,sRGB)
+        bTransferCharacteristics            1 (BT.709)
+        bMatrixCoefficients                 4 (SMPTE 170M (BT.601))
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       1
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x0a60  2x 608 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       2
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x0b00  2x 768 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       3
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x0b20  2x 800 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       4
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x1300  3x 768 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       5
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x1320  3x 800 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       6
+      bNumEndpoints           1
+      bInterfaceClass        14 Video
+      bInterfaceSubClass      2 Video Streaming
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x13fc  3x 1020 bytes
+        bInterval               1
+</pre></div>
+</div>
+</section>
+<section id="windows-dump-camera-usb-descriptor">
+<h2>Windows Dump Camera USB Descriptor<a class="headerlink" href="#windows-dump-camera-usb-descriptor" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Information</span> <span class="k">for</span> <span class="n">device</span> <span class="n">USB</span> <span class="n">Camera</span> <span class="p">(</span><span class="n">VID</span><span class="o">=</span><span class="mh">0x057E</span> <span class="n">PID</span><span class="o">=</span><span class="mh">0x030A</span><span class="p">):</span>
+
+<span class="n">Connection</span> <span class="n">Information</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="n">Device</span> <span class="n">current</span> <span class="n">bus</span> <span class="n">speed</span><span class="p">:</span> <span class="n">HighSpeed</span>
+<span class="n">Device</span> <span class="n">supports</span> <span class="n">USB</span> <span class="mf">1.1</span> <span class="n">specification</span>
+<span class="n">Device</span> <span class="n">supports</span> <span class="n">USB</span> <span class="mf">2.0</span> <span class="n">specification</span>
+<span class="n">Device</span> <span class="n">address</span><span class="p">:</span> <span class="mh">0x0020</span>
+<span class="n">Current</span> <span class="n">configuration</span> <span class="n">value</span><span class="p">:</span> <span class="mh">0x00</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="nb">open</span> <span class="n">pipes</span><span class="p">:</span> <span class="mi">0</span>
+
+<span class="n">Device</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x12</span>	<span class="n">bLength</span>
+<span class="mh">0x01</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x0200</span>	<span class="n">bcdUSB</span>
+<span class="mh">0xEF</span>	<span class="n">bDeviceClass</span>      <span class="p">(</span><span class="n">Miscellaneous</span> <span class="n">device</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bDeviceSubClass</span>   
+<span class="mh">0x01</span>	<span class="n">bDeviceProtocol</span>   
+<span class="mh">0x40</span>	<span class="n">bMaxPacketSize0</span>   <span class="p">(</span><span class="mi">64</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x057E</span>	<span class="n">idVendor</span>
+<span class="mh">0x030A</span>	<span class="n">idProduct</span>
+<span class="mh">0x0924</span>	<span class="n">bcdDevice</span>
+<span class="mh">0x30</span>	<span class="n">iManufacturer</span>   <span class="s2">&quot;Guillemot Corporation&quot;</span>
+<span class="mh">0x60</span>	<span class="n">iProduct</span>   <span class="s2">&quot;USB Camera&quot;</span>
+<span class="mh">0x00</span>	<span class="n">iSerialNumber</span>
+<span class="mh">0x01</span>	<span class="n">bNumConfigurations</span>
+
+<span class="n">Device</span> <span class="n">Qualifier</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0A</span>	<span class="n">bLength</span>
+<span class="mh">0x06</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x0200</span>	<span class="n">bcdUSB</span>
+<span class="mh">0xEF</span>	<span class="n">bDeviceClass</span>      <span class="p">(</span><span class="n">Miscellaneous</span> <span class="n">device</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bDeviceSubClass</span>   
+<span class="mh">0x01</span>	<span class="n">bDeviceProtocol</span>   
+<span class="mh">0x40</span>	<span class="n">bMaxPacketSize0</span>   <span class="p">(</span><span class="mi">64</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bNumConfigurations</span> 
+<span class="mh">0x00</span>	<span class="n">bReserved</span> 
+
+<span class="n">Configuration</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x02</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x0309</span>	<span class="n">wTotalLength</span>   <span class="p">(</span><span class="mi">777</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bNumInterfaces</span>
+<span class="mh">0x01</span>	<span class="n">bConfigurationValue</span>
+<span class="mh">0x30</span>	<span class="n">iConfiguration</span>   <span class="s2">&quot;Guillemot Corporation&quot;</span>
+<span class="mh">0x80</span>	<span class="n">bmAttributes</span>   <span class="p">(</span><span class="n">Bus</span><span class="o">-</span><span class="n">powered</span> <span class="n">Device</span><span class="p">)</span>
+<span class="mh">0xFA</span>	<span class="n">bMaxPower</span>      <span class="p">(</span><span class="mi">500</span> <span class="n">mA</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Association</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x08</span>	<span class="n">bLength</span>
+<span class="mh">0x0B</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x00</span>	<span class="n">bFirstInterface</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceCount</span>
+<span class="mh">0x0E</span>	<span class="n">bFunctionClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x03</span>	<span class="n">bFunctionSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bFunctionProtocol</span>   
+<span class="mh">0x60</span>	<span class="n">iFunction</span>   <span class="s2">&quot;USB Camera&quot;</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x00</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x00</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x60</span>	<span class="n">iInterface</span>   <span class="s2">&quot;USB Camera&quot;</span>
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0D</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0D</span> <span class="mh">0x24</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x01</span> <span class="mh">0x4D</span> <span class="mh">0x00</span> <span class="mh">0xC0</span> <span class="mh">0xE1</span> <span class="mh">0xE4</span> 
+<span class="mh">0x00</span> <span class="mh">0x01</span> <span class="mh">0x01</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x09</span> <span class="mh">0x24</span> <span class="mh">0x03</span> <span class="mh">0x02</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x04</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x1A</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x1A</span> <span class="mh">0x24</span> <span class="mh">0x06</span> <span class="mh">0x04</span> <span class="mh">0xF0</span> <span class="mh">0x77</span> <span class="mh">0x35</span> <span class="mh">0xD1</span> <span class="mh">0x89</span> <span class="mh">0x8D</span> 
+<span class="mh">0x00</span> <span class="mh">0x47</span> <span class="mh">0x81</span> <span class="mh">0x2E</span> <span class="mh">0x7D</span> <span class="mh">0xD5</span> <span class="mh">0xE2</span> <span class="mh">0xFD</span> <span class="mh">0xB8</span> <span class="mh">0x98</span> 
+<span class="mh">0x08</span> <span class="mh">0x01</span> <span class="mh">0x03</span> <span class="mh">0x01</span> <span class="mh">0xFF</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x12</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x12</span> <span class="mh">0x24</span> <span class="mh">0x02</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x02</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x03</span> <span class="mh">0x0A</span> <span class="mh">0x02</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0B</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x03</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x02</span> <span class="mh">0x7F</span> <span class="mh">0x15</span> 
+<span class="mh">0x00</span> 
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x82</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">2</span><span class="p">)</span>
+<span class="mh">0x03</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Interrupt</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="kc">None</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0010</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">16</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x06</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">32</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x05</span>	<span class="n">bLength</span>
+<span class="mh">0x25</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x05</span> <span class="mh">0x25</span> <span class="mh">0x03</span> <span class="mh">0x10</span> <span class="mh">0x00</span> 
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x00</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x00</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0F</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0F</span> <span class="mh">0x24</span> <span class="mh">0x01</span> <span class="mh">0x02</span> <span class="mh">0x2D</span> <span class="mh">0x02</span> <span class="mh">0x81</span> <span class="mh">0x00</span> <span class="mh">0x02</span> <span class="mh">0x02</span> 
+<span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0B</span> <span class="mh">0x24</span> <span class="mh">0x06</span> <span class="mh">0x01</span> <span class="mh">0x05</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x02</span> <span class="mh">0xE0</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xC0</span> <span class="mh">0xA8</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x08</span> <span class="mh">0x07</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x02</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x01</span> <span class="mh">0xF0</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x30</span> <span class="mh">0x2A</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xC2</span> <span class="mh">0x01</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0xA0</span> <span class="mh">0x00</span> <span class="mh">0x78</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x8C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x70</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x04</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x00</span> <span class="mh">0x90</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xEC</span> <span class="mh">0x0D</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x94</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x01</span> <span class="mh">0x20</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x37</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x52</span> <span class="mh">0x02</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x1A</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x1A</span> <span class="mh">0x24</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0x05</span> <span class="mh">0x80</span> <span class="mh">0x02</span> <span class="mh">0xE0</span> <span class="mh">0x01</span> <span class="mh">0x40</span> 
+<span class="mh">0x01</span> <span class="mh">0xF0</span> <span class="mh">0x00</span> <span class="mh">0xA0</span> <span class="mh">0x00</span> <span class="mh">0x78</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x00</span> <span class="mh">0x90</span> 
+<span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x01</span> <span class="mh">0x20</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x06</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x06</span> <span class="mh">0x24</span> <span class="mh">0x0D</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x04</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x1B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x1B</span> <span class="mh">0x24</span> <span class="mh">0x04</span> <span class="mh">0x02</span> <span class="mh">0x05</span> <span class="mh">0x59</span> <span class="mh">0x55</span> <span class="mh">0x59</span> <span class="mh">0x32</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x10</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xAA</span> <span class="mh">0x00</span> <span class="mh">0x38</span> <span class="mh">0x9B</span> 
+<span class="mh">0x71</span> <span class="mh">0x10</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x32</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x32</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x02</span> <span class="mh">0xE0</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+<span class="mh">0x60</span> <span class="mh">0x09</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x19</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x09</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x06</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x20</span> <span class="mh">0xA1</span> <span class="mh">0x07</span> <span class="mh">0x00</span> <span class="mh">0x2A</span> <span class="mh">0x2C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x42</span> 
+<span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x84</span> <span class="mh">0x1E</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x32</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x32</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x02</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x01</span> <span class="mh">0xF0</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0x58</span> <span class="mh">0x02</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x50</span> <span class="mh">0x46</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x58</span> <span class="mh">0x02</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x06</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x20</span> <span class="mh">0xA1</span> <span class="mh">0x07</span> <span class="mh">0x00</span> <span class="mh">0x2A</span> <span class="mh">0x2C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x42</span> 
+<span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x84</span> <span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x32</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x32</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0xA0</span> <span class="mh">0x00</span> <span class="mh">0x78</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0x96</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x94</span> <span class="mh">0x11</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x96</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x06</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x20</span> <span class="mh">0xA1</span> <span class="mh">0x07</span> <span class="mh">0x00</span> <span class="mh">0x2A</span> <span class="mh">0x2C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x42</span> 
+<span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x84</span> <span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x32</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x32</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x04</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x00</span> <span class="mh">0x90</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xC6</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x34</span> <span class="mh">0x17</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xC6</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x06</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x20</span> <span class="mh">0xA1</span> <span class="mh">0x07</span> <span class="mh">0x00</span> <span class="mh">0x2A</span> <span class="mh">0x2C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x42</span> 
+<span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x84</span> <span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x32</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x32</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x01</span> <span class="mh">0x20</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+<span class="mh">0x18</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xD0</span> <span class="mh">0x5C</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x18</span> <span class="mh">0x03</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x06</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x20</span> <span class="mh">0xA1</span> <span class="mh">0x07</span> <span class="mh">0x00</span> <span class="mh">0x2A</span> <span class="mh">0x2C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x42</span> 
+<span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x84</span> <span class="mh">0x0F</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x1A</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x1A</span> <span class="mh">0x24</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0x05</span> <span class="mh">0x80</span> <span class="mh">0x02</span> <span class="mh">0xE0</span> <span class="mh">0x01</span> <span class="mh">0x40</span> 
+<span class="mh">0x01</span> <span class="mh">0xF0</span> <span class="mh">0x00</span> <span class="mh">0xA0</span> <span class="mh">0x00</span> <span class="mh">0x78</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x00</span> <span class="mh">0x90</span> 
+<span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x01</span> <span class="mh">0x20</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x06</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x06</span> <span class="mh">0x24</span> <span class="mh">0x0D</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x04</span> 
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x01</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0A60</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">2</span> <span class="n">x</span> <span class="mi">608</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x02</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0B00</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">2</span> <span class="n">x</span> <span class="mi">768</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x03</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0B20</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">2</span> <span class="n">x</span> <span class="mi">800</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x04</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x1300</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">3</span> <span class="n">x</span> <span class="mi">768</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x05</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x1320</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">3</span> <span class="n">x</span> <span class="mi">800</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x06</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x13FC</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">3</span> <span class="n">x</span> <span class="mi">1020</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">microframes</span><span class="p">)</span>
+
+<span class="n">Other</span> <span class="n">Speed</span> <span class="n">Configuration</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x07</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x026A</span>	<span class="n">wTotalLength</span>   <span class="p">(</span><span class="mi">618</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x04</span>	<span class="n">bNumInterfaces</span>
+<span class="mh">0x01</span>	<span class="n">bConfigurationValue</span>
+<span class="mh">0x30</span>	<span class="n">iConfiguration</span>   <span class="s2">&quot;Guillemot Corporation&quot;</span>
+<span class="mh">0x80</span>	<span class="n">bmAttributes</span>   <span class="p">(</span><span class="n">Bus</span><span class="o">-</span><span class="n">powered</span> <span class="n">Device</span><span class="p">)</span>
+<span class="mh">0xFA</span>	<span class="n">bMaxPower</span>      <span class="p">(</span><span class="mi">500</span> <span class="n">mA</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Association</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x08</span>	<span class="n">bLength</span>
+<span class="mh">0x0B</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x00</span>	<span class="n">bFirstInterface</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceCount</span>
+<span class="mh">0x0E</span>	<span class="n">bFunctionClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x03</span>	<span class="n">bFunctionSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bFunctionProtocol</span>   
+<span class="mh">0x60</span>	<span class="n">iFunction</span>   <span class="s2">&quot;USB Camera&quot;</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x00</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x00</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x60</span>	<span class="n">iInterface</span>   <span class="s2">&quot;USB Camera&quot;</span>
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0D</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0D</span> <span class="mh">0x24</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x01</span> <span class="mh">0x4D</span> <span class="mh">0x00</span> <span class="mh">0x38</span> <span class="mh">0x9C</span> <span class="mh">0x1C</span> 
+<span class="mh">0x00</span> <span class="mh">0x01</span> <span class="mh">0x01</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x09</span> <span class="mh">0x24</span> <span class="mh">0x03</span> <span class="mh">0x02</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x04</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x1A</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x1A</span> <span class="mh">0x24</span> <span class="mh">0x06</span> <span class="mh">0x04</span> <span class="mh">0x70</span> <span class="mh">0x33</span> <span class="mh">0xF0</span> <span class="mh">0x28</span> <span class="mh">0x11</span> <span class="mh">0x63</span> 
+<span class="mh">0x2E</span> <span class="mh">0x4A</span> <span class="mh">0xBA</span> <span class="mh">0x2C</span> <span class="mh">0x68</span> <span class="mh">0x90</span> <span class="mh">0xEB</span> <span class="mh">0x33</span> <span class="mh">0x40</span> <span class="mh">0x16</span> 
+<span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x03</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x12</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x12</span> <span class="mh">0x24</span> <span class="mh">0x02</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x02</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0x02</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0B</span> <span class="mh">0x24</span> <span class="mh">0x05</span> <span class="mh">0x03</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x02</span> <span class="mh">0x7F</span> <span class="mh">0x05</span> 
+<span class="mh">0x00</span> 
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x82</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">2</span><span class="p">)</span>
+<span class="mh">0x03</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Interrupt</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="kc">None</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0010</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">16</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x06</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">6</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x05</span>	<span class="n">bLength</span>
+<span class="mh">0x25</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x05</span> <span class="mh">0x25</span> <span class="mh">0x03</span> <span class="mh">0x10</span> <span class="mh">0x00</span> 
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x00</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x00</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0E</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0E</span> <span class="mh">0x24</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0xF8</span> <span class="mh">0x00</span> <span class="mh">0x81</span> <span class="mh">0x00</span> <span class="mh">0x02</span> <span class="mh">0x02</span> 
+<span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x0B</span> <span class="mh">0x24</span> <span class="mh">0x06</span> <span class="mh">0x01</span> <span class="mh">0x05</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x02</span> <span class="mh">0xE0</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xC0</span> <span class="mh">0xA8</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x08</span> <span class="mh">0x07</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x02</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x01</span> <span class="mh">0xF0</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x30</span> <span class="mh">0x2A</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xC2</span> <span class="mh">0x01</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0xA0</span> <span class="mh">0x00</span> <span class="mh">0x78</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x8C</span> <span class="mh">0x0A</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x70</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x04</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x00</span> <span class="mh">0x90</span> <span class="mh">0x00</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xEC</span> <span class="mh">0x0D</span> <span class="mh">0x00</span> <span class="mh">0x80</span> <span class="mh">0x94</span> <span class="mh">0x00</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x26</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x26</span> <span class="mh">0x24</span> <span class="mh">0x07</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x01</span> <span class="mh">0x20</span> <span class="mh">0x01</span> <span class="mh">0x00</span> 
+<span class="mh">0xF4</span> <span class="mh">0x01</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x37</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x52</span> <span class="mh">0x02</span> 
+<span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+<span class="mh">0x76</span> <span class="mh">0x96</span> <span class="mh">0x98</span> <span class="mh">0x00</span> <span class="mh">0x15</span> <span class="mh">0x16</span> <span class="mh">0x05</span> <span class="mh">0x00</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x1B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x1B</span> <span class="mh">0x24</span> <span class="mh">0x03</span> <span class="mh">0x00</span> <span class="mh">0x05</span> <span class="mh">0x80</span> <span class="mh">0x02</span> <span class="mh">0xE0</span> <span class="mh">0x01</span> <span class="mh">0xA0</span> 
+<span class="mh">0x00</span> <span class="mh">0x78</span> <span class="mh">0x00</span> <span class="mh">0xB0</span> <span class="mh">0x00</span> <span class="mh">0x90</span> <span class="mh">0x00</span> <span class="mh">0x40</span> <span class="mh">0x01</span> <span class="mh">0xF0</span> 
+<span class="mh">0x00</span> <span class="mh">0x60</span> <span class="mh">0x01</span> <span class="mh">0x20</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x64</span> 
+
+<span class="n">Unknown</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x06</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="n">Hex</span> <span class="n">dump</span><span class="p">:</span> 
+<span class="mh">0x06</span> <span class="mh">0x24</span> <span class="mh">0x0D</span> <span class="mh">0x01</span> <span class="mh">0x01</span> <span class="mh">0x04</span> 
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x01</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0300</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">768</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x02</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0320</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">800</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x03</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0350</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">848</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x04</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0380</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">896</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x05</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x039F</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">927</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x06</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x0E</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Video</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x81</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">1</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x03FF</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">1023</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">1</span> <span class="n">frames</span><span class="p">)</span>
+
+<span class="n">Interface</span> <span class="n">Association</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x08</span>	<span class="n">bLength</span>
+<span class="mh">0x0B</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x02</span>	<span class="n">bFirstInterface</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceCount</span>
+<span class="mh">0x01</span>	<span class="n">bFunctionClass</span>      <span class="p">(</span><span class="n">Audio</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bFunctionSubClass</span>   
+<span class="mh">0x00</span>	<span class="n">bFunctionProtocol</span>   
+<span class="mh">0x40</span>	<span class="n">iFunction</span>   <span class="s2">&quot;Audio_Device&quot;</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x00</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x00</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Audio</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceSubClass</span>   <span class="p">(</span><span class="n">Audio</span> <span class="n">Control</span> <span class="n">Interface</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x40</span>	<span class="n">iInterface</span>   <span class="s2">&quot;Audio_Device&quot;</span>
+
+<span class="n">AC</span> <span class="n">Interface</span> <span class="n">Header</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x0100</span>	<span class="n">bcdADC</span>
+<span class="mh">0x0026</span>	<span class="n">wTotalLength</span>   <span class="p">(</span><span class="mi">38</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bInCollection</span>
+<span class="mh">0x03</span>	<span class="n">baInterfaceNr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">AC</span> <span class="n">Input</span> <span class="n">Terminal</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0C</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x02</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x01</span>	<span class="n">bTerminalID</span>
+<span class="mh">0x0201</span>	<span class="n">wTerminalType</span>   <span class="p">(</span><span class="n">Microphone</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bAssocTerminal</span>
+<span class="mh">0x01</span>	<span class="n">bNrChannels</span>   <span class="p">(</span><span class="mi">1</span> <span class="n">channels</span><span class="p">)</span>
+<span class="mh">0x0000</span>	<span class="n">wChannelConfig</span>
+<span class="mh">0x00</span>	<span class="n">iChannelNames</span>
+<span class="mh">0x00</span>	<span class="n">iTerminal</span>
+
+<span class="n">AC</span> <span class="n">Output</span> <span class="n">Terminal</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x03</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x03</span>	<span class="n">bTerminalID</span>
+<span class="mh">0x0101</span>	<span class="n">wTerminalType</span>   <span class="p">(</span><span class="n">USB</span> <span class="n">Streaming</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bAssocTerminal</span>
+<span class="mh">0x05</span>	<span class="n">bSourceID</span>
+<span class="mh">0x00</span>	<span class="n">iTerminal</span>
+
+<span class="n">AC</span> <span class="n">Feature</span> <span class="n">Unit</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x08</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x06</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x05</span>	<span class="n">bUnitID</span>
+<span class="mh">0x01</span>	<span class="n">bSourceID</span>
+<span class="mh">0x01</span>	<span class="n">bControlSize</span>
+<span class="n">bmaControls</span><span class="p">:</span> 
+ <span class="mh">0x03</span>	<span class="n">Channel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">iFeature</span>
+
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x03</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x00</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x00</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Audio</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   <span class="p">(</span><span class="n">Audio</span> <span class="n">Streaming</span> <span class="n">Interface</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x03</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x01</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Audio</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   <span class="p">(</span><span class="n">Audio</span> <span class="n">Streaming</span> <span class="n">Interface</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">AS</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x03</span>	<span class="n">bTerminalLink</span>
+<span class="mh">0x01</span>	<span class="n">bDelay</span>
+<span class="mh">0x0001</span>	<span class="n">wFormatTag</span>   <span class="p">(</span><span class="n">PCM</span><span class="p">)</span>
+
+<span class="n">AS</span> <span class="n">Format</span> <span class="n">Type</span> <span class="mi">1</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x02</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x01</span>	<span class="n">bFormatType</span>   <span class="p">(</span><span class="n">FORMAT_TYPE_1</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bNrChannels</span>   <span class="p">(</span><span class="mi">1</span> <span class="n">channels</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bSubframeSize</span>
+<span class="mh">0x10</span>	<span class="n">bBitResolution</span>   <span class="p">(</span><span class="mi">16</span> <span class="n">bits</span> <span class="n">per</span> <span class="n">sample</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bSamFreqType</span>   <span class="p">(</span><span class="n">Discrete</span> <span class="n">sampling</span> <span class="n">frequencies</span><span class="p">)</span>
+<span class="mh">0x003E80</span> 	<span class="n">tSamFreq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="p">(</span><span class="mi">16000</span> <span class="n">Hz</span><span class="p">)</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span> <span class="p">(</span><span class="n">Audio</span><span class="o">/</span><span class="n">MIDI</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x83</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">3</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0020</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">32</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x04</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">8</span> <span class="n">frames</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bRefresh</span>
+<span class="mh">0x00</span>	<span class="n">bSynchAddress</span>
+
+<span class="n">AS</span> <span class="n">Isochronous</span> <span class="n">Data</span> <span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x25</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x01</span>	<span class="n">bmAttributes</span>   <span class="p">(</span><span class="n">Sampling</span> <span class="n">Frequency</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bLockDelayUnits</span>   <span class="p">(</span><span class="n">undefined</span><span class="p">)</span>
+<span class="mh">0x0000</span>	<span class="n">wLockDelay</span>
+
+<span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x04</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x03</span>	<span class="n">bInterfaceNumber</span>
+<span class="mh">0x02</span>	<span class="n">bAlternateSetting</span>
+<span class="mh">0x01</span>	<span class="n">bNumEndPoints</span>
+<span class="mh">0x01</span>	<span class="n">bInterfaceClass</span>      <span class="p">(</span><span class="n">Audio</span> <span class="n">Device</span> <span class="n">Class</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bInterfaceSubClass</span>   <span class="p">(</span><span class="n">Audio</span> <span class="n">Streaming</span> <span class="n">Interface</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bInterfaceProtocol</span>   
+<span class="mh">0x00</span>	<span class="n">iInterface</span>
+
+<span class="n">AS</span> <span class="n">Interface</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x03</span>	<span class="n">bTerminalLink</span>
+<span class="mh">0x01</span>	<span class="n">bDelay</span>
+<span class="mh">0x0001</span>	<span class="n">wFormatTag</span>   <span class="p">(</span><span class="n">PCM</span><span class="p">)</span>
+
+<span class="n">AS</span> <span class="n">Format</span> <span class="n">Type</span> <span class="mi">1</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x0B</span>	<span class="n">bLength</span>
+<span class="mh">0x24</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x02</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x01</span>	<span class="n">bFormatType</span>   <span class="p">(</span><span class="n">FORMAT_TYPE_1</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bNrChannels</span>   <span class="p">(</span><span class="mi">1</span> <span class="n">channels</span><span class="p">)</span>
+<span class="mh">0x02</span>	<span class="n">bSubframeSize</span>
+<span class="mh">0x10</span>	<span class="n">bBitResolution</span>   <span class="p">(</span><span class="mi">16</span> <span class="n">bits</span> <span class="n">per</span> <span class="n">sample</span><span class="p">)</span>
+<span class="mh">0x01</span>	<span class="n">bSamFreqType</span>   <span class="p">(</span><span class="n">Discrete</span> <span class="n">sampling</span> <span class="n">frequencies</span><span class="p">)</span>
+<span class="mh">0x00BB80</span> 	<span class="n">tSamFreq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="p">(</span><span class="mi">48000</span> <span class="n">Hz</span><span class="p">)</span>
+
+<span class="n">Endpoint</span> <span class="n">Descriptor</span> <span class="p">(</span><span class="n">Audio</span><span class="o">/</span><span class="n">MIDI</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x09</span>	<span class="n">bLength</span>
+<span class="mh">0x05</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x83</span>	<span class="n">bEndpointAddress</span>  <span class="p">(</span><span class="n">IN</span> <span class="n">endpoint</span> <span class="mi">3</span><span class="p">)</span>
+<span class="mh">0x05</span>	<span class="n">bmAttributes</span>      <span class="p">(</span><span class="n">Transfer</span><span class="p">:</span> <span class="n">Isochronous</span> <span class="o">/</span> <span class="n">Synch</span><span class="p">:</span> <span class="n">Asynchronous</span> <span class="o">/</span> <span class="n">Usage</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span>
+<span class="mh">0x0060</span>	<span class="n">wMaxPacketSize</span>    <span class="p">(</span><span class="mi">1</span> <span class="n">x</span> <span class="mi">96</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="mh">0x04</span>	<span class="n">bInterval</span>         <span class="p">(</span><span class="mi">8</span> <span class="n">frames</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bRefresh</span>
+<span class="mh">0x00</span>	<span class="n">bSynchAddress</span>
+
+<span class="n">AS</span> <span class="n">Isochronous</span> <span class="n">Data</span> <span class="n">Endpoint</span> <span class="n">Descriptor</span><span class="p">:</span>
+<span class="o">------------------------------</span>
+<span class="mh">0x07</span>	<span class="n">bLength</span>
+<span class="mh">0x25</span>	<span class="n">bDescriptorType</span>
+<span class="mh">0x01</span>	<span class="n">bDescriptorSubtype</span>
+<span class="mh">0x01</span>	<span class="n">bmAttributes</span>   <span class="p">(</span><span class="n">Sampling</span> <span class="n">Frequency</span><span class="p">)</span>
+<span class="mh">0x00</span>	<span class="n">bLockDelayUnits</span>   <span class="p">(</span><span class="n">undefined</span><span class="p">)</span>
+<span class="mh">0x0000</span>	<span class="n">wLockDelay</span>
+
+<span class="n">Microsoft</span> <span class="n">OS</span> <span class="n">Descriptor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">available</span><span class="o">.</span> <span class="n">Error</span> <span class="n">code</span><span class="p">:</span> <span class="mh">0x0000001F</span>
+
+<span class="n">String</span> <span class="n">Descriptor</span> <span class="n">Table</span>
+<span class="o">--------------------------------</span>
+<span class="n">Index</span>  <span class="n">LANGID</span>  <span class="n">String</span>
+<span class="mh">0x00</span>   <span class="mh">0x0000</span>  <span class="mh">0x0409</span> 
+<span class="mh">0x30</span>   <span class="mh">0x0409</span>  <span class="s2">&quot;Guillemot Corporation&quot;</span>
+<span class="mh">0x60</span>   <span class="mh">0x0409</span>  <span class="s2">&quot;USB Camera&quot;</span>
+<span class="mh">0x40</span>   <span class="mh">0x0409</span>  <span class="s2">&quot;Audio_Device&quot;</span>
+
+<span class="o">------------------------------</span>
+
+<span class="n">Connection</span> <span class="n">path</span> <span class="k">for</span> <span class="n">device</span><span class="p">:</span> 
+<span class="n">符合</span> <span class="n">USB</span> <span class="n">xHCI</span> <span class="n">的主机控制器</span>
+<span class="n">Root</span> <span class="n">Hub</span>
+<span class="n">USB</span> <span class="n">Camera</span> <span class="p">(</span><span class="n">VID</span><span class="o">=</span><span class="mh">0x057E</span> <span class="n">PID</span><span class="o">=</span><span class="mh">0x030A</span><span class="p">)</span> <span class="n">Port</span><span class="p">:</span> <span class="mi">3</span>
+
+<span class="n">Running</span> <span class="n">on</span><span class="p">:</span> <span class="n">Windows</span> <span class="mi">10</span> <span class="ow">or</span> <span class="n">greater</span>
+
+<span class="n">Brought</span> <span class="n">to</span> <span class="n">you</span> <span class="n">by</span> <span class="n">TDD</span> <span class="n">v2</span><span class="mf">.11.0</span><span class="p">,</span> <span class="n">Mar</span> <span class="mi">26</span> <span class="mi">2018</span><span class="p">,</span> <span class="mi">09</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mi">50</span>
+</pre></div>
+</div>
+</section>
+<section id="vc">
+<h2>VC架构<a class="headerlink" href="#vc" title="Permalink to this headline"></a></h2>
+<p>OUTPUT_TERMINAL(bSourceID = 4) &lt;– EXTENSION_UNIT(bUnitID = 4, baSourceID = 3) &lt;– PROCESSING_UNIT(bUnitID = 3, bSourceID = 1) &lt;– INPUT_TERMINAL(bTerminalID = 1)</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

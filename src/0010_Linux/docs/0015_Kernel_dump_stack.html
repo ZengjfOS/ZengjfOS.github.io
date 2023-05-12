@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Kernel dump_stack()</a></li>
+<li><a class="reference internal" href="#diff">diff</a></li>
+<li><a class="reference internal" href="#log">输出log</a></li>
+<li><a class="reference internal" href="#id1">查找内核函数</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="kernel-dump-stack">
+<h1>Kernel dump_stack()<a class="headerlink" href="#kernel-dump-stack" title="Permalink to this headline"></a></h1>
+<p>利用内核的dump_stack()快速理清tty设备函数调用关系</p>
+</section>
+<section id="diff">
+<h1>diff<a class="headerlink" href="#diff" title="Permalink to this headline"></a></h1>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/kernel-4.9/drivers/tty/serial/8250/8250_dma.c b/kernel-4.9/drivers/tty/serial/8250/8250_dma.c</span><span class="w"></span>
+<span class="gh">index fdbddbc6375..b5e5556fcc3 100644</span><span class="w"></span>
+<span class="gd">--- a/kernel-4.9/drivers/tty/serial/8250/8250_dma.c</span><span class="w"></span>
+<span class="gi">+++ b/kernel-4.9/drivers/tty/serial/8250/8250_dma.c</span><span class="w"></span>
+<span class="gu">@@ -71,13 +71,29 @@ int serial8250_tx_dma(struct uart_8250_port *p)</span><span class="w"></span>
+<span class="w"> </span>       struct circ_buf                 *xmit = &amp;p-&gt;port.state-&gt;xmit;<span class="w"></span>
+<span class="w"> </span>       struct dma_async_tx_descriptor  *desc;<span class="w"></span>
+<span class="w"> </span>       int ret;<span class="w"></span>
+
+<span class="w"> </span>       if (uart_tx_stopped(&amp;p-&gt;port) || dma-&gt;tx_running ||<span class="w"></span>
+<span class="w"> </span>           uart_circ_empty(xmit))<span class="w"></span>
+<span class="w"> </span>               return 0;<span class="w"></span>
+
+<span class="gi">+       dump_stack();</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>       dma-&gt;tx_size = CIRC_CNT_TO_END(xmit-&gt;head, xmit-&gt;tail, UART_XMIT_SIZE);<span class="w"></span>
+
+<span class="w"> </span>       desc = dmaengine_prep_slave_single(dma-&gt;txchan,<span class="w"></span>
+<span class="w"> </span>                                          dma-&gt;tx_addr + xmit-&gt;tail,<span class="w"></span>
+<span class="w"> </span>                                          dma-&gt;tx_size, DMA_MEM_TO_DEV,<span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="log">
+<h1>输出log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="mf">5952.713043</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">]</span><span class="n">Call</span> <span class="n">trace</span><span class="p">:</span>
+<span class="p">[</span> <span class="mf">5952.713058</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb928a7e8</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">dump_backtrace</span><span class="o">+</span><span class="mh">0x0</span><span class="o">/</span><span class="mh">0x288</span>
+<span class="p">[</span> <span class="mf">5952.713066</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb928a7e0</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">show_stack</span><span class="o">+</span><span class="mh">0x14</span><span class="o">/</span><span class="mh">0x1c</span>
+<span class="p">[</span> <span class="mf">5952.713074</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb95eaef0</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">dump_stack</span><span class="o">+</span><span class="mh">0xcc</span><span class="o">/</span><span class="mh">0x104</span>
+<span class="p">[</span> <span class="mf">5952.713083</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb9672b70</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">serial8250_tx_dma</span><span class="o">+</span><span class="mh">0x94</span><span class="o">/</span><span class="mh">0x2a8</span>
+<span class="p">[</span> <span class="mf">5952.713090</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb96712c8</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">serial8250_start_tx</span><span class="o">+</span><span class="mh">0x110</span><span class="o">/</span><span class="mh">0x1b8</span>
+<span class="p">[</span> <span class="mf">5952.713099</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb966a950</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">__uart_start</span><span class="o">+</span><span class="mh">0x58</span><span class="o">/</span><span class="mh">0x64</span>
+<span class="p">[</span> <span class="mf">5952.713106</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb966accc</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">uart_write</span><span class="o">+</span><span class="mh">0x1cc</span><span class="o">/</span><span class="mh">0x234</span>
+<span class="p">[</span> <span class="mf">5952.713113</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb965fd3c</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">n_tty_write</span><span class="o">+</span><span class="mh">0x11c</span><span class="o">/</span><span class="mh">0x3c8</span>
+<span class="p">[</span> <span class="mf">5952.713122</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb965b628</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">tty_write</span><span class="o">+</span><span class="mh">0x1e4</span><span class="o">/</span><span class="mh">0x27c</span>
+<span class="p">[</span> <span class="mf">5952.713130</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb9416040</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">__vfs_write</span><span class="o">+</span><span class="mh">0x44</span><span class="o">/</span><span class="mh">0x124</span>
+<span class="p">[</span> <span class="mf">5952.713136</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb9416320</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">vfs_write</span><span class="o">+</span><span class="mh">0xc8</span><span class="o">/</span><span class="mh">0x184</span>
+<span class="p">[</span> <span class="mf">5952.713142</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb9416514</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">SyS_write</span><span class="o">+</span><span class="mh">0x6c</span><span class="o">/</span><span class="mh">0xcc</span>
+<span class="p">[</span> <span class="mf">5952.713149</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">][</span><span class="o">&lt;</span><span class="n">ffffff9cb92835c0</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">el0_svc_naked</span><span class="o">+</span><span class="mh">0x34</span><span class="o">/</span><span class="mh">0x38</span>
+<span class="p">[</span> <span class="mf">5952.713155</span><span class="p">]</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">2247</span><span class="p">:</span><span class="n">Binder</span><span class="p">:</span><span class="mi">563_2</span><span class="p">]</span><span class="o">==</span><span class="n">serial8250_tx_dma</span><span class="p">,</span><span class="n">head</span><span class="p">:</span><span class="mi">933</span> <span class="n">tail</span><span class="p">:</span><span class="mi">908</span> <span class="n">tx_size</span><span class="p">:</span><span class="mi">25</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h1>查找内核函数<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>cd kernel-4.9/drivers/tty/serial</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ack</span> <span class="pre">&quot;</span> <span class="pre">uart_write\(&quot;</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">serial_core</span><span class="o">.</span><span class="n">c</span>
+<span class="mi">566</span><span class="p">:</span><span class="n">static</span> <span class="nb">int</span> <span class="n">uart_write</span><span class="p">(</span><span class="n">struct</span> <span class="n">tty_struct</span> <span class="o">*</span><span class="n">tty</span><span class="p">,</span>
+</pre></div>
+</div>
+</li>
+<li><p>uart_write</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">uart_write</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">tty_struct</span><span class="w"> </span><span class="o">*</span><span class="n">tty</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                        </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">uart_state</span><span class="w"> </span><span class="o">*</span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tty</span><span class="o">-&gt;</span><span class="n">driver_data</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">uart_port</span><span class="w"> </span><span class="o">*</span><span class="n">port</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">circ_buf</span><span class="w"> </span><span class="o">*</span><span class="n">circ</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">         * This means you called this function _after_ the port was</span>
+<span class="cm">         * closed.  No cookie for you.</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">state</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">WARN_ON</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EL3HLT</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uart_port_lock</span><span class="p">(</span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">flags</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">circ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">state</span><span class="o">-&gt;</span><span class="n">xmit</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">buf</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">uart_port_unlock</span><span class="p">(</span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="n">flags</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">port</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CIRC_SPACE_TO_END</span><span class="p">(</span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span><span class="w"> </span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">,</span><span class="w"> </span><span class="n">UART_XMIT_SIZE</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">count</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">memcpy</span><span class="p">(</span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">buf</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span><span class="w"> </span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">circ</span><span class="o">-&gt;</span><span class="n">head</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">UART_XMIT_SIZE</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">buf</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">count</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">__uart_start</span><span class="p">(</span><span class="n">tty</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">uart_port_unlock</span><span class="p">(</span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="n">flags</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">uart_port</span></code>中有<code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">uart_state</span></code>，所以修改上面的state从port中获取；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

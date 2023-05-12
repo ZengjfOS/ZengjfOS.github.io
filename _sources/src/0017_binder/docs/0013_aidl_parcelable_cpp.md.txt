@@ -1,0 +1,222 @@
+# aidl parcelable cpp
+
+aidl直接定义parcelable数据，用数组替代list parcelable类型的数据
+
+# 参考文档
+
+* [Passing objects over IPC](https://developer.android.com/guide/components/aidl#PassingObjects)
+  * In Android 10 (API level 29), you can define Parcelable objects directly in AIDL.
+* https://android.googlesource.com/platform/system/tools/aidl/+show/brillo-m10-dev/docs/aidl-cpp.md
+
+# list parcel build error
+
+暂时不支持List的Parcelable
+
+```
+aidl E 01-11 03:28:12   411   411 type_cpp.cpp:509] aidl-cpp does not yet support List<com.networkmanager.aidl.FilterItem>
+```
+
+将上面的list换成数组处理
+
+```
+List<DnsItem> listSysAllowDnsItems(); --> DnsItem[] listSysAllowDnsItems();
+```
+
+* https://android.googlesource.com/platform/system/tools/aidl/+show/brillo-m10-dev/docs/aidl-cpp.md
+  * 如下是代码数据转换表
+
+| Java Type             | C++ Type            | inout | Notes                                                 |
+|-----------------------|---------------------|-------|-------------------------------------------------------|
+| boolean               | bool                | in    | These 8 types are all considered primitives.         |
+| byte                  | int8\_t             | in    |                                                       |
+| char                  | char16\_t           | in    |                                                       |
+| int                   | int32\_t            | in    |                                                       |
+| long                  | int64\_t            | in    |                                                       |
+| float                 | float               | in    |                                                       |
+| double                | double              | in    |                                                       |
+| String                | String16            | in    | Supports null references.                             |
+| android.os.Parcelable | android::Parcelable | inout |                                                       |
+| T extends IBinder     | sp<T>               | in    |                                                       |
+| Arrays (T[])          | vector<T>           | inout | May contain only primitives, Strings and parcelables. |
+| List<String>          | vector<String16>    | inout |                                                       |
+| PersistableBundle     | PersistableBundle   | inout | binder/PersistableBundle.h                            |
+| List<IBinder>         | vector<sp<IBinder>> | inout |                                                       |
+| FileDescriptor        | ScopedFd            | inout | nativehelper/ScopedFd.h                               |
+
+如下是list转换为数组的diff，作为参考
+
+```diff
+diff --git a/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl b/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl
+index 3f5619b0..da16aaf5 100755
+--- a/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl
++++ b/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl
+@@ -1,2 +1,8 @@
+ package com.networkmanager.aidl;
+-parcelable FilterItem;
+\ No newline at end of file
++
++parcelable FilterItem {
++       String opType;
++       String pkgName;
++       String addr;
++}
++
+diff --git a/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl b/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl
+index 8b8257b2..1b1231c4 100755
+--- a/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl
++++ b/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl
+@@ -1,5 +1,6 @@
+ package com.networkmanager.aidl;
+ import com.networkmanager.aidl.FilterItem;
++import com.networkmanager.aidl.DnsItem;
+
+ interface INetWorkControlManager {
+        //增加一条应用规则，为包名为pkgName的应用启用过滤（黑白名单均可）
+@@ -15,11 +16,11 @@ interface INetWorkControlManager {
+        //根据包名获取该应用所有的过滤规则
+        //入参 pkgName   应用包名
+        //返回 过滤规则列表
+-       List<FilterItem> listAppFilterItems(String pkgName);
++       FilterItem[] listAppFilterItems(String pkgName);
+
+        //获取所有应用的过滤规则
+        //返回 过滤规则列表
+-       List<FilterItem> listAllAppFilterItems();
++       FilterItem[] listAllAppFilterItems();
+
+        //获取系统禁止访问的所有地址
+        //返回 地址列表
+```
+
+aidl编译Android.bp参考
+
+```
+aidl_interface {
+    name: "aidl-test",
+    srcs: [
+        "src/com/networkmanager/aidl/DnsItem.aidl",
+        "src/com/networkmanager/aidl/FilterItem.aidl",
+        "src/com/networkmanager/aidl/INetWorkControlManager.aidl",
+    ],
+    include_dirs: [
+        "frameworks/base/core/java",
+    ],
+    local_include_dir: "src",
+    vendor_available: true,
+    backend: {
+        cpp: {
+            enabled: true,
+        },
+        java: {
+            enabled: false,
+        },
+        ndk: {
+            enabled: false,
+        },
+    },
+}
+```
+
+# parcelable传统实现
+
+声明
+
+```java
+package com.networkmanager.aidl;
+
+parcelable DnsItem;
+```
+
+实现
+
+```java
+package com.networkmanager.aidl;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+/***************************************
+ * @author tangkw
+ * 过滤黑白名单数据结构类
+ **************************************/
+public class DnsItem implements Parcelable {
+
+        private String dns="";// 包名
+        private String addr="";// IP地址(若为*代表所有)
+
+        public DnsItem(){
+
+        }
+
+        public DnsItem(String dns, String addr) {
+
+                this.dns = dns;
+                this.addr = addr;
+        }
+
+        @Override
+        public int describeContents() {
+                // TODO Auto-generated method stub
+                return 0;
+        }
+
+        public String getDns() {
+                return dns;
+        }
+
+        public void setDns(String dns) {
+                this.dns= dns;
+        }
+
+        public String getAddr() {
+                return addr;
+        }
+
+        public void setAddr(String addr) {
+                this.addr = addr;
+        }
+
+        @Override
+        public String toString() {
+                // return "DnsItem [dns=" + dns
+                // + ", addr=" + addr + "]";
+                return "DnsItem: "+ dns+" -> "+addr;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+                // TODO Auto-generated method stub
+                dest.writeString(this.dns);
+                dest.writeString(this.addr);
+        }
+
+        public static Parcelable.Creator<DnsItem> getCreator() {
+                return CREATOR;
+        }
+
+        public static final Parcelable.Creator<DnsItem> CREATOR = new Creator<DnsItem>() {
+
+                @Override
+                public DnsItem[] newArray(int size) {
+                        return new DnsItem[size];
+                }
+
+                @Override
+                public DnsItem createFromParcel(Parcel source) {
+                        return new DnsItem(source.readString(),
+                                        source.readString());
+                }
+        };
+}
+```
+
+# parcelable自动实现
+
+```java
+package com.networkmanager.aidl;
+
+parcelable DnsItem {
+        String dns;
+        String addr;
+}
+```

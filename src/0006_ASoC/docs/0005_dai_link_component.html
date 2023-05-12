@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">dai_link component</a></li>
+<li><a class="reference internal" href="#snd-soc-register-card">snd_soc_register_card调用</a></li>
+<li><a class="reference internal" href="#soc-init-dai-link">soc_init_dai_link代码分析</a></li>
+<li><a class="reference internal" href="#dai-linklink-component">dai_link添加link-component数组结构展开</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dai-link-component">
+<h1>dai_link component<a class="headerlink" href="#dai-link-component" title="Permalink to this headline"></a></h1>
+<p>dai_link的真实面目</p>
+<p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L1086">soc_init_dai_link Source Code</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="w"> </span><span class="o">*</span><span class="n">codecs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="w"> </span><span class="o">*</span><span class="n">platform</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>如上可以，<code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">snd_soc_dai_link</span></code>将codec和platform连接在了一起，这也就是link的意思了；</p>
+</section>
+<section id="snd-soc-register-card">
+<h1>snd_soc_register_card调用<a class="headerlink" href="#snd-soc-register-card" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_register_card</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">client_mutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_card_prelinks</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_init_dai_link</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="p">);</span><span class="w">                        </span><span class="c1">// &lt;---- snd_soc_register_card调用</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: failed to init link %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">client_mutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">client_mutex</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">snd_soc_bind_card</span><span class="p">(</span><span class="n">card</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">EXPORT_SYMBOL_GPL</span><span class="p">(</span><span class="n">snd_soc_register_card</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="soc-init-dai-link">
+<h1>soc_init_dai_link代码分析<a class="headerlink" href="#soc-init-dai-link" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L1086">soc_init_dai_link Source Code</a></p></li>
+<li><p><span class="xref myst">i.MX6 soc dai_link数组结构展开</span></p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">soc_init_dai_link</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">                 </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="o">*</span><span class="n">link</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="w"> </span><span class="o">*</span><span class="n">codec</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_init_platform</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="p">);</span><span class="w">                            </span><span class="c1">// 创建platform component</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: failed to init multiplatform</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_init_multicodec</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="p">);</span><span class="w">                          </span><span class="c1">// 创建codec component</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: failed to init multicodec</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">for_each_link_codecs</span><span class="p">(</span><span class="n">link</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">codec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                              </span><span class="c1">// codec名称和设备树不用同时设定，DAI名字要设定</span>
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">         * Codec must be specified by 1 of name or OF node,</span>
+<span class="cm">         * not both or neither.</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!!</span><span class="n">codec</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"></span>
+<span class="w">            </span><span class="o">!!</span><span class="n">codec</span><span class="o">-&gt;</span><span class="n">of_node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: Neither/both codec name/of_node are set for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* Codec DAI name must be specified */</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * priv-&gt;dai_link[0].codec_dai_name = &quot;cs42888&quot;</span>
+<span class="cm">         * priv-&gt;dai_link[1].codec_dai_name = &quot;snd-soc-dummy-dai&quot;</span>
+<span class="cm">         * priv-&gt;dai_link[2].codec_dai_name = &quot;cs42888&quot;</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">codec</span><span class="o">-&gt;</span><span class="n">dai_name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: codec_dai_name not set for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * Platform may be specified by either name or OF node, but</span>
+<span class="cm">     * can be left unspecified, and a dummy platform will be used.</span>
+<span class="cm">     * platform的名字和设备树节点只能设定一个</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">of_node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;ASoC: Both platform name/of_node are set for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * Defer card registartion if platform dai component is not added to</span>
+<span class="cm">     * component list.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">of_node</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">        </span><span class="o">!</span><span class="n">soc_find_component</span><span class="p">(</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">of_node</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EPROBE_DEFER</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * CPU device may be specified by either name or OF node, but</span>
+<span class="cm">     * can be left unspecified, and will be matched based on DAI</span>
+<span class="cm">     * name alone..</span>
+<span class="cm">     * cpu的名字和设备树节点只能设定一个</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_name</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_of_node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;ASoC: Neither/both cpu name/of_node are set for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * Defer card registartion if cpu dai component is not added to</span>
+<span class="cm">     * component list.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_name</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">        </span><span class="o">!</span><span class="n">soc_find_component</span><span class="p">(</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_of_node</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_name</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EPROBE_DEFER</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * At least one of CPU DAI name or CPU device name/node must be</span>
+<span class="cm">     * specified</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_dai_name</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">        </span><span class="o">!</span><span class="p">(</span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_name</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">cpu_of_node</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;ASoC: Neither cpu_dai_name nor cpu_name/of_node are set for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p>platform snd_soc_dai_link_component</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_init_platform</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">                 </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="o">*</span><span class="n">dai_link</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="w"> </span><span class="o">*</span><span class="n">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * FIXME</span>
+<span class="cm">     *</span>
+<span class="cm">     * this function should be removed in the future</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* convert Legacy platform link */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">platform</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">legacy_platform</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_kzalloc</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="p">),</span><span class="w"></span>
+<span class="w">                </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">platform</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">platform</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">platform</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">legacy_platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">name</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">platform_name</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">of_node</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">platform_of_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">dai_name</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* if there&#39;s no platform we match on the empty platform */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">        </span><span class="o">!</span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">of_node</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">platform</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>codec snd_soc_dai_link_component</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_init_multicodec</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">                   </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="o">*</span><span class="n">dai_link</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Legacy codec/codec_dai link is a single entry in multicodec */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codec_name</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">||</span><span class="w"></span>
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codec_dai_name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_kzalloc</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link_component</span><span class="p">),</span><span class="w"></span>
+<span class="w">                </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codec_name</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codec_of_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codec_dai_name</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">codecs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: DAI link has no CODECs</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="dai-linklink-component">
+<h1>dai_link添加link-component数组结构展开<a class="headerlink" href="#dai-linklink-component" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="n">fsl_asoc_card_dai</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Default ASoC DAI Link*/</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_asoc_card_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">legacy_platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},],</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* DPCM Link between Front-End and Back-End (Optional) */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-FE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-FE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy-dai&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dynamic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">legacy_platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy-dai&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},],</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-BE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-BE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">be_hw_params_fixup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">be_hw_params_fixup</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_asoc_card_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">no_pcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">legacy_platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codecs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="n">dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">},],</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

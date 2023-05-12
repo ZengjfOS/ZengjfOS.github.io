@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">bitbake variable override</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">代码分析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bitbake-variable-override">
+<h1>bitbake variable override<a class="headerlink" href="#bitbake-variable-override" title="Permalink to this headline"></a></h1>
+<p>bitback变量覆盖</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/latest/bitbake-user-manual/bitbake-user-manual.html#basic-syntax">3.1. Basic Syntax</a></p></li>
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/latest/mega-manual/mega-manual.html#var-MACHINEOVERRIDES">MACHINEOVERRIDES</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>代码分析<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx8qmmek.conf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#@TYPE: Machine</span>
+<span class="c1">#@NAME: i.MX 8QM B0 MEK</span>
+<span class="c1">#@DESCRIPTION: i.MX 8QuadMax Multisensory Enablement Kit (MEK) board</span>
+<span class="c1">#@MAINTAINER: Jun Zhu &lt;junzhu@nxp.com&gt;</span>
+
+<span class="n">MACHINEOVERRIDES</span> <span class="o">=.</span> <span class="s2">&quot;mx8:mx8qm:&quot;</span>
+
+<span class="n">require</span> <span class="n">conf</span><span class="o">/</span><span class="n">machine</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">base</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">require</span> <span class="n">conf</span><span class="o">/</span><span class="n">machine</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">arm</span><span class="o">/</span><span class="n">arch</span><span class="o">-</span><span class="n">arm64</span><span class="o">.</span><span class="n">inc</span>
+
+<span class="n">MACHINE_FEATURES_append</span> <span class="o">=</span> <span class="s2">&quot; qca6174&quot;</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>meta-fsl-bsp-release/imx/meta-bsp/conf/machine/include/imx-base.inc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">SERIAL_CONSOLE</span> <span class="o">=</span> <span class="s2">&quot;115200 ttymxc0&quot;</span>
+<span class="n">SERIAL_CONSOLE_mxs</span> <span class="o">=</span> <span class="s2">&quot;115200 ttyAMA0&quot;</span>
+
+<span class="n">KERNEL_IMAGETYPE</span> <span class="o">=</span> <span class="s2">&quot;zImage&quot;</span>
+<span class="n">KERNEL_IMAGETYPE_mx8</span> <span class="o">=</span> <span class="s2">&quot;Image&quot;</span>
+
+<span class="n">MACHINE_FEATURES</span> <span class="o">=</span> <span class="s2">&quot;usbgadget usbhost vfat alsa touchscreen&quot;</span>
+
+<span class="n">MACHINE_FEATURES_append_mx8qm</span>  <span class="o">=</span> <span class="s2">&quot; xen&quot;</span>
+<span class="n">MACHINE_FEATURES_append_mx8qxp</span> <span class="o">=</span> <span class="s2">&quot; xen&quot;</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>检查确认<code class="docutils literal notranslate"><span class="pre">KERNEL_IMAGETYPE</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>zengjf@UbuntuServer:imx8-build-wayland$ bitbake example -e  | grep KERNEL_IMAGETYPE
+# $KERNEL_IMAGETYPE [4 operations]
+KERNEL_IMAGETYPE=&quot;Image&quot;
+# $KERNEL_IMAGETYPES [2 operations]
+#     [_defaultval] &quot;${KERNEL_IMAGETYPE}&quot;
+#     [doc] &quot;The list of types of kernel to build for a device, usually set by the machine configuration files and defaults to KERNEL_IMAGETYPE.&quot;
+#   &quot;${KERNEL_IMAGETYPE}&quot;
+KERNEL_IMAGETYPES=&quot;Image&quot;
+# $KERNEL_IMAGETYPE_mx8
+KERNEL_IMAGETYPE_mx8=&quot;Image&quot;
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

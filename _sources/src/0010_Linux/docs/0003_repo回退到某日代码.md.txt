@@ -1,0 +1,46 @@
+# repo回退到某日代码
+
+repo大规模回退版本编译
+
+# 参考文档
+
+* [使用repo命令统一回退项目中各git版本库到指定日期](https://blog.csdn.net/qianxuedegushi/article/details/119824878)
+
+# git回退版本思路
+
+* git log --before "2022-07-16 00:00" -1
+* git log --before "2022-07-15 23:59" -1
+* git log --before "2022-07-15 23:59" -1 --pretty=format:"%H"
+* dateInfo=2022-07-15; git log --before "${dateInfo} 23:59" -1 --pretty=format:"%H"
+* 获取commit id
+  ```sh
+  dateInfo=2022-07-15; commitID=`git log --before "${dateInfo} 23:59" -1 --pretty=format:"%H"`; echo ${commitID}
+  ```
+* reset
+  ```sh
+  dateInfo=2022-07-15; commitID=`git log --before "${dateInfo} 23:59" -1 --pretty=format:"%H"`; git reset --hard ${commitID}
+  ```
+
+# repo回退版本
+
+* repo forall -c "git checkout dev"
+* 直接设置时间
+  ```
+  repo forall -c 'dateInfo=2022-07-18; commitID=`git log --before "${dateInfo} 23:59" -1 --pretty=format:"%H"`; git reset --hard ${commitID}'
+  ```
+    * 内部的反引号是需要在仓库中执行，所以只能使用单引号，特别需要注意
+  * repo forall -c 'git log -1 --pretty=oneline'
+
+# 可调时间及格式化查看log
+
+* repo forall -c "git checkout dev"
+* export日期
+  ```sh
+  export dateInfo=2022-07-18 && repo forall -c 'commitID=`git log --before "${dateInfo} 23:59" -1 --pretty=format:"%H"`; git reset --hard ${commitID}'
+  ```
+  * 内部的反引号是需要在仓库中执行，所以只能使用单引号，所以采用export导出日期信息才能在单引号脚本执行中引用到
+* 采用markdown表格输出
+  ```sh
+  echo "commit id | date | author name | module | commit log";echo "---|---|---|---|---";repo forall -c 'git log -1 --pretty=format:"%H | %ai | %an | `basename $PWD` | %s"'
+  ```
+* [0003_RepoExcel.py](refers/0003_RepoExcel.py)

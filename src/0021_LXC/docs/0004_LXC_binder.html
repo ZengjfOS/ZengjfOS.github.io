@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">LXC binder</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#lxc-guestdevice">lxc guest添加device</a></li>
+<li><a class="reference internal" href="#host">host运行服务程序</a></li>
+<li><a class="reference internal" href="#guestservice">guest运行service</a></li>
+<li><a class="reference internal" href="#guestclient">guest测试client</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lxc-binder">
+<h1>LXC binder<a class="headerlink" href="#lxc-binder" title="Permalink to this headline"></a></h1>
+<p>尝试容器中使用binder</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/59142605/how-to-determine-the-cgroup-of-a-device-and-give-it-to-a-lxc-container">How to determine the cgroup of a device and give it to a lxc container</a></p></li>
+</ul>
+</section>
+<section id="lxc-guestdevice">
+<h1>lxc guest添加device<a class="headerlink" href="#lxc-guestdevice" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo lxc-start -n zengjf</p></li>
+<li><p>https://github.com/LowLevelOfLogic/RaspberryPi/tree/servicemanager</p>
+<ul class="simple">
+<li><p>编译拷贝到busybox的bin目录下去</p></li>
+<li><p>frameworks/native/cmds/servicemanager</p></li>
+</ul>
+</li>
+<li><p>手动添加节点：</p>
+<ul class="simple">
+<li><p>sudo lxc-device -n zengjf -l TRACE -o lxc.log add /dev/binder</p>
+<ul>
+<li><p>Creates a /dev/binder device in container zengjf based on the matching device on the host.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>自动添加节点：</p>
+<ul>
+<li><p>ls -al /dev/binder</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">crw</span><span class="o">-------</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">61</span> <span class="n">Feb</span> <span class="mi">21</span> <span class="mi">07</span><span class="p">:</span><span class="mi">50</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">binder</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>主设备号：10</p></li>
+<li><p>此设备号：61</p></li>
+</ul>
+</li>
+<li><p>/var/lib/lxc/zengjf/config</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...省略</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">cgroup</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">allow</span> <span class="o">=</span> <span class="n">c</span> <span class="mi">10</span><span class="p">:</span><span class="mi">61</span> <span class="n">rwm</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">mount</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">binder</span> <span class="n">dev</span><span class="o">/</span><span class="n">binder</span> <span class="n">none</span> <span class="n">bind</span><span class="p">,</span><span class="n">optional</span><span class="p">,</span><span class="n">create</span><span class="o">=</span><span class="n">file</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo lxc-start -n zengjf -l TRACE -o lxc.log</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="host">
+<h1>host运行服务程序<a class="headerlink" href="#host" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>sudo ./servicemanager</p></li>
+</ul>
+</section>
+<section id="guestservice">
+<h1>guest运行service<a class="headerlink" href="#guestservice" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>./service</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0000</span><span class="p">:</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">1</span><span class="n">a</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">e</span> <span class="n">n</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">64</span> <span class="n">d</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">72</span> <span class="n">r</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0016</span><span class="p">:</span> <span class="mi">6</span><span class="n">f</span> <span class="n">o</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">69</span> <span class="n">i</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">64</span> <span class="n">d</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">2</span><span class="n">e</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">f</span> <span class="n">o</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">73</span> <span class="n">s</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">2</span><span class="n">e</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">49</span> <span class="n">I</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0032</span><span class="p">:</span> <span class="mi">53</span> <span class="n">S</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">72</span> <span class="n">r</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">76</span> <span class="n">v</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">69</span> <span class="n">i</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">63</span> <span class="n">c</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">4</span><span class="n">d</span> <span class="n">M</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0048</span><span class="p">:</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">e</span> <span class="n">n</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">67</span> <span class="n">g</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">72</span> <span class="n">r</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0064</span><span class="p">:</span> <span class="mi">09</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">63</span> <span class="n">c</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">c</span> <span class="n">l</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">63</span> <span class="n">c</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">75</span> <span class="n">u</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">c</span> <span class="n">l</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0080</span><span class="p">:</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">74</span> <span class="n">t</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">85</span> <span class="o">.</span> <span class="mi">2</span><span class="n">a</span> <span class="o">*</span> <span class="mi">62</span> <span class="n">b</span> <span class="mi">73</span> <span class="n">s</span> <span class="mi">7</span><span class="n">f</span> <span class="o">.</span> <span class="mi">01</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0096</span><span class="p">:</span> <span class="mi">7</span><span class="n">b</span> <span class="p">{</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="n">BR_NOOP</span><span class="p">:</span>
+<span class="n">BR_INCREFS</span><span class="p">:</span>
+  <span class="mh">0xbe9139cc</span><span class="p">,</span> <span class="mh">0xbe9139d0</span>
+<span class="n">BR_ACQUIRE</span><span class="p">:</span>
+  <span class="mh">0xbe9139e0</span><span class="p">,</span> <span class="mh">0xbe9139e4</span>
+<span class="n">BR_TRANSACTION_COMPLETE</span><span class="p">:</span>
+<span class="n">BR_REPLY</span><span class="p">:</span>
+  <span class="n">target</span> <span class="mi">0000000000000000</span>  <span class="n">cookie</span> <span class="mi">0000000000000000</span>  <span class="n">code</span> <span class="mi">00000000</span>  <span class="n">flags</span> <span class="mi">00000000</span>
+  <span class="n">pid</span>        <span class="mi">0</span>  <span class="n">uid</span>        <span class="mi">0</span>  <span class="n">data</span> <span class="mi">4</span>  <span class="n">offs</span> <span class="mi">0</span>
+<span class="mi">0000</span><span class="p">:</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>host端servicemanager收到信息如下：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BR_NOOP</span><span class="p">:</span>
+<span class="n">BR_TRANSACTION</span><span class="p">:</span>
+  <span class="n">target</span> <span class="mi">0000000000000000</span>  <span class="n">cookie</span> <span class="mi">0000000000000000</span>  <span class="n">code</span> <span class="mi">00000003</span>  <span class="n">flags</span> <span class="mi">00000000</span>
+  <span class="n">pid</span>     <span class="mi">4501</span>  <span class="n">uid</span>        <span class="mi">0</span>  <span class="n">data</span> <span class="mi">112</span>  <span class="n">offs</span> <span class="mi">8</span>
+<span class="mi">0000</span><span class="p">:</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">1</span><span class="n">a</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">e</span> <span class="n">n</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">64</span> <span class="n">d</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">72</span> <span class="n">r</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0016</span><span class="p">:</span> <span class="mi">6</span><span class="n">f</span> <span class="n">o</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">69</span> <span class="n">i</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">64</span> <span class="n">d</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">2</span><span class="n">e</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">f</span> <span class="n">o</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">73</span> <span class="n">s</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">2</span><span class="n">e</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">49</span> <span class="n">I</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0032</span><span class="p">:</span> <span class="mi">53</span> <span class="n">S</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">72</span> <span class="n">r</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">76</span> <span class="n">v</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">69</span> <span class="n">i</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">63</span> <span class="n">c</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">4</span><span class="n">d</span> <span class="n">M</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0048</span><span class="p">:</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">e</span> <span class="n">n</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">67</span> <span class="n">g</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">72</span> <span class="n">r</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0064</span><span class="p">:</span> <span class="mi">09</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">63</span> <span class="n">c</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">c</span> <span class="n">l</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">63</span> <span class="n">c</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">75</span> <span class="n">u</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">6</span><span class="n">c</span> <span class="n">l</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0080</span><span class="p">:</span> <span class="mi">61</span> <span class="n">a</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">74</span> <span class="n">t</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">65</span> <span class="n">e</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">85</span> <span class="o">.</span> <span class="mi">2</span><span class="n">a</span> <span class="o">*</span> <span class="mi">68</span> <span class="n">h</span> <span class="mi">73</span> <span class="n">s</span> <span class="mi">7</span><span class="n">f</span> <span class="o">.</span> <span class="mi">01</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+<span class="mi">0096</span><span class="p">:</span> <span class="mi">01</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span> <span class="mi">00</span> <span class="o">.</span>
+  <span class="o">-</span> <span class="nb">type</span> <span class="mi">73682</span><span class="n">a85</span>  <span class="n">flags</span> <span class="mi">0000017</span><span class="n">f</span>  <span class="n">ptr</span> <span class="mi">0000000000000001</span>  <span class="n">cookie</span> <span class="mi">0000000000000000</span>
+<span class="n">BR_NOOP</span><span class="p">:</span>
+<span class="n">BR_TRANSACTION_COMPLETE</span><span class="p">:</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="guestclient">
+<h1>guest测试client<a class="headerlink" href="#guestclient" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>运行service后运行client完整输出：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>~ <span class="c1"># service &amp;</span>
+~ <span class="c1"># 0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .</span>
+<span class="m">0016</span>: 6f o <span class="m">00</span> . <span class="m">69</span> i <span class="m">00</span> . <span class="m">64</span> d <span class="m">00</span> . 2e . <span class="m">00</span> . 6f o <span class="m">00</span> . <span class="m">73</span> s <span class="m">00</span> . 2e . <span class="m">00</span> . <span class="m">49</span> I <span class="m">00</span> .
+<span class="m">0032</span>: <span class="m">53</span> S <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . <span class="m">72</span> r <span class="m">00</span> . <span class="m">76</span> v <span class="m">00</span> . <span class="m">69</span> i <span class="m">00</span> . <span class="m">63</span> c <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . 4d M <span class="m">00</span> .
+<span class="m">0048</span>: <span class="m">61</span> a <span class="m">00</span> . 6e n <span class="m">00</span> . <span class="m">61</span> a <span class="m">00</span> . <span class="m">67</span> g <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . <span class="m">72</span> r <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+<span class="m">0064</span>: <span class="m">09</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">63</span> c <span class="m">00</span> . <span class="m">61</span> a <span class="m">00</span> . 6c l <span class="m">00</span> . <span class="m">63</span> c <span class="m">00</span> . <span class="m">75</span> u <span class="m">00</span> . 6c l <span class="m">00</span> .
+<span class="m">0080</span>: <span class="m">61</span> a <span class="m">00</span> . <span class="m">74</span> t <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">85</span> . 2a * <span class="m">62</span> b <span class="m">73</span> s 7f . <span class="m">01</span> . <span class="m">00</span> . <span class="m">00</span> .
+<span class="m">0096</span>: 7b <span class="o">{</span> <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+BR_NOOP:
+BR_INCREFS:
+  0xbe97f9cc, 0xbe97f9d0
+BR_ACQUIRE:
+  0xbe97f9e0, 0xbe97f9e4
+BR_TRANSACTION_COMPLETE:
+BR_REPLY:
+  target <span class="m">0000000000000000</span>  cookie <span class="m">0000000000000000</span>  code <span class="m">00000000</span>  flags <span class="m">00000000</span>
+  pid        <span class="m">0</span>  uid        <span class="m">0</span>  data <span class="m">4</span>  offs <span class="m">0</span>
+<span class="m">0000</span>: <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+
+~ <span class="c1"># client a 121</span>
+<span class="m">0000</span>: <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . 1a . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">61</span> a <span class="m">00</span> . 6e n <span class="m">00</span> . <span class="m">64</span> d <span class="m">00</span> . <span class="m">72</span> r <span class="m">00</span> .
+<span class="m">0016</span>: 6f o <span class="m">00</span> . <span class="m">69</span> i <span class="m">00</span> . <span class="m">64</span> d <span class="m">00</span> . 2e . <span class="m">00</span> . 6f o <span class="m">00</span> . <span class="m">73</span> s <span class="m">00</span> . 2e . <span class="m">00</span> . <span class="m">49</span> I <span class="m">00</span> .
+<span class="m">0032</span>: <span class="m">53</span> S <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . <span class="m">72</span> r <span class="m">00</span> . <span class="m">76</span> v <span class="m">00</span> . <span class="m">69</span> i <span class="m">00</span> . <span class="m">63</span> c <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . 4d M <span class="m">00</span> .
+<span class="m">0048</span>: <span class="m">61</span> a <span class="m">00</span> . 6e n <span class="m">00</span> . <span class="m">61</span> a <span class="m">00</span> . <span class="m">67</span> g <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . <span class="m">72</span> r <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+<span class="m">0064</span>: <span class="m">09</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">63</span> c <span class="m">00</span> . <span class="m">61</span> a <span class="m">00</span> . 6c l <span class="m">00</span> . <span class="m">63</span> c <span class="m">00</span> . <span class="m">75</span> u <span class="m">00</span> . 6c l <span class="m">00</span> .
+<span class="m">0080</span>: <span class="m">61</span> a <span class="m">00</span> . <span class="m">74</span> t <span class="m">00</span> . <span class="m">65</span> e <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+BR_NOOP:
+BR_TRANSACTION_COMPLETE:
+BR_REPLY:
+  target <span class="m">0000000000000000</span>  cookie <span class="m">0000000000000000</span>  code <span class="m">00000000</span>  flags <span class="m">00000000</span>
+  pid        <span class="m">0</span>  uid        <span class="m">0</span>  data <span class="m">24</span>  offs <span class="m">8</span>
+<span class="m">0000</span>: <span class="m">85</span> . 2a * <span class="m">68</span> h <span class="m">73</span> s 7f . <span class="m">01</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">01</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+<span class="m">0016</span>: <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+  - <span class="nb">type</span> 73682a85  flags 0000017f  ptr <span class="m">0000000000000001</span>  cookie <span class="m">0000000000000000</span>
+milliseconds: <span class="m">1613619932681</span>
+<span class="m">0000</span>: <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">79</span> y <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+BR_NOOP:
+BR_TRANSACTION:
+  target 000000000000007b  cookie <span class="m">0000000000000000</span>  code <span class="m">00000000</span>  flags <span class="m">00000000</span>
+  pid       <span class="m">28</span>  uid        <span class="m">0</span>  data <span class="m">8</span>  offs <span class="m">0</span>
+<span class="m">0000</span>: <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> . <span class="m">79</span> y <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+i am server,add one <span class="m">121</span>
+BR_NOOP:
+BR_TRANSACTION_COMPLETE:
+BR_NOOP:
+BR_TRANSACTION_COMPLETE:
+BR_REPLY:
+  target <span class="m">0000000000000000</span>  cookie <span class="m">0000000000000000</span>  code <span class="m">00000000</span>  flags <span class="m">00000000</span>
+  pid        <span class="m">0</span>  uid        <span class="m">0</span>  data <span class="m">4</span>  offs <span class="m">0</span>
+<span class="m">0000</span>: 7a z <span class="m">00</span> . <span class="m">00</span> . <span class="m">00</span> .
+milliseconds: <span class="m">1613619937682</span>
+get ret of <span class="nv">addone</span><span class="o">=</span> <span class="m">122</span>
+~ <span class="c1">#</span>
+</pre></div>
+</div>
+</li>
+<li><p>servicemanager完整输出</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:servicemanager $ sudo ./servicemanager
+BR_NOOP:
+BR_TRANSACTION:
+  target 0000000000000000  cookie 0000000000000000  code 00000003  flags 00000000
+  pid     4514  uid        0  data 112  offs 8
+0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 . 85 . 2a * 68 h 73 s 7f . 01 . 00 . 00 .
+0096: 01 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 . 00 .
+  - type 73682a85  flags 0000017f  ptr 0000000000000001  cookie 0000000000000000
+BR_NOOP:
+BR_TRANSACTION_COMPLETE:
+BR_NOOP:
+BR_TRANSACTION:
+  target 0000000000000000  cookie 0000000000000000  code 00000002  flags 00000000
+  pid     4515  uid        0  data 88  offs 0
+0000: 00 . 00 . 00 . 00 . 1a . 00 . 00 . 00 . 61 a 00 . 6e n 00 . 64 d 00 . 72 r 00 .
+0016: 6f o 00 . 69 i 00 . 64 d 00 . 2e . 00 . 6f o 00 . 73 s 00 . 2e . 00 . 49 I 00 .
+0032: 53 S 00 . 65 e 00 . 72 r 00 . 76 v 00 . 69 i 00 . 63 c 00 . 65 e 00 . 4d M 00 .
+0048: 61 a 00 . 6e n 00 . 61 a 00 . 67 g 00 . 65 e 00 . 72 r 00 . 00 . 00 . 00 . 00 .
+0064: 09 . 00 . 00 . 00 . 63 c 00 . 61 a 00 . 6c l 00 . 63 c 00 . 75 u 00 . 6c l 00 .
+0080: 61 a 00 . 74 t 00 . 65 e 00 . 00 . 00 .
+BR_NOOP:
+BR_TRANSACTION_COMPLETE:
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+# git 无法使用
+
+遇到git无法使用，需要切换环境
+
+# 参考文档
+
+* [xcode command line tools not able to locate git](https://stackoverflow.com/questions/67886103/xcode-command-line-tools-not-able-to-locate-git)
+
+# 报错现象
+
+```
+sh: line 1:  3392 Abort trap: 6           /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -find git 2> /dev/null
+git: error: sh -c '/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -find git 2> /dev/null' failed with exit code 34304: (null) (errno=Invalid argument)
+xcode-select: Failed to locate 'git', requesting installation of command line developer tools.
+```
+
+# 处理方法
+
+```
+sudo xcode-select -switch /Library/Developer/CommandLineTools
+```

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">IoT网页GPIO控制LED</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">原理图</a></li>
+<li><a class="reference internal" href="#id3">源代码</a></li>
+<li><a class="reference internal" href="#id4">实践操作</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="iotgpioled">
+<h1>IoT网页GPIO控制LED<a class="headerlink" href="#iotgpioled" title="Permalink to this headline"></a></h1>
+<p>通过Python3 Flask作为HTTP服务端，控制GPIO</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0009_USB%E6%91%84%E5%83%8F%E5%A4%B4%E6%90%AD%E5%BB%BAIP%E7%BD%91%E7%BB%9C%E6%91%84%E5%83%8F%E5%A4%B4.html"><span class="doc std std-doc">0009_USB摄像头搭建IP网络摄像头.md</span></a></p></li>
+<li><p><a class="reference internal" href="0014_%E5%8A%A8%E6%80%81%E8%AE%BE%E5%A4%87%E6%A0%91GPIO%E6%8E%A7%E5%88%B6LED.html"><span class="doc std std-doc">0014_动态设备树GPIO控制LED.md</span></a></p></li>
+<li><p><a class="reference internal" href="0015_%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E6%8E%A7%E5%88%B6GPIO.html"><span class="doc std std-doc">0015_用户空间控制GPIO.md</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>原理图<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><img alt="0014_GPIO_LED_Power_OFF.png" src="../../../_images/0014_GPIO_LED_Power_OFF.png" /></p>
+</section>
+<section id="id3">
+<h1>源代码<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/LowLevelOfLogic/RaspberryPi/tree/IP_Camera</p>
+<ul>
+<li><p>ledMonitor.py</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h1>实践操作<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>cd /sys/class/gpio/</p></li>
+<li><p>echo 10 &gt; export</p></li>
+<li><p>cd gpio10</p></li>
+<li><p>echo out &gt; direction</p></li>
+<li><p>python3 ledMonitor.py</p></li>
+<li><p>http://192.168.3.3:5000/</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

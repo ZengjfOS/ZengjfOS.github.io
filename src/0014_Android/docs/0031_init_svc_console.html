@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">init svc console</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简述</a></li>
+<li><a class="reference internal" href="#id3">通知栏串口终端提示</a></li>
+<li><a class="reference internal" href="#init-rc">init.rc</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="init-svc-console">
+<h1>init svc console<a class="headerlink" href="#init-svc-console" title="Permalink to this headline"></a></h1>
+<p>通知栏移植提示console打开了</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/zlcchina/article/details/12947139">android 创建service root权限执行脚本</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简述<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>Android应用程序怎样启动让init进程知道我们想运行那个进程呢？</p>
+<p>答案是设置系统属性”ctl.start”，把”ctl.start”设置为你要运行的Service，假设为”xxx”，Android系统将会帮你运行”ctl.start”系统属性中指定的Service。那么运行结果init进程将会将会写入命名为”init.svc.+Service名称”的属性中，也就是”init.svc.xxx”属性，应用程序可以参考查阅这个值来确定Service执行的情况。</p>
+</section>
+<section id="id3">
+<h1>通知栏串口终端提示<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<p>Serial console enabled</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java
+  * final void finishBooting()
+    * showConsoleNotificationIfActive();
+      * private void showConsoleNotificationIfActive()
+        * if (!SystemProperties.get(&quot;init.svc.console&quot;).equals(&quot;running&quot;))
+        * String title = mContext.getString(com.android.internal.R.string.console_running_notification_title);
+          * frameworks/base/core/res/res/values/strings.xml
+            * &lt;string name=&quot;console_running_notification_title&quot;&gt;Serial console enabled&lt;/string&gt;
+</pre></div>
+</div>
+<p>getprop init.svc.console</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">running</span>
+</pre></div>
+</div>
+</section>
+<section id="init-rc">
+<h1>init.rc<a class="headerlink" href="#init-rc" title="Permalink to this headline"></a></h1>
+<p>out/target/product/k62v1_64_bsp/system/etc/init/hw/init.rc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">console</span> <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+    <span class="k">class</span> <span class="nc">core</span>
+    <span class="n">console</span>
+    <span class="n">disabled</span>
+    <span class="n">user</span> <span class="n">shell</span>
+    <span class="n">group</span> <span class="n">shell</span> <span class="n">log</span> <span class="n">readproc</span>
+    <span class="n">seclabel</span> <span class="n">u</span><span class="p">:</span><span class="n">r</span><span class="p">:</span><span class="n">shell</span><span class="p">:</span><span class="n">s0</span>
+    <span class="n">setenv</span> <span class="n">HOSTNAME</span> <span class="n">console</span>
+
+<span class="n">on</span> <span class="nb">property</span><span class="p">:</span><span class="n">ro</span><span class="o">.</span><span class="n">debuggable</span><span class="o">=</span><span class="mi">1</span>
+    <span class="c1"># Give writes to anyone for the trace folder on debug builds.</span>
+    <span class="c1"># The folder is used to store method traces.</span>
+    <span class="n">chmod</span> <span class="mi">0773</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">trace</span>
+    <span class="c1"># Give reads to anyone for the window trace folder on debug builds.</span>
+    <span class="n">chmod</span> <span class="mi">0775</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">wmtrace</span>
+    <span class="c1"># Give reads to anyone for the accessibility trace folder on debug builds.</span>
+    <span class="n">chmod</span> <span class="mi">0775</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">a11ytrace</span>
+
+<span class="n">on</span> <span class="n">init</span> <span class="o">&amp;&amp;</span> <span class="nb">property</span><span class="p">:</span><span class="n">ro</span><span class="o">.</span><span class="n">debuggable</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">start</span> <span class="n">console</span>
+</pre></div>
+</div>
+<p>getprop | grep ro.debuggable</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">ro</span><span class="o">.</span><span class="n">debuggable</span><span class="p">]:</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>out/target/product/k62v1_64_bsp/system/build.prop</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ro</span><span class="o">.</span><span class="n">debuggable</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>build/make/core/main.mk</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="c">## user/userdebug ##</span>
+
+<span class="nv">user_variant</span> <span class="o">:=</span> <span class="k">$(</span>filter user userdebug,<span class="k">$(</span>TARGET_BUILD_VARIANT<span class="k">))</span>
+<span class="nv">enable_target_debugging</span> <span class="o">:=</span> <span class="nb">true</span>
+<span class="nv">tags_to_install</span> <span class="o">:=</span>
+<span class="cp">ifneq (,$(user_variant))</span>
+<span class="c">  # Target is secure in user builds.</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.secure<span class="o">=</span><span class="m">1</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> security.perf_harden<span class="o">=</span><span class="m">1</span>
+
+<span class="cp">  ifeq ($(user_variant),user)</span>
+    <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.adb.secure<span class="o">=</span><span class="m">1</span>
+<span class="cp">  endif</span>
+
+<span class="cp">  ifeq ($(user_variant),userdebug)</span>
+<span class="c">    # Pick up some extra useful tools</span>
+    <span class="nv">tags_to_install</span> <span class="o">+=</span> debug
+<span class="cp">  else</span>
+<span class="c">    # Disable debugging in plain user builds.</span>
+    enable_target_debugging :<span class="o">=</span>
+<span class="cp">  endif</span>
+
+<span class="c">  # Disallow mock locations by default for user builds</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.allow.mock.location<span class="o">=</span><span class="m">0</span>
+
+<span class="cp">else # !user_variant</span>
+<span class="c">  # Turn on checkjni for non-user builds.</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.kernel.android.checkjni<span class="o">=</span><span class="m">1</span>
+<span class="c">  # Set device insecure for non-user builds.</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.secure<span class="o">=</span><span class="m">0</span>
+<span class="c">  # Allow mock locations by default for non user builds</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.allow.mock.location<span class="o">=</span><span class="m">1</span>
+<span class="cp">endif # !user_variant</span>
+
+<span class="cp">ifeq (true,$(strip $(enable_target_debugging)))</span>
+<span class="c">  # Target is more debuggable and adbd is on by default</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.debuggable<span class="o">=</span><span class="m">1</span>
+<span class="c">  # Enable Dalvik lock contention logging.</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> dalvik.vm.lockprof.threshold<span class="o">=</span><span class="m">500</span>
+<span class="cp">else # !enable_target_debugging</span>
+<span class="c">  # Target is less debuggable and adbd is off by default</span>
+  <span class="nv">ADDITIONAL_SYSTEM_PROPERTIES</span> <span class="o">+=</span> ro.debuggable<span class="o">=</span><span class="m">0</span>
+<span class="cp">endif # !enable_target_debugging</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

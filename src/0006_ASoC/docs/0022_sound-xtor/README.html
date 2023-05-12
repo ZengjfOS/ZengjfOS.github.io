@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/login.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">sound-xtor</a><ul>
+<li><a class="reference internal" href="#id1">设备树</a><ul>
+<li><a class="reference internal" href="#xtor-audio">xtor-audio</a></li>
+<li><a class="reference internal" href="#sai0">sai0</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">主要修改函数</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sound-xtor">
+<h1>sound-xtor<a class="headerlink" href="#sound-xtor" title="Permalink to this headline"></a></h1>
+<p>蓝牙PCM连接对应的声卡配置</p>
+<section id="id1">
+<h2>设备树<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<section id="xtor-audio">
+<h3>xtor-audio<a class="headerlink" href="#xtor-audio" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">sound</span><span class="o">-</span><span class="n">xtor</span> <span class="p">{</span>
+    <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;fsl,imx-audio-xtor&quot;</span><span class="p">;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;xtor-audio&quot;</span><span class="p">;</span>
+    <span class="n">cpu</span><span class="o">-</span><span class="n">dai</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">sai0</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;okay&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="sai0">
+<h3>sai0<a class="headerlink" href="#sai0" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">sai0</span><span class="p">:</span> <span class="n">sai</span><span class="o">@</span><span class="mi">59040000</span> <span class="p">{</span>
+    <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;fsl,imx8qm-sai&quot;</span><span class="p">;</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mh">0x0</span> <span class="mh">0x59040000</span> <span class="mh">0x0</span> <span class="mh">0x10000</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">interrupts</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">GIC_SPI</span> <span class="mi">314</span> <span class="n">IRQ_TYPE_LEVEL_HIGH</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">clocks</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_AUD_SAI_0_IPG</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_CLK_DUMMY</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_AUD_SAI_0_MCLK</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_CLK_DUMMY</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_CLK_DUMMY</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">clock</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;bus&quot;</span><span class="p">,</span> <span class="s2">&quot;mclk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mclk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mclk2&quot;</span><span class="p">,</span> <span class="s2">&quot;mclk3&quot;</span><span class="p">;</span>
+    <span class="n">dma</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="s2">&quot;tx&quot;</span><span class="p">;</span>
+    <span class="n">dmas</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">edma2</span> <span class="mi">12</span> <span class="mi">0</span> <span class="mi">1</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;&amp;</span><span class="n">edma2</span> <span class="mi">13</span> <span class="mi">0</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;disabled&quot;</span><span class="p">;</span>
+    <span class="n">power</span><span class="o">-</span><span class="n">domains</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">pd_sai0</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+
+<span class="o">&amp;</span><span class="n">sai0</span> <span class="p">{</span>
+    <span class="n">assigned</span><span class="o">-</span><span class="n">clocks</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_AUD_PLL0_DIV</span><span class="o">&gt;</span><span class="p">,</span>
+            <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_AUD_ACM_AUD_PLL_CLK0_DIV</span><span class="o">&gt;</span><span class="p">,</span>
+            <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_AUD_ACM_AUD_REC_CLK0_DIV</span><span class="o">&gt;</span><span class="p">,</span>
+            <span class="o">&lt;&amp;</span><span class="n">clk</span> <span class="n">IMX8QM_AUD_SAI_0_MCLK</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">assigned</span><span class="o">-</span><span class="n">clock</span><span class="o">-</span><span class="n">rates</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mi">786432000</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="mi">49152000</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="mi">12288000</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="mi">49152000</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">pinctrl</span><span class="o">-</span><span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">;</span>
+    <span class="n">pinctrl</span><span class="o">-</span><span class="mi">0</span> <span class="o">=</span> <span class="o">&lt;&amp;</span><span class="n">pinctrl_sai0</span><span class="o">&gt;</span><span class="p">;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;okay&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+
+<span class="n">pinctrl_sai0</span><span class="p">:</span> <span class="n">sai0grp</span> <span class="p">{</span>
+    <span class="n">fsl</span><span class="p">,</span><span class="n">pins</span> <span class="o">=</span> <span class="o">&lt;</span>
+        <span class="n">SC_P_SPI0_CS1_AUD_SAI0_TXC</span>      <span class="mh">0x0600004c</span>
+        <span class="n">SC_P_SPI2_CS1_AUD_SAI0_TXFS</span>     <span class="mh">0x0600004c</span>
+        <span class="n">SC_P_SAI1_RXFS_AUD_SAI0_RXD</span>     <span class="mh">0x0600004c</span>
+        <span class="n">SC_P_SAI1_RXC_AUD_SAI0_TXD</span>      <span class="mh">0x0600006c</span>
+    <span class="o">&gt;</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>引脚配置说明：vendor/nxp-opensource/kernel_imx/Documentation/devicetree/bindings/pinctrl</p>
+</section>
+</section>
+<section id="id2">
+<h2>主要修改函数<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>static int imx_xtor_hw_params(struct snd_pcm_substream *substream,
+                     struct snd_pcm_hw_params *params)
+{
+    struct snd_soc_pcm_runtime *rtd = substream-&gt;private_data;
+    struct imx_xtor_data *data = snd_soc_card_get_drvdata(rtd-&gt;card);
+    bool tx = substream-&gt;stream == SNDRV_PCM_STREAM_PLAYBACK;
+    struct cpu_priv *cpu_priv = &amp;data-&gt;cpu_priv;
+    struct device *dev = rtd-&gt;card-&gt;dev;
+    u32 channels = params_channels(params);
+    unsigned int fmt = SND_SOC_DAI_FORMAT_I2S | SND_SOC_DAIFMT_NB_NF;
+    int ret, dir;
+
+    /* For playback the XTOR is slave, and for record is master */
+    //fmt |= tx ? SND_SOC_DAIFMT_CBS_CFS : SND_SOC_DAIFMT_CBM_CFM;
+    //dir = tx ? SND_SOC_CLOCK_OUT : SND_SOC_CLOCK_IN;
+    fmt |= SND_SOC_DAIFMT_CBM_CFM;
+    dir = SND_SOC_CLOCK_IN;
+    
+    /* set cpu DAI configuration */
+    ret = snd_soc_dai_set_fmt(rtd-&gt;cpu_dai, fmt);
+    if (ret) {
+        dev_err(dev, &quot;failed to set cpu dai fmt: %d\n&quot;, ret);
+        return ret;
+    }
+
+    /* Specific configurations of DAIs starts from here */
+    ret = snd_soc_dai_set_sysclk(rtd-&gt;cpu_dai, cpu_priv-&gt;sysclk_id[tx],
+                     0, dir);
+    if (ret) {
+        dev_err(dev, &quot;failed to set cpu sysclk: %d\n&quot;, ret);
+        return ret;
+    }
+
+    ret = snd_soc_dai_set_tdm_slot(rtd-&gt;cpu_dai, BIT(channels) - 1,
+        // BIT(channels) - 1, cpu_priv-&gt;slots, params_width(params));
+        BIT(channels) - 1, 0, params_width(params));
+    if (ret) {
+        dev_err(dev, &quot;failed to set cpu dai tdm slot: %d\n&quot;, ret);
+        return ret;
+    }
+
+    return 0;
+}
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

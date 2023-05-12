@@ -1,0 +1,16 @@
+# Android adb remote
+
+adb远程连接Android设备
+
+# 参考文档
+
+* [Android adb远程调试](https://blog.csdn.net/u012785382/article/details/79171782)
+
+# steps
+
+* sudo apt-get install -y android-tools-adb android-tools-fastboot
+* adb tcpip 5555
+  * 该命令将会重启手机上的adbd，开启网络调试功能
+* adb connect 192.168.43.103:5555
+  * 提示connected即为连接成功
+* adb shell

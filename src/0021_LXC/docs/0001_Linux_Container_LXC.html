@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Linux Container LXC</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#hypervisor-kvm-container">Hypervisor KVM Container架构区别</a></li>
+<li><a class="reference internal" href="#snap-lxc">snap lxc容器安装及基本使用</a></li>
+<li><a class="reference internal" href="#id2">snap lxc容器位置</a></li>
+<li><a class="reference internal" href="#id3">snap lxc命令分析</a></li>
+<li><a class="reference internal" href="#lxc">LXC</a></li>
+<li><a class="reference internal" href="#namespace">Namespace</a></li>
+<li><a class="reference internal" href="#cgroups">cgroups</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linux-container-lxc">
+<h1>Linux Container LXC<a class="headerlink" href="#linux-container-lxc" title="Permalink to this headline"></a></h1>
+<p>理解容器LXC的本质</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/pppaass/article/details/76602419">基于容器原理(docker、lxc、cells)的Android 双系统设计概要</a></p>
+<ul>
+<li><p>https://github.com/jianglin-code/cells-of-container-android</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://blog.csdn.net/pppaass/article/details/51416694">QEMU KVM 虚拟机移植之性能提高篇小结（android 虚拟机双系统方案）</a></p></li>
+<li><p>https://github.com/jianglin-code</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/jianglin-code/cells-of-container-android">cells-of-container-android</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jianglin-code/cells-android10">cells-android10</a></p></li>
+<li><p>https://github.com/beordle/cells-of-Android</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://blog.pistack.co.za/run-lxc-containers-on-raspberry-pi-with-raspbian-buster/">Run LXC Containers on Raspberry Pi with Raspbian Buster</a></p></li>
+<li><p><a class="reference external" href="https://www.cyberciti.biz/faq/how-to-list-vm-images-in-lxd-linux-containers/">How to list VM images in LXD (Linux Containers)</a></p></li>
+<li><p>https://alpinelinux.org/</p></li>
+<li><p><a class="reference external" href="https://fuckcloudnative.io/posts/understanding-cgroups-part-1-basics/">Linux Cgroup 入门教程：基本概念</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/jettery/article/details/77185412">使用Linux的namespace来隔离system的教程</a></p></li>
+</ul>
+</section>
+<section id="hypervisor-kvm-container">
+<h1>Hypervisor KVM Container架构区别<a class="headerlink" href="#hypervisor-kvm-container" title="Permalink to this headline"></a></h1>
+<p><img alt="0001_Linux_Container_LXC_Hypervisor.png" src="../../../_images/0001_Linux_Container_LXC_Hypervisor.png" /></p>
+</section>
+<section id="snap-lxc">
+<h1>snap lxc容器安装及基本使用<a class="headerlink" href="#snap-lxc" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo apt install snapd bridge-utils -y</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://zh.wikipedia.org/wiki/Snappy_(%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8)">Snappy (包管理器)</a></p></li>
+</ul>
+</li>
+<li><p>sudo snap install core lxd</p></li>
+<li><p>export PATH=$PATH:/snap/bin</p></li>
+<li><p>lxd -h</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="nb">object</span> <span class="s1">&#39;/usr/lib/arm-linux-gnueabihf/libarmmem-$</span><span class="si">{PLATFORM}</span><span class="s1">.so&#39;</span> <span class="kn">from</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ld</span><span class="o">.</span><span class="n">so</span><span class="o">.</span><span class="n">preload</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">preloaded</span> <span class="p">(</span><span class="n">cannot</span> <span class="nb">open</span> <span class="n">shared</span> <span class="nb">object</span> <span class="n">file</span><span class="p">):</span> <span class="n">ignored</span><span class="o">.</span>
+<span class="o">...</span><span class="n">省略</span>
+</pre></div>
+</div>
+<ul>
+<li><p>sudo vim /etc/ld.so.preload</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">#/usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>sudo adduser pi lxd</p></li>
+<li><p>newgrp lxd</p></li>
+<li><p>mkdir ~/zengjf/lxc</p></li>
+<li><p>cd ~/zengjf/lxc</p></li>
+<li><p>lxd init</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Would you like to use LXD clustering? (yes/no) [default=no]:
+Do you want to configure a new storage pool? (yes/no) [default=yes]:
+Name of the new storage pool [default=default]:
+Name of the storage backend to use (btrfs, dir, lvm, ceph) [default=btrfs]:
+Create a new BTRFS pool? (yes/no) [default=yes]:
+Would you like to use an existing empty block device (e.g. a disk or partition)? (yes/no) [default=no]:
+Size in GB of the new loop device (1GB minimum) [default=5GB]: 2GB
+Would you like to connect to a MAAS server? (yes/no) [default=no]:
+Would you like to create a new local network bridge? (yes/no) [default=yes]:
+What should the new bridge be called? [default=lxdbr0]:
+What IPv4 address should be used? (CIDR subnet notation, “auto” or “none”) [default=auto]:
+What IPv6 address should be used? (CIDR subnet notation, “auto” or “none”) [default=auto]:
+Would you like the LXD server to be available over the network? (yes/no) [default=no]:
+Would you like stale cached images to be updated automatically? (yes/no) [default=yes]
+Would you like a YAML &quot;lxd init&quot; preseed to be printed? (yes/no) [default=no]:
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>只修改了默认的文件大小为2GB，其他的默认</p></li>
+</ul>
+</li>
+<li><p>lxc list</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">To</span> <span class="n">start</span> <span class="n">your</span> <span class="n">first</span> <span class="n">instance</span><span class="p">,</span> <span class="k">try</span><span class="p">:</span> <span class="n">lxc</span> <span class="n">launch</span> <span class="n">ubuntu</span><span class="p">:</span><span class="mf">18.04</span>
+
+<span class="o">+------+-------+------+------+------+-----------+</span>
+<span class="o">|</span> <span class="n">NAME</span> <span class="o">|</span> <span class="n">STATE</span> <span class="o">|</span> <span class="n">IPV4</span> <span class="o">|</span> <span class="n">IPV6</span> <span class="o">|</span> <span class="n">TYPE</span> <span class="o">|</span> <span class="n">SNAPSHOTS</span> <span class="o">|</span>
+<span class="o">+------+-------+------+------+------+-----------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc info | more</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="p">:</span> <span class="p">{}</span>
+<span class="n">api_extensions</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">storage_zfs_remove_snapshots</span>
+<span class="o">-</span> <span class="n">container_host_shutdown_timeout</span>
+<span class="o">-</span> <span class="n">container_stop_priority</span>
+<span class="o">-</span> <span class="n">container_syscall_filtering</span>
+<span class="o">-</span> <span class="n">auth_pki</span>
+<span class="o">-</span> <span class="n">container_last_used_at</span>
+<span class="o">-</span> <span class="n">etag</span>
+<span class="o">-</span> <span class="n">patch</span>
+<span class="o">-</span> <span class="n">usb_devices</span>
+<span class="o">...</span><span class="n">省略</span>
+  <span class="n">driver</span><span class="p">:</span> <span class="n">lxc</span>
+  <span class="n">driver_version</span><span class="p">:</span> <span class="mf">4.0.6</span>
+  <span class="n">firewall</span><span class="p">:</span> <span class="n">nftables</span>
+  <span class="n">kernel</span><span class="p">:</span> <span class="n">Linux</span>
+  <span class="n">kernel_architecture</span><span class="p">:</span> <span class="n">armv7l</span>
+  <span class="n">kernel_features</span><span class="p">:</span>
+    <span class="n">netnsid_getifaddrs</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">seccomp_listener</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">seccomp_listener_continue</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+    <span class="n">shiftfs</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+    <span class="n">uevent_injection</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">unpriv_fscaps</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+  <span class="n">kernel_version</span><span class="p">:</span> <span class="mf">5.4.79</span><span class="o">-</span><span class="n">v7l</span><span class="o">+</span>
+  <span class="n">lxc_features</span><span class="p">:</span>
+    <span class="n">cgroup2</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">devpts_fd</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">mount_injection_file</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">network_gateway_device_route</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">network_ipvlan</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">network_l2proxy</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">network_phys_macvlan_mtu</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">network_veth_router</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">pidfd</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">seccomp_allow_deny_syntax</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">seccomp_notify</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+    <span class="n">seccomp_proxy_send_notify_fd</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+  <span class="n">os_name</span><span class="p">:</span> <span class="n">Raspbian</span> <span class="n">GNU</span><span class="o">/</span><span class="n">Linux</span>
+  <span class="n">os_version</span><span class="p">:</span> <span class="s2">&quot;10&quot;</span>
+  <span class="n">project</span><span class="p">:</span> <span class="n">default</span>
+  <span class="n">server</span><span class="p">:</span> <span class="n">lxd</span>
+  <span class="n">server_clustered</span><span class="p">:</span> <span class="n">false</span>
+  <span class="n">server_name</span><span class="p">:</span> <span class="n">raspberrypi</span>
+  <span class="n">server_pid</span><span class="p">:</span> <span class="mi">3855</span>
+  <span class="n">server_version</span><span class="p">:</span> <span class="s2">&quot;4.10&quot;</span>
+  <span class="n">storage</span><span class="p">:</span> <span class="n">btrfs</span>
+  <span class="n">storage_version</span><span class="p">:</span> <span class="mf">4.15.1</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc image list images:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------------------------------------+--------------+--------+----------------------------------------------+--------------+-----------------+-----------+-------------------------------+</span>
+<span class="o">|</span>                <span class="n">ALIAS</span>                 <span class="o">|</span> <span class="n">FINGERPRINT</span>  <span class="o">|</span> <span class="n">PUBLIC</span> <span class="o">|</span>                 <span class="n">DESCRIPTION</span>                  <span class="o">|</span> <span class="n">ARCHITECTURE</span> <span class="o">|</span>      <span class="n">TYPE</span>       <span class="o">|</span>   <span class="n">SIZE</span>    <span class="o">|</span>          <span class="n">UPLOAD</span> <span class="n">DATE</span>          <span class="o">|</span>
+<span class="o">+--------------------------------------+--------------+--------+----------------------------------------------+--------------+-----------------+-----------+-------------------------------+</span>
+<span class="o">|</span> <span class="n">alpine</span><span class="o">/</span><span class="mf">3.10</span> <span class="p">(</span><span class="mi">3</span> <span class="n">more</span><span class="p">)</span>                 <span class="o">|</span> <span class="mi">9</span><span class="n">d1b3ad888be</span> <span class="o">|</span> <span class="n">yes</span>    <span class="o">|</span> <span class="n">Alpine</span> <span class="mf">3.10</span> <span class="n">armhf</span> <span class="p">(</span><span class="mi">20210126_13</span><span class="p">:</span><span class="mi">27</span><span class="p">)</span>           <span class="o">|</span> <span class="n">armv7l</span>       <span class="o">|</span> <span class="n">CONTAINER</span>       <span class="o">|</span> <span class="mf">2.10</span><span class="n">MB</span>    <span class="o">|</span> <span class="n">Jan</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2021</span> <span class="n">at</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span><span class="n">am</span> <span class="p">(</span><span class="n">UTC</span><span class="p">)</span> <span class="o">|</span>
+<span class="o">+--------------------------------------+--------------+--------+----------------------------------------------+--------------+-----------------+-----------+-------------------------------+</span>
+<span class="o">|</span> <span class="n">alpine</span><span class="o">/</span><span class="mf">3.10</span><span class="o">/</span><span class="n">amd64</span> <span class="p">(</span><span class="mi">1</span> <span class="n">more</span><span class="p">)</span>           <span class="o">|</span> <span class="mi">506166850</span><span class="n">f05</span> <span class="o">|</span> <span class="n">yes</span>    <span class="o">|</span> <span class="n">Alpine</span> <span class="mf">3.10</span> <span class="n">amd64</span> <span class="p">(</span><span class="mi">20210126_13</span><span class="p">:</span><span class="mi">00</span><span class="p">)</span>           <span class="o">|</span> <span class="n">x86_64</span>       <span class="o">|</span> <span class="n">CONTAINER</span>       <span class="o">|</span> <span class="mf">2.40</span><span class="n">MB</span>    <span class="o">|</span> <span class="n">Jan</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2021</span> <span class="n">at</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span><span class="n">am</span> <span class="p">(</span><span class="n">UTC</span><span class="p">)</span> <span class="o">|</span>
+<span class="o">+--------------------------------------+--------------+--------+----------------------------------------------+--------------+-----------------+-----------+-------------------------------+</span>
+<span class="o">...</span><span class="n">省略</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>需要等待挺久的，会输出很多行</p></li>
+<li><p>lxc remote add tuna-images https://mirrors.tuna.tsinghua.edu.cn/lxc-images/ –protocol=simplestreams –public</p></li>
+<li><p>lxc image list tuna-images:</p></li>
+</ul>
+</li>
+<li><p>lxc init images:alpine/3.10 alpine-container</p></li>
+<li><p>lxc list</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+------------------+---------+------+------+-----------+-----------+</span>
+<span class="o">|</span>       <span class="n">NAME</span>       <span class="o">|</span>  <span class="n">STATE</span>  <span class="o">|</span> <span class="n">IPV4</span> <span class="o">|</span> <span class="n">IPV6</span> <span class="o">|</span>   <span class="n">TYPE</span>    <span class="o">|</span> <span class="n">SNAPSHOTS</span> <span class="o">|</span>
+<span class="o">+------------------+---------+------+------+-----------+-----------+</span>
+<span class="o">|</span> <span class="n">alpine</span><span class="o">-</span><span class="n">container</span> <span class="o">|</span> <span class="n">STOPPED</span> <span class="o">|</span>      <span class="o">|</span>      <span class="o">|</span> <span class="n">CONTAINER</span> <span class="o">|</span> <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">+------------------+---------+------+------+-----------+-----------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc start alpine-container</p>
+<ul class="simple">
+<li><p>lxc stop alpine-container</p></li>
+</ul>
+</li>
+<li><p>lxc list</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+------------------+---------+---------------------+-----------------------------------------------+-----------+-----------+</span>
+<span class="o">|</span>       <span class="n">NAME</span>       <span class="o">|</span>  <span class="n">STATE</span>  <span class="o">|</span>        <span class="n">IPV4</span>         <span class="o">|</span>                     <span class="n">IPV6</span>                      <span class="o">|</span>   <span class="n">TYPE</span>    <span class="o">|</span> <span class="n">SNAPSHOTS</span> <span class="o">|</span>
+<span class="o">+------------------+---------+---------------------+-----------------------------------------------+-----------+-----------+</span>
+<span class="o">|</span> <span class="n">alpine</span><span class="o">-</span><span class="n">container</span> <span class="o">|</span> <span class="n">RUNNING</span> <span class="o">|</span> <span class="mf">10.117.80.67</span> <span class="p">(</span><span class="n">eth0</span><span class="p">)</span> <span class="o">|</span> <span class="n">fd42</span><span class="p">:</span><span class="mi">116</span><span class="n">d</span><span class="p">:</span><span class="n">f610</span><span class="p">:</span><span class="mi">9948</span><span class="p">:</span><span class="mi">216</span><span class="p">:</span><span class="mi">3</span><span class="n">eff</span><span class="p">:</span><span class="n">fe8c</span><span class="p">:</span><span class="n">f8d2</span> <span class="p">(</span><span class="n">eth0</span><span class="p">)</span> <span class="o">|</span> <span class="n">CONTAINER</span> <span class="o">|</span> <span class="mi">0</span>         <span class="o">|</span>
+<span class="o">+------------------+---------+---------------------+-----------------------------------------------+-----------+-----------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc exec alpine-container – sh</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~</span> <span class="c1"># pwd</span>
+<span class="o">/</span><span class="n">root</span>
+<span class="o">~</span> <span class="c1"># ls /</span>
+<span class="nb">bin</span>    <span class="n">dev</span>    <span class="n">etc</span>    <span class="n">home</span>   <span class="n">lib</span>    <span class="n">media</span>  <span class="n">mnt</span>    <span class="n">opt</span>    <span class="n">proc</span>   <span class="n">root</span>   <span class="n">run</span>    <span class="n">sbin</span>   <span class="n">srv</span>    <span class="n">sys</span>    <span class="n">tmp</span>    <span class="n">usr</span>    <span class="n">var</span>
+<span class="o">~</span> <span class="c1">#</span>
+</pre></div>
+</div>
+<ul>
+<li><p>sed -i ‘s/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g’ /etc/apk/repositories</p>
+<ul class="simple">
+<li><p>使用科大镜像</p></li>
+</ul>
+</li>
+<li><p>apk update</p></li>
+<li><p>apk add openssh-server</p></li>
+<li><p>adduser zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Changing</span> <span class="n">password</span> <span class="k">for</span> <span class="n">zengjf</span>
+<span class="n">New</span> <span class="n">password</span><span class="p">:</span>
+<span class="n">Bad</span> <span class="n">password</span><span class="p">:</span> <span class="n">too</span> <span class="n">weak</span>
+<span class="n">Retype</span> <span class="n">password</span><span class="p">:</span>
+<span class="n">passwd</span><span class="p">:</span> <span class="n">password</span> <span class="k">for</span> <span class="n">zengjf</span> <span class="n">changed</span> <span class="n">by</span> <span class="n">root</span>
+</pre></div>
+</div>
+</li>
+<li><p>rc-update add sshd</p></li>
+<li><p>/etc/init.d/sshd restart</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">*</span> <span class="n">Caching</span> <span class="n">service</span> <span class="n">dependencies</span> <span class="o">...</span><span class="p">[</span> <span class="n">ok</span> <span class="p">]</span>
+<span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span><span class="p">:</span> <span class="n">generating</span> <span class="n">new</span> <span class="n">host</span> <span class="n">keys</span><span class="p">:</span> <span class="n">RSA</span>
+<span class="n">DSA</span> <span class="n">ECDSA</span> <span class="n">ED25519</span>
+ <span class="o">*</span> <span class="n">Starting</span> <span class="n">sshd</span> <span class="o">...</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>ssh zengjf&#64;10.117.80.67</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>The authenticity of host &#39;10.117.80.67 (10.117.80.67)&#39; can&#39;t be established.
+ECDSA key fingerprint is SHA256:iUeSLvQI46GYUDhZGI/vBfmXdQzRYFj0KfPjACdZwBU.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added &#39;10.117.80.67&#39; (ECDSA) to the list of known hosts.
+zengjf@10.117.80.67&#39;s password:
+Welcome to Alpine!
+
+The Alpine Wiki contains a large amount of how-to guides and general
+information about administrating Alpine systems.
+See &lt;http://wiki.alpinelinux.org/&gt;.
+
+You can setup the system with the command: setup-alpine
+
+You may change this message by editing /etc/motd.
+
+alpine-container:~$ pwd
+/home/zengjf
+alpine-container:~$ ls /
+bin    dev    etc    home   lib    media  mnt    opt    proc   root   run    sbin   srv    sys    tmp    usr    var
+alpine-container:~$
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>snap lxc容器位置<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>export PATH=$PATH:/snap/bin</p></li>
+<li><p>lxc storage show default</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="p">:</span>
+  <span class="n">size</span><span class="p">:</span> <span class="mi">2</span><span class="n">GB</span>
+  <span class="n">source</span><span class="p">:</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">snap</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">disks</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">img</span>
+<span class="n">description</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+<span class="n">name</span><span class="p">:</span> <span class="n">default</span>
+<span class="n">driver</span><span class="p">:</span> <span class="n">btrfs</span>
+<span class="n">used_by</span><span class="p">:</span>
+<span class="o">-</span> <span class="o">/</span><span class="mf">1.0</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="mi">9</span><span class="n">d1b3ad888be05fd15c940607734c702a1ddcea9849af2037c131c6f862ff3f1</span>
+<span class="o">-</span> <span class="o">/</span><span class="mf">1.0</span><span class="o">/</span><span class="n">instances</span><span class="o">/</span><span class="n">alpine</span><span class="o">-</span><span class="n">container</span>
+<span class="o">-</span> <span class="o">/</span><span class="mf">1.0</span><span class="o">/</span><span class="n">profiles</span><span class="o">/</span><span class="n">default</span>
+<span class="n">status</span><span class="p">:</span> <span class="n">Created</span>
+<span class="n">locations</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">none</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo file default.img</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="o">.</span><span class="n">img</span><span class="p">:</span> <span class="n">BTRFS</span> <span class="n">Filesystem</span> <span class="n">label</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">sectorsize</span> <span class="mi">4096</span><span class="p">,</span> <span class="n">nodesize</span> <span class="mi">16384</span><span class="p">,</span> <span class="n">leafsize</span> <span class="mi">16384</span><span class="p">,</span> <span class="n">UUID</span><span class="o">=</span><span class="mf">931e56</span><span class="n">aa</span><span class="o">-</span><span class="n">c016</span><span class="o">-</span><span class="mi">4</span><span class="n">a43</span><span class="o">-</span><span class="n">aa24</span><span class="o">-</span><span class="mi">1209432168</span><span class="n">ba</span><span class="p">,</span> <span class="mi">11096064</span><span class="o">/</span><span class="mi">1999998976</span> <span class="nb">bytes</span> <span class="n">used</span><span class="p">,</span> <span class="mi">1</span> <span class="n">devices</span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://zhuanlan.zhihu.com/p/61407714">Linux 文件系统的未来 btrfs</a></p></li>
+<li><p>lxc stop alpine-container</p></li>
+<li><p>losetup /dev/loop8 default.img</p>
+<ul class="simple">
+<li><p>losetup -d /dev/loop8</p></li>
+</ul>
+</li>
+<li><p>losetup –list</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NAME</span>       <span class="n">SIZELIMIT</span> <span class="n">OFFSET</span> <span class="n">AUTOCLEAR</span> <span class="n">RO</span> <span class="n">BACK</span><span class="o">-</span><span class="n">FILE</span>                                  <span class="n">DIO</span> <span class="n">LOG</span><span class="o">-</span><span class="n">SEC</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop1</span>         <span class="mi">0</span>      <span class="mi">0</span>         <span class="mi">1</span>  <span class="mi">1</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">snapd</span><span class="o">/</span><span class="n">snaps</span><span class="o">/</span><span class="n">core18_1948</span><span class="o">.</span><span class="n">snap</span>        <span class="mi">0</span>     <span class="mi">512</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop8</span>         <span class="mi">0</span>      <span class="mi">0</span>         <span class="mi">0</span>  <span class="mi">0</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">snap</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">disks</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">img</span>   <span class="mi">0</span>     <span class="mi">512</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop2</span>         <span class="mi">0</span>      <span class="mi">0</span>         <span class="mi">1</span>  <span class="mi">1</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">snapd</span><span class="o">/</span><span class="n">snaps</span><span class="o">/</span><span class="n">core_10584</span><span class="o">.</span><span class="n">snap</span>         <span class="mi">0</span>     <span class="mi">512</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop0</span>         <span class="mi">0</span>      <span class="mi">0</span>         <span class="mi">1</span>  <span class="mi">1</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">snapd</span><span class="o">/</span><span class="n">snaps</span><span class="o">/</span><span class="n">lxd_19021</span><span class="o">.</span><span class="n">snap</span>          <span class="mi">0</span>     <span class="mi">512</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop3</span>         <span class="mi">0</span>      <span class="mi">0</span>         <span class="mi">1</span>  <span class="mi">0</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">snap</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">disks</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">img</span>   <span class="mi">0</span>     <span class="mi">512</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>/dev/loop3和/dev/loop8相同，删掉/dev/loop8</p></li>
+<li><p>losetup -d /dev/loop8</p></li>
+</ul>
+</li>
+<li><p>udisksctl info -b /dev/loop3</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">org</span><span class="o">/</span><span class="n">freedesktop</span><span class="o">/</span><span class="n">UDisks2</span><span class="o">/</span><span class="n">block_devices</span><span class="o">/</span><span class="n">loop3</span><span class="p">:</span>
+  <span class="n">org</span><span class="o">.</span><span class="n">freedesktop</span><span class="o">.</span><span class="n">UDisks2</span><span class="o">.</span><span class="n">Block</span><span class="p">:</span>
+    <span class="n">Configuration</span><span class="p">:</span>              <span class="p">[]</span>
+    <span class="n">CryptoBackingDevice</span><span class="p">:</span>        <span class="s1">&#39;/&#39;</span>
+    <span class="n">Device</span><span class="p">:</span>                     <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop3</span>
+    <span class="n">DeviceNumber</span><span class="p">:</span>               <span class="mi">1795</span>
+    <span class="n">Drive</span><span class="p">:</span>                      <span class="s1">&#39;/&#39;</span>
+    <span class="n">HintAuto</span><span class="p">:</span>                   <span class="n">false</span>
+    <span class="n">HintIconName</span><span class="p">:</span>
+    <span class="n">HintIgnore</span><span class="p">:</span>                 <span class="n">false</span>
+    <span class="n">HintName</span><span class="p">:</span>
+    <span class="n">HintPartitionable</span><span class="p">:</span>          <span class="n">true</span>
+    <span class="n">HintSymbolicIconName</span><span class="p">:</span>
+    <span class="n">HintSystem</span><span class="p">:</span>                 <span class="n">true</span>
+    <span class="n">Id</span><span class="p">:</span>
+    <span class="n">IdLabel</span><span class="p">:</span>                    <span class="n">default</span>
+    <span class="n">IdType</span><span class="p">:</span>                     <span class="n">btrfs</span>
+    <span class="n">IdUUID</span><span class="p">:</span>                     <span class="mf">931e56</span><span class="n">aa</span><span class="o">-</span><span class="n">c016</span><span class="o">-</span><span class="mi">4</span><span class="n">a43</span><span class="o">-</span><span class="n">aa24</span><span class="o">-</span><span class="mi">1209432168</span><span class="n">ba</span>
+    <span class="n">IdUsage</span><span class="p">:</span>                    <span class="n">filesystem</span>
+    <span class="n">IdVersion</span><span class="p">:</span>
+    <span class="n">MDRaid</span><span class="p">:</span>                     <span class="s1">&#39;/&#39;</span>
+    <span class="n">MDRaidMember</span><span class="p">:</span>               <span class="s1">&#39;/&#39;</span>
+    <span class="n">PreferredDevice</span><span class="p">:</span>            <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop3</span>
+    <span class="n">ReadOnly</span><span class="p">:</span>                   <span class="n">false</span>
+    <span class="n">Size</span><span class="p">:</span>                       <span class="mi">2000000000</span>
+    <span class="n">Symlinks</span><span class="p">:</span>                   <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">label</span><span class="o">/</span><span class="n">default</span>
+                                <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">uuid</span><span class="o">/</span><span class="mf">931e56</span><span class="n">aa</span><span class="o">-</span><span class="n">c016</span><span class="o">-</span><span class="mi">4</span><span class="n">a43</span><span class="o">-</span><span class="n">aa24</span><span class="o">-</span><span class="mi">1209432168</span><span class="n">ba</span>
+    <span class="n">UserspaceMountOptions</span><span class="p">:</span>
+  <span class="n">org</span><span class="o">.</span><span class="n">freedesktop</span><span class="o">.</span><span class="n">UDisks2</span><span class="o">.</span><span class="n">Filesystem</span><span class="p">:</span>
+    <span class="n">MountPoints</span><span class="p">:</span>
+    <span class="n">Size</span><span class="p">:</span>               <span class="mi">0</span>
+  <span class="n">org</span><span class="o">.</span><span class="n">freedesktop</span><span class="o">.</span><span class="n">UDisks2</span><span class="o">.</span><span class="n">Loop</span><span class="p">:</span>
+    <span class="n">Autoclear</span><span class="p">:</span>          <span class="n">true</span>
+    <span class="n">BackingFile</span><span class="p">:</span>        <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">snap</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">disks</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">img</span>
+    <span class="n">SetupByUID</span><span class="p">:</span>         <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo su</p>
+<ul>
+<li><p>mkdir /zengjf</p></li>
+<li><p>sudo mount /dev/loop3 /zengjf</p></li>
+<li><p>udisksctl info -b /dev/loop3</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">org</span><span class="o">/</span><span class="n">freedesktop</span><span class="o">/</span><span class="n">UDisks2</span><span class="o">/</span><span class="n">block_devices</span><span class="o">/</span><span class="n">loop3</span><span class="p">:</span>
+  <span class="n">org</span><span class="o">.</span><span class="n">freedesktop</span><span class="o">.</span><span class="n">UDisks2</span><span class="o">.</span><span class="n">Block</span><span class="p">:</span>
+    <span class="n">Configuration</span><span class="p">:</span>              <span class="p">[]</span>
+    <span class="n">CryptoBackingDevice</span><span class="p">:</span>        <span class="s1">&#39;/&#39;</span>
+    <span class="n">Device</span><span class="p">:</span>                     <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop3</span>
+    <span class="n">DeviceNumber</span><span class="p">:</span>               <span class="mi">1795</span>
+    <span class="n">Drive</span><span class="p">:</span>                      <span class="s1">&#39;/&#39;</span>
+    <span class="n">HintAuto</span><span class="p">:</span>                   <span class="n">false</span>
+    <span class="n">HintIconName</span><span class="p">:</span>
+    <span class="n">HintIgnore</span><span class="p">:</span>                 <span class="n">false</span>
+    <span class="n">HintName</span><span class="p">:</span>
+    <span class="n">HintPartitionable</span><span class="p">:</span>          <span class="n">true</span>
+    <span class="n">HintSymbolicIconName</span><span class="p">:</span>
+    <span class="n">HintSystem</span><span class="p">:</span>                 <span class="n">true</span>
+    <span class="n">Id</span><span class="p">:</span>
+    <span class="n">IdLabel</span><span class="p">:</span>                    <span class="n">default</span>
+    <span class="n">IdType</span><span class="p">:</span>                     <span class="n">btrfs</span>
+    <span class="n">IdUUID</span><span class="p">:</span>                     <span class="mf">931e56</span><span class="n">aa</span><span class="o">-</span><span class="n">c016</span><span class="o">-</span><span class="mi">4</span><span class="n">a43</span><span class="o">-</span><span class="n">aa24</span><span class="o">-</span><span class="mi">1209432168</span><span class="n">ba</span>
+    <span class="n">IdUsage</span><span class="p">:</span>                    <span class="n">filesystem</span>
+    <span class="n">IdVersion</span><span class="p">:</span>
+    <span class="n">MDRaid</span><span class="p">:</span>                     <span class="s1">&#39;/&#39;</span>
+    <span class="n">MDRaidMember</span><span class="p">:</span>               <span class="s1">&#39;/&#39;</span>
+    <span class="n">PreferredDevice</span><span class="p">:</span>            <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">loop3</span>
+    <span class="n">ReadOnly</span><span class="p">:</span>                   <span class="n">false</span>
+    <span class="n">Size</span><span class="p">:</span>                       <span class="mi">2000000000</span>
+    <span class="n">Symlinks</span><span class="p">:</span>                   <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">label</span><span class="o">/</span><span class="n">default</span>
+                                <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">uuid</span><span class="o">/</span><span class="mf">931e56</span><span class="n">aa</span><span class="o">-</span><span class="n">c016</span><span class="o">-</span><span class="mi">4</span><span class="n">a43</span><span class="o">-</span><span class="n">aa24</span><span class="o">-</span><span class="mi">1209432168</span><span class="n">ba</span>
+    <span class="n">UserspaceMountOptions</span><span class="p">:</span>
+  <span class="n">org</span><span class="o">.</span><span class="n">freedesktop</span><span class="o">.</span><span class="n">UDisks2</span><span class="o">.</span><span class="n">Filesystem</span><span class="p">:</span>
+    <span class="n">MountPoints</span><span class="p">:</span>        <span class="o">/</span><span class="n">zengjf</span>
+    <span class="n">Size</span><span class="p">:</span>               <span class="mi">0</span>
+  <span class="n">org</span><span class="o">.</span><span class="n">freedesktop</span><span class="o">.</span><span class="n">UDisks2</span><span class="o">.</span><span class="n">Loop</span><span class="p">:</span>
+    <span class="n">Autoclear</span><span class="p">:</span>          <span class="n">true</span>
+    <span class="n">BackingFile</span><span class="p">:</span>        <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">snap</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">lxd</span><span class="o">/</span><span class="n">disks</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">img</span>
+    <span class="n">SetupByUID</span><span class="p">:</span>         <span class="mi">0</span>
+</pre></div>
+</div>
+<ul>
+<li><p>MountPoints: /zengjf</p></li>
+<li><p>ls -al /dev/disk/by-label/default</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">11</span> <span class="n">Jan</span> <span class="mi">28</span> <span class="mi">11</span><span class="p">:</span><span class="mi">16</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">label</span><span class="o">/</span><span class="n">default</span> <span class="o">-&gt;</span> <span class="o">../../</span><span class="n">loop3</span>
+</pre></div>
+</div>
+</li>
+<li><p>ls -al /dev/disk/by-uuid/931e56aa-c016-4a43-aa24-1209432168ba</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">11</span> <span class="n">Jan</span> <span class="mi">28</span> <span class="mi">11</span><span class="p">:</span><span class="mi">16</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">uuid</span><span class="o">/</span><span class="mf">931e56</span><span class="n">aa</span><span class="o">-</span><span class="n">c016</span><span class="o">-</span><span class="mi">4</span><span class="n">a43</span><span class="o">-</span><span class="n">aa24</span><span class="o">-</span><span class="mi">1209432168</span><span class="n">ba</span> <span class="o">-&gt;</span> <span class="o">../../</span><span class="n">loop3</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>ls /zengjf/</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">containers</span>  <span class="n">containers</span><span class="o">-</span><span class="n">snapshots</span>  <span class="n">custom</span>  <span class="n">custom</span><span class="o">-</span><span class="n">snapshots</span>  <span class="n">images</span>  <span class="n">virtual</span><span class="o">-</span><span class="n">machines</span>  <span class="n">virtual</span><span class="o">-</span><span class="n">machines</span><span class="o">-</span><span class="n">snapshots</span>
+</pre></div>
+</div>
+</li>
+<li><p>cd /zengjf/containers/alpine-container/rootfs/etc/apk</p></li>
+<li><p>ack ustc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">repositories</span>
+<span class="mi">1</span><span class="p">:</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">ustc</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">alpine</span><span class="o">/</span><span class="n">v3</span><span class="mf">.10</span><span class="o">/</span><span class="n">main</span>
+<span class="mi">2</span><span class="p">:</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">ustc</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">alpine</span><span class="o">/</span><span class="n">v3</span><span class="mf">.10</span><span class="o">/</span><span class="n">community</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>lxc start alpine-container</p></li>
+</ul>
+</section>
+<section id="id3">
+<h1>snap lxc命令分析<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>cd /snap/bin</p></li>
+<li><p>ls -al</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="mi">8</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">2</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">52</span> <span class="o">.</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">6</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">4096</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="o">..</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>    <span class="mi">7</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">52</span> <span class="n">lxc</span> <span class="o">-&gt;</span> <span class="n">lxd</span><span class="o">.</span><span class="n">lxc</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span><span class="o">.</span><span class="n">buginfo</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span><span class="o">.</span><span class="n">check</span><span class="o">-</span><span class="n">kernel</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span><span class="o">.</span><span class="n">lxc</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span><span class="o">.</span><span class="n">lxc</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">lxd</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>   <span class="mi">13</span> <span class="n">Jan</span> <span class="mi">27</span> <span class="mi">17</span><span class="p">:</span><span class="mi">51</span> <span class="n">lxd</span><span class="o">.</span><span class="n">migrate</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">snap</span>
+</pre></div>
+</div>
+</li>
+<li><p>snap list</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Name    Version    Rev    Tracking       Publisher   Notes
+core    16-2.48.2  10584  latest/stable  canonical✓  core
+core18  20201210   1948   latest/stable  canonical✓  base
+lxd     4.10       19021  latest/stable  canonical✓  -
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://bbs.huaweicloud.com/blogs/197847">Snap简介</a></p>
+<ul class="simple">
+<li><p>当我们运行lxd命令的时候，/usr/bin/snap被调用。/usr/bin/snap会先看看自己叫什么名字，名字里有没有点。以lxd为例，里面没点，因此/usr/bin/snap知道要去调用snaplxd里的lxd命令。以lxc为例，lxd.lxc里有点，因此/usr/bin/snap知道调用snap lxd里的lxc命令。无论那种情况，/usr/bin/snap都知道了snap包名。之后它就可以去读snap包里的meta/snap.yaml文件了。meta/snap.yaml里有对这个snap的描述，包括基于core¸ core18还是core20。于是/usr/bin/snap可以确定snap的基础镜像。基础镜像确定后，/usr/bin/snap准备容器的文件系统，然后继续根据meta/snap.yaml描述，应用资源使用策略，这时候AppArmor会派上用场。一切准备完毕，最终在容器里调用用户所要运行的命令。</p></li>
+</ul>
+</li>
+<li><p>/etc/profile.d/apps-bin-path.sh</p>
+<ul class="simple">
+<li><p>添加PATH路径</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="lxc">
+<h1>LXC<a class="headerlink" href="#lxc" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>参考文档</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.jianshu.com/p/63fea471bc43">简述Linux容器和lxc</a></p>
+<ul>
+<li><p>Linux容器功能是基于cgroups和Namespace来实现的。所以要了解Linux容器必须先了解cgroup和Namespace；</p></li>
+<li><p>cgroups是将任意进程进行分组化管理的Linux内核功能。通过cgroups可以有效的隔离各类进程，同时还可以控制进程的资源占用(CPU，内存等等)情况；</p></li>
+<li><p>使用Namespace，可以让每个进程组有独立的PID，IPC和网络空间。Namespace的生效主要是通过clone系统调用来实现的。clone系统调用的第3个参数flags就是通过设置Namespace来划分资源的；</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://dzone.com/articles/how-to-install-and-configure-lxc-container-on-ubun">How to Install and Configure an LXC Container on Ubuntu 16.04</a></p></li>
+<li><p><a class="reference external" href="https://www.blackmagicboxes.com/?p=349">Raspberry PI 3, Ubuntu &amp; LXC Howto</a></p></li>
+<li><p><a class="reference external" href="https://raspberrypicloud.wordpress.com/2013/03/12/creating-an-lxc-container-on-the-raspberry-pi/">Creating an LXC Container on the Raspberry Pi</a></p></li>
+</ul>
+</li>
+<li><p>sudo apt-get install lxc lxc-templates</p></li>
+<li><p>lxc-checkconfig</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Kernel</span> <span class="n">configuration</span> <span class="ow">not</span> <span class="n">found</span> <span class="n">at</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">gz</span><span class="p">;</span> <span class="n">searching</span><span class="o">...</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">checkconfig</span><span class="p">:</span> <span class="n">unable</span> <span class="n">to</span> <span class="n">retrieve</span> <span class="n">kernel</span> <span class="n">configuration</span>
+
+<span class="n">Try</span> <span class="n">modprobe</span> <span class="n">configs</span> <span class="n">module</span><span class="p">,</span> <span class="ow">or</span>
+<span class="n">Try</span> <span class="n">recompiling</span> <span class="k">with</span> <span class="n">IKCONFIG_PROC</span><span class="p">,</span> <span class="n">installing</span> <span class="n">the</span> <span class="n">kernel</span> <span class="n">headers</span><span class="p">,</span>
+<span class="ow">or</span> <span class="n">specifying</span> <span class="n">the</span> <span class="n">kernel</span> <span class="n">configuration</span> <span class="n">path</span> <span class="k">with</span><span class="p">:</span>
+  <span class="n">CONFIG</span><span class="o">=&lt;</span><span class="n">path</span><span class="o">&gt;</span> <span class="n">lxc</span><span class="o">-</span><span class="n">checkconfig</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/42617192/after-starting-my-lxc-containers-my-command-lxc-checkconfig-gives-me-output-as">After starting my LXC Containers, My command lxc-checkconfig, gives me output as “Unable to retrieve kernel configuration”</a></p>
+<ul>
+<li><p>You should export kernel config to proc, i.e. rebuild your kernel with specified option CONFIG_IKCONFIG_PROC=y</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>sudo modprobe configs</p></li>
+<li><p>lxc-checkconfig</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span> <span class="n">Namespaces</span> <span class="o">---</span>
+<span class="n">Namespaces</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Utsname</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Ipc</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Pid</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">User</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Network</span> <span class="n">namespace</span><span class="p">:</span> <span class="n">enabled</span>
+
+<span class="o">---</span> <span class="n">Control</span> <span class="n">groups</span> <span class="o">---</span>
+<span class="n">Cgroups</span><span class="p">:</span> <span class="n">enabled</span>
+
+<span class="n">Cgroup</span> <span class="n">v1</span> <span class="n">mount</span> <span class="n">points</span><span class="p">:</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">systemd</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">blkio</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">devices</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">cpuset</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">pids</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">freezer</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">net_cls</span><span class="p">,</span><span class="n">net_prio</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">cpu</span><span class="p">,</span><span class="n">cpuacct</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">perf_event</span>
+
+<span class="n">Cgroup</span> <span class="n">v2</span> <span class="n">mount</span> <span class="n">points</span><span class="p">:</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">fs</span><span class="o">/</span><span class="n">cgroup</span><span class="o">/</span><span class="n">unified</span>
+
+<span class="n">Cgroup</span> <span class="n">v1</span> <span class="n">clone_children</span> <span class="n">flag</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Cgroup</span> <span class="n">device</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Cgroup</span> <span class="n">sched</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Cgroup</span> <span class="n">cpu</span> <span class="n">account</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Cgroup</span> <span class="n">memory</span> <span class="n">controller</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">Cgroup</span> <span class="n">cpuset</span><span class="p">:</span> <span class="n">enabled</span>
+
+<span class="o">---</span> <span class="n">Misc</span> <span class="o">---</span>
+<span class="n">Veth</span> <span class="n">pair</span> <span class="n">device</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">Macvlan</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">Vlan</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="n">loaded</span>
+<span class="n">Bridges</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">Advanced</span> <span class="n">netfilter</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="n">loaded</span>
+<span class="n">CONFIG_NF_NAT_IPV4</span><span class="p">:</span> <span class="n">missing</span>
+<span class="n">CONFIG_NF_NAT_IPV6</span><span class="p">:</span> <span class="n">missing</span>
+<span class="n">CONFIG_IP_NF_TARGET_MASQUERADE</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">CONFIG_IP6_NF_TARGET_MASQUERADE</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">CONFIG_NETFILTER_XT_TARGET_CHECKSUM</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">CONFIG_NETFILTER_XT_MATCH_COMMENT</span><span class="p">:</span> <span class="n">enabled</span><span class="p">,</span> <span class="ow">not</span> <span class="n">loaded</span>
+<span class="n">FUSE</span> <span class="p">(</span><span class="k">for</span> <span class="n">use</span> <span class="k">with</span> <span class="n">lxcfs</span><span class="p">):</span> <span class="n">enabled</span><span class="p">,</span> <span class="n">loaded</span>
+
+<span class="o">---</span> <span class="n">Checkpoint</span><span class="o">/</span><span class="n">Restore</span> <span class="o">---</span>
+<span class="n">checkpoint</span> <span class="n">restore</span><span class="p">:</span> <span class="n">missing</span>
+<span class="n">CONFIG_FHANDLE</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">CONFIG_EVENTFD</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">CONFIG_EPOLL</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">CONFIG_UNIX_DIAG</span><span class="p">:</span> <span class="n">missing</span>
+<span class="n">CONFIG_INET_DIAG</span><span class="p">:</span> <span class="n">enabled</span>
+<span class="n">CONFIG_PACKET_DIAG</span><span class="p">:</span> <span class="n">missing</span>
+<span class="n">CONFIG_NETLINK_DIAG</span><span class="p">:</span> <span class="n">missing</span>
+<span class="n">File</span> <span class="n">capabilities</span><span class="p">:</span>
+
+<span class="n">Note</span> <span class="p">:</span> <span class="n">Before</span> <span class="n">booting</span> <span class="n">a</span> <span class="n">new</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">check</span> <span class="n">its</span> <span class="n">configuration</span>
+<span class="n">usage</span> <span class="p">:</span> <span class="n">CONFIG</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">config</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">lxc</span><span class="o">-</span><span class="n">checkconfig</span>
+</pre></div>
+</div>
+</li>
+<li><p>ls /usr/share/lxc/templates/</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lxc</span><span class="o">-</span><span class="n">alpine</span>     <span class="n">lxc</span><span class="o">-</span><span class="n">download</span>       <span class="n">lxc</span><span class="o">-</span><span class="n">opensuse</span>    <span class="n">lxc</span><span class="o">-</span><span class="n">sshd</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">altlinux</span>   <span class="n">lxc</span><span class="o">-</span><span class="n">fedora</span>         <span class="n">lxc</span><span class="o">-</span><span class="n">oracle</span>      <span class="n">lxc</span><span class="o">-</span><span class="n">ubuntu</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">archlinux</span>  <span class="n">lxc</span><span class="o">-</span><span class="n">fedora</span><span class="o">-</span><span class="n">legacy</span>  <span class="n">lxc</span><span class="o">-</span><span class="n">plamo</span>       <span class="n">lxc</span><span class="o">-</span><span class="n">ubuntu</span><span class="o">-</span><span class="n">cloud</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">busybox</span>    <span class="n">lxc</span><span class="o">-</span><span class="n">gentoo</span>         <span class="n">lxc</span><span class="o">-</span><span class="n">pld</span>         <span class="n">lxc</span><span class="o">-</span><span class="n">voidlinux</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">centos</span>     <span class="n">lxc</span><span class="o">-</span><span class="n">local</span>          <span class="n">lxc</span><span class="o">-</span><span class="n">sabayon</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">cirros</span>     <span class="n">lxc</span><span class="o">-</span><span class="n">oci</span>            <span class="n">lxc</span><span class="o">-</span><span class="n">slackware</span>
+<span class="n">lxc</span><span class="o">-</span><span class="n">debian</span>     <span class="n">lxc</span><span class="o">-</span><span class="n">openmandriva</span>   <span class="n">lxc</span><span class="o">-</span><span class="n">sparclinux</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo lxc-create -n zengjf -t busybox</p></li>
+<li><p>sudo lxc-ls</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zengjf</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo lxc-start -n zengjf -d</p></li>
+<li><p>sudo lxc-info -n zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Name</span><span class="p">:</span>           <span class="n">zengjf</span>
+<span class="n">State</span><span class="p">:</span>          <span class="n">RUNNING</span>
+<span class="n">PID</span><span class="p">:</span>            <span class="mi">2014</span>
+<span class="n">CPU</span> <span class="n">use</span><span class="p">:</span>        <span class="mf">0.03</span> <span class="n">seconds</span>
+<span class="n">BlkIO</span> <span class="n">use</span><span class="p">:</span>      <span class="mi">0</span> <span class="nb">bytes</span>
+</pre></div>
+</div>
+</li>
+<li><p>ls /var/lib/lxc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zengjf</span>
+</pre></div>
+</div>
+<ul>
+<li><p>关与密码</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nd">@raspberrypi</span><span class="p">:</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lxc</span><span class="c1"># cat zengjf/rootfs/etc/passwd</span>
+<span class="n">root</span><span class="p">:</span><span class="n">x</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="o">/</span><span class="n">root</span><span class="p">:</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+<span class="n">root</span><span class="nd">@raspberrypi</span><span class="p">:</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lxc</span><span class="c1"># cat zengjf/rootfs/etc/shadow</span>
+</pre></div>
+</div>
+</li>
+<li><p>因为shadow中没有内容，所以去掉密码设置，修改如下，否则后面无法登录</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="nd">@raspberrypi</span><span class="p">:</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lxc</span><span class="c1"># cat zengjf/rootfs/etc/passwd</span>
+<span class="n">root</span><span class="p">::</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="o">/</span><span class="n">root</span><span class="p">:</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>sudo lxc-console -n zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="n">Connected</span> <span class="n">to</span> <span class="n">tty</span> <span class="mi">1</span>
+<span class="n">Type</span> <span class="o">&lt;</span><span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span> <span class="n">q</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">exit</span> <span class="n">the</span> <span class="n">console</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span> <span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">enter</span> <span class="n">Ctrl</span><span class="o">+</span><span class="n">a</span> <span class="n">itself</span>
+
+<span class="n">Login</span> <span class="n">timed</span> <span class="n">out</span> <span class="n">after</span> <span class="mi">60</span> <span class="n">seconds</span>
+
+<span class="n">zengjf</span> <span class="n">login</span><span class="p">:</span> <span class="n">root</span>
+
+
+<span class="n">BusyBox</span> <span class="n">v1</span><span class="mf">.30.1</span> <span class="p">(</span><span class="n">Raspbian</span> <span class="mi">1</span><span class="p">:</span><span class="mf">1.30.1</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">shell</span> <span class="p">(</span><span class="n">ash</span><span class="p">)</span>
+<span class="n">Enter</span> <span class="s1">&#39;help&#39;</span> <span class="k">for</span> <span class="n">a</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">commands</span><span class="o">.</span>
+
+<span class="o">~</span> <span class="c1"># ls /</span>
+<span class="nb">bin</span>      <span class="n">dev</span>      <span class="n">home</span>     <span class="n">lib64</span>    <span class="n">null</span>     <span class="n">ram0</span>     <span class="n">sbin</span>     <span class="n">sys</span>      <span class="n">tty</span>      <span class="n">tty1</span>     <span class="n">urandom</span>  <span class="n">var</span>
+<span class="n">console</span>  <span class="n">etc</span>      <span class="n">lib</span>      <span class="n">mnt</span>      <span class="n">proc</span>     <span class="n">root</span>     <span class="n">selinux</span>  <span class="n">tmp</span>      <span class="n">tty0</span>     <span class="n">tty5</span>     <span class="n">usr</span>      <span class="n">zero</span>
+<span class="o">~</span> <span class="c1"># pwd</span>
+<span class="o">/</span><span class="n">root</span>
+<span class="o">~</span> <span class="c1">#</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctrl+a</span> <span class="pre">q</span></code>退出console</p></li>
+</ul>
+</section>
+<section id="namespace">
+<h1>Namespace<a class="headerlink" href="#namespace" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>参考文档</p>
+<ul>
+<li><p><a class="reference external" href="https://fuckcloudnative.io/posts/introduction-to-linux-namespaces-part-1-api/">Linux Namespace 基础教程：namespace API</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/jettery/article/details/77185412">使用Linux的namespace来隔离system的教程</a></p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Process Namespace</strong></p>
+<p>历史上，Linux内核维护了一个单一的进程树。该树包含对父子层次结构中当前运行的每个进程的引用。鉴于具有足够权限并满足某些条件的过程，可以通过向其附加示踪器或甚至可以将其杀死来检查另一过程。</p>
+<p>随着Linux命名空间的引入，可以拥有多个”嵌套”进程树。每个进程树都可以有一个完全孤立的进程。这可以确保属于一个进程树的进程不能检查或杀死，实际上甚至不能知道其他兄弟或父进程树中的进程的存在。</p>
+<p>每次启动Linux的计算机都会启动，它只需一个进程（进程标识符（PID））1。该进程是进程树的根目录，并通过执行适当的维护工作并启动它来启动系统的其余部分正确的守护进程/服务。所有其他进程从树中的这个进程下面开始。 PID命名空间允许使用自己的PID 1进程来分离一个新的树。执行此操作的过程将保留在原始树中的父命名空间中，但会使该子进程成为其自己的进程树的根。</p>
+<p>通过PID命名空间隔离，子命名空间中的进程无法知道父进程的存在。但是，父命名空间中的进程具有子命名空间中进程的完整视图，就像它们是父命名空间中的任何其他进程一样。</p>
+<p>可以创建嵌套的子命名空间集：一个进程在新的PID命名空间中启动子进程，该子进程在新的PID命名空间中产生另一个进程，依此类推。</p>
+</section>
+<section id="cgroups">
+<h1>cgroups<a class="headerlink" href="#cgroups" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>参考文档</p>
+<ul>
+<li><p><a class="reference external" href="https://www.cnblogs.com/sparkdev/p/8296063.html">linux cgroups 简介</a></p></li>
+<li><p><a class="reference external" href="https://fuckcloudnative.io/posts/understanding-cgroups-part-1-basics/">Linux Cgroup 入门教程：基本概念</a></p></li>
+</ul>
+</li>
+</ul>
+<p>Cgroup是Linux kernel的一项功能：它是在一个系统中运行的层级制进程组，你可对其进行资源分配（如CPU时间、系统内存、网络带宽或者这些资源的组合）。通过使用cgroup，系统管理员在分配、排序、拒绝、管理和监控系统资源等方面，可以进行精细化控制。硬件资源可以在应用程序和用户间智能分配，从而增加整体效率。</p>
+<p>cgroup和namespace类似，也是将进程进行分组，但它的目的和namespace不一样，namespace是为了隔离进程组之间的资源，而cgroup是为了对一组进程进行统一的资源监控和限制。</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

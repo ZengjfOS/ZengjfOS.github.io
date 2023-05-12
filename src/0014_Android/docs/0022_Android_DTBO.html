@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android DTBO</a></li>
+<li><a class="reference internal" href="#id1">编译流程</a></li>
+<li><a class="reference internal" href="#lk-overlay">LK Overlay应用流程</a></li>
+<li><a class="reference internal" href="#android-r">Android R修改调试</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-dtbo">
+<h1>Android DTBO<a class="headerlink" href="#android-dtbo" title="Permalink to this headline"></a></h1>
+<p>Android DTS Overlay，dtsi文件名不能有大写，删除内核重编</p>
+</section>
+<section id="id1">
+<h1>编译流程<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Android Q</p>
+<ul>
+<li><p>kernel-4.9/arch/arm64/configs/k62v1_64_bsp_defconfig</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE</span><span class="o">=</span><span class="n">y</span>
+<span class="n">CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE_NAMES</span><span class="o">=</span><span class="s2">&quot;mediatek/mt6765&quot;</span>
+<span class="n">CONFIG_BUILD_ARM64_DTB_OVERLAY_IMAGE_NAMES</span><span class="o">=</span><span class="s2">&quot;mediatek/k62v1_64_bsp&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>CONFIG_BUILD_ARM64_DTB_OVERLAY_IMAGE_NAMES=”mediatek/k62v1_64_bsp”</p>
+<ul>
+<li><p>多个空格分开</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>kernel-4.9/scripts/drvgen/drvgen.mk</p>
+<ul class="simple">
+<li><p>dtbo id在这里面生成，没有使用<code class="docutils literal notranslate"><span class="pre">device/mediatek/build/core/build_dtboimage.mk</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Android R</p>
+<ul>
+<li><p>device/mediateksample/k62v1_64_bsp/ProjectConfig.mk</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">MTK_PROJECT_DTB_NAMES</span> <span class="o">=</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>空会使用项目名作为值，多个空格分开</p></li>
+</ul>
+</li>
+<li><p>device/mediatek/vendor/common/BoardConfig.mk</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="cp">ifeq ($(strip $(MTK_PROJECT_DTB_NAMES)),)</span>
+<span class="cp">ifeq ($(MTK_K64_SUPPORT), yes)</span>
+<span class="nv">PROJECT_DTB_NAMES</span> <span class="o">?=</span> mediatek/<span class="k">$(</span>MTK_TARGET_PROJECT<span class="k">)</span>
+<span class="cp">else</span>
+<span class="nv">PROJECT_DTB_NAMES</span> <span class="o">?=</span> <span class="k">$(</span>MTK_TARGET_PROJECT<span class="k">)</span>
+<span class="cp">endif</span>
+<span class="cp">else</span>
+<span class="nv">PROJECT_DTB_NAMES</span> <span class="o">?=</span> <span class="k">$(</span>MTK_PROJECT_DTB_NAMES<span class="k">)</span>
+<span class="cp">endif</span>
+</pre></div>
+</div>
+</li>
+<li><p>kernel-4.19/Android.mk</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="c">## DTB build template</span>
+<span class="nv">MTK_DTBIMAGE_DTS</span> <span class="o">:=</span> <span class="k">$(</span>addsuffix .dts,<span class="k">$(</span>addprefix <span class="k">$(</span>KERNEL_DIR<span class="k">)</span>/arch/<span class="k">$(</span>KERNEL_TARGET_ARCH<span class="k">)</span>/boot/dts/,<span class="k">$(</span>PLATFORM_DTB_NAME<span class="k">)))</span>
+<span class="cp">include device/mediatek/build/core/build_dtbimage.mk</span>
+
+<span class="nv">MTK_DTBOIMAGE_DTS</span> <span class="o">:=</span> <span class="k">$(</span>addsuffix .dts,<span class="k">$(</span>addprefix <span class="k">$(</span>KERNEL_DIR<span class="k">)</span>/arch/<span class="k">$(</span>KERNEL_TARGET_ARCH<span class="k">)</span>/boot/dts/,<span class="k">$(</span>PROJECT_DTB_NAMES<span class="k">)))</span>
+<span class="cp">include device/mediatek/build/core/build_dtboimage.mk</span>
+</pre></div>
+</div>
+</li>
+<li><p>device/mediatek/build/core/build_dtboimage.mk</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span>MTK_DTBOIMAGE_DTB :=
+MTK_DTBOIMAGE_DTSI :=
+$(foreach i,$(MTK_DTBOIMAGE_DTS),\
+  $(eval base_prj := $(shell grep -m 1 &#39;#include [&lt;\&quot;].*\/cust\.dtsi[&gt;\&quot;]&#39; $(i) | sed &#39;s/#include [&lt;&quot;]//g&#39; | sed &#39;s/\/cust\.dtsi[&gt;&quot;]//g&#39; | sed &#39;s/\/\*//g&#39; | sed &#39;s/\*\///g&#39; | sed &#39;s/ //g&#39;))\
+  $(if $(strip $(base_prj)),\
+    $(eval prj_path := $(KERNEL_OUT)/arch/$(KERNEL_TARGET_ARCH)/boot/dts/$(base_prj))\
+    $(eval dws_path := $(KERNEL_DIR)/drivers/misc/mediatek/dws/$(MTK_PLATFORM_DIR)/$(base_prj).dws)\
+    $(if $(filter $(prj_path),$(MTK_DTBOIMAGE_DTSI)),,\
+      $(eval $(call drvgen_dws_to_dtsi,$(dws_path),$(prj_path)))\
+      $(eval MTK_DTBOIMAGE_DTSI += $(prj_path))\
+      $(eval LOCAL_ADDITIONAL_DEPENDENCIES := $(prj_path)/cust.dtsi)\
+    )\
+  )\
+  $(eval LOCAL_ADDITIONAL_DEPENDENCIES_D := $(MTK_DTBIMAGE_DTB))\
+  $(eval LOCAL_ADDITIONAL_DEPENDENCIES_D += $(MTK_DTBOIMAGE_DTB))\
+  $(eval LOCAL_SRC_FILES := $(i))\
+  $(eval include device/mediatek/build/core/build_dtb.mk)\
+  $(eval MTK_DTBOIMAGE_DTB += $(my_kernel_dtb))\
+)
+
+kernel: $(my_kernel_dtb).merge
+my_dtbo_id := 0
+define mk_dtboimg_cfg
+echo $(1) &gt;&gt;$(2);\
+echo &quot; id=$(my_dtbo_id)&quot; &gt;&gt;$(2);\
+$(eval my_dtbo_id := $(call int_plus,$(my_dtbo_id),1))
+endef
+
+MTK_DTBOIMAGE_CFG := $(KERNEL_OUT)/arch/$(KERNEL_TARGET_ARCH)/boot/dts/dtboimg.cfg
+$(MTK_DTBOIMAGE_CFG): PRIVATE_DTB := $(MTK_DTBOIMAGE_DTB)
+$(MTK_DTBOIMAGE_CFG): $(MTK_DTBOIMAGE_DTB)
+    $(hide) rm -f $@.tmp
+    $(hide) $(foreach f,$(PRIVATE_DTB),$(call mk_dtboimg_cfg,$(f),$@.tmp))
+    $(hide) if ! cmp -s $@.tmp $@; then \
+        mv $@.tmp $@; \
+    else \
+        rm $@.tmp; \
+    fi
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="lk-overlay">
+<h1>LK Overlay应用流程<a class="headerlink" href="#lk-overlay" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/odm_mdtbo.c</p>
+<ul>
+<li><p>int get_odm_mdtbo_index(void)</p>
+<ul>
+<li><p>vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/custom_dtb_index.c</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cm">/******************************************************************************</span>
+<span class="cm">* NOTE: This function is for the internal projects of MT6771.</span>
+<span class="cm">*        -----------------------------------------</span>
+<span class="cm">*       | GPIO_163    GPIO_164    PCB_ID          |</span>
+<span class="cm">*       |   Low          Low      SEVB  (MTK0963) |</span>
+<span class="cm">*       |   Low          High     Phone (MTK0891) |</span>
+<span class="cm">*       |   High         Low      TBD             |</span>
+<span class="cm">*       |   High         High     TBD             |</span>
+<span class="cm">*        -----------------------------------------</span>
+<span class="cm">*</span>
+<span class="cm">*       Customers need to implement their own customized_get_odm_mdtbo_index()</span>
+<span class="cm">*       function.</span>
+<span class="cm">******************************************************************************/</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">customized_get_odm_mdtbo_index</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">S32</span><span class="w"> </span><span class="n">pin163</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt_get_gpio_in</span><span class="p">(</span><span class="n">GPIO_163</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">S32</span><span class="w"> </span><span class="n">pin164</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mt_get_gpio_in</span><span class="p">(</span><span class="n">GPIO_164</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dprintf</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pin163 = %d, pin164 = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">pin163</span><span class="p">,</span><span class="w"> </span><span class="n">pin164</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pin163</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">GPIO_HIGH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pin164</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">GPIO_HIGH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// idx = 3;</span>
+<span class="w">            </span><span class="n">dprintf</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Error: PCB_ID: Unknown, dtb idx = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">dprintf</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Error: PCB_ID: Unknown, dtb idx = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pin164</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">GPIO_HIGH</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">dprintf</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PCB_ID: Phone (MTK0891), dtb idx = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">dprintf</span><span class="p">(</span><span class="n">INFO</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PCB_ID: SEVB (MTK0963), dtb idx = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">idx</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>log</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">250</span><span class="p">]</span> <span class="p">[</span><span class="n">SBC</span><span class="p">]</span> <span class="n">dtbo</span> <span class="n">vfy</span> <span class="k">pass</span><span class="p">(</span><span class="mi">1</span> <span class="n">ms</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">251</span><span class="p">]</span> <span class="n">pin163</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pin164</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">[</span><span class="mi">251</span><span class="p">]</span> <span class="n">PCB_ID</span><span class="p">:</span> <span class="n">SEVB</span> <span class="p">(</span><span class="n">MTK0963</span><span class="p">),</span> <span class="n">dtb</span> <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">[</span><span class="mi">251</span><span class="p">]</span> <span class="n">dtbo_offset</span><span class="p">:</span> <span class="mh">0x80</span>
+<span class="p">[</span><span class="mi">252</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="p">:::</span> <span class="n">lvl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">load_dtbo_buffer</span> <span class="n">takes</span> <span class="mi">31</span> <span class="n">ms</span>
+<span class="p">[</span><span class="mi">253</span><span class="p">]</span> <span class="n">dtbo_size</span> <span class="p">:</span> <span class="mi">43617</span>
+<span class="p">[</span><span class="mi">264</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="p">:::</span> <span class="n">lvl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">dtb_overlay</span> <span class="n">takes</span> <span class="mi">11</span> <span class="n">ms</span>
+<span class="p">[</span><span class="mi">265</span><span class="p">]</span> <span class="p">[</span><span class="n">PROFILE</span><span class="p">]</span> <span class="p">:::</span> <span class="n">lvl</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">lk_dtb_init</span> <span class="n">takes</span> <span class="mi">99</span> <span class="n">ms</span>
+</pre></div>
+</div>
+</li>
+<li><p>board id</p>
+<ul class="simple">
+<li><p>vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/mt_gpio.c</p>
+<ul>
+<li><p>u32 getBoardIDVals(void)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="android-r">
+<h1>Android R修改调试<a class="headerlink" href="#android-r" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>kernel-4.19/arch/arm64/boot/dts/mediatek</p>
+<ul class="simple">
+<li><p>cp k62v1_64_bsp.dts k62v1_64_bsp_test1.dts</p></li>
+<li><p>cp k62v1_64_bsp.dts k62v1_64_bsp_test2.dts</p></li>
+</ul>
+</li>
+<li><p>device/mediateksample/k62v1_64_bsp/ProjectConfig.mk</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk b/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gh">index 4003272cb91..f692c8ce518 100755</span><span class="w"></span>
+<span class="gd">--- a/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gi">+++ b/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk</span><span class="w"></span>
+<span class="gu">@@ -521,7 +521,8 @@ MTK_BT_HEARING_AID_SUPPORT = no</span><span class="w"></span>
+<span class="w"> </span>MTK_CAM_VPU_DSDN = no<span class="w"></span>
+<span class="w"> </span>MTK_AI_CAM_SUPPORT = no<span class="w"></span>
+<span class="w"> </span>MTK_BIP_UICC_SERVER_MODE = no<span class="w"></span>
+<span class="gd">-MTK_PROJECT_DTB_NAMES =</span><span class="w"></span>
+<span class="gi">+# MTK_PROJECT_DTB_NAMES =</span><span class="w"></span>
+<span class="gi">+MTK_PROJECT_DTB_NAMES = mediatek/k62v1_64_bsp mediatek/k62v1_64_bsp_test1 mediatek/k62v1_64_bsp_test2</span><span class="w"></span>
+<span class="w"> </span>MTK_TINYSYS_SCP_LOGGER_SUPPORT = yes<span class="w"></span>
+<span class="w"> </span>MTK_CAM_GESTURE_SUPPORT = no<span class="w"></span>
+<span class="w"> </span>MTK_SENSOR_ARCHITECTURE = 1.0<span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>build</p></li>
+<li><p>cat obj/KERNEL_OBJ/arch/arm64/boot/dts/dtboimg.cfg</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">out</span><span class="o">/</span><span class="n">target</span><span class="o">/</span><span class="n">product</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">obj</span><span class="o">/</span><span class="n">KERNEL_OBJ</span><span class="o">/</span><span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">.</span><span class="n">dtb</span>
+ <span class="nb">id</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">out</span><span class="o">/</span><span class="n">target</span><span class="o">/</span><span class="n">product</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">obj</span><span class="o">/</span><span class="n">KERNEL_OBJ</span><span class="o">/</span><span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">k62v1_64_bsp_test1</span><span class="o">.</span><span class="n">dtb</span>
+ <span class="nb">id</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">out</span><span class="o">/</span><span class="n">target</span><span class="o">/</span><span class="n">product</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">obj</span><span class="o">/</span><span class="n">KERNEL_OBJ</span><span class="o">/</span><span class="n">arch</span><span class="o">/</span><span class="n">arm64</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">k62v1_64_bsp_test2</span><span class="o">.</span><span class="n">dtb</span>
+ <span class="nb">id</span><span class="o">=</span><span class="mi">2</span>
+</pre></div>
+</div>
+</li>
+<li><p>out/host/linux-x86/bin/mkdtimg dump out/target/product/k62v1_64_bsp/obj/PACKAGING/dtboimage/dtbo.img</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dt_table_header</span><span class="p">:</span>
+               <span class="n">magic</span> <span class="o">=</span> <span class="n">d7b7ab1e</span>
+          <span class="n">total_size</span> <span class="o">=</span> <span class="mi">130979</span>
+         <span class="n">header_size</span> <span class="o">=</span> <span class="mi">32</span>
+       <span class="n">dt_entry_size</span> <span class="o">=</span> <span class="mi">32</span>
+      <span class="n">dt_entry_count</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">dt_entries_offset</span> <span class="o">=</span> <span class="mi">32</span>
+           <span class="n">page_size</span> <span class="o">=</span> <span class="mi">2048</span>
+             <span class="n">version</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">dt_table_entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+             <span class="n">dt_size</span> <span class="o">=</span> <span class="mi">43617</span>
+           <span class="n">dt_offset</span> <span class="o">=</span> <span class="mi">128</span>
+                  <span class="nb">id</span> <span class="o">=</span> <span class="mi">00000000</span>
+                 <span class="n">rev</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="p">(</span><span class="n">FDT</span><span class="p">)</span><span class="n">size</span> <span class="o">=</span> <span class="mi">43617</span>
+     <span class="p">(</span><span class="n">FDT</span><span class="p">)</span><span class="n">compatible</span> <span class="o">=</span> <span class="p">(</span><span class="n">unknown</span><span class="p">)</span>
+<span class="n">dt_table_entry</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+             <span class="n">dt_size</span> <span class="o">=</span> <span class="mi">43617</span>
+           <span class="n">dt_offset</span> <span class="o">=</span> <span class="mi">43745</span>
+                  <span class="nb">id</span> <span class="o">=</span> <span class="mi">00000001</span>
+                 <span class="n">rev</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="p">(</span><span class="n">FDT</span><span class="p">)</span><span class="n">size</span> <span class="o">=</span> <span class="mi">43617</span>
+     <span class="p">(</span><span class="n">FDT</span><span class="p">)</span><span class="n">compatible</span> <span class="o">=</span> <span class="p">(</span><span class="n">unknown</span><span class="p">)</span>
+<span class="n">dt_table_entry</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+             <span class="n">dt_size</span> <span class="o">=</span> <span class="mi">43617</span>
+           <span class="n">dt_offset</span> <span class="o">=</span> <span class="mi">87362</span>
+                  <span class="nb">id</span> <span class="o">=</span> <span class="mi">00000002</span>
+                 <span class="n">rev</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="n">custom</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">00000000</span>
+           <span class="p">(</span><span class="n">FDT</span><span class="p">)</span><span class="n">size</span> <span class="o">=</span> <span class="mi">43617</span>
+     <span class="p">(</span><span class="n">FDT</span><span class="p">)</span><span class="n">compatible</span> <span class="o">=</span> <span class="p">(</span><span class="n">unknown</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

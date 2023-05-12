@@ -1,0 +1,13 @@
+# iphone samba
+
+解决iphone无法拷贝文件到samba
+
+# 参考文档
+
+* [IPhone 无法移动文件到 samba 共享目录](https://www.dianbanjiu.com/post/iphone-%E6%97%A0%E6%B3%95%E7%A7%BB%E5%8A%A8%E6%96%87%E4%BB%B6%E5%88%B0-samba-%E5%85%B1%E4%BA%AB%E7%9B%AE%E5%BD%95/)
+* [0006_搭建samba服务端.md](/src/0001_RaspberryPi/docs/0006_搭建samba服务端.md)
+* https://www.samba.org/samba/docs/current/man-html/vfs_fruit.8.html
+
+# 说明
+
+在samba配置文件的`[global]`中添加`vfs objects = fruit streams_xattr`

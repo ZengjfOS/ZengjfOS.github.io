@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">HID Keyboard</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">报告描述符生成器</a></li>
+<li><a class="reference internal" href="#code-positon">Code Positon</a></li>
+<li><a class="reference internal" href="#hid">HID 报告描述符</a></li>
+<li><a class="reference internal" href="#id3">HID Keyboard</a></li>
+<li><a class="reference internal" href="#wireshark-capture">Wireshark Capture</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hid-keyboard">
+<h1>HID Keyboard<a class="headerlink" href="#hid-keyboard" title="Permalink to this headline"></a></h1>
+<p>HID键盘示例</p>
+<p>键盘的描述符共有8字节的输入报告和1字节的输出报告:</p>
+<ul class="simple">
+<li><p>8字节输入报告：第1字节特殊按键，第2字节保留常量，第3-8字节普通按键。键值可以参考USB HID to PS/2 Scan Code Translation Table.</p></li>
+<li><p>1字节输出报告：这1个字节总共用了5bits使用3bits常量来补足成1个字节。5bits用来点亮特殊键盘上的Led灯，比如键盘的大小写，数字键，小键盘的LED灯。</p></li>
+<li><p>如果不给键盘配置OUT端点，那么键盘的1字节输出报告将由控制端点的SetReport进行传输。</p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/e4b67784093407afe5c7aecf4902ecaf/0008_USB_HID_Keyboard_Firmware.pdf"><span class="xref download myst">0008_USB_HID_Keyboard_Firmware.pdf</span></a></p></li>
+<li><p><a class="reference external" href="https://eleccelerator.com/tutorial-about-usb-hid-report-descriptors/">Tutorial about USB HID Report Descriptors</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/jiujiujiuqiuqiuqiu/article/details/47277685">关于USBHID协议以及鼠标键盘描述符的解释</a></p></li>
+<li><p><a class="reference external" href="https://www.cypress.com/file/103181/download">USB HID Keyboard Firmware Using EZ-USB® FX2LPTM</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>报告描述符生成器<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><a class="reference external" href="https://www.usb.org/document-library/hid-descriptor-tool">HID Descriptor Tool</a></p>
+</section>
+<section id="code-positon">
+<h1>Code Positon<a class="headerlink" href="#code-positon" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">C:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Firmware\hid_kb</span></code></p>
+</section>
+<section id="hid">
+<h1>HID 报告描述符<a class="headerlink" href="#hid" title="Permalink to this headline"></a></h1>
+<div class="highlight-ASM notranslate"><div class="highlight"><pre><span></span><span class="nl">HIDReportDscr:</span><span class="w"></span>
+<span class="w">    </span><span class="c1">; 通用桌面键盘</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Generic Desktop)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">09</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">06</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage (Keyboard)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">A1h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">   </span><span class="c1">;    Collection (Application)</span>
+
+<span class="w">    </span><span class="c1">; 按键值类型，输入，占用8bit * 1</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">07</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (Key codes)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E0h</span><span class="w">   </span><span class="c1">;    Usage minimum (224)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="no">E7h</span><span class="w">   </span><span class="c1">;    Usage maximum (231)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">15</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical minimum (0)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">25</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical maximum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (data, variable, absolute)</span>
+
+<span class="w">    </span><span class="c1">; 常量，也就是保留，占用8bit * 1</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (constant)</span>
+
+<span class="w">    </span><span class="c1">; 灯类型，输出，占用1bit * 5</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage Page (LED)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage minimum (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage maximum (5)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">02</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (data, variable, absolute)</span>
+
+<span class="w">    </span><span class="c1">; 常量，也就是保留，占用3bit * 1，填充前面的5bit，达到8bit</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (1)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">03</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (3)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">91</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">01</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Output (constant)</span>
+
+<span class="w">    </span><span class="c1">; 按键值类型，输入，占用8bit * 3</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">95</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">03</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report count (3)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">75</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">08</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Report size (8)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">15</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical minimum (0)         每个字节的取值范围是 0~101</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">25</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Logical maximum (101)       </span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">05</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">07</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage page (key codes)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">19</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage minimum (0)           分别是键盘码 0~键盘码 101</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">29</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Usage maximum (101)         </span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">81</span><span class="no">h</span><span class="p">,</span><span class="w"> </span><span class="mi">00</span><span class="no">h</span><span class="w">    </span><span class="c1">;    Input (data, array)</span>
+<span class="w">    </span><span class="nf">db</span><span class="w"> </span><span class="mi">0</span><span class="no">C0h</span><span class="w">        </span><span class="c1">;    End Collection</span>
+<span class="nl">HIDReportDscrEnd:</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h1>HID Keyboard<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="n">TD_Init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">             </span><span class="c1">// Called once at startup</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="n">leds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="n">oldbuttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">   </span><span class="n">EP1OUTCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xB0</span><span class="p">;</span><span class="w">       </span><span class="c1">// valid, interrupt</span>
+<span class="w">   </span><span class="n">EP1INCFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0XB0</span><span class="p">;</span><span class="w">        </span><span class="c1">// valid, interrupt</span>
+
+<span class="w">   </span><span class="n">EP2CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP4CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP6CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EP8CFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">   </span><span class="c1">// disable unused endpoints</span>
+
+<span class="w">    </span><span class="c1">// EZUSB_InitI2C();            // Initialize EZ-USB I2C controller</span>
+
+
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">TD_Poll</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w">             </span><span class="c1">// Called repeatedly while the device is idle</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1INCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">    </span><span class="c1">// Is the IN1BUF available; 八字节的输入报文</span>
+<span class="w">   </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// EZUSB_ReadI2C(BTN_ADDR,0x01,&amp;buttons);    // Read button states</span>
+<span class="w">      </span><span class="n">buttons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x01</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// buttons &amp;= 0x0F;</span>
+<span class="w">      </span><span class="c1">// if ((oldbuttons - buttons) != 0)    //Change in button state</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">buttons</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">    </span><span class="c1">//Change in button state</span>
+<span class="w">      </span><span class="p">{</span><span class="w"></span>
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">    </span><span class="c1">//Shift</span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">         </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w">    </span><span class="c1">//a</span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">         </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w">    </span><span class="c1">//b</span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">         </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">buttons</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w">    </span><span class="c1">//c</span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">         </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">EP1INBUF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP1INBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// oldbuttons = buttons;</span>
+<span class="w">   </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">EP1OUTCS</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bmEPBUSY</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">    </span><span class="c1">// Is there something available; 1字节的输出报文</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">leds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">;</span><span class="w">            </span><span class="c1">//Turn all off</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">EP1OUTBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x02</span><span class="p">)</span><span class="w">    </span><span class="c1">//Caps</span>
+<span class="w">            </span><span class="n">leds</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0xBF</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">EP1OUTBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x01</span><span class="p">)</span><span class="w">    </span><span class="c1">//Scroll</span>
+<span class="w">            </span><span class="n">leds</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0xF7</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">EP1OUTBUF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x04</span><span class="p">)</span><span class="w">    </span><span class="c1">//Num</span>
+<span class="w">            </span><span class="n">leds</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mh">0xFE</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// EZUSB_WriteI2C(LED_ADDR, 0x01, &amp;leds);</span>
+<span class="w">      </span><span class="c1">// EZUSB_WaitForEEPROMWrite(LED_ADDR);</span>
+
+<span class="w">        </span><span class="n">EP1OUTBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">                </span><span class="c1">//Rearm endpoint buffer</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="c1">//-----------------------------------------------------------------------------</span>
+<span class="c1">// Device Request hooks</span>
+<span class="c1">//   The following hooks are called by the end point 0 device request parser.</span>
+<span class="c1">//-----------------------------------------------------------------------------</span>
+
+<span class="n">BOOL</span><span class="w"> </span><span class="n">DR_GetDescriptor</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">BYTE</span><span class="w"> </span><span class="n">length</span><span class="p">,</span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">pHIDDscr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">WORD</span><span class="p">)</span><span class="o">&amp;</span><span class="n">HIDDscr</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pReportDscr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">WORD</span><span class="p">)</span><span class="o">&amp;</span><span class="n">HIDReportDscr</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pReportDscrEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">WORD</span><span class="p">)</span><span class="o">&amp;</span><span class="n">HIDReportDscrEnd</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">SETUPDAT</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">GD_HID</span><span class="p">:</span><span class="w">                    </span><span class="c1">//HID Descriptor</span>
+<span class="w">            </span><span class="n">SUDPTRH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MSB</span><span class="p">(</span><span class="n">pHIDDscr</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">SUDPTRL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LSB</span><span class="p">(</span><span class="n">pHIDDscr</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">FALSE</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">GD_REPORT</span><span class="p">:</span><span class="w">                    </span><span class="c1">//Report Descriptor</span>
+<span class="w">            </span><span class="n">length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pReportDscrEnd</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">pReportDscr</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">         </span><span class="n">AUTOPTR1H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MSB</span><span class="p">(</span><span class="n">pReportDscr</span><span class="p">);</span><span class="w"></span>
+<span class="w">         </span><span class="n">AUTOPTR1L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LSB</span><span class="p">(</span><span class="n">pReportDscr</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">         </span><span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">length</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">EP0BUF</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">XAUTODAT1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">         </span><span class="n">EP0BCL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">;</span><span class="w"></span>
+<span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">FALSE</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="p">(</span><span class="n">TRUE</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="wireshark-capture">
+<h1>Wireshark Capture<a class="headerlink" href="#wireshark-capture" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Enumerate
+<img alt="0008_HID_Keyboard_Enumerate.png" src="../../../_images/0008_HID_Keyboard_Enumerate.png" /></p></li>
+<li><p>Interrupt IN
+<img alt="0008_HID_Keyboard_IN_Wireshark.png" src="../../../_images/0008_HID_Keyboard_IN_Wireshark.png" /></p></li>
+<li><p>Interrupt Out
+<img alt="0008_HID_Keyboard_Out_Wireshark.png" src="../../../_images/0008_HID_Keyboard_Out_Wireshark.png" /></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

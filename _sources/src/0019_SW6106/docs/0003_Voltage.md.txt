@@ -1,0 +1,47 @@
+# Voltage
+
+获取当前电池、输出的电压
+
+# 参考文档
+
+* [0001_SW6106_Register_Release_RG005_1_v1.2.pdf](refers/0001_SW6106_Register_Release_RG005_1_v1.2.pdf)
+
+# 处理程序
+
+```python
+#!/usr/bin/env python3
+
+from smbus import SMBus
+from time import sleep
+
+i2cbus = SMBus(1)  # Create a new I2C bus
+i2caddress = 0x3c  # Address of SW6106 device
+
+while True:
+    print("---------------------------------------")
+
+    batLow = i2cbus.read_byte_data(i2caddress, 0x14)
+    voutBatHigh = i2cbus.read_byte_data(i2caddress, 0x15)
+    voutLow = i2cbus.read_byte_data(i2caddress, 0x16)
+
+    bat = (((voutBatHigh & 0x0f) << 8) | (batLow & 0xff))
+    vout = ((((voutBatHigh & 0x0f0) >> 4) << 8) | voutLow)
+
+    batVoltage = bat * 1.2
+    voutVoltage = vout * 4
+
+    print("batLow, voutBatHigh, voutLow: 0x%x, 0x%x, 0x%x" % (batLow, voutBatHigh, voutLow))
+    print("bat, batVoltage, 0x%x, %f" % (bat, batVoltage))
+    print("vout, voutVoltage, 0x%x, %f" % (vout, voutVoltage))
+
+    sleep(1)
+```
+
+# log
+
+```
+---------------------------------------
+batLow, voutBatHigh, voutLow: 0x4d, 0x5c, 0x7
+bat, batVoltage, 0xc4d, 3778.800000
+vout, voutVoltage, 0x507, 5148.000000
+```

@@ -1,0 +1,575 @@
+# LXC busybox
+
+busybox lxc工作原理分析
+
+# 参考文档
+
+* https://github.com/ZengjfOS/lxc-android
+
+# busybox binaries
+
+* https://busybox.net/downloads/binaries/1.21.1/
+  * busybox-armv7l
+* Android测试存放路径
+  * /vendor/bin/
+
+# template
+
+* https://github.com/lxc/lxc/blob/master/templates/lxc-busybox.in
+* https://github.com/ppoffice/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in
+
+# lxc busybox来自哪里
+
+* /usr/share/lxc/templates/lxc-busybox
+  ```sh
+  # ...省略
+  
+  configure_busybox()
+  {
+    rootfs="${1}"
+  
+    if ! which busybox > /dev/null 2>&1; then
+      echo "ERROR: Failed to find busybox binary"
+      return 1
+    fi
+  
+    # copy busybox in the rootfs
+    if ! cp "$(which busybox)" "${rootfs}/bin"; then
+      echo "ERROR: Failed to copy busybox binary"
+      return 1
+    fi
+  
+    # symlink busybox for the commands it supports
+    # it would be nice to just use "chroot $rootfs busybox --install -s /bin"
+    # but that only works right in a chroot with busybox >= 1.19.0
+    (
+      cd "${rootfs}/bin" || return 1
+      ./busybox --list | grep -v busybox | xargs -n1 ln -s busybox
+    )
+  
+    # relink /sbin/init
+    ln "${rootfs}/bin/busybox" "${rootfs}/sbin/init"
+  
+    # /etc/fstab must exist for "mount -a"
+    touch "${rootfs}/etc/fstab"
+  
+    # passwd exec must be setuid
+    chmod +s "${rootfs}/bin/passwd"
+    touch "${rootfs}/etc/shadow"
+  
+    return 0
+  }
+  
+  # ...省略
+  ```
+
+# 查看lxc配置
+
+* lxc-config --help
+  ```
+  Usage: lxc-config -l: list all available configuration items
+         lxc-config item: print configuration item
+  ```
+* lxc-config -l
+  ```
+  lxc.default_config
+  lxc.lxcpath
+  lxc.bdev.lvm.vg
+  lxc.bdev.lvm.thin_pool
+  lxc.bdev.zfs.root
+  lxc.cgroup.use
+  lxc.cgroup.pattern
+  ```
+* lxc-config lxc.default_config
+  ```
+  /etc/lxc/default.conf
+  ```
+* lxc-config lxc.lxcpath
+  ```
+  /var/lib/lxc
+  ```
+* lxc-config lxc.bdev.lvm.vg
+  ```
+  lxc
+  ```
+* lxc-config lxc.bdev.lvm.thin_pool
+  ```
+  lxc
+  ```
+* lxc-config lxc.bdev.zfs.root
+  ```
+  lxc
+  ```
+* lxc-config lxc.cgroup.use
+  ```
+  lxc.cgroup.use is not set.
+  ```
+* lxc-config lxc.cgroup.pattern
+  ```
+  lxc/%n
+  ```
+
+# 容器配置
+
+* /var/lib/lxc/zengjf/config
+  ```sh
+  # Template used to create this container: /usr/share/lxc/templates/lxc-busybox
+  # Parameters passed to the template:
+  # Template script checksum (SHA-1): 21abc1440b73cdb95d96d5459b27c3a87df9976f
+  # For additional config options, please look at lxc.container.conf(5)
+  
+  # Uncomment the following line to support nesting containers:
+  #lxc.include = /usr/share/lxc/config/nesting.conf
+  # (Be aware this has security implications)
+  
+  lxc.net.0.type = empty
+  lxc.apparmor.profile = generated
+  lxc.apparmor.allow_nesting = 1
+  lxc.rootfs.path = dir:/var/lib/lxc/zengjf/rootfs
+  lxc.signal.halt = SIGUSR1
+  lxc.signal.reboot = SIGTERM
+  lxc.uts.name = "zengjf"
+  lxc.tty.max = 1
+  lxc.pty.max = 1
+  lxc.cap.drop = sys_module mac_admin mac_override sys_time
+  
+  # When using LXC with apparmor, uncomment the next line to run unconfined:
+  #lxc.apparmor.profile = unconfined
+  
+  lxc.mount.auto = cgroup:mixed proc:mixed sys:mixed
+  lxc.mount.entry = shm /dev/shm tmpfs defaults 0 0
+  lxc.mount.entry = /lib lib none ro,bind 0 0
+  lxc.mount.entry = /usr/lib usr/lib none ro,bind 0 0
+  lxc.mount.entry = /sys/kernel/security sys/kernel/security none ro,bind,optional 0 0
+  ```
+
+# 检查内核配置
+
+* ls /proc/config.gz
+  ```
+  ls: cannot access '/proc/config.gz': No such file or directory
+  ```
+* lxc-checkconfig
+  ```
+  Kernel configuration not found at /proc/config.gz; searching...
+  lxc-checkconfig: unable to retrieve kernel configuration
+  
+  Try modprobe configs module, or
+  Try recompiling with IKCONFIG_PROC, installing the kernel headers,
+  or specifying the kernel configuration path with:
+    CONFIG=<path> lxc-checkconfig
+  ```
+* sudo modprobe configs
+* ls /proc/config.gz
+  ```
+  /proc/config.gz
+  ```
+* lxc-checkconfig检查内核配置
+  * 原理如下：https://github.com/ppoffice/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/cmd/lxc-checkconfig.in
+    ```sh
+    #!/bin/sh
+    
+    # Allow environment variables to override config
+    : ${CONFIG:=/proc/config.gz}                        # proc内核配置
+    : ${MODNAME:=configs}                               # 生成上面proc的内核配置的内核模块
+    
+    CAT="cat"                                           # 默认假设没有压缩，如果压缩了要用zcat读取
+    
+    # ...省略
+    
+    is_set() {
+        $CAT $CONFIG | grep "$1=[y|m]" > /dev/null      # cat/zcat读取/proc/config.gz
+        return $?
+    }
+    
+    # ...省略
+    
+    if gunzip -tq < $CONFIG 2>/dev/null; then           # 用gunzip检查，但是在Android下这行行不通
+        CAT="zcat"
+    fi
+    
+    # ...省略
+    
+    echo "--- Namespaces ---"
+    echo -n "Namespaces: " && is_enabled CONFIG_NAMESPACES yes
+    echo
+    # ...省略
+    ```
+    * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/cmd/lxc-checkconfig.in#L7
+
+# LXC for Android
+
+* https://github.com/ppoffice/lxc-android
+  * **针对Android的相关配置**：https://github.com/ppoffice/lxc-android/blob/lxc-3.0.3-android-28/src/Android.bp
+* https://github.com/ZengjfOS/lxc-android
+* [ppoffice/01_Android_LXC_Note.md](https://gist.github.com/ppoffice/154acbc7fa6f8b73b7b3b57af3ca6951)
+* 测试打包镜像的时候注意执行下面命令，否则容易不执行打包，结果系统里没更新：
+  * rm vendor.img
+  * rm system.img
+
+# 测试树莓派busybox运行在Android Q上
+
+* adb root
+* adb remount
+* adb push \<busybox path\> /vendor/bin
+* adb shell
+* cd /data/data && mkdir zengjf && cd zengjf
+* ln -s /vendor/bin/busybox ls
+* ./ls /
+
+# 启动树莓派容器
+
+* cd /var/lib/lxc
+* tar cf zengjf.tar zengjf
+* 拷贝出系统
+* adb root
+* adb remount
+* adb push \<zengjf.tar path\> /data/data/zengjf.tar
+* adb shell
+  * cd /data/data
+  * tar xf zengjf.tar
+  * lxc-config lxc.lxcpath
+    ```
+    /data/lxc/containers
+    ```
+  * mv zengjf /data/lxc/containers
+* lxc-start -n zengjf
+  ```
+  Failed to create lock for zengjf
+  lxc-start: zengjf: external/lxc-android/src/lxc/tools/lxc_start.c: main: 265 Failed to create lxc_container
+  ```
+  * mkdir /data/lxc/run -p
+* lxc-start -n zengjf
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengjf
+  config path: /data/lxc/containers
+  lxc-start: zengjf: external/lxc-android/src/lxc/confile.c: parse_line: 2262 Unknown configuration key "lxc.apparmor.allow_nesting"
+  lxc-start: zengjf: external/lxc-android/src/lxc/parse.c: lxc_file_for_each_line_mmap: 142 Failed to parse config file "/data/lxc/containers/zengjf/config" at line "lxc.apparmor.allow_nesting = 1"
+  Failed to load config for zengjf
+  lxc-start: zengjf: external/lxc-android/src/lxc/tools/lxc_start.c: main: 265 Failed to create lxc_container
+  ```
+  * 注释容器/var/lib/lxc/zengjf/config配置文件
+    ```
+    #lxc.apparmor.allow_nesting = 1
+    ```
+* lxc-start -n zengjf
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengjf
+  config path: /data/lxc/containers
+  lxc-start: zengjf: external/lxc-android/src/lxc/lxccontainer.c: wait_on_daemonized_start: 842 Received container state "ABORTING" instead of "RUNNING"
+  lxc-start: zengjf: external/lxc-android/src/lxc/tools/lxc_start.c: main: 331 The container failed to start
+  lxc-start: zengjf: external/lxc-android/src/lxc/tools/lxc_start.c: main: 334 To get more details, run the container in foreground mode
+  lxc-start: zengjf: external/lxc-android/src/lxc/tools/lxc_start.c: main: 337 Additional information can be obtained by setting the --logfile and --logpriority options
+  ```
+* lxc-start -n zengjf -l DEBUG -o lxc.log
+  * -l, --logpriority=LEVEL
+    * Set log priority to LEVEL. The default log priority is ERROR. Possible values are : FATAL, CRIT, WARN, ERROR, NOTICE, INFO, DEBUG.
+  * -o, --logfile=FILE
+    * Output to an alternate log FILE. The default is no log.
+  * cat lxc.log
+    ```
+    lxc-start zengjf 20210209040137.185 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:262 - create lxc_container lxcpath: /data/lxc/containers
+    
+    lxc-start zengjf 20210209040137.344 WARN     initutils - external/lxc-android/src/lxc/initutils.c:setproctitle:324 - Invalid argument - Failed to set cmdline
+    lxc-start zengjf 20210209040137.344 INFO     lxccontainer - external/lxc-android/src/lxc/lxccontainer.c:do_lxcapi_start:959 - Failed to set process title to [lxc monitor] /data/lxc/containers zengjf
+    lxc-start zengjf 20210209040137.471 INFO     lsm - external/lxc-android/src/lxc/lsm/lsm.c:lsm_init:50 - LSM security driver nop
+    lxc-start zengjf 20210209040137.478 DEBUG    terminal - external/lxc-android/src/lxc/terminal.c:lxc_terminal_peer_default:707 - No such device - The process does not have a controlling terminal
+    lxc-start zengjf 20210209040137.482 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/cg2_bpf rw,nosuid,nodev,noexec,relatime shared:8 - cgroup2 none rw
+    "
+    lxc-start zengjf 20210209040137.484 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/cpuctl rw,nosuid,nodev,noexec,relatime shared:13 - cgroup none rw,cpu
+    "
+    lxc-start zengjf 20210209040137.484 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/acct rw,nosuid,nodev,noexec,relatime shared:14 - cgroup none rw,cpuacct
+    "
+    lxc-start zengjf 20210209040137.484 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/cpuset rw,nosuid,nodev,noexec,relatime shared:15 - cgroup none rw,cpuset,noprefix,release_agent=/sbin/cpuset_release_agent
+    "
+    lxc-start zengjf 20210209040137.484 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/memcg rw,nosuid,nodev,noexec,relatime shared:16 - cgroup none rw,memory
+    "
+    lxc-start zengjf 20210209040137.484 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/stune rw,nosuid,nodev,noexec,relatime shared:17 - cgroup none rw,schedtune
+    "
+    lxc-start zengjf 20210209040137.487 INFO     start - external/lxc-android/src/lxc/start.c:lxc_init:897 - Container "zengjf" is initialized
+    lxc-start zengjf 20210209040137.558 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWNS
+    lxc-start zengjf 20210209040137.558 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWPID
+    lxc-start zengjf 20210209040137.558 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWUTS
+    lxc-start zengjf 20210209040137.559 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWIPC
+    lxc-start zengjf 20210209040137.559 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWNET
+    lxc-start zengjf 20210209040137.559 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved mnt namespace via fd 15
+    lxc-start zengjf 20210209040137.560 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved pid namespace via fd 16
+    lxc-start zengjf 20210209040137.560 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved uts namespace via fd 17
+    lxc-start zengjf 20210209040137.560 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved ipc namespace via fd 18
+    lxc-start zengjf 20210209040137.561 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved net namespace via fd 19
+    lxc-start zengjf 20210209040137.565 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_spawn:1742 - Preserved net namespace via fd 10
+    lxc-start zengjf 20210209040137.569 INFO     start - external/lxc-android/src/lxc/start.c:do_start:1242 - Unshared CLONE_NEWCGROUP
+    lxc-start zengjf 20210209040137.580 ERROR    conf - external/lxc-android/src/lxc/conf.c:lxc_mount_rootfs:1309 - No such file or directory - Failed to access to "/data/lxc/rootfs". Check it is present
+    lxc-start zengjf 20210209040137.581 ERROR    conf - external/lxc-android/src/lxc/conf.c:lxc_setup_rootfs_prepare_root:3445 - Failed to setup rootfs for
+    lxc-start zengjf 20210209040137.581 ERROR    conf - external/lxc-android/src/lxc/conf.c:lxc_setup:3498 - Failed to setup rootfs
+    lxc-start zengjf 20210209040137.581 ERROR    start - external/lxc-android/src/lxc/start.c:do_start:1263 - Failed to setup container "zengjf"
+    lxc-start zengjf 20210209040137.582 ERROR    sync - external/lxc-android/src/lxc/sync.c:__sync_wait:62 - An error occurred in another process (expected sequence number 5)
+    lxc-start zengjf 20210209040137.583 DEBUG    network - external/lxc-android/src/lxc/network.c:lxc_delete_network:3180 - Deleted network devices
+    lxc-start zengjf 20210209040137.583 DEBUG    lxccontainer - external/lxc-android/src/lxc/lxccontainer.c:wait_on_daemonized_start:830 - First child 12698 exited
+    lxc-start zengjf 20210209040137.583 ERROR    lxccontainer - external/lxc-android/src/lxc/lxccontainer.c:wait_on_daemonized_start:842 - Received container state "ABORTING" instead of "RUNNING"
+    lxc-start zengjf 20210209040137.584 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:331 - The container failed to start
+    lxc-start zengjf 20210209040137.584 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:334 - To get more details, run the container in foreground mode
+    lxc-start zengjf 20210209040137.584 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:337 - Additional information can be obtained by setting the --logfile and --logpriority options
+    lxc-start zengjf 20210209040137.591 ERROR    start - external/lxc-android/src/lxc/start.c:__lxc_start:1939 - Failed to spawn container "zengjf"
+    ```
+    * 报错原因
+      ```
+      lxc-start zengjf 20210209040137.580 ERROR    conf - external/lxc-android/src/lxc/conf.c:lxc_mount_rootfs:1309 - No such file or directory - Failed to access to "/data/lxc/rootfs". Check it is present
+      ```
+    * mkdir /data/lxc/rootfs -p
+* lxc-start -n zengjf -l DEBUG -o lxc.log
+  * cat lxc.log
+    ```
+    lxc-start zengjf 20210209040942.583 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:262 - create lxc_container lxcpath: /data/lxc/containers
+  
+    lxc-start zengjf 20210209040942.693 WARN     initutils - external/lxc-android/src/lxc/initutils.c:setproctitle:324 - Invalid argument - Failed to set cmdline
+    lxc-start zengjf 20210209040942.694 INFO     lxccontainer - external/lxc-android/src/lxc/lxccontainer.c:do_lxcapi_start:959 - Failed to set process title to [lxc monitor] /data/lxc/containers zengjf
+    lxc-start zengjf 20210209040942.807 INFO     lsm - external/lxc-android/src/lxc/lsm/lsm.c:lsm_init:50 - LSM security driver nop
+    lxc-start zengjf 20210209040942.812 DEBUG    terminal - external/lxc-android/src/lxc/terminal.c:lxc_terminal_peer_default:707 - No such device - The process does not have a controlling terminal
+    lxc-start zengjf 20210209040942.817 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/cg2_bpf rw,nosuid,nodev,noexec,relatime shared:8 - cgroup2 none rw
+    "
+    lxc-start zengjf 20210209040942.819 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/cpuctl rw,nosuid,nodev,noexec,relatime shared:13 - cgroup none rw,cpu
+    "
+    lxc-start zengjf 20210209040942.819 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/acct rw,nosuid,nodev,noexec,relatime shared:14 - cgroup none rw,cpuacct
+    "
+    lxc-start zengjf 20210209040942.819 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/cpuset rw,nosuid,nodev,noexec,relatime shared:15 - cgroup none rw,cpuset,noprefix,release_agent=/sbin/cpuset_release_agent
+    "
+    lxc-start zengjf 20210209040942.819 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/memcg rw,nosuid,nodev,noexec,relatime shared:16 - cgroup none rw,memory
+    "
+    lxc-start zengjf 20210209040942.819 WARN     cgfsng - external/lxc-android/src/lxc/cgroups/cgfsng.c:cg_hybrid_get_controllers:746 - Found hierarchy not under /sys/fs/cgroup: "/dev/stune rw,nosuid,nodev,noexec,relatime shared:17 - cgroup none rw,schedtune
+    "
+    lxc-start zengjf 20210209040942.822 INFO     start - external/lxc-android/src/lxc/start.c:lxc_init:897 - Container "zengjf" is initialized
+    lxc-start zengjf 20210209040942.889 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWNS
+    lxc-start zengjf 20210209040942.889 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWPID
+    lxc-start zengjf 20210209040942.889 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWUTS
+    lxc-start zengjf 20210209040942.889 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWIPC
+    lxc-start zengjf 20210209040942.889 INFO     start - external/lxc-android/src/lxc/start.c:lxc_spawn:1688 - Cloned CLONE_NEWNET
+    lxc-start zengjf 20210209040942.890 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved mnt namespace via fd 15
+    lxc-start zengjf 20210209040942.891 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved pid namespace via fd 16
+    lxc-start zengjf 20210209040942.891 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved uts namespace via fd 17
+    lxc-start zengjf 20210209040942.891 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved ipc namespace via fd 18
+    lxc-start zengjf 20210209040942.892 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_try_preserve_namespaces:196 - Preserved net namespace via fd 19
+    lxc-start zengjf 20210209040942.895 DEBUG    start - external/lxc-android/src/lxc/start.c:lxc_spawn:1742 - Preserved net namespace via fd 10
+    lxc-start zengjf 20210209040942.898 INFO     start - external/lxc-android/src/lxc/start.c:do_start:1242 - Unshared CLONE_NEWCGROUP
+    lxc-start zengjf 20210209040942.908 DEBUG    storage - external/lxc-android/src/lxc/storage/storage.c:get_storage_by_name:231 - Detected rootfs type "dir"
+    lxc-start zengjf 20210209040942.909 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_mount_rootfs:1332 - Mounted rootfs "/data/lxc/containers/zengjf/rootfs" onto "/data/lxc/rootfs" with options "(null)"
+    lxc-start zengjf 20210209040942.909 INFO     conf - external/lxc-android/src/lxc/conf.c:setup_utsname:791 - Set hostname to "zengjf"
+    lxc-start zengjf 20210209040942.909 INFO     network - external/lxc-android/src/lxc/network.c:lxc_setup_network_in_child_namespaces:3053 - network has been setup
+    lxc-start zengjf 20210209040942.910 INFO     conf - external/lxc-android/src/lxc/conf.c:mount_autodev:1118 - Preparing "/dev"
+    lxc-start zengjf 20210209040942.913 INFO     conf - external/lxc-android/src/lxc/conf.c:mount_autodev:1165 - Prepared "/dev"
+    lxc-start zengjf 20210209040942.925 INFO     conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1209 - Populating "/dev"
+    lxc-start zengjf 20210209040942.926 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1224 - Created device node "/data/lxc/rootfs/dev/full"
+    lxc-start zengjf 20210209040942.926 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1224 - Created device node "/data/lxc/rootfs/dev/null"
+    lxc-start zengjf 20210209040942.926 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1224 - Created device node "/data/lxc/rootfs/dev/random"
+    lxc-start zengjf 20210209040942.926 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1224 - Created device node "/data/lxc/rootfs/dev/tty"
+    lxc-start zengjf 20210209040942.927 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1224 - Created device node "/data/lxc/rootfs/dev/urandom"
+    lxc-start zengjf 20210209040942.927 DEBUG    conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1224 - Created device node "/data/lxc/rootfs/dev/zero"
+    lxc-start zengjf 20210209040942.927 INFO     conf - external/lxc-android/src/lxc/conf.c:lxc_fill_autodev:1286 - Populated "/dev"
+    lxc-start zengjf 20210209040942.927 WARN     conf - external/lxc-android/src/lxc/conf.c:mount_entry_on_absolute_rootfs:2282 - Ignoring mount point "/dev/shm"
+    lxc-start zengjf 20210209040942.928 ERROR    utils - external/lxc-android/src/lxc/utils.c:safe_mount:1179 - No such file or directory - Failed to mount "/lib" onto "/data/lxc/rootfs/lib"
+    lxc-start zengjf 20210209040942.928 ERROR    conf - external/lxc-android/src/lxc/conf.c:mount_entry:2019 - No such file or directory - Failed to mount "/lib" on "/data/lxc/rootfs/lib"
+    lxc-start zengjf 20210209040942.929 ERROR    conf - external/lxc-android/src/lxc/conf.c:lxc_setup:3611 - Failed to setup mount entries
+    lxc-start zengjf 20210209040942.929 ERROR    start - external/lxc-android/src/lxc/start.c:do_start:1263 - Failed to setup container "zengjf"
+    lxc-start zengjf 20210209040942.930 ERROR    sync - external/lxc-android/src/lxc/sync.c:__sync_wait:62 - An error occurred in another process (expected sequence number 5)
+    lxc-start zengjf 20210209040942.931 DEBUG    network - external/lxc-android/src/lxc/network.c:lxc_delete_network:3180 - Deleted network devices
+    lxc-start zengjf 20210209040942.932 DEBUG    lxccontainer - external/lxc-android/src/lxc/lxccontainer.c:wait_on_daemonized_start:830 - First child 17694 exited
+    lxc-start zengjf 20210209040942.933 ERROR    lxccontainer - external/lxc-android/src/lxc/lxccontainer.c:wait_on_daemonized_start:842 - Received container state "ABORTING" instead of "RUNNING"
+    lxc-start zengjf 20210209040942.934 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:331 - The container failed to start
+    lxc-start zengjf 20210209040942.934 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:334 - To get more details, run the container in foreground mode
+    lxc-start zengjf 20210209040942.935 ERROR    lxc_start - external/lxc-android/src/lxc/tools/lxc_start.c:main:337 - Additional information can be obtained by setting the --logfile and --logpriority options
+    lxc-start zengjf 20210209040942.938 ERROR    start - external/lxc-android/src/lxc/start.c:__lxc_start:1939 - Failed to spawn container "zengjf"
+    ```
+    * 报错原因
+      ```
+      lxc-start zengjf 20210209040942.928 ERROR    utils - external/lxc-android/src/lxc/utils.c:safe_mount:1179 - No such file or directory - Failed to mount "/lib" onto "/data/lxc/rootfs/lib"
+      lxc-start zengjf 20210209040942.928 ERROR    conf - external/lxc-android/src/lxc/conf.c:mount_entry:2019 - No such file or directory - Failed to mount "/lib" on "/data/lxc/rootfs/lib"
+      lxc-start zengjf 20210209040942.929 ERROR    conf - external/lxc-android/src/lxc/conf.c:lxc_setup:3611 - Failed to setup mount entries
+      ```
+    * 注释容器/var/lib/lxc/zengjf/config配置文件相关mount
+      ```
+      ...省略
+  
+      #lxc.apparmor.allow_nesting = 1
+  
+      ...省略
+  
+      #lxc.mount.entry = /lib lib none ro,bind 0 0
+      #lxc.mount.entry = /usr/lib usr/lib none ro,bind 0 0
+      #lxc.mount.entry = /sys/kernel/security sys/kernel/security none ro,bind,optional 0 0
+      ```
+* sudo lxc-console -n zengjf
+  * root用户，无密码
+    ```sh
+    dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+    dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+    dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengjf
+    config path: /data/lxc/containers
+    
+    Connected to tty 1
+    Type <Ctrl+a q> to exit the console, <Ctrl+a Ctrl+a> to enter Ctrl+a itself
+    
+    zengjf login: root
+    
+    
+    BusyBox v1.30.1 (Raspbian 1:1.30.1-4) built-in shell (ash)
+    Enter 'help' for a list of built-in commands.
+    
+    ~ # ls /
+    bin      etc      lib64    proc     sbin     tmp      tty1     usr
+    console  home     mnt      ram0     selinux  tty      tty5     var
+    dev      lib      null     root     sys      tty0     urandom  zero
+    ~ # exit
+    ```
+  * `ctrl + a q`退出容器console
+* lxc-info -n zengjf
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengjf
+  config path: /data/lxc/containers
+  Name:           zengjf
+  State:          RUNNING
+  PID:            20796
+  ```
+* ls /data/lxc
+  ```
+  containers log rootfs run
+  ```
+  * 如上所示，经测试，需要先建立如上目录才能正常启动容器系统
+
+# 创建Busybox容器
+
+* lxc-create -n zengsf -t busybox
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  lxc-create: zengsf: external/lxc-android/src/lxc/confile.c: parse_line: 2262 Unknown configuration key "lxc.apparmor.allow_nesting"
+  lxc-create: zengsf: external/lxc-android/src/lxc/parse.c: lxc_file_for_each_line_mmap: 142 Failed to parse config file "/vendor/etc/lxc/default.conf" at line "lxc.apparmor.allow_nesting = 1"
+  lxc-create: zengsf: external/lxc-android/src/lxc/utils.c: get_template_path: 918 No such file or directory - bad template: busybox
+  lxc-create: zengsf: external/lxc-android/src/lxc/lxccontainer.c: do_lxcapi_create: 1786 Unknown template "busybox"
+  lxc-create: zengsf: external/lxc-android/src/lxc/tools/lxc_create.c: main: 327 Failed to create container zengsf
+  ```
+  * 注释容器/vendor/etc/lxc/default.conf配置文件
+    ```
+    #lxc.apparmor.allow_nesting = 1
+    ```
+    * [主要是由于前面使用树莓派的配置，`/vendor/etc/lxc/default.conf`应使用这里面的配置](https://github.com/ZengjfOS/lxc-android/tree/lxc-3.0.3-android-28/config/etc)
+    * https://github.com/ZengjfOS/lxc-android/tree/lxc-3.0.3-android-28/config/etc
+* push模板lxc-busybox到/data/lxc/templates
+  * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in
+* lxc-create -n zengsf -t busybox
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  lxc-create: zengsf: external/lxc-android/src/lxc/utils.c: get_template_path: 918 Permission denied - bad template: busybox
+  lxc-create: zengsf: external/lxc-android/src/lxc/lxccontainer.c: do_lxcapi_create: 1786 Unknown template "busybox"
+  lxc-create: zengsf: external/lxc-android/src/lxc/tools/lxc_create.c: main: 327 Failed to create container zengsf
+  ```
+  * chmod 777 /data/lxc/templates/lxc-busybox
+* lxc-create -n zengsf -t busybox
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  /data/lxc/templates/lxc-busybox[277]: getopt: inaccessible or not found
+  LXC busybox image builder
+  
+  Special arguments:
+  [ -h | --help ]: Print this help message and exit.
+  
+  LXC internal arguments (do not pass manually!):
+  [ --name <name> ]: The container name
+  [ --path <path> ]: The path to the container
+  [ --rootfs <rootfs> ]: The path to the container's rootfs
+  [ --mapped-uid <map> ]: A uid map (user namespaces)
+  [ --mapped-gid <map> ]: A gid map (user namespaces)
+  lxc-create: zengsf: external/lxc-android/src/lxc/lxccontainer.c: create_run_template: 1617 Failed to create container from template
+  lxc-create: zengsf: external/lxc-android/src/lxc/tools/lxc_create.c: main: 327 Failed to create container zengsf
+  ```
+  * 报错原因：
+    ```
+    /data/lxc/templates/lxc-busybox[277]: getopt: inaccessible or not found
+    ```
+  * 修改模板使用busybox的getopt命令
+    ```sh
+    if ! options=$(busybox getopt -o hp:n: -l help,rootfs:,path:,name:,mapped-uid:,mapped-gid: -- "$@"); then
+      usage
+      exit 1
+    fi
+    ```
+    * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in#L274
+* lxc-create -n zengsf -t busybox -l DEBUG -o lxc.log
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  ln: cannot create symbolic link from 'busybox' to './busybox': File exists
+  ```
+  * 该ln报错不影响代码处理，主要由模板这段代码ln产生
+    ```
+    # symlink busybox for the commands it supports
+    # it would be nice to just use "chroot $rootfs busybox --install -s /bin"
+    # but that only works right in a chroot with busybox >= 1.19.0
+    (
+      cd "${rootfs}/bin" || return 1
+      ./busybox --list | grep -v busybox | xargs -n1 ln -s busybox
+    )
+    ```
+    * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in#L190
+* lxc-start -n zengsf
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  ```
+* lxc-console -n zengsf
+  ```
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  
+  Connected to tty 1
+  Type <Ctrl+a q> to exit the console, <Ctrl+a Ctrl+a> to enter Ctrl+a itself
+  
+  zengsf login: root
+  Password:
+  ```
+  * `ctrl + a q`退出容器console
+  * lxc-stop -n zengsf
+  * /data/lxc/containers/zengsf/rootfs/etc/passwd
+    ```
+    root::0:0:root:/root:/bin/sh
+    ```
+    * 设置成无密码
+      * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/templates/lxc-busybox.in#L102
+    * chroot /data/lxc/containers/zengsf/rootfs /bin/passwd
+* lxc-start -n zengsf
+* lxc-console -n zengsf
+  ```sh
+  dest =: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest create: /data/lxc/run/lxc/lock//data/lxc/containers
+  dest lock: /data/lxc/run/lxc/lock//data/lxc/containers/.zengsf
+  config path: /data/lxc/containers
+  
+  Connected to tty 1
+  Type <Ctrl+a q> to exit the console, <Ctrl+a Ctrl+a> to enter Ctrl+a itself
+  
+  zengsf login: root
+  ~ # ls /
+  bin      etc      lib64    proc     sbin     tmp      tty1     usr
+  console  home     mnt      ram0     selinux  tty      tty5     var
+  dev      lib      null     root     sys      tty0     urandom  zero
+  ~ #
+  ```

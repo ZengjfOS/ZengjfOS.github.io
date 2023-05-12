@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SimpleBLEPeripheral Key Hack</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#source-code">Source Code</a></li>
+<li><a class="reference internal" href="#hal-key-to-start">HAL Key To Start</a><ul>
+<li><a class="reference internal" href="#hardware">Hardware</a></li>
+<li><a class="reference internal" href="#code-hack">Code Hack</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simplebleperipheral-key-hack">
+<h1>SimpleBLEPeripheral Key Hack<a class="headerlink" href="#simplebleperipheral-key-hack" title="Permalink to this headline"></a></h1>
+<p>SimpleBLEPeripheral示例分析</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p><a class="reference external" href="http://www.ti.com/lit/pdf/swru191">CC253x/4x User’s Guide (Rev. F)</a></p>
+</section>
+<section id="source-code">
+<h1>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">C:\Texas</span> <span class="pre">Instruments\BLE-CC254x-1.4.2.2\Projects\ble\SimpleBLEPeripheral</span></code><br />
+<img alt="0007_SimpleBLEPeripheral_Source_Code_Main.png" src="../../../_images/0007_SimpleBLEPeripheral_Source_Code_Main.png" /></p>
+</section>
+<section id="hal-key-to-start">
+<h1>HAL Key To Start<a class="headerlink" href="#hal-key-to-start" title="Permalink to this headline"></a></h1>
+<section id="hardware">
+<h2>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Schematic<br />
+<img alt="0007_P01_Port_In_Hardware.png" src="../../../_images/0007_P01_Port_In_Hardware.png" /></p></li>
+<li><p>Register<br />
+<img alt="0007_P01_Port_P0_Register.png" src="../../../_images/0007_P01_Port_P0_Register.png" /><br />
+<img alt="0007_P01_Port_P0SEL_Register.png" src="../../../_images/0007_P01_Port_P0SEL_Register.png" /><br />
+<img alt="0007_P01_Port_P0DIR_Register.png" src="../../../_images/0007_P01_Port_P0DIR_Register.png" /><br />
+<img alt="0007_P01_Port_P0INP_Register.png" src="../../../_images/0007_P01_Port_P0INP_Register.png" /><br />
+<img alt="0007_P01_Port_P0IFG_Register.png" src="../../../_images/0007_P01_Port_P0IFG_Register.png" /><br />
+<img alt="0007_P01_Port_P0IEN_Register.png" src="../../../_images/0007_P01_Port_P0IEN_Register.png" /></p></li>
+</ul>
+</section>
+<section id="code-hack">
+<h2>Code Hack<a class="headerlink" href="#code-hack" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">main(void)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">HalDriverInit()</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">HalKeyInit()</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">HalKeyInit</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">halKeySavedKeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1">// Initialize previous key to 0.</span>
+
+<span class="cp">#if defined ( CC2540_MINIDK )</span>
+<span class="w">    </span><span class="n">HAL_KEY_SW_1_SEL</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="n">HAL_KEY_SW_1_BIT</span><span class="p">);</span><span class="w">    </span><span class="cm">/* Set pin function to GPIO */</span><span class="w"></span>
+<span class="w">    </span><span class="n">HAL_KEY_SW_1_DIR</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="n">HAL_KEY_SW_1_BIT</span><span class="p">);</span><span class="w">    </span><span class="cm">/* Set pin direction to Input */</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 设置GPIO</span>
+<span class="w">    </span><span class="n">HAL_KEY_SW_2_SEL</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="n">HAL_KEY_SW_2_BIT</span><span class="p">);</span><span class="w">    </span><span class="cm">/* Set pin function to GPIO */</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 设置为输入</span>
+<span class="w">    </span><span class="n">HAL_KEY_SW_2_DIR</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="n">HAL_KEY_SW_2_BIT</span><span class="p">);</span><span class="w">    </span><span class="cm">/* Set pin direction to Input */</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="cp">#if defined ( CC2540_MINIDK )</span>
+<span class="w">    </span><span class="cm">/* Rising/Falling edge configuratinn */</span><span class="w"></span>
+<span class="w">    </span><span class="n">PICTL</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">HAL_KEY_SW_1_EDGEBIT</span><span class="p">;</span><span class="w">   </span><span class="cm">/* Set the edge bit to set falling edge to give int */</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 打开中断</span>
+<span class="w">    </span><span class="n">HAL_KEY_SW_1_IEN</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">HAL_KEY_SW_1_IENBIT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">HAL_KEY_SW_2_IENBIT</span><span class="w"> </span><span class="p">);</span><span class="w">   </span><span class="cm">/* enable CPU interrupt */</span><span class="w">  </span>
+<span class="cp">#endif</span>
+<span class="p">}</span><span class="w"></span>
+<span class="c1">// 注册中断处理函数</span>
+<span class="n">HAL_ISR_FUNCTION</span><span class="p">(</span><span class="w"> </span><span class="n">halKeyPort0Isr</span><span class="p">,</span><span class="w"> </span><span class="n">P0INT_VECTOR</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">HAL_ENTER_ISR</span><span class="p">();</span><span class="w"></span>
+
+<span class="cp">#if defined ( CC2540_MINIDK )</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">HAL_KEY_SW_1_PXIFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_1_BIT</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">HAL_KEY_SW_2_PXIFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_2_BIT</span><span class="p">))</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">HAL_KEY_SW_6_PXIFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_6_BIT</span><span class="p">)</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 处理中断</span>
+<span class="w">        </span><span class="n">halProcessKeyInterrupt</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">halProcessKeyInterrupt()</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">halProcessKeyInterrupt</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">valid</span><span class="o">=</span><span class="n">FALSE</span><span class="p">;</span><span class="w"></span>
+
+<span class="cp">#if defined ( CC2540_MINIDK )</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">HAL_KEY_SW_1_PXIFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_1_BIT</span><span class="p">)</span><span class="w"> </span><span class="cm">/* Interrupt Flag has been set by SW1 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">HAL_KEY_SW_1_PXIFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="n">HAL_KEY_SW_1_BIT</span><span class="p">);</span><span class="w"> </span><span class="cm">/* Clear Interrupt Flag */</span><span class="w"></span>
+<span class="w">        </span><span class="n">valid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">HAL_KEY_SW_2_PXIFG</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_2_BIT</span><span class="p">)</span><span class="w">  </span><span class="cm">/* Interrupt Flag has been set by SW2 */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">HAL_KEY_SW_2_PXIFG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="n">HAL_KEY_SW_2_BIT</span><span class="p">);</span><span class="w"> </span><span class="cm">/* Clear Interrupt Flag */</span><span class="w"></span>
+<span class="w">        </span><span class="n">valid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">valid</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 触发Hal_TaskID任务事件</span>
+<span class="w">        </span><span class="n">osal_start_timerEx</span><span class="w"> </span><span class="p">(</span><span class="n">Hal_TaskID</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_KEY_EVENT</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_KEY_DEBOUNCE_VALUE</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">uint16</span> <span class="pre">Hal_ProcessEvent(</span> <span class="pre">uint8</span> <span class="pre">task_id,</span> <span class="pre">uint16</span> <span class="pre">events</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">uint16</span><span class="w"> </span><span class="nf">Hal_ProcessEvent</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">task_id</span><span class="p">,</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="n">msgPtr</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">task_id</span><span class="p">;</span><span class="w">  </span><span class="c1">// Intentionally unreferenced parameter</span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">events</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_EVENT</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="cp">#if (defined HAL_KEY) &amp;&amp; (HAL_KEY == TRUE)</span>
+<span class="w">        </span><span class="cm">/* Check for keys */</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 获取键值</span>
+<span class="w">        </span><span class="n">HalKeyPoll</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* if interrupt disabled, do next polling */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Hal_KeyIntEnable</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="n">osal_start_timerEx</span><span class="p">(</span><span class="w"> </span><span class="n">Hal_TaskID</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_KEY_EVENT</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">HAL_KEY_EVENT</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">HalKeyPoll()</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">HalKeyPoll</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">notify</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#if defined (CC2540_MINIDK)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">HAL_KEY_SW_1_PORT</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_1_BIT</span><span class="p">))</span><span class="w">    </span><span class="cm">/* Key is active low */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">keys</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">HAL_KEY_SW_1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">HAL_KEY_SW_2_PORT</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_2_BIT</span><span class="p">))</span><span class="w">    </span><span class="cm">/* Key is active low */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">keys</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">HAL_KEY_SW_2</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Store the current keys for comparation next time */</span><span class="w"></span>
+<span class="w">    </span><span class="n">halKeySavedKeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">keys</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Invoke Callback if new keys were depressed */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">notify</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">pHalKeyProcessFunction</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 发送按键触发信息</span>
+<span class="w">        </span><span class="p">(</span><span class="n">pHalKeyProcessFunction</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">keys</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_KEY_STATE_NORMAL</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InitBoard(</span> <span class="pre">OB_READY</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">HalKeyConfig(</span> <span class="pre">OnboardKeyIntEnable,</span> <span class="pre">OnBoard_KeyCallback)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">pHalKeyProcessFunction</span> <span class="pre">=</span> <span class="pre">cback</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">OnBoard_KeyCallback</span> <span class="pre">(</span> <span class="pre">uint8</span> <span class="pre">keys,</span> <span class="pre">uint8</span> <span class="pre">state</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">OnBoard_KeyCallback</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">keys</span><span class="p">,</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">shift</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">state</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// shift key (S1) is used to generate key interrupt</span>
+<span class="w">    </span><span class="c1">// applications should not use S1 when key interrupt is enabled</span>
+<span class="w">    </span><span class="n">shift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">OnboardKeyIntEnable</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">HAL_KEY_INTERRUPT_ENABLE</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">((</span><span class="n">keys</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_6</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 发送按键消息</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">OnBoard_SendKeys</span><span class="p">(</span><span class="w"> </span><span class="n">keys</span><span class="p">,</span><span class="w"> </span><span class="n">shift</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">SUCCESS</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">OnBoard_SendKeys(</span> <span class="pre">keys,</span> <span class="pre">shift</span> <span class="pre">)</span> <span class="pre">!=</span> <span class="pre">SUCCESS</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">uint8</span><span class="w"> </span><span class="nf">OnBoard_SendKeys</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">keys</span><span class="p">,</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">state</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">keyChange_t</span><span class="w"> </span><span class="o">*</span><span class="n">msgPtr</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">registeredKeysTaskID</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">NO_TASK_ID</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Send the address to the task</span>
+<span class="w">        </span><span class="c1">// 分配一个消息体</span>
+<span class="w">        </span><span class="n">msgPtr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">keyChange_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">osal_msg_allocate</span><span class="p">(</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">keyChange_t</span><span class="p">)</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">msgPtr</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">msgPtr</span><span class="o">-&gt;</span><span class="n">hdr</span><span class="p">.</span><span class="n">event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KEY_CHANGE</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">msgPtr</span><span class="o">-&gt;</span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">state</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">msgPtr</span><span class="o">-&gt;</span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">keys</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="c1">// 发送按键消息给SimpleBLEPeripheral_ProcessEvent任务</span>
+<span class="w">            </span><span class="n">osal_msg_send</span><span class="p">(</span><span class="w"> </span><span class="n">registeredKeysTaskID</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">msgPtr</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">SUCCESS</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">FAILURE</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">osal_init_system()</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">osalInitTasks()</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">SimpleBLEPeripheral_Init(</span> <span class="pre">taskID</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">RegisterForKeys(</span> <span class="pre">simpleBLEPeripheral_TaskID</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">uint8</span><span class="w"> </span><span class="nf">RegisterForKeys</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">task_id</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Allow only the first task</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">registeredKeysTaskID</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">NO_TASK_ID</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 注册按键事件处理任务ID，相当于指定前面发送给SimpleBLEPeripheral_ProcessEvent任务的任务id</span>
+<span class="w">        </span><span class="n">registeredKeysTaskID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">task_id</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uint16</span> <span class="pre">SimpleBLEPeripheral_ProcessEvent(</span> <span class="pre">uint8</span> <span class="pre">task_id,</span> <span class="pre">uint16</span> <span class="pre">events</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">simpleBLEPeripheral_ProcessOSALMsg(</span> <span class="pre">(osal_event_hdr_t</span> <span class="pre">*)pMsg</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">simpleBLEPeripheral_HandleKeys(</span> <span class="pre">((keyChange_t</span> <span class="pre">*)pMsg)-&gt;state,</span> <span class="pre">((keyChange_t</span> <span class="pre">*)pMsg)-&gt;keys</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">simpleBLEPeripheral_HandleKeys</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">shift</span><span class="p">,</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">SK_Keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">VOID</span><span class="w"> </span><span class="n">shift</span><span class="p">;</span><span class="w">  </span><span class="c1">// Intentionally unreferenced parameter</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_1</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">SK_Keys</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">SK_KEY_LEFT</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">keys</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HAL_KEY_SW_2</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">SK_Keys</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">SK_KEY_RIGHT</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// if device is not in a connection, pressing the right key should toggle</span>
+<span class="w">        </span><span class="c1">// advertising on and off</span>
+<span class="w">        </span><span class="c1">// Note:  If PLUS_BROADCASTER is define this condition is ignored and</span>
+<span class="w">        </span><span class="c1">//        Device may advertise during connections as well. </span>
+<span class="cp">#ifndef PLUS_BROADCASTER  </span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">gapProfileState</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">GAPROLE_CONNECTED</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="cp">#endif </span><span class="c1">// PLUS_BROADCASTER</span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">current_adv_enabled_status</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">new_adv_enabled_status</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">//Find the current GAP advertisement status</span>
+<span class="w">        </span><span class="c1">// 获取当前GAPROLE的状态</span>
+<span class="w">        </span><span class="n">GAPRole_GetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_ADVERT_ENABLED</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">current_adv_enabled_status</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">current_adv_enabled_status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">FALSE</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">new_adv_enabled_status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">new_adv_enabled_status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FALSE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">//change the GAP advertisement status to opposite of current status</span>
+<span class="w">        </span><span class="c1">// 设置当前GAPROLE的状态</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_ADVERT_ENABLED</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">new_adv_enabled_status</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="cp">#ifndef PLUS_BROADCASTER</span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="cp">#endif </span><span class="c1">// PLUS_BROADCASTER</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Set the value of the keys state to the Simple Keys Profile;</span>
+<span class="w">    </span><span class="c1">// This will send out a notification of the keys state if enabled</span>
+<span class="w">    </span><span class="n">SK_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SK_KEY_ATTR</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">SK_Keys</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">SK_SetParameter(</span> <span class="pre">SK_KEY_ATTR,</span> <span class="pre">sizeof</span> <span class="pre">(</span> <span class="pre">uint8</span> <span class="pre">),</span> <span class="pre">&amp;SK_Keys</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">bStatus_t</span><span class="w"> </span><span class="nf">SK_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">pValue</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">bStatus_t</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SUCCESS</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">param</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SK_KEY_ATTR</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">skKeyPressed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">pValue</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span>
+<span class="w">                </span><span class="c1">// See if Notification/Indication has been enabled</span>
+<span class="w">                </span><span class="n">GATTServApp_ProcessCharCfg</span><span class="p">(</span><span class="w"> </span><span class="n">skConfig</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">skKeyPressed</span><span class="p">,</span><span class="w"> </span><span class="n">FALSE</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                          </span><span class="n">simplekeysAttrTbl</span><span class="p">,</span><span class="w"> </span><span class="n">GATT_NUM_ATTRS</span><span class="p">(</span><span class="w"> </span><span class="n">simplekeysAttrTbl</span><span class="w"> </span><span class="p">),</span><span class="w"></span>
+<span class="w">                                          </span><span class="n">INVALID_TASK_ID</span><span class="p">,</span><span class="w"> </span><span class="n">sk_ReadAttrCB</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bleInvalidRange</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">          </span>
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">INVALIDPARAMETER</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

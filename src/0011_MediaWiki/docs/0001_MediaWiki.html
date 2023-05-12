@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">MediaWiki</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#docker-desktop">docker desktop</a></li>
+<li><a class="reference internal" href="#docker-config">docker config</a></li>
+<li><a class="reference internal" href="#docker-image">docker image</a></li>
+<li><a class="reference internal" href="#docker-mediawiki">docker mediawiki</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mediawiki">
+<h1>MediaWiki<a class="headerlink" href="#mediawiki" title="Permalink to this headline"></a></h1>
+<p>MediaWiki安装</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/yangkuo024/article/details/120745478">Docker安装MediaWiki(最新版)</a></p></li>
+</ul>
+</section>
+<section id="docker-desktop">
+<h1>docker desktop<a class="headerlink" href="#docker-desktop" title="Permalink to this headline"></a></h1>
+<p>下载对应版本的桌面版：https://www.docker.com/products/docker-desktop/</p>
+</section>
+<section id="docker-config">
+<h1>docker config<a class="headerlink" href="#docker-config" title="Permalink to this headline"></a></h1>
+<p><img alt="0001_docker_engine_config.png" src="../../../_images/0001_docker_engine_config.png" /></p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;registry-mirrors&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;https://hub-mirror.c.163.com&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https://mirror.baidubce.com&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;insecure-registries&quot;</span><span class="o">:</span> <span class="p">[],</span>
+  <span class="s2">&quot;debug&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="s2">&quot;experimental&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="s2">&quot;features&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;buildkit&quot;</span><span class="o">:</span> <span class="kc">true</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;builder&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;gc&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;enabled&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="s2">&quot;defaultKeepStorage&quot;</span><span class="o">:</span> <span class="s2">&quot;20GB&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>查看配置生效shell: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">info</span></code></p>
+</section>
+<section id="docker-image">
+<h1>docker image<a class="headerlink" href="#docker-image" title="Permalink to this headline"></a></h1>
+<p><img alt="0001_docker_image_folder.png" src="../../../_images/0001_docker_image_folder.png" /></p>
+</section>
+<section id="docker-mediawiki">
+<h1>docker mediawiki<a class="headerlink" href="#docker-mediawiki" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://hub.docker.com/_/mediawiki</p></li>
+<li><p>docker pull mysql:5.7</p>
+<ul>
+<li><p>docker run –name mysql5.7 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a8a65788b70aebcb08d1c7909d03503d6c61f015af0dcd80e2a3cab2d7e9d392</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>MYSQL_ROOT_PASSWORD=123456表示生成的容器里的root账户密码是123456</p></li>
+<li><p>开放3306端口</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>docker pull mediawiki</p>
+<ul>
+<li><p>使用docker桌面版开启服务</p>
+<ul>
+<li><p>只支持http，不支持https</p></li>
+<li><p>http://zengjf.local/<br />
+<img alt="0001_mediawiki_first_homepage.png" src="../../../_images/0001_mediawiki_first_homepage.png" /></p></li>
+<li><p>选择语言中文<br />
+<img alt="0001_mediawiki_language_select.png" src="../../../_images/0001_mediawiki_language_select.png" /></p></li>
+<li><p>欢迎界面选择：继续</p></li>
+<li><p>连接到数据库：</p>
+<ul class="simple">
+<li><p>数据库主机：</p>
+<ul>
+<li><p>宿主机IP，可以通过ifconfig查看，电脑IP要是更换了，暂时不知道怎么处理</p></li>
+<li><p>192.168.137.2</p></li>
+</ul>
+</li>
+<li><p>root密码：123456</p></li>
+<li><p>继续</p></li>
+</ul>
+</li>
+<li><p>设置wiki基本信息</p></li>
+<li><p>下载LocalSettings</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/361cabab7eb67baa9aef825032e3fcaf/0001_LocalSettings.php"><span class="xref download myst">0001_LocalSettings.php</span></a></p></li>
+<li><p>docker ps</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONTAINER</span> <span class="n">ID</span>   <span class="n">IMAGE</span>              <span class="n">COMMAND</span>                  <span class="n">CREATED</span>          <span class="n">STATUS</span>          <span class="n">PORTS</span>                               <span class="n">NAMES</span>
+<span class="n">a8a65788b70a</span>   <span class="n">mysql</span><span class="p">:</span><span class="mf">5.7</span>          <span class="s2">&quot;docker-entrypoint.s…&quot;</span>   <span class="mi">18</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="n">Up</span> <span class="mi">18</span> <span class="n">minutes</span>   <span class="mf">0.0.0.0</span><span class="p">:</span><span class="mi">3306</span><span class="o">-&gt;</span><span class="mi">3306</span><span class="o">/</span><span class="n">tcp</span><span class="p">,</span> <span class="mi">33060</span><span class="o">/</span><span class="n">tcp</span>   <span class="n">mysql5</span><span class="mf">.7</span>
+<span class="mi">1197</span><span class="n">ff86d4e9</span>   <span class="n">mediawiki</span><span class="p">:</span><span class="n">latest</span>   <span class="s2">&quot;docker-php-entrypoi…&quot;</span>   <span class="mi">41</span> <span class="n">minutes</span> <span class="n">ago</span>   <span class="n">Up</span> <span class="mi">41</span> <span class="n">minutes</span>   <span class="mf">0.0.0.0</span><span class="p">:</span><span class="mi">80</span><span class="o">-&gt;</span><span class="mi">80</span><span class="o">/</span><span class="n">tcp</span>                  <span class="n">mediawiki</span>
+</pre></div>
+</div>
+</li>
+<li><p>docker cp LocalSettings.php 1197ff86d4e9:/var/www/html</p></li>
+</ul>
+</li>
+<li><p>点击：进入您的wiki<br />
+<img alt="0001_mediawiki_homepage_show.png" src="../../../_images/0001_mediawiki_homepage_show.png" /></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

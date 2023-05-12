@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Settings Analysis</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#layout-inspector">Layout Inspector使用方法</a></li>
+<li><a class="reference internal" href="#settings-entry">Settings Entry</a></li>
+<li><a class="reference internal" href="#toplevelsettings">TopLevelSettings</a></li>
+<li><a class="reference internal" href="#wifi">Wifi设置界面添加网络</a></li>
+<li><a class="reference internal" href="#id2">Wifi设置界面连接网络</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="settings-analysis">
+<h1>Settings Analysis<a class="headerlink" href="#settings-analysis" title="Permalink to this headline"></a></h1>
+<p>Android Settings分析</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/panpeng1234/article/details/108078863">Android Q WiFi 启动流程分析一</a></p></li>
+</ul>
+</section>
+<section id="layout-inspector">
+<h1>Layout Inspector使用方法<a class="headerlink" href="#layout-inspector" title="Permalink to this headline"></a></h1>
+<p>[Tools] -&gt; [Layout Inspector] -&gt; [Show all processes] -&gt; [com.android.settings] -&gt; [Select Window] -&gt; [com.android.settings.Settings]</p>
+</section>
+<section id="settings-entry">
+<h1>Settings Entry<a class="headerlink" href="#settings-entry" title="Permalink to this headline"></a></h1>
+<p><img alt="0008_Settings_Home_Page_Enter_Class.png" src="../../../_images/0008_Settings_Home_Page_Enter_Class.png" /></p>
+</section>
+<section id="toplevelsettings">
+<h1>TopLevelSettings<a class="headerlink" href="#toplevelsettings" title="Permalink to this headline"></a></h1>
+<p>TopLevelSettings.java处理信息</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">packages</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">Settings</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">com</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">homepage</span><span class="o">/</span><span class="n">TopLevelSettings</span><span class="o">.</span><span class="n">java</span>
+  <span class="o">*</span> <span class="n">public</span> <span class="k">class</span> <span class="nc">TopLevelSettings</span> <span class="n">extends</span> <span class="n">DashboardFragment</span> <span class="n">implements</span> <span class="n">PreferenceFragmentCompat</span><span class="o">.</span><span class="n">OnPreferenceStartFragmentCallback</span>
+    <span class="o">*</span> <span class="n">protected</span> <span class="nb">int</span> <span class="n">getPreferenceScreenResId</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">top_level_settings</span><span class="p">;</span> <span class="p">}</span>
+      <span class="o">*</span> <span class="n">packages</span><span class="o">/</span><span class="n">apps</span><span class="o">/</span><span class="n">Settings</span><span class="o">/</span><span class="n">res</span><span class="o">/</span><span class="n">xml</span><span class="o">/</span><span class="n">top_level_settings</span><span class="o">.</span><span class="n">xml</span>
+</pre></div>
+</div>
+<p>top_level_settings.xml布局信息如下</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span>[...省略]
+<span class="nt">&lt;PreferenceScreen</span>
+    <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
+    <span class="na">xmlns:settings=</span><span class="s">&quot;http://schemas.android.com/apk/res-auto&quot;</span>
+    <span class="na">android:key=</span><span class="s">&quot;top_level_settings&quot;</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;Preference</span>
+        <span class="na">android:key=</span><span class="s">&quot;top_level_network&quot;</span>
+        <span class="na">android:title=</span><span class="s">&quot;@string/network_dashboard_title&quot;</span>
+        <span class="na">android:summary=</span><span class="s">&quot;@string/summary_placeholder&quot;</span>
+        <span class="na">android:icon=</span><span class="s">&quot;@drawable/ic_homepage_network&quot;</span>
+        <span class="na">android:order=</span><span class="s">&quot;-120&quot;</span>
+        <span class="na">android:fragment=</span><span class="s">&quot;com.android.settings.network.NetworkDashboardFragment&quot;</span>
+        <span class="na">settings:controller=</span><span class="s">&quot;com.android.settings.network.TopLevelNetworkEntryPreferenceController&quot;</span><span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;Preference</span>
+        <span class="na">android:key=</span><span class="s">&quot;top_level_connected_devices&quot;</span>
+        <span class="na">android:title=</span><span class="s">&quot;@string/connected_devices_dashboard_title&quot;</span>
+        <span class="na">android:summary=</span><span class="s">&quot;@string/summary_placeholder&quot;</span>
+        <span class="na">android:icon=</span><span class="s">&quot;@drawable/ic_homepage_connected_device&quot;</span>
+        <span class="na">android:order=</span><span class="s">&quot;-110&quot;</span>
+        <span class="na">android:fragment=</span><span class="s">&quot;com.android.settings.connecteddevice.ConnectedDeviceDashboardFragment&quot;</span>
+        <span class="na">settings:controller=</span><span class="s">&quot;com.android.settings.connecteddevice.TopLevelConnectedDevicesPreferenceController&quot;</span><span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;Preference</span>
+        <span class="na">android:key=</span><span class="s">&quot;top_level_apps_and_notifs&quot;</span>
+        <span class="na">android:title=</span><span class="s">&quot;@string/app_and_notification_dashboard_title&quot;</span>
+        <span class="na">android:summary=</span><span class="s">&quot;@string/app_and_notification_dashboard_summary&quot;</span>
+        <span class="na">android:icon=</span><span class="s">&quot;@drawable/ic_homepage_apps&quot;</span>
+        <span class="na">android:order=</span><span class="s">&quot;-100&quot;</span>
+        <span class="na">android:fragment=</span><span class="s">&quot;com.android.settings.applications.AppAndNotificationDashboardFragment&quot;</span><span class="nt">/&gt;</span>
+
+    [...省略]
+
+<span class="nt">&lt;/PreferenceScreen&gt;</span>
+</pre></div>
+</div>
+<p>可以看到主界面对应布局 top_level_settings.xml中都是一个个Preference，也就对应了主页面每一个条目，可以看到 xml 中 Preference数目和主界面显示数目是不对等了，为啥呢？因为存在动态添加的，查阅 TopLevelSettings 代码发现没啥特殊而且代码量很少，看到 TopLevelSettings 继承 DashboardFragment。主要是因为 DashboardFragment 动态加载</p>
+<p><code class="docutils literal notranslate"><span class="pre">packages/apps/Settings/src/com/android/settings/dashboard/DashboardFragment.java</span></code></p>
+<div class="highlight-Java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">DashboardFragment</span> <span class="kd">extends</span> <span class="n">SettingsPreferenceFragment</span>
+        <span class="kd">implements</span> <span class="n">SettingsBaseActivity</span><span class="p">.</span><span class="na">CategoryListener</span><span class="p">,</span> <span class="n">Indexable</span><span class="p">,</span>
+        <span class="n">SummaryLoader</span><span class="p">.</span><span class="na">SummaryConsumer</span><span class="p">,</span> <span class="n">PreferenceGroup</span><span class="p">.</span><span class="na">OnExpandButtonClickListener</span><span class="p">,</span>
+        <span class="n">BasePreferenceController</span><span class="p">.</span><span class="na">UiBlockListener</span> <span class="p">{</span>
+    
+    <span class="c1">// ...省略</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAttach</span><span class="p">(</span><span class="n">Context</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">super</span><span class="p">.</span><span class="na">onAttach</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+        <span class="n">mSuppressInjectedTileKeys</span> <span class="o">=</span> <span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="na">getResources</span><span class="p">().</span><span class="na">getStringArray</span><span class="p">(</span>
+                <span class="n">R</span><span class="p">.</span><span class="na">array</span><span class="p">.</span><span class="na">config_suppress_injected_tile_keys</span><span class="p">));</span>
+        <span class="n">mDashboardFeatureProvider</span> <span class="o">=</span> <span class="n">FeatureFactory</span><span class="p">.</span><span class="na">getFactory</span><span class="p">(</span><span class="n">context</span><span class="p">).</span>
+                <span class="n">getDashboardFeatureProvider</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+        <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">AbstractPreferenceController</span><span class="o">&gt;</span> <span class="n">controllers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+        <span class="c1">// Load preference controllers from code</span>
+        <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">AbstractPreferenceController</span><span class="o">&gt;</span> <span class="n">controllersFromCode</span> <span class="o">=</span>
+                <span class="n">createPreferenceControllers</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+        <span class="c1">// Load preference controllers from xml definition</span>
+        <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">BasePreferenceController</span><span class="o">&gt;</span> <span class="n">controllersFromXml</span> <span class="o">=</span> <span class="n">PreferenceControllerListHelper</span>
+                <span class="p">.</span><span class="na">getPreferenceControllersFromXml</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">getPreferenceScreenResId</span><span class="p">());</span>
+        <span class="c1">// Filter xml-based controllers in case a similar controller is created from code already.</span>
+        <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">BasePreferenceController</span><span class="o">&gt;</span> <span class="n">uniqueControllerFromXml</span> <span class="o">=</span>
+                <span class="n">PreferenceControllerListHelper</span><span class="p">.</span><span class="na">filterControllers</span><span class="p">(</span>
+                        <span class="n">controllersFromXml</span><span class="p">,</span> <span class="n">controllersFromCode</span><span class="p">);</span>
+
+        <span class="c1">// Add unique controllers to list.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">controllersFromCode</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">controllers</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">controllersFromCode</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">controllers</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">uniqueControllerFromXml</span><span class="p">);</span>
+
+        <span class="c1">// And wire up with lifecycle.</span>
+        <span class="kd">final</span> <span class="n">Lifecycle</span> <span class="n">lifecycle</span> <span class="o">=</span> <span class="n">getSettingsLifecycle</span><span class="p">();</span>
+        <span class="n">uniqueControllerFromXml</span>
+                <span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+                <span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">controller</span> <span class="o">-&gt;</span> <span class="n">controller</span> <span class="k">instanceof</span> <span class="n">LifecycleObserver</span><span class="p">)</span>
+                <span class="p">.</span><span class="na">forEach</span><span class="p">(</span>
+                        <span class="n">controller</span> <span class="o">-&gt;</span> <span class="n">lifecycle</span><span class="p">.</span><span class="na">addObserver</span><span class="p">((</span><span class="n">LifecycleObserver</span><span class="p">)</span> <span class="n">controller</span><span class="p">));</span>
+
+        <span class="n">mPlaceholderPreferenceController</span> <span class="o">=</span>
+                <span class="k">new</span> <span class="n">DashboardTilePlaceholderPreferenceController</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+        <span class="n">controllers</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">mPlaceholderPreferenceController</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">AbstractPreferenceController</span> <span class="n">controller</span> <span class="p">:</span> <span class="n">controllers</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">addPreferenceController</span><span class="p">(</span><span class="n">controller</span><span class="p">);</span>
+        <span class="p">}</span>
+
+    <span class="c1">// ...省略</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>分析<code class="docutils literal notranslate"><span class="pre">NetworkDashboardFragment</span></code>启动Wifi，其中<code class="docutils literal notranslate"><span class="pre">android:fragment=&quot;com.android.settings.wifi.WifiSettings&quot;</span></code>即进入Wifi设置界面</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">com</span><span class="o">/</span><span class="n">android</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">network</span><span class="o">/</span><span class="n">NetworkDashboardFragment</span><span class="o">.</span><span class="n">java</span>
+  <span class="o">*</span> <span class="n">protected</span> <span class="nb">int</span> <span class="n">getPreferenceScreenResId</span><span class="p">()</span>
+    <span class="o">*</span> <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">network_and_internet</span><span class="p">;</span>
+      <span class="o">*</span> <span class="n">android</span><span class="p">:</span><span class="n">fragment</span><span class="o">=</span><span class="s2">&quot;com.android.settings.wifi.WifiSettings&quot;</span>
+        <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onStart</span><span class="p">()</span>
+          <span class="o">*</span> <span class="n">mWifiEnabler</span> <span class="o">=</span> <span class="n">createWifiEnabler</span><span class="p">();</span>
+            <span class="o">*</span> <span class="n">final</span> <span class="n">SettingsActivity</span> <span class="n">activity</span> <span class="o">=</span> <span class="p">(</span><span class="n">SettingsActivity</span><span class="p">)</span> <span class="n">getActivity</span><span class="p">();</span>
+            <span class="o">*</span> <span class="k">return</span> <span class="n">new</span> <span class="n">WifiEnabler</span><span class="p">(</span><span class="n">activity</span><span class="p">,</span> <span class="n">new</span> <span class="n">SwitchBarController</span><span class="p">(</span><span class="n">activity</span><span class="o">.</span><span class="n">getSwitchBar</span><span class="p">()),</span> <span class="n">mMetricsFeatureProvider</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">public</span> <span class="k">class</span> <span class="nc">SwitchBarController</span> <span class="n">extends</span> <span class="n">SwitchWidgetController</span> <span class="n">implements</span> <span class="n">SwitchBar</span><span class="o">.</span><span class="n">OnSwitchChangeListener</span>
+                <span class="o">*</span> <span class="n">public</span> <span class="n">void</span> <span class="n">onSwitchChanged</span><span class="p">(</span><span class="n">Switch</span> <span class="n">switchView</span><span class="p">,</span> <span class="n">boolean</span> <span class="n">isChecked</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">mListener</span><span class="o">.</span><span class="n">onSwitchToggled</span><span class="p">(</span><span class="n">isChecked</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">调用WifiEnabler中的onSwitchToggled</span><span class="p">()</span>
+              <span class="o">*</span> <span class="n">public</span> <span class="k">class</span> <span class="nc">WifiEnabler</span> <span class="n">implements</span> <span class="n">SwitchWidgetController</span><span class="o">.</span><span class="n">OnSwitchChangeListener</span>
+                <span class="o">*</span> <span class="n">public</span> <span class="n">boolean</span> <span class="n">onSwitchToggled</span><span class="p">(</span><span class="n">boolean</span> <span class="n">isChecked</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">mWifiManager</span><span class="o">.</span><span class="n">setWifiEnabled</span><span class="p">(</span><span class="n">isChecked</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="wifi">
+<h1>Wifi设置界面添加网络<a class="headerlink" href="#wifi" title="Permalink to this headline"></a></h1>
+<p>在<code class="docutils literal notranslate"><span class="pre">src/main/java/com/android/settings/wifi/WifiSettings.java</span></code>设置界面中，点击添加网络，触发如下事件：</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onPreferenceTreeClick</span><span class="p">(</span><span class="n">Preference</span> <span class="n">preference</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// If the preference has a fragment set, open that</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">preference</span><span class="p">.</span><span class="na">getFragment</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">preference</span><span class="p">.</span><span class="na">setOnPreferenceClickListener</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+            <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onPreferenceTreeClick</span><span class="p">(</span><span class="n">preference</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">preference</span> <span class="k">instanceof</span> <span class="n">LongPressAccessPointPreference</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">mSelectedAccessPoint</span> <span class="o">=</span> <span class="p">((</span><span class="n">LongPressAccessPointPreference</span><span class="p">)</span> <span class="n">preference</span><span class="p">).</span><span class="na">getAccessPoint</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onPreferenceTreeClick</span><span class="p">(</span><span class="n">preference</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="cm">/**</span>
+<span class="cm">             * Bypass dialog and connect to unsecured networks, or previously connected saved</span>
+<span class="cm">             * networks, or Passpoint provided networks.</span>
+<span class="cm">             */</span>
+            <span class="k">switch</span> <span class="p">(</span><span class="n">WifiUtils</span><span class="p">.</span><span class="na">getConnectingType</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">case</span> <span class="n">WifiUtils</span><span class="p">.</span><span class="na">CONNECT_TYPE_OSU_PROVISION</span><span class="p">:</span>
+                    <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">startOsuProvisioning</span><span class="p">(</span><span class="n">mConnectListener</span><span class="p">);</span>
+                    <span class="n">mClickedConnect</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">case</span> <span class="n">WifiUtils</span><span class="p">.</span><span class="na">CONNECT_TYPE_OPEN_NETWORK</span><span class="p">:</span>
+                    <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">generateOpenNetworkConfig</span><span class="p">();</span>
+                    <span class="n">connect</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span> <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">isSaved</span><span class="p">());</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">case</span> <span class="n">WifiUtils</span><span class="p">.</span><span class="na">CONNECT_TYPE_SAVED_NETWORK</span><span class="p">:</span>
+                    <span class="n">connect</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span> <span class="kc">true</span> <span class="cm">/* isSavedNetwork */</span><span class="p">);</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">default</span><span class="p">:</span>
+                    <span class="n">showDialog</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">,</span> <span class="n">WifiConfigUiBase</span><span class="p">.</span><span class="na">MODE_CONNECT</span><span class="p">);</span>
+                    <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">preference</span> <span class="o">==</span> <span class="n">mAddWifiNetworkPreference</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">onAddNetworkPressed</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onPreferenceTreeClick</span><span class="p">(</span><span class="n">preference</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Called when &quot;add network&quot; button is pressed.</span>
+<span class="cm">     */</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">onAddNetworkPressed</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// No exact access point is selected.</span>
+        <span class="n">mSelectedAccessPoint</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+        <span class="n">launchAddNetworkFragment</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">launchAddNetworkFragment</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">new</span> <span class="n">SubSettingLauncher</span><span class="p">(</span><span class="n">getContext</span><span class="p">())</span>
+                <span class="p">.</span><span class="na">setTitleRes</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">string</span><span class="p">.</span><span class="na">wifi_add_network</span><span class="p">)</span>
+                <span class="p">.</span><span class="na">setDestination</span><span class="p">(</span><span class="n">AddNetworkFragment</span><span class="p">.</span><span class="na">class</span><span class="p">.</span><span class="na">getName</span><span class="p">())</span>
+                <span class="p">.</span><span class="na">setSourceMetricsCategory</span><span class="p">(</span><span class="n">getMetricsCategory</span><span class="p">())</span>
+                <span class="p">.</span><span class="na">setResultListener</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">ADD_NETWORK_REQUEST</span><span class="p">)</span>
+                <span class="p">.</span><span class="na">launch</span><span class="p">();</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>Wifi设置界面连接网络<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>连接网络UI布局文件：src/main/res/layout/wifi_dialog.xml</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* src/main/java/com/android/settings/wifi/WifiSettings.java
+  * public boolean onPreferenceTreeClick(Preference preference)
+    * showDialog(mSelectedAccessPoint, WifiConfigUiBase.MODE_CONNECT);
+      * showDialog(WIFI_DIALOG_ID);
+        * mDialogFragment = SettingsDialogFragment.newInstance(this, dialogId);
+          * settingsDialogFragment.setDialogId(dialogId);
+            * mDialogId = dialogId;
+          * src/main/java/com/android/settings/SettingsPreferenceFragment.java
+            * public Dialog onCreateDialog(Bundle savedInstanceState)
+              * return ((DialogCreatable) mParentFragment).onCreateDialog(mDialogId);
+                * 调用父类的onCreateDialog()函数，也就是WifiSettings.java中的函数；
+        * mDialogFragment.show(getChildFragmentManager(), Integer.toString(dialogId));
+</pre></div>
+</div>
+<p>在<code class="docutils literal notranslate"><span class="pre">src/main/java/com/android/settings/wifi/WifiSettings.java</span></code>设置界面中，点击连接Wifi AP，触发如下事件，最终会调用该类中的<code class="docutils literal notranslate"><span class="pre">public</span> <span class="pre">Dialog</span> <span class="pre">onCreateDialog(int</span> <span class="pre">dialogId)</span></code>：</p>
+<div class="highlight-Java notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onPreferenceTreeClick</span><span class="p">(</span><span class="n">Preference</span> <span class="n">preference</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// If the preference has a fragment set, open that</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">preference</span><span class="p">.</span><span class="na">getFragment</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">preference</span><span class="p">.</span><span class="na">setOnPreferenceClickListener</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+            <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onPreferenceTreeClick</span><span class="p">(</span><span class="n">preference</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">preference</span> <span class="k">instanceof</span> <span class="n">LongPressAccessPointPreference</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">mSelectedAccessPoint</span> <span class="o">=</span> <span class="p">((</span><span class="n">LongPressAccessPointPreference</span><span class="p">)</span> <span class="n">preference</span><span class="p">).</span><span class="na">getAccessPoint</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onPreferenceTreeClick</span><span class="p">(</span><span class="n">preference</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="cm">/**</span>
+<span class="cm">             * Bypass dialog and connect to unsecured networks, or previously connected saved</span>
+<span class="cm">             * networks, or Passpoint provided networks.</span>
+<span class="cm">             */</span>
+            <span class="k">switch</span> <span class="p">(</span><span class="n">WifiUtils</span><span class="p">.</span><span class="na">getConnectingType</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">case</span> <span class="n">WifiUtils</span><span class="p">.</span><span class="na">CONNECT_TYPE_OSU_PROVISION</span><span class="p">:</span>
+                    <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">startOsuProvisioning</span><span class="p">(</span><span class="n">mConnectListener</span><span class="p">);</span>
+                    <span class="n">mClickedConnect</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">case</span> <span class="n">WifiUtils</span><span class="p">.</span><span class="na">CONNECT_TYPE_OPEN_NETWORK</span><span class="p">:</span>
+                    <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">generateOpenNetworkConfig</span><span class="p">();</span>
+                    <span class="n">connect</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span> <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">isSaved</span><span class="p">());</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">case</span> <span class="n">WifiUtils</span><span class="p">.</span><span class="na">CONNECT_TYPE_SAVED_NETWORK</span><span class="p">:</span>
+                    <span class="n">connect</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span> <span class="kc">true</span> <span class="cm">/* isSavedNetwork */</span><span class="p">);</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">default</span><span class="p">:</span>
+                    <span class="n">showDialog</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">,</span> <span class="n">WifiConfigUiBase</span><span class="p">.</span><span class="na">MODE_CONNECT</span><span class="p">);</span>
+                    <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">preference</span> <span class="o">==</span> <span class="n">mAddWifiNetworkPreference</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">onAddNetworkPressed</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onPreferenceTreeClick</span><span class="p">(</span><span class="n">preference</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">showDialog</span><span class="p">(</span><span class="n">AccessPoint</span> <span class="n">accessPoint</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dialogMode</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">accessPoint</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">WifiConfiguration</span> <span class="n">config</span> <span class="o">=</span> <span class="n">accessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">WifiUtils</span><span class="p">.</span><span class="na">isNetworkLockedDown</span><span class="p">(</span><span class="n">getActivity</span><span class="p">(),</span> <span class="n">config</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">accessPoint</span><span class="p">.</span><span class="na">isActive</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">RestrictedLockUtils</span><span class="p">.</span><span class="na">sendShowAdminSupportDetailsIntent</span><span class="p">(</span><span class="n">getActivity</span><span class="p">(),</span>
+                        <span class="n">RestrictedLockUtilsInternal</span><span class="p">.</span><span class="na">getDeviceOwner</span><span class="p">(</span><span class="n">getActivity</span><span class="p">()));</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">mDialog</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">removeDialog</span><span class="p">(</span><span class="n">WIFI_DIALOG_ID</span><span class="p">);</span>
+            <span class="n">mDialog</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Save the access point and edit mode</span>
+        <span class="n">mDlgAccessPoint</span> <span class="o">=</span> <span class="n">accessPoint</span><span class="p">;</span>
+        <span class="n">mDialogMode</span> <span class="o">=</span> <span class="n">dialogMode</span><span class="p">;</span>
+
+        <span class="c1">// 会调用下面的 public Dialog onCreateDialog(int dialogId) 函数</span>
+        <span class="n">showDialog</span><span class="p">(</span><span class="n">WIFI_DIALOG_ID</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Dialog</span> <span class="nf">onCreateDialog</span><span class="p">(</span><span class="kt">int</span> <span class="n">dialogId</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="n">dialogId</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="n">WIFI_DIALOG_ID</span><span class="p">:</span>
+                <span class="c1">// modify network</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">mDlgAccessPoint</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">mAccessPointSavedState</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="c1">// restore AP from save state</span>
+                    <span class="n">mDlgAccessPoint</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AccessPoint</span><span class="p">(</span><span class="n">getActivity</span><span class="p">(),</span> <span class="n">mAccessPointSavedState</span><span class="p">);</span>
+                    <span class="c1">// Reset the saved access point data</span>
+                    <span class="n">mAccessPointSavedState</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="n">mDialog</span> <span class="o">=</span> <span class="n">WifiDialog</span>
+                        <span class="p">.</span><span class="na">createModal</span><span class="p">(</span><span class="n">getActivity</span><span class="p">(),</span> <span class="k">this</span><span class="p">,</span> <span class="n">mDlgAccessPoint</span><span class="p">,</span> <span class="n">mDialogMode</span><span class="p">);</span>
+                <span class="n">mSelectedAccessPoint</span> <span class="o">=</span> <span class="n">mDlgAccessPoint</span><span class="p">;</span>
+                <span class="k">return</span> <span class="n">mDialog</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="kd">super</span><span class="p">.</span><span class="na">onCreateDialog</span><span class="p">(</span><span class="n">dialogId</span><span class="p">);</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>点击连接网络触发<code class="docutils literal notranslate"><span class="pre">WifiDialog.WifiDialogListener</span></code>回调函数<code class="docutils literal notranslate"><span class="pre">onSubmit()</span></code>，所以这里的<code class="docutils literal notranslate"><span class="pre">onSubmit()</span></code>函数算是其他方面的代码分析起点</p>
+<div class="highlight-Java notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onForget</span><span class="p">(</span><span class="n">WifiDialog</span> <span class="n">dialog</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">forget</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onSubmit</span><span class="p">(</span><span class="n">WifiDialog</span> <span class="n">dialog</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">mDialog</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">submit</span><span class="p">(</span><span class="n">mDialog</span><span class="p">.</span><span class="na">getController</span><span class="p">());</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onScan</span><span class="p">(</span><span class="n">WifiDialog</span> <span class="n">dialog</span><span class="p">,</span> <span class="n">String</span> <span class="n">ssid</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Launch QR code scanner to join a network.</span>
+        <span class="n">startActivityForResult</span><span class="p">(</span><span class="n">WifiDppUtils</span><span class="p">.</span><span class="na">getEnrolleeQrCodeScannerIntent</span><span class="p">(</span><span class="n">ssid</span><span class="p">),</span>
+                <span class="n">REQUEST_CODE_WIFI_DPP_ENROLLEE_QR_CODE_SCANNER</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* package */</span> <span class="kt">void</span> <span class="nf">submit</span><span class="p">(</span><span class="n">WifiConfigController</span> <span class="n">configController</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="kd">final</span> <span class="n">WifiConfiguration</span> <span class="n">config</span> <span class="o">=</span> <span class="n">configController</span><span class="p">.</span><span class="na">getConfig</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">config</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span> <span class="o">!=</span> <span class="kc">null</span>
+                    <span class="o">&amp;&amp;</span> <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">isSaved</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">connect</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span> <span class="kc">true</span> <span class="cm">/* isSavedNetwork */</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">configController</span><span class="p">.</span><span class="na">getMode</span><span class="p">()</span> <span class="o">==</span> <span class="n">WifiConfigUiBase</span><span class="p">.</span><span class="na">MODE_MODIFY</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">mWifiManager</span><span class="p">.</span><span class="na">save</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">mSaveListener</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">mWifiManager</span><span class="p">.</span><span class="na">save</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">mSaveListener</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// Not an &quot;Add network&quot;</span>
+                <span class="n">connect</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="kc">false</span> <span class="cm">/* isSavedNetwork */</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">mWifiTracker</span><span class="p">.</span><span class="na">resumeScanning</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* package */</span> <span class="kt">void</span> <span class="nf">forget</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">mMetricsFeatureProvider</span><span class="p">.</span><span class="na">action</span><span class="p">(</span><span class="n">getActivity</span><span class="p">(),</span> <span class="n">SettingsEnums</span><span class="p">.</span><span class="na">ACTION_WIFI_FORGET</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">isSaved</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getNetworkInfo</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span>
+                    <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getNetworkInfo</span><span class="p">().</span><span class="na">getState</span><span class="p">()</span> <span class="o">!=</span> <span class="n">State</span><span class="p">.</span><span class="na">DISCONNECTED</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// Network is active but has no network ID - must be ephemeral.</span>
+                <span class="n">mWifiManager</span><span class="p">.</span><span class="na">disableEphemeralNetwork</span><span class="p">(</span>
+                        <span class="n">AccessPoint</span><span class="p">.</span><span class="na">convertToQuotedString</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getSsidStr</span><span class="p">()));</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="c1">// Should not happen, but a monkey seems to trigger it</span>
+                <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Failed to forget invalid network &quot;</span> <span class="o">+</span> <span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">());</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">().</span><span class="na">isPasspoint</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">mWifiManager</span><span class="p">.</span><span class="na">removePasspointConfiguration</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">().</span><span class="na">FQDN</span><span class="p">);</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">IllegalArgumentException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Failed to remove Passpoint configuration with error: &quot;</span> <span class="o">+</span> <span class="n">e</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">mWifiManager</span><span class="p">.</span><span class="na">forget</span><span class="p">(</span><span class="n">mSelectedAccessPoint</span><span class="p">.</span><span class="na">getConfig</span><span class="p">().</span><span class="na">networkId</span><span class="p">,</span> <span class="n">mForgetListener</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="n">mWifiTracker</span><span class="p">.</span><span class="na">resumeScanning</span><span class="p">();</span>
+
+        <span class="c1">// We need to rename/replace &quot;Next&quot; button in wifi setup context.</span>
+        <span class="n">changeNextButtonState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">connect</span><span class="p">(</span><span class="kd">final</span> <span class="n">WifiConfiguration</span> <span class="n">config</span><span class="p">,</span> <span class="kt">boolean</span> <span class="n">isSavedNetwork</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Log subtype if configuration is a saved network.</span>
+        <span class="n">mMetricsFeatureProvider</span><span class="p">.</span><span class="na">action</span><span class="p">(</span><span class="n">getContext</span><span class="p">(),</span> <span class="n">SettingsEnums</span><span class="p">.</span><span class="na">ACTION_WIFI_CONNECT</span><span class="p">,</span>
+                <span class="n">isSavedNetwork</span><span class="p">);</span>
+        <span class="n">mWifiManager</span><span class="p">.</span><span class="na">connect</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">mConnectListener</span><span class="p">);</span>
+        <span class="n">mClickedConnect</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">connect</span><span class="p">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">networkId</span><span class="p">,</span> <span class="kt">boolean</span> <span class="n">isSavedNetwork</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Log subtype if configuration is a saved network.</span>
+        <span class="n">mMetricsFeatureProvider</span><span class="p">.</span><span class="na">action</span><span class="p">(</span><span class="n">getActivity</span><span class="p">(),</span> <span class="n">SettingsEnums</span><span class="p">.</span><span class="na">ACTION_WIFI_CONNECT</span><span class="p">,</span>
+                <span class="n">isSavedNetwork</span><span class="p">);</span>
+        <span class="n">mWifiManager</span><span class="p">.</span><span class="na">connect</span><span class="p">(</span><span class="n">networkId</span><span class="p">,</span> <span class="n">mConnectListener</span><span class="p">);</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

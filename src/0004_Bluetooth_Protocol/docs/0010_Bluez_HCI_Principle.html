@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Bluez HCI Principle</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">基础理解</a></li>
+<li><a class="reference internal" href="#bluez">Bluez</a></li>
+<li><a class="reference internal" href="#usb">USB接口蓝牙</a></li>
+<li><a class="reference internal" href="#uart">UART接口蓝牙</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bluez-hci-principle">
+<h1>Bluez HCI Principle<a class="headerlink" href="#bluez-hci-principle" title="Permalink to this headline"></a></h1>
+<p>Bluez HCI通信</p>
+<p>Bluetooth USB dongle是蓝牙接收器，作为Host功能，貌似只要实现到HCI这部分就够了；</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><strong><a class="reference external" href="https://blog.csdn.net/zjli321/article/details/52122447">Ubuntu系统(bluez)蓝牙调试</a></strong></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/xubin341719/article/details/38640725">Android blueZ HCI（二）：hcitool hcidump常用方法</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>基础理解<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>HCI: Host Controller Interface，用来沟通Host和Module。Host通常就是PC， Module则是以各种物理连接形式（USB,serial,pc-card等）连接到PC上的bluetooth Dongle。</p></li>
+<li><p>HCI则比较特殊，它一部分在软件中实现，用来给上层协议和程序提供访问接口（Bluez中,hci.c hci_usb.c，hci_sock.c等）.另一部分也是在Firmware中实现，用来将软件部分的指令等用底层协议明白的方式传递给底层。</p></li>
+</ul>
+</section>
+<section id="bluez">
+<h1>Bluez<a class="headerlink" href="#bluez" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>使用Bluez时，需要内核提供一系列的socket接口来操作蓝牙；</p></li>
+<li><p>蓝牙框架分成两部分：</p>
+<ul>
+<li><p>蓝牙驱动部分：含hci层协议及蓝牙硬件接口的管理。</p></li>
+<li><p>蓝牙socket部分：负责管理提供给bluez的socket，并包含L2cap层的功能，蓝牙socket部分与蓝牙驱动部分通过hci_core来连接；</p></li>
+</ul>
+</li>
+<li><p>Bluez下移植蓝牙方面看，只关心两个地方：</p>
+<ul>
+<li><p>一个是蓝牙驱动的移植，因为这部分每家公司的Firmware不一样，数据传输可能有差异；</p></li>
+<li><p>另一个是bluez的工具集中的hciattach工具（使用uart接口的蓝牙才需要这部分），绑定通信的串口；</p></li>
+</ul>
+</li>
+<li><p>对比bluedroid与bluez在蓝牙移植方面的差异，最大的不同就是hci和L2cap层所处的位置：</p>
+<ul>
+<li><p>在bluedroid中，hci和L2cap层放在bluedroid中，是在内核之上；</p></li>
+<li><p>而bluez中，hci和L2cap层不属于bluez中的代码，而是放到内核里；</p></li>
+</ul>
+</li>
+<li><p>Bluez的蓝牙驱动负责hci协议的处理、与蓝牙硬件交互数据、注册hci接口供蓝牙socket部分使用。</p></li>
+</ul>
+</section>
+<section id="usb">
+<h1>USB接口蓝牙<a class="headerlink" href="#usb" title="Permalink to this headline"></a></h1>
+<p>对于usb接口的蓝牙，只要给蓝牙上电，usb枚举到蓝牙设备后，就会调用蓝牙驱动的probe函数，在该函数中就会向hci_core注册接口；</p>
+</section>
+<section id="uart">
+<h1>UART接口蓝牙<a class="headerlink" href="#uart" title="Permalink to this headline"></a></h1>
+<p>Uart接口蓝牙，使用那个uart口依赖硬件，同时也没办法像usb一样向串口驱动注册一个功能驱动等待probe，uart是没有枚举的过程的。所以uart接口蓝牙就需要应用层把使用的串口通知hci_core层，同时uart接口蓝牙的fw download及config配置工作也放到了应用层，这些工作都是由hciattach来实现。</p>
+<p><img alt="0010_hciattach_work_flow.png" src="../../../_images/0010_hciattach_work_flow.png" /></p>
+<p>串口的使用有一个切换的过程，在初始化的时候，由hciattach使用串口，初始化完成后，把串口切换给hci使用，hci负责与串口交互蓝牙数据，中间还经过了h4/h5协议层，驱动层跟移植相关只有h4/h5协议，若h4/h5使用的是内核自带的协议，那驱动层就不需要做任何的工作。</p>
+<p><img alt="0010_hciattach_work_flow_code.png" src="../../../_images/0010_hciattach_work_flow_code.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

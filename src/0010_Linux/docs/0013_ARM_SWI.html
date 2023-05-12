@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ARM SWI</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简要描述</a></li>
+<li><a class="reference internal" href="#id3">汇编处理流程</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="arm-swi">
+<h1>ARM SWI<a class="headerlink" href="#arm-swi" title="Permalink to this headline"></a></h1>
+<p>SWI指令引起软件中断异常，为操作系统应用程序调用系统接口提供的一种机制</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/zqixiao_09/article/details/50776191">ARM 软中断指令SWI</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简要描述<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>软中断是利用硬件中断的概念，用软件方式进行模拟，实现从用户模式切换到特权模式并执行特权程序的机制。</p></li>
+<li><p>硬件中断是由电平的物理特性决定，在电平变化时引发中断操作，而软中断是通过一条具体指令SWI，引发中断操作，也就是说用户程序里可以通过写入SWI指令来切换到特权模式，当CPU执行到SWI指令时会从用户模式切换到管理模式下，执行软件中断处理。由于SWI指令由操作系统提供的API封装起来，并且软件中断处理程序也是操作系统编写者提前写好的，因此用户程序调用API时就是将操作权限交给了操作系统，所以用户程序还是不能随意访问硬件。</p></li>
+</ul>
+</section>
+<section id="id3">
+<h1>汇编处理流程<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>CPU执行到<code class="docutils literal notranslate"><span class="pre">swi</span> <span class="pre">xxx</span></code>执行后，产生软件中断，由异常处理部分知识可知，软中断产生后CPU将强制将PC的值置为异常向量表地址0x08，在异常向量表0x08处安放跳转指令<code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">HandleSWI</span></code>，这样CPU就跳往我们自己定义的HandleSWI处执行；</p></li>
+<li><p>软中断处理中通过<code class="docutils literal notranslate"><span class="pre">STMFD</span>&#160; <span class="pre">SP!,</span> <span class="pre">{R0-R12,</span>&#160; <span class="pre">LR}</span></code>要保存程序执行现场，将R0~R12通用寄存器数据保存在管理模式下SP栈内，LR由硬件自动保存软中断指令下一条指令的地址（后面利用LR的地址取得SWI指令编码），该寄存器值也保存在SP栈内，将来处理完毕之后返回；</p></li>
+<li><p>由SWI指令编码知识可知，SWI指令低24位保存有软中断号，通过<code class="docutils literal notranslate"><span class="pre">LDR</span> <span class="pre">R4,</span> <span class="pre">[LR,</span> <span class="pre">#-4]</span></code>指令，取得SWI指令编码（LR为硬件自动保存<code class="docutils literal notranslate"><span class="pre">SWI</span> <span class="pre">xxx</span></code>指令的下一条指令地址，LR – 4就是SWI指令地址），将其保存在R4寄存器中。通过<code class="docutils literal notranslate"><span class="pre">BIC</span> <span class="pre">R4,</span> <span class="pre">R4,</span> <span class="pre">#0xFF000000</span></code>指令将SWI指令高8位清除掉，只保留低24位立即数，取得swi指令编码；</p></li>
+<li><p>根据24位立即数中的软中断号判断用户程序的请求操作。如果24位立即数为1，表示led_on系统调用产生的软中断，则在管理模式下调用对应的亮灯操作do_led_on。如果24位立即数为2，表示led_off系统调用产生的软中断，则调用灭灯操作do_led_on，根据ATPCS调用规则，R0~R3做为参数传递寄存器，在软中断处理中没有使用这4个寄存器，而是使用R4作为操作寄存器的。</p></li>
+<li><p>执行完系统调用操作之后，返回到swi_return（在调用对应系统操作时，通过<code class="docutils literal notranslate"><span class="pre">LDREQ</span> <span class="pre">LR,</span> <span class="pre">=swi_return</span></code>设置了返回地址），执行返回处理，通过<code class="docutils literal notranslate"><span class="pre">LDMIA</span> <span class="pre">SP!,</span> <span class="pre">{R0-R12,</span> <span class="pre">PC}^</span></code>指令将用户寄存器数据恢复到R0~R12，将进入软中断处理时保存的返回地址LR的值恢复给PC，实现程序返回，同时还恢复了状态寄存器。切换回用户模式下程序中继续执行。</p></li>
+</ul>
+<p><img alt="0013_ARM_CPU-SWI.png" src="../../../_images/0013_ARM_CPU-SWI.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

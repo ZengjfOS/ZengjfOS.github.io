@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android eMCP</a></li>
+<li><a class="reference internal" href="#makefile">Makefile</a></li>
+<li><a class="reference internal" href="#memorydevicelist-mt6765">MemoryDeviceList_MT6765</a></li>
+<li><a class="reference internal" href="#custom-memorydevice">custom_MemoryDevice</a></li>
+<li><a class="reference internal" href="#output-emi">output emi</a></li>
+<li><a class="reference internal" href="#ddr3-ddr4">DDR3 DDR4</a></li>
+<li><a class="reference internal" href="#emcp">eMCP示例</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-emcp">
+<h1>Android eMCP<a class="headerlink" href="#android-emcp" title="Permalink to this headline"></a></h1>
+<p>eMMC、DRAM初始化</p>
+</section>
+<section id="makefile">
+<h1>Makefile<a class="headerlink" href="#makefile" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">vendor/mediatek/proprietary/bootable/bootloader/preloader/tools/emigen/emigen.mk</span></code><br />
+利用perl脚本将<code class="docutils literal notranslate"><span class="pre">.xls</span></code>文件转换成配置文件，其会涉及到<code class="docutils literal notranslate"><span class="pre">custom_MemoryDevice.h</span></code></p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="cp">ifndef EMIGEN_OUT</span>
+<span class="nv">EMIGEN_OUT</span> <span class="o">:=</span> <span class="k">$(</span>PRELOADER_OUT<span class="k">)</span>
+<span class="cp">endif</span>
+<span class="cp">ifndef PERL</span>
+<span class="nv">PERL</span> <span class="o">:=</span> perl
+<span class="cp">endif</span>
+<span class="k">export</span> <span class="nv">EMIGEN_OUT</span>
+
+<span class="nv">ALL_EMIGEN_FILE</span> <span class="o">:=</span> <span class="se">\</span>
+        inc/custom_emi.h <span class="se">\</span>
+        MTK_Loader_Info.tag
+
+<span class="cp">ifeq ($(MTK_PLATFORM),MT2601)</span>
+<span class="nv">ALL_EMIGEN_FILE</span> <span class="o">+=</span> <span class="se">\</span>
+        custom_emi.c
+<span class="cp">endif</span>
+
+<span class="nv">EMIGEN_FILE_LIST</span> <span class="o">:=</span> <span class="k">$(</span>addprefix <span class="k">$(</span>EMIGEN_OUT<span class="k">)</span>/,<span class="k">$(</span>ALL_EMIGEN_FILE<span class="k">))</span>
+<span class="nv">CUSTOM_MEMORY_HDR</span> <span class="o">:=</span> <span class="k">$(</span>MTK_PATH_CUSTOM<span class="k">)</span>/inc/custom_MemoryDevice.h
+<span class="cp">ifeq ($(MACH_TYPE),mt6735m)</span>
+<span class="nv">MEMORY_DEVICE_XLS</span> <span class="o">:=</span> <span class="k">$(</span>D_ROOT<span class="k">)</span>/tools/emigen/MT6735/MemoryDeviceList_MT6735M.xls
+<span class="cp">else ifeq ($(MACH_TYPE),mt6753)</span>
+<span class="nv">MEMORY_DEVICE_XLS</span> <span class="o">:=</span> <span class="k">$(</span>D_ROOT<span class="k">)</span>/tools/emigen/MT6735/MemoryDeviceList_MT6753.xls
+<span class="cp">else ifeq ($(MACH_TYPE),mt6737t)</span>
+<span class="nv">MEMORY_DEVICE_XLS</span> <span class="o">:=</span> <span class="k">$(</span>D_ROOT<span class="k">)</span>/tools/emigen/MT6735/MemoryDeviceList_MT6737T.xls
+<span class="cp">else ifeq ($(MACH_TYPE),mt6737m)</span>
+<span class="nv">MEMORY_DEVICE_XLS</span> <span class="o">:=</span> <span class="k">$(</span>D_ROOT<span class="k">)</span>/tools/emigen/MT6735/MemoryDeviceList_MT6737M.xls
+<span class="cp">else</span>
+<span class="nv">MEMORY_DEVICE_XLS</span> <span class="o">:=</span> <span class="k">$(</span>D_ROOT<span class="k">)</span>/tools/emigen/<span class="k">$(</span>MTK_PLATFORM<span class="k">)</span>/MemoryDeviceList_<span class="k">$(</span>MTK_PLATFORM<span class="k">)</span>.xls          <span class="c1"># MT6765</span>
+<span class="cp">endif</span>
+<span class="nv">EMIGEN_SCRIPT</span> <span class="o">:=</span> <span class="k">$(</span>D_ROOT<span class="k">)</span>/tools/emigen/<span class="k">$(</span>MTK_PLATFORM<span class="k">)</span>/emigen.pl
+<span class="nv">EMIGEN_PREBUILT_PATH</span> <span class="o">:=</span> <span class="k">$(</span>MTK_PATH_CUSTOM<span class="k">)</span>
+<span class="nv">EMIGEN_PREBUILT_CHECK</span> <span class="o">:=</span> <span class="k">$(</span>filter-out <span class="k">$(</span>wildcard <span class="k">$(</span>addprefix <span class="k">$(</span>EMIGEN_PREBUILT_PATH<span class="k">)</span>/,<span class="k">$(</span>ALL_EMIGEN_FILE<span class="k">)))</span>,<span class="k">$(</span>addprefix <span class="k">$(</span>EMIGEN_PREBUILT_PATH<span class="k">)</span>/,<span class="k">$(</span>ALL_EMIGEN_FILE<span class="k">)))</span>
+
+<span class="c">##############################################################</span>
+<span class="c"># Emigen generate parameter for header and tag files</span>
+<span class="c">#</span>
+<span class="nv">BUILD_EMI_H</span> <span class="o">:=</span> <span class="m">0</span>
+<span class="nv">BUILD_LOADER_TAG</span> <span class="o">:=</span> <span class="m">1</span>
+<span class="k">export </span><span class="nv">EMIGEN_TAG_OUT</span> <span class="o">:=</span> <span class="k">$(</span>EMIGEN_OUT<span class="k">)</span>
+<span class="k">export </span><span class="nv">EMIGEN_H_OUT</span> <span class="o">:=</span> <span class="k">$(</span>EMIGEN_OUT<span class="k">)</span>/inc
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">emigen</span>
+<span class="nf">emigen</span><span class="o">:</span> <span class="k">$(</span><span class="nv">EMIGEN_FILE_LIST</span><span class="k">)</span>
+<span class="cp">ifneq ($(EMIGEN_PREBUILT_CHECK),)</span>
+<span class="nf">$(EMIGEN_H_OUT)/custom_emi.h</span><span class="o">:</span> <span class="k">$(</span><span class="nv">EMIGEN_SCRIPT</span><span class="k">)</span> <span class="k">$(</span><span class="nv">CUSTOM_MEMORY_HDR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">MEMORY_DEVICE_XLS</span><span class="k">)</span>
+        @mkdir -p <span class="k">$(</span>dir <span class="nv">$@</span><span class="k">)</span>
+        <span class="k">$(</span>PERL<span class="k">)</span> <span class="k">$(</span>EMIGEN_SCRIPT<span class="k">)</span> <span class="k">$(</span>CUSTOM_MEMORY_HDR<span class="k">)</span> <span class="k">$(</span>MEMORY_DEVICE_XLS<span class="k">)</span> <span class="k">$(</span>MTK_PLATFORM<span class="k">)</span> <span class="k">$(</span>MTK_PROJECT<span class="k">)</span> <span class="k">$(</span>EMIGEN_H_OUT<span class="k">)</span> <span class="k">$(</span>BUILD_EMI_H<span class="k">)</span> <span class="k">$(</span>MACH_TYPE<span class="k">)</span>
+
+<span class="nf">$(EMIGEN_TAG_OUT)/MTK_Loader_Info.tag</span><span class="o">:</span> <span class="k">$(</span><span class="nv">EMIGEN_SCRIPT</span><span class="k">)</span> <span class="k">$(</span><span class="nv">CUSTOM_MEMORY_HDR</span><span class="k">)</span> <span class="k">$(</span><span class="nv">MEMORY_DEVICE_XLS</span><span class="k">)</span>
+        @mkdir -p <span class="k">$(</span>dir <span class="nv">$@</span><span class="k">)</span>
+        <span class="k">$(</span>PERL<span class="k">)</span> <span class="k">$(</span>EMIGEN_SCRIPT<span class="k">)</span> <span class="k">$(</span>CUSTOM_MEMORY_HDR<span class="k">)</span> <span class="k">$(</span>MEMORY_DEVICE_XLS<span class="k">)</span> <span class="k">$(</span>MTK_PLATFORM<span class="k">)</span> <span class="k">$(</span>MTK_PROJECT<span class="k">)</span> <span class="k">$(</span>EMIGEN_TAG_OUT<span class="k">)</span> <span class="k">$(</span>BUILD_LOADER_TAG<span class="k">)</span> <span class="k">$(</span>MACH_TYPE<span class="k">)</span>
+
+<span class="cp">else</span>
+<span class="nf">$(EMIGEN_FILE_LIST)</span><span class="o">:</span> <span class="k">$(</span><span class="nv">EMIGEN_OUT</span><span class="k">)</span>/% : <span class="k">$(</span><span class="nv">EMIGEN_PREBUILT_PATH</span><span class="k">)</span>/%
+        @mkdir -p <span class="k">$(</span>dir <span class="nv">$@</span><span class="k">)</span>
+        cp -f $&lt; <span class="nv">$@</span>
+<span class="cp">endif</span>
+</pre></div>
+</div>
+</section>
+<section id="memorydevicelist-mt6765">
+<h1>MemoryDeviceList_MT6765<a class="headerlink" href="#memorydevicelist-mt6765" title="Permalink to this headline"></a></h1>
+<p>eMCP配置文件：<code class="docutils literal notranslate"><span class="pre">vendor/mediatek/proprietary/bootable/bootloader/preloader/tools/emigen/MT6765/MemoryDeviceList_MT6765.xls</span></code></p>
+</section>
+<section id="custom-memorydevice">
+<h1>custom_MemoryDevice<a class="headerlink" href="#custom-memorydevice" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">.xls</span></code>里面可能有很多行(一行一种eMCP)，这里相当于用于选择那些行(选择哪些eMCP)：<code class="docutils literal notranslate"><span class="pre">vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k62v1_64_bsp/inc/custom_MemoryDevice.h</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef __CUSTOM_MEMORYDEVICE__</span>
+<span class="cp">#define __CUSTOM_MEMORYDEVICE__</span>
+
+<span class="cm">/*</span>
+<span class="cm"> ****************************************************************************</span>
+<span class="cm"> [README , VERY IMPORTANT NOTICE]</span>
+<span class="cm"> --------------------------------</span>
+<span class="cm"> After user configured this C header file, not only C compiler compile it but</span>
+<span class="cm"> also auto-gen tool parse user&#39;s configure setting.</span>
+<span class="cm"> Here are recommend configure convention to make both work fine.</span>
+
+<span class="cm"> 1. All configurations in this file form as #define MACRO_NAME MACRO_VALUE format.</span>
+<span class="cm">    Note the #define must be the first non-space character of a line</span>
+
+<span class="cm"> 2. To disable the optional configurable item. Please use // before #define,</span>
+<span class="cm">    for example: //#define MEMORY_DEVICE_TYPE</span>
+
+<span class="cm"> 3. Please don&#39;t use #if , #elif , #else , #endif conditional macro key word here.</span>
+<span class="cm">    Such usage might cause compile result conflict with auto-gen tool parsing result.</span>
+<span class="cm">    Auto-Gen tool will show error and stop.</span>
+<span class="cm">    3.1.  any conditional keyword such as #if , #ifdef , #ifndef , #elif , #else detected.</span>
+<span class="cm">          execpt this #ifndef __CUSTOM_MEMORYDEVICE__</span>
+<span class="cm">    3.2.  any duplicated MACRO_NAME parsed. For example auto-gen tool got</span>
+<span class="cm">          2nd MEMORY_DEVICE_TYPE macro value.</span>
+<span class="cm"> ****************************************************************************</span>
+<span class="cm">*/</span><span class="w"></span>
+
+<span class="cm">/*</span>
+<span class="cm"> ****************************************************************************</span>
+<span class="cm"> Step 1: Specify memory device type and its complete part number</span>
+<span class="cm">         Possible memory device type: LPSDRAM (SDR, DDR)</span>
+<span class="cm"> ****************************************************************************</span>
+<span class="cm">*/</span><span class="w"></span>
+
+<span class="cp">#define BOARD_ID                MT6765_EVB</span>
+
+<span class="cp">#define CS_PART_NUMBER[0]       F0TQ26AAFTBCER</span>
+<span class="cp">#define CS_PART_NUMBER[1]       F0TQ27AAFTMCER</span>
+
+<span class="cp">#endif </span><span class="cm">/* __CUSTOM_MEMORYDEVICE__ */</span><span class="cp"></span>
+</pre></div>
+</div>
+</section>
+<section id="output-emi">
+<h1>output emi<a class="headerlink" href="#output-emi" title="Permalink to this headline"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">target/product/k62v1_64_bsp/obj/PRELOADER_OBJ/inc/custom_emi.h</span></code></p>
+</section>
+<section id="ddr3-ddr4">
+<h1>DDR3 DDR4<a class="headerlink" href="#ddr3-ddr4" title="Permalink to this headline"></a></h1>
+<p>在CPU引脚上有引脚通过上下拉来确定当前使用的DDR3还是DDR4</p>
+</section>
+<section id="emcp">
+<h1>eMCP示例<a class="headerlink" href="#emcp" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>KMGX6001BA_B514</p></li>
+<li><p>DDR认证信息可以从MTK Online —&gt; QVL(New)获取</p>
+<ul class="simple">
+<li><p>下载对应的eMCP参数</p></li>
+</ul>
+</li>
+<li><p>将下载的eMCP参数拷贝到：vendor/mediatek/proprietary/bootable/bootloader/preloader/tools/emigen/MT6765/MemoryDeviceList_MT6765.xls</p></li>
+<li><p>添加内存支持</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">--</span><span class="n">git</span> <span class="n">a</span><span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">bootable</span><span class="o">/</span><span class="n">bootloader</span><span class="o">/</span><span class="n">preloader</span><span class="o">/</span><span class="n">custom</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">inc</span><span class="o">/</span><span class="n">custom_MemoryDevice</span><span class="o">.</span><span class="n">h</span> <span class="n">b</span><span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">bootable</span><span class="o">/</span><span class="n">bootloader</span><span class="o">/</span><span class="n">preloader</span><span class="o">/</span><span class="n">custom</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">inc</span><span class="o">/</span><span class="n">custom_MemoryDevice</span><span class="o">.</span><span class="n">h</span>
+<span class="n">index</span> <span class="mf">5470e81183</span><span class="n">d</span><span class="o">..</span><span class="n">b1cfc458f7a</span> <span class="mi">100755</span>
+<span class="o">---</span> <span class="n">a</span><span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">bootable</span><span class="o">/</span><span class="n">bootloader</span><span class="o">/</span><span class="n">preloader</span><span class="o">/</span><span class="n">custom</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">inc</span><span class="o">/</span><span class="n">custom_MemoryDevice</span><span class="o">.</span><span class="n">h</span>
+<span class="o">+++</span> <span class="n">b</span><span class="o">/</span><span class="n">vendor</span><span class="o">/</span><span class="n">mediatek</span><span class="o">/</span><span class="n">proprietary</span><span class="o">/</span><span class="n">bootable</span><span class="o">/</span><span class="n">bootloader</span><span class="o">/</span><span class="n">preloader</span><span class="o">/</span><span class="n">custom</span><span class="o">/</span><span class="n">k62v1_64_bsp</span><span class="o">/</span><span class="n">inc</span><span class="o">/</span><span class="n">custom_MemoryDevice</span><span class="o">.</span><span class="n">h</span>
+<span class="o">@@</span> <span class="o">-</span><span class="mi">108</span><span class="p">,</span><span class="mi">6</span> <span class="o">+</span><span class="mi">108</span><span class="p">,</span><span class="mi">7</span> <span class="o">@@</span>
+ <span class="c1">#define CS_PART_NUMBER[0]       KMDD60018M_B320</span>
+ <span class="c1">#define CS_PART_NUMBER[1]       KMDH6001DA_B422</span>
+ <span class="c1">#define CS_PART_NUMBER[2]       KMDP6001DA_B425</span>
+<span class="o">+</span><span class="c1">#define CS_PART_NUMBER[3]       KMGX6001BA_B514</span>
+
+ <span class="c1">#endif /* __CUSTOM_MEMORYDEVICE__ */</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

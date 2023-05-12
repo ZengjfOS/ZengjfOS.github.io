@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Stream_ON hack</a></li>
+<li><a class="reference internal" href="#id1">回调函数</a></li>
+<li><a class="reference internal" href="#id2">调用路径</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="stream-on-hack">
+<h1>Stream_ON hack<a class="headerlink" href="#stream-on-hack" title="Permalink to this headline"></a></h1>
+<p>Stream ON函数处理流程</p>
+</section>
+<section id="id1">
+<h1>回调函数<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">const</span> <span class="n">struct</span> <span class="n">v4l2_ioctl_ops</span> <span class="n">mxc_isi_capture_ioctl_ops</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">vidioc_querycap</span>        <span class="o">=</span> <span class="n">mxc_isi_cap_querycap</span><span class="p">,</span>
+
+    <span class="o">.</span><span class="n">vidioc_enum_fmt_vid_cap_mplane</span>    <span class="o">=</span> <span class="n">mxc_isi_cap_enum_fmt_mplane</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_try_fmt_vid_cap_mplane</span>    <span class="o">=</span> <span class="n">mxc_isi_cap_try_fmt_mplane</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_s_fmt_vid_cap_mplane</span>    <span class="o">=</span> <span class="n">mxc_isi_cap_s_fmt_mplane</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_g_fmt_vid_cap_mplane</span>    <span class="o">=</span> <span class="n">mxc_isi_cap_g_fmt_mplane</span><span class="p">,</span>
+
+    <span class="o">.</span><span class="n">vidioc_reqbufs</span>            <span class="o">=</span> <span class="n">vb2_ioctl_reqbufs</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_querybuf</span>        <span class="o">=</span> <span class="n">vb2_ioctl_querybuf</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_qbuf</span>            <span class="o">=</span> <span class="n">vb2_ioctl_qbuf</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_dqbuf</span>            <span class="o">=</span> <span class="n">vb2_ioctl_dqbuf</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_expbuf</span>            <span class="o">=</span> <span class="n">vb2_ioctl_expbuf</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_prepare_buf</span>        <span class="o">=</span> <span class="n">vb2_ioctl_prepare_buf</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_create_bufs</span>        <span class="o">=</span> <span class="n">vb2_ioctl_create_bufs</span><span class="p">,</span>
+
+    <span class="o">.</span><span class="n">vidioc_streamon</span>        <span class="o">=</span> <span class="n">mxc_isi_cap_streamon</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_streamoff</span>        <span class="o">=</span> <span class="n">mxc_isi_cap_streamoff</span><span class="p">,</span>
+
+    <span class="o">.</span><span class="n">vidioc_g_selection</span>        <span class="o">=</span> <span class="n">mxc_isi_cap_g_selection</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_s_selection</span>        <span class="o">=</span> <span class="n">mxc_isi_cap_s_selection</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_g_chip_ident</span>    <span class="o">=</span> <span class="n">mxc_isi_cap_g_chip_ident</span><span class="p">,</span>
+
+    <span class="o">.</span><span class="n">vidioc_g_parm</span>            <span class="o">=</span> <span class="n">mxc_isi_cap_g_parm</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_s_parm</span>            <span class="o">=</span> <span class="n">mxc_isi_cap_s_parm</span><span class="p">,</span>
+
+    <span class="o">.</span><span class="n">vidioc_enum_framesizes</span> <span class="o">=</span> <span class="n">mxc_isi_cap_enum_framesizes</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">vidioc_enum_frameintervals</span> <span class="o">=</span> <span class="n">mxc_isi_cap_enum_frameintervals</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>调用路径<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>static int mxc_isi_cap_streamon(struct file *file, void *priv, enum v4l2_buf_type type)</p>
+<ul>
+<li><p>ret = v4l2_subdev_call(subdev, video, s_stream, enable);</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">const</span> <span class="n">struct</span> <span class="n">v4l2_subdev_core_ops</span> <span class="n">max9286_core_ops</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">s_power</span>    <span class="o">=</span> <span class="n">max9286_set_power</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="n">static</span> <span class="n">const</span> <span class="n">struct</span> <span class="n">v4l2_subdev_video_ops</span> <span class="n">max9286_video_ops</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">s_parm</span> <span class="o">=</span>    <span class="n">max9286_s_parm</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">g_parm</span> <span class="o">=</span>    <span class="n">max9286_g_parm</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">s_stream</span>        <span class="o">=</span> <span class="n">max9286_s_stream</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="n">static</span> <span class="n">const</span> <span class="n">struct</span> <span class="n">v4l2_subdev_ops</span> <span class="n">max9286_subdev_ops</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">core</span>    <span class="o">=</span> <span class="o">&amp;</span><span class="n">max9286_core_ops</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">pad</span>    <span class="o">=</span> <span class="o">&amp;</span><span class="n">max9286_pad_ops</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">video</span>    <span class="o">=</span> <span class="o">&amp;</span><span class="n">max9286_video_ops</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>static int max9286_s_stream(struct v4l2_subdev *sd, int enable)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

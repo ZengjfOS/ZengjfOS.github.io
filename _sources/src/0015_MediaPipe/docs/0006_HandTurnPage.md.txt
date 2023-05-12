@@ -1,0 +1,124 @@
+# Hand Turn Page
+
+训练翻页手势
+
+# 参考文档
+
+* [hand-gesture-recognition-using-mediapipe](https://github.com/kinivi/hand-gesture-recognition-mediapipe)
+
+# capture data
+
+* python3 LogTools.py HandTurnPage -mode live
+  * [HandTurnPage.py](refers/0006_HandTurnPage/HandTurnPage.py)
+    * z: open data file
+    * x: close data file
+    * a: start or stop write to file
+    * 加入了结果预测代码，如果是第一次采集数据，可以用
+      * [0004_MediaPipeHands.md](0004_MediaPipeHands.md)
+        * 这里的程序可以单独用于数据采集，帧率比较小，可以调快
+
+# Train
+
+* [0006_HandTurnPage](refers/0006_HandTurnPage)
+  * [HandTurnPage_Colab.ipynb](refers/0006_HandTurnPage/HandTurnPage_Colab.ipynb)
+  * [HandTurnPage_Local.ipynb](refers/0006_HandTurnPage/HandTurnPage_Local.ipynb)
+
+# predict
+
+* [HandTurnPage.py](refers/0006_HandTurnPage/HandTurnPage.py)
+  * python3 LogTools.py HandTurnPage -mode live
+  * python3 LogTools.py HandTurnPage -mode predict
+
+# Android
+
+* 基于patch
+  * [support-left-right-ok-hand-gesture.patch](refers/0005_HandGesture/support-left-right-ok-hand-gesture.patch)
+
+```diff
+diff --git a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
+index 421cfb1..e5ed7b9 100644
+--- a/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
++++ b/mediapipe/examples/android/solutions/hands/src/main/java/com/google/mediapipe/examples/hands/MainActivity.java
+@@ -57,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
+ 
+   private Hands hands;
+   public Interpreter interpreter = null;
+-  public String[] label = {"left", "right", "ok"};
++  // public String[] label = {"left", "right", "ok"};
++  public String[] label = {"fist", "palm"};
++  public MotionData preMotionData = null;
+   public int maxAt = 0;
+   public Handler mHandler = new Handler() {
+     @Override
+@@ -99,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
+     setupLiveDemoUiComponents();
+ 
+     try {
+-      interpreter = new Interpreter(loadModelFile("HandGesture"));
++      // interpreter = new Interpreter(loadModelFile("HandGesture"));
++      interpreter = new Interpreter(loadModelFile("HandTurnPage"));
+       interpreter.allocateTensors();
+     } catch (IOException e) {
+       e.printStackTrace();
+@@ -424,11 +427,49 @@ public class MainActivity extends AppCompatActivity {
+       maxAt = outputs[j] > outputs[maxAt] ? j : maxAt;
+     }
+ 
+-    Message message = new Message();
+-    message.what = 1;
+-    mHandler.sendMessage(message);
+-
+     Log.e(TAG, Arrays.toString(output.array()) + " -> " + maxAt + " -> " + label[maxAt]);
++
++    int width = result.inputBitmap().getWidth();
++    int height = result.inputBitmap().getHeight();
++    MotionData motionData = new MotionData();
++    for (NormalizedLandmark landmark : result.multiHandLandmarks().get(0).getLandmarkList()) {
++      motionData.x += wristLandmark.getX() * width;
++      motionData.y += wristLandmark.getY() * height;
++    }
++    motionData.x /= 21;
++    motionData.y /= 21;
++    motionData.motion = label[maxAt];
++
++    if (preMotionData == null) {
++      preMotionData = motionData;
++    } else {
++      if (preMotionData.motion == "palm" && motionData.motion == "palm") {
++        int xOffset = motionData.x - preMotionData.x;
++        int yOffset = motionData.x - preMotionData.x;
++        String direction = "static";
++
++        Log.e(TAG, "x offset: " + (motionData.x - preMotionData.x));
++        Log.e(TAG, "y offset: " + (motionData.y - preMotionData.y));
++
++        if (xOffset > 20)
++          direction = "right";
++        if (xOffset < -20)
++          direction = "left";
++
++        String finalDirection = direction;
++        runOnUiThread(() -> {
++            setTitle(finalDirection);
++        });
++      }
++    }
++
++    preMotionData = motionData;
++  }
++
++  public class MotionData {
++    public String motion = "fist";
++    public int x = 0;
++    public int y = 0;
+   }
+ 
+   private ByteBuffer loadModelFile(String model) throws IOException {
+```
+
+程序运行效果，视频转换
+
+* 320xAUTO
+* 10 FPS
+
+![0006_HandTurnPage.gif](images/0006_HandTurnPage.gif)

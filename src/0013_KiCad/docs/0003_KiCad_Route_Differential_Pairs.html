@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">KiCad Route Differential Pairs</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#kicad">KiCad阻抗计算器</a></li>
+<li><a class="reference internal" href="#id2">设置差分对</a></li>
+<li><a class="reference internal" href="#id3">差分对布线</a></li>
+<li><a class="reference internal" href="#id4">差分对长度匹配</a></li>
+<li><a class="reference internal" href="#id5">阻抗板参数分析</a></li>
+<li><a class="reference internal" href="#id6">在线阻抗计算网址</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="kicad-route-differential-pairs">
+<h1>KiCad Route Differential Pairs<a class="headerlink" href="#kicad-route-differential-pairs" title="Permalink to this headline"></a></h1>
+<p>差分对阻抗线计算、设置、等长大体怎么处理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.digikey.com/en/maker/projects/how-to-route-differential-pairs-in-kicad-for-usb/45b99011f5d34879ae1831dce1f13e93">How to Route Differential Pairs in KiCad (for USB)</a></p></li>
+<li><p><a class="reference external" href="http://club.szlcsc.com/article/details_11533_1.html">嘉立创阻抗多层板：层压结构及参数</a></p></li>
+<li><p><a class="reference external" href="https://www.jlc.com/portal/vtechnology.html">嘉立创工艺参数</a></p></li>
+</ul>
+</section>
+<section id="kicad">
+<h1>KiCad阻抗计算器<a class="headerlink" href="#kicad" title="Permalink to this headline"></a></h1>
+<p>[Tools] -&gt; [Calculator Tools] -&gt; [TransLine]</p>
+<p><img alt="0003_KiCad_PCB_Calculator_TransLine.png" src="../../../_images/0003_KiCad_PCB_Calculator_TransLine.png" /></p>
+<ul class="simple">
+<li><p>Substrate Parameters section</p>
+<ul>
+<li><p>Er (dielectric constant): 4.5</p>
+<ul>
+<li><p>介电常数</p></li>
+</ul>
+</li>
+<li><p>TanD (dielectric loss factor): 0.02</p>
+<ul>
+<li><p>介电损耗因子</p></li>
+</ul>
+</li>
+<li><p>Rho (conductor’s specific resistance): 1.72e-08</p>
+<ul>
+<li><p>导体的电阻率</p></li>
+</ul>
+</li>
+<li><p>H (distance between traces and bottom ground plane): 1.6 mm (board thickness)</p>
+<ul>
+<li><p>迹线与底部接地平面之间的距离</p></li>
+</ul>
+</li>
+<li><p>H_t (distance between traces and top ground plane): 10000 mm (we want this to be large to approximate infinity, as we are using an external layer for our differential pair–set this to the FR4 thickness if you are routing your USB lines on an internal layer sandwiched between two ground planes)</p>
+<ul>
+<li><p>迹线与顶部接地平面之间的距离</p></li>
+</ul>
+</li>
+<li><p>T (copper thickness): 0.03556 mm (corresponds to 1 oz. copper)</p>
+<ul>
+<li><p>铜厚</p></li>
+</ul>
+</li>
+<li><p>Rough (roughness of surface): 0 (not needed for our calculations)</p>
+<ul>
+<li><p>表面粗糙度</p></li>
+</ul>
+</li>
+<li><p>mu Rel C (relative permeability of conductor): 1 (not needed for our calculations)</p>
+<ul>
+<li><p>导体的相对磁导率</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Physical Parameters section</p>
+<ul>
+<li><p>the smallest possible distance between the traces (S) for your differential pair, as this will help keep trace width down.</p>
+<ul>
+<li><p><strong>没看懂什么意思</strong></p></li>
+</ul>
+</li>
+<li><p>modify the trace width (W) until you achieve the desired differential impedance.</p></li>
+<li><p>trace length (L) is not important for what we’re looking for in this case.</p></li>
+</ul>
+</li>
+<li><p>Zdiff (differential impedance) is equal to 2 * Zodd, so a Zodd of 45 Ω gives us a Zdiff of 90 Ω.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>设置差分对<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>[File] -&gt; [Board Setup] -&gt; [Design Rules] -&gt; [Net Classes]</p>
+<p><img alt="0003_KiCad_PCB_Board_Setup_Net_Classes.png" src="../../../_images/0003_KiCad_PCB_Board_Setup_Net_Classes.png" /></p>
+</section>
+<section id="id3">
+<h1>差分对布线<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>because the footprint pads are so small, we need to route away from the pads first before using the differential pair tool.</p>
+<ul>
+<li><p>由于芯片引脚宽度可能小于差分对线宽，所以要先将线引到合适的地方，再用差分对信号线宽布线，貌似这个只能这样处理，和引脚同样宽；</p></li>
+</ul>
+</li>
+<li><p>if the differential pair widths are too large for the end component’s pads, use single-track routing with a custom width to bring the traces in to connect to the pads.</p>
+<ul>
+<li><p>在差分线的末尾，也会遇到同样的引脚线宽和差分对线宽不吻合问题，同上处理；</p></li>
+</ul>
+</li>
+<li><p>如下图所示，可以看到起始引脚、差分线、终端引脚走线方式：<br />
+<img alt="0003_KiCad_PCB_Differential_Pair_Begin_End_Type.jpg" src="../../../_images/0003_KiCad_PCB_Differential_Pair_Begin_End_Type.jpg" /></p></li>
+</ul>
+</section>
+<section id="id4">
+<h1>差分对长度匹配<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<p>For high-speed buses, you almost always want the bits on each bus line to arrive at their destination at the same time (or as close as possible to the same time). If traces are different lengths, bits may arrive at different times!</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.nwengineeringllc.com/article/guide-to-pcb-trace-length-matching-in-high-speed-design.php">Guide to PCB Trace Length Matching in High Speed Design</a></p></li>
+</ul>
+<p>[Route] -&gt; [Tune Skew of a differential pair] -&gt; 选择需要修改的线 -&gt; [右键] -&gt; [Length Tuning Settings…]</p>
+<p><img alt="0003_KiCad_PCB_Differential_Pair_Skew_Tuning.jpg" src="../../../_images/0003_KiCad_PCB_Differential_Pair_Skew_Tuning.jpg" /></p>
+</section>
+<section id="id5">
+<h1>阻抗板参数分析<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Board</span> <span class="n">thickness</span>  <span class="p">:</span> <span class="mf">1.56</span><span class="n">mm</span>
+<span class="n">Finished</span> <span class="n">copper</span> <span class="n">weight</span> <span class="n">inners</span> <span class="p">:</span> <span class="mi">1</span><span class="n">oz</span>
+<span class="n">Finished</span> <span class="n">copper</span> <span class="n">weight</span> <span class="n">outers</span> <span class="p">:</span> <span class="mi">1</span><span class="n">oz</span>
+
+<span class="n">Board</span> <span class="n">finish</span> <span class="p">:</span> <span class="n">OSP</span>
+<span class="n">Material</span> <span class="nb">type</span> <span class="p">:</span> <span class="n">FR4</span>
+<span class="n">Colour</span> <span class="n">of</span> <span class="n">solder</span> <span class="n">resists</span> <span class="p">:</span> <span class="n">Green</span>
+<span class="n">Colour</span> <span class="n">of</span> <span class="n">silk</span> <span class="n">screens</span> <span class="p">:</span> <span class="n">White</span> <span class="n">Only</span> <span class="n">on</span> <span class="n">the</span> <span class="n">top</span> <span class="n">side</span>
+<span class="n">Board</span> <span class="n">to</span> <span class="p">:</span> <span class="n">UL94</span><span class="o">-</span><span class="n">V0</span>
+<span class="n">TG</span> <span class="o">&gt;=</span><span class="mi">130</span>
+
+<span class="mi">50</span><span class="n">R</span> <span class="n">trace</span> <span class="n">width</span> <span class="mf">0.13</span><span class="n">mm</span><span class="o">@</span> <span class="mi">3</span><span class="n">GHz</span>
+<span class="mi">90</span><span class="n">R</span> <span class="n">diff</span> <span class="n">pair</span> <span class="n">width</span> <span class="mf">0.147</span> <span class="n">spacing</span> <span class="mf">0.253</span><span class="n">mm</span> <span class="o">@</span> <span class="mf">2.5</span><span class="n">GHz</span>
+<span class="mi">100</span><span class="n">R</span> <span class="n">diff</span> <span class="n">pair</span> <span class="n">width</span> <span class="mf">0.127</span> <span class="n">spacing</span> <span class="mf">0.253</span><span class="n">mm</span> <span class="o">@</span> <span class="mi">2</span><span class="n">GHz</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>参考文档：<a class="reference external" href="https://www.jlc.com/portal/vtechnology.html">嘉立创工艺参数</a></p>
+<ul>
+<li><p>Board thickness(板厚) : 1.56mm</p></li>
+<li><p>Finished copper weight inners(内层铜厚) : 1oz</p></li>
+<li><p>Finished copper weight outers(外层铜厚) : 1oz</p></li>
+<li><p>Board finish : OSP(有机保焊膜，又称护铜剂)</p></li>
+<li><p>Material type(材料) : FR4（全玻纤）</p></li>
+<li><p>Colour of solder resists(阻焊层颜色) : Green</p></li>
+<li><p>Colour of silk screens(丝印层颜色) : White Only on the top side</p></li>
+<li><p>Board to : UL94-V0(垂直燃烧燃烧在10秒内停止，不允许燃烧滴落)</p></li>
+<li><p>TG &gt;=130(基材保持刚性的最高温度(℃))</p></li>
+<li><p>50R trace width 0.13mm &#64; 3GHz(50欧差分线线宽0.13mm，频率3GHz)</p></li>
+<li><p>90R diff pair width 0.147 spacing 0.253mm &#64; 2.5GHz(90欧差分线线宽0.147mm，间隙0.253mm，频率2.5GHz)</p></li>
+<li><p>100R diff pair width 0.127 spacing 0.253mm &#64; 2GHz(100欧差分线线宽0.127mm，间隙0.253mm，频率2GHz)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id6">
+<h1>在线阻抗计算网址<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://www.pcbway.com/pcb_prototype/impedance_calculator.html</p></li>
+<li><p>https://www.eeweb.com/tools/edge-coupled-microstrip-impedance/</p></li>
+</ul>
+<p><img alt="0003_KiCad_PCB_Online_impedance_Calculator.png" src="../../../_images/0003_KiCad_PCB_Online_impedance_Calculator.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

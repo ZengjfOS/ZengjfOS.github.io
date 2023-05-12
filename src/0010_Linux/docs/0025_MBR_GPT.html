@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">MBR GPT</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">术语及缩写</a></li>
+<li><a class="reference internal" href="#mbr">MBR分区数据格式</a></li>
+<li><a class="reference internal" href="#gpt">GPT分区数据格式</a></li>
+<li><a class="reference internal" href="#rpi-sd-info">RPI SD info</a></li>
+<li><a class="reference internal" href="#id3">MBR</a></li>
+<li><a class="reference internal" href="#id4">GPT</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mbr-gpt">
+<h1>MBR GPT<a class="headerlink" href="#mbr-gpt" title="Permalink to this headline"></a></h1>
+<p>分析MBR GPT分区格式</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/gkxg001/article/details/82870109">MBR分区表详解</a></p></li>
+<li><p><a class="reference external" href="https://github.com/ZengjfOS/batTool/tree/bpttool">bpt tool</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/diaoxuesong/article/details/9406015">GPT分区数据格式分析(图已补上)</a></p></li>
+<li><p><a class="reference external" href="https://www.cnblogs.com/jswang/p/9071847.html">硬盘基本知识（磁头、磁道、扇区、柱面）</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>术语及缩写<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>术语/缩写</p></th>
+<th class="text-center head"><p>解释</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>GPT</p></td>
+<td class="text-center"><p>GUID Partition Table</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>MBR</p></td>
+<td class="text-center"><p>Master Boot Record</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>LBA</p></td>
+<td class="text-center"><p>Logic Block Address</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mbr">
+<h1>MBR分区数据格式<a class="headerlink" href="#mbr" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>存贮字节位</p></th>
+<th class="text-left head"><p>内容及含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>第1字节</p></td>
+<td class="text-left"><p>引导标志。若值为80H表示活动分区，若值为00H表示非活动分区。</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>第2、3、4字节</p></td>
+<td class="text-left"><p>本分区的起始磁头号、扇区号、柱面号。其中：<br> 磁头号——第2字节；<br> 扇区号——第3字节的低6位；<br> 柱面号——为第3字节高2位+第4字节8位。</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>第5字节</p></td>
+<td class="text-left"><p>分区类型符：<br> 00H——表示该分区未用（即没有指定）；<br> 06H——FAT16基本分区；<br> 0BH——FAT32基本分区；<br> 05H——扩展分区；<br> 07H——NTFS分区；<br> 0FH——（LBA模式）扩展分区（83H为Linux分区等）。</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>第6、7、8字节</p></td>
+<td class="text-left"><p>本分区的结束磁头号、扇区号、柱面号。其中：<br> 磁头号——第6字节；<br> 扇区号——第7字节的低6位；<br> 柱面号——第7字节的高2位+第8字节。</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>第9、10、11、12字节</p></td>
+<td class="text-left"><p>逻辑起始扇区号 ，本分区之前已用了的扇区数。</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>第13、14、15、16字节</p></td>
+<td class="text-left"><p>本分区的总扇区数。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gpt">
+<h1>GPT分区数据格式<a class="headerlink" href="#gpt" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>起始字节</p></th>
+<th class="text-left head"><p>长度</p></th>
+<th class="text-left head"><p>内容</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>0</p></td>
+<td class="text-left"><p>16字节</p></td>
+<td class="text-left"><p>分区类型GUID</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>16</p></td>
+<td class="text-left"><p>16字节</p></td>
+<td class="text-left"><p>分区GUID</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>32</p></td>
+<td class="text-left"><p>8字节</p></td>
+<td class="text-left"><p>起始LBA（小端序）</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>40</p></td>
+<td class="text-left"><p>8字节</p></td>
+<td class="text-left"><p>末尾LBA</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>48</p></td>
+<td class="text-left"><p>8字节</p></td>
+<td class="text-left"><p>属性标签（如：bit60表示“只读”）</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>56</p></td>
+<td class="text-left"><p>72字节</p></td>
+<td class="text-left"><p>分区名（可以包括36个UTF-16（小端序）字符）</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="rpi-sd-info">
+<h1>RPI SD info<a class="headerlink" href="#rpi-sd-info" title="Permalink to this headline"></a></h1>
+<p>fidsk p获取信息</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Command</span> <span class="p">(</span><span class="n">m</span> <span class="k">for</span> <span class="n">help</span><span class="p">):</span> <span class="n">p</span>
+<span class="n">Disk</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mmcblk0</span><span class="p">:</span> <span class="mf">14.9</span> <span class="n">GiB</span><span class="p">,</span> <span class="mi">15931539456</span> <span class="nb">bytes</span><span class="p">,</span> <span class="mi">31116288</span> <span class="n">sectors</span>
+<span class="n">Units</span><span class="p">:</span> <span class="n">sectors</span> <span class="n">of</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">512</span> <span class="o">=</span> <span class="mi">512</span> <span class="nb">bytes</span>
+<span class="n">Sector</span> <span class="n">size</span> <span class="p">(</span><span class="n">logical</span><span class="o">/</span><span class="n">physical</span><span class="p">):</span> <span class="mi">512</span> <span class="nb">bytes</span> <span class="o">/</span> <span class="mi">512</span> <span class="nb">bytes</span>
+<span class="n">I</span><span class="o">/</span><span class="n">O</span> <span class="n">size</span> <span class="p">(</span><span class="n">minimum</span><span class="o">/</span><span class="n">optimal</span><span class="p">):</span> <span class="mi">512</span> <span class="nb">bytes</span> <span class="o">/</span> <span class="mi">512</span> <span class="nb">bytes</span>
+<span class="n">Disklabel</span> <span class="nb">type</span><span class="p">:</span> <span class="n">dos</span>
+<span class="n">Disk</span> <span class="n">identifier</span><span class="p">:</span> <span class="mh">0x92edae2c</span>
+
+<span class="n">Device</span>         <span class="n">Boot</span> <span class="n">Start</span>      <span class="n">End</span>  <span class="n">Sectors</span>  <span class="n">Size</span> <span class="n">Id</span> <span class="n">Type</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mmcblk0p1</span>       <span class="mi">8192</span>    <span class="mi">98045</span>    <span class="mi">89854</span> <span class="mf">43.9</span><span class="n">M</span>  <span class="n">c</span> <span class="n">W95</span> <span class="n">FAT32</span> <span class="p">(</span><span class="n">LBA</span><span class="p">)</span>
+<span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mmcblk0p2</span>      <span class="mi">98304</span> <span class="mi">31116287</span> <span class="mi">31017984</span> <span class="mf">14.8</span><span class="n">G</span> <span class="mi">83</span> <span class="n">Linux</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h1>MBR<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">dd</span> <span class="pre">if=/dev/mmcblk0</span> <span class="pre">of=mmcblk0.img</span> <span class="pre">count=1</span> <span class="pre">bs=512</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>00000000: fab8 0010 8ed0 bc00 b0b8 0000 8ed8 8ec0  ................
+00000010: fbbe 007c bf00 06b9 0002 f3a4 ea21 0600  ...|.........!..
+00000020: 00be be07 3804 750b 83c6 1081 fefe 0775  ....8.u........u
+00000030: f3eb 16b4 02b0 01bb 007c b280 8a74 018b  .........|...t..
+00000040: 4c02 cd13 ea00 7c00 00eb fe00 0000 0000  L.....|.........
+00000050: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000060: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000070: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000080: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000090: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000000a0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000000b0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000000c0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000000d0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000000e0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000000f0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000100: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000110: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000120: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000130: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000140: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000150: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000160: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000170: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000180: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+00000190: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000001a0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000001b0: 0000 0000 0000 0000 2cae ed92 0000 0082  ........,.......
+000001c0: 0300 0c1a 1206 0020 0000 fe5e 0100 001e  ....... ...^....
+000001d0: 1906 83fe ffff 0080 0100 004c d901 0000  ...........L....
+000001e0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+000001f0: 0000 0000 0000 0000 0000 0000 0000 55aa  ..............U.
+00000200: 0a                                       .
+</pre></div>
+</div>
+</li>
+<li><p>起始磁头、扇区、柱面地址，基本只对硬盘有用，SD卡不关注；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1be</span></code> ~ <code class="docutils literal notranslate"><span class="pre">0x1dd</span></code>: <code class="docutils literal notranslate"><span class="pre">0082</span> <span class="pre">0300</span> <span class="pre">0c1a</span> <span class="pre">1206</span> <span class="pre">0020</span> <span class="pre">0000</span> <span class="pre">fe5e</span> <span class="pre">0100</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">00</span></code>: 引导标志</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0c</span></code>: W95 FAT32 (LBA)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">00200000</span></code>: 0x2000 – ‭8192‬ sector – offset sectors – 本分区相对物理0号扇区的偏移量</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fe5e0100</span></code>: 0x15efe – ‭89854‬ sector – content sectors – 本分区所占的扇区总数</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h1>GPT<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>需要注意的是SD/eMMC的LBA可能不是512B，所以需要注意GPT是以LBA来算的；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dd</span> <span class="pre">if=device-partitions.img</span> <span class="pre">of=gpt.img</span> <span class="pre">count=2</span> <span class="pre">bs=1024</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">00000000</span><span class="p">:</span> <span class="n">faeb</span> <span class="n">fe00</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000010</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000020</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000030</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000040</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000050</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000060</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000070</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000080</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000090</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000000</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000000</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000000</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000000</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000000e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000000</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000100</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000110</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000120</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000130</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000140</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000150</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000160</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000170</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000180</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000190</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000001</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000001</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000001</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0100</span> <span class="n">eeff</span> <span class="n">ffff</span> <span class="mi">0100</span> <span class="mi">0000</span> <span class="n">ffff</span> <span class="mi">7</span><span class="n">f03</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000001</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000001e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000001</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">55</span><span class="n">aa</span>  <span class="o">..............</span><span class="n">U</span><span class="o">.</span>
+<span class="mi">00000200</span><span class="p">:</span> <span class="mi">4546</span> <span class="mi">4920</span> <span class="mi">5041</span> <span class="mi">5254</span> <span class="mi">0000</span> <span class="mi">0100</span> <span class="mi">5</span><span class="n">c00</span> <span class="mi">0000</span>  <span class="n">EFI</span> <span class="n">PART</span><span class="o">....</span>\<span class="o">...</span>
+<span class="mi">00000210</span><span class="p">:</span> <span class="n">e0a3</span> <span class="mi">9370</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0100</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">...</span><span class="n">p</span><span class="o">............</span>
+<span class="mi">00000220</span><span class="p">:</span> <span class="n">ffff</span> <span class="mi">7</span><span class="n">f03</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">2200</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">........</span><span class="s2">&quot;.......</span>
+<span class="mi">00000230</span><span class="p">:</span> <span class="n">deff</span> <span class="mi">7</span><span class="n">f03</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">1765</span> <span class="n">f86c</span> <span class="n">fee1</span> <span class="n">b843</span>  <span class="o">.........</span><span class="n">e</span><span class="o">.</span><span class="n">l</span><span class="o">...</span><span class="n">C</span>
+<span class="mi">00000240</span><span class="p">:</span> <span class="n">b51a</span> <span class="mi">8</span><span class="n">cf9</span> <span class="n">bed7</span> <span class="n">d016</span> <span class="mi">0200</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000250</span><span class="p">:</span> <span class="mi">8000</span> <span class="mi">0000</span> <span class="mi">8000</span> <span class="mi">0000</span> <span class="mi">2771</span> <span class="n">d89b</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">........</span><span class="s1">&#39;q......</span>
+<span class="mi">00000260</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000270</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000280</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000290</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000002</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000002</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000002</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000002</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000002e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000002</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000300</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000310</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000320</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000330</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000340</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000350</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000360</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000370</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000380</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000390</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000003</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000003</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000003</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000003</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000003e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000003</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000400</span><span class="p">:</span> <span class="mi">2873</span> <span class="mi">2</span><span class="n">ac1</span> <span class="mi">1</span><span class="n">ff8</span> <span class="n">d211</span> <span class="n">ba4b</span> <span class="mi">00</span><span class="n">a0</span> <span class="n">c93e</span> <span class="n">c93b</span>  <span class="p">(</span><span class="n">s</span><span class="o">*......</span><span class="n">K</span><span class="o">...&gt;.</span><span class="p">;</span>
+<span class="mi">00000410</span><span class="p">:</span> <span class="n">f386</span> <span class="mi">18</span><span class="n">b5</span> <span class="mi">2</span><span class="n">d05</span> <span class="mi">6541</span> <span class="mi">8256</span> <span class="mi">0574</span> <span class="mi">73</span><span class="n">a9</span> <span class="n">cd3d</span>  <span class="o">....-.</span><span class="n">eA</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">ts</span><span class="o">..=</span>
+<span class="mi">00000420</span><span class="p">:</span> <span class="mi">0040</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="n">ff7f</span> <span class="mi">0600</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">.@..............</span>
+<span class="mi">00000430</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">6200</span> <span class="mi">6</span><span class="n">f00</span> <span class="mi">6</span><span class="n">f00</span> <span class="mi">7400</span>  <span class="o">........</span><span class="n">b</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">t</span><span class="o">.</span>
+<span class="mi">00000440</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000450</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000460</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000470</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000480</span><span class="p">:</span> <span class="n">af3d</span> <span class="n">c60f</span> <span class="mi">8384</span> <span class="mi">7247</span> <span class="mf">8e79</span> <span class="mi">3</span><span class="n">d69</span> <span class="n">d847</span> <span class="mi">7</span><span class="n">de4</span>  <span class="o">.=....</span><span class="n">rG</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">i</span><span class="o">.</span><span class="n">G</span><span class="p">}</span><span class="o">.</span>
+<span class="mi">00000490</span><span class="p">:</span> <span class="mi">23</span><span class="n">b6</span> <span class="n">dee4</span> <span class="mi">8138</span> <span class="n">f141</span> <span class="n">a3fc</span> <span class="mi">1295</span> <span class="n">f6e2</span> <span class="n">b013</span>  <span class="c1">#....8.A........</span>
+<span class="mi">000004</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0080</span> <span class="mi">0600</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="n">ffef</span> <span class="mi">7</span><span class="n">f03</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000004</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">6600</span> <span class="mi">7300</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">........</span><span class="n">f</span><span class="o">.</span><span class="n">s</span><span class="o">.....</span>
+<span class="mi">000004</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000004</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000004e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000004</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000500</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000510</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000520</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000530</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000540</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000550</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000560</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000570</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000580</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000590</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000005</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000005</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000005</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000005</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000005e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000005</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000600</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000610</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000620</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000630</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000640</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000650</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000660</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000670</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000680</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000690</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000006</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000006</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000006</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000006</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000006e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000006</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000700</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000710</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000720</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000730</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000740</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000750</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000760</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000770</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000780</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000790</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000007</span><span class="n">a0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000007</span><span class="n">b0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000007</span><span class="n">c0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000007</span><span class="n">d0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mf">000007e0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">000007</span><span class="n">f0</span><span class="p">:</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span>  <span class="o">................</span>
+<span class="mi">00000800</span><span class="p">:</span> <span class="mi">0</span><span class="n">a</span>                                       <span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0x1be</span></code> ~ <code class="docutils literal notranslate"><span class="pre">0x1dd</span></code>: <code class="docutils literal notranslate"><span class="pre">0000</span> <span class="pre">0100</span> <span class="pre">eeff</span> <span class="pre">ffff</span> <span class="pre">0100</span> <span class="pre">0000</span> <span class="pre">ffff</span> <span class="pre">7f03</span> <span class="pre">0000</span></code></p>
+<ul class="simple">
+<li><p>0xEE</p></li>
+</ul>
+</li>
+<li><p>0x400(LBA2)：</p>
+<ul class="simple">
+<li><p>2873 2ac1 1ff8 d211 ba4b 00a0 c93e c93b: 分区类型GUID</p></li>
+<li><p>f386 18b5 2d05 6541 8256 0574 73a9 cd3d: 分区GUID</p></li>
+<li><p>0040 0000 0000 0000: LBA开始 – 0x400</p></li>
+<li><p>ff7f 0600 0000 0000: LBA结束 – 0x67FFF</p></li>
+<li><p>6200 6f00 6f00 7400: 分区名</p></li>
+</ul>
+</li>
+<li><p>bpt配置信息</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pi@raspberrypi:~/zengjf/bpttool/output $ cat device-partitions.bpt
+{
+  &quot;settings&quot;: {
+    &quot;ab_suffixes&quot;: [&quot;_a&quot;, &quot;_b&quot;],
+    &quot;disk_size&quot;: 30064771072,
+    &quot;disk_alignment&quot;: 2097152,
+    &quot;disk_guid&quot;: &quot;6cf86517-e1fe-43b8-b51a-8cf9bed7d016&quot;
+  },
+  &quot;partitions&quot;: [
+    {
+      &quot;label&quot;: &quot;boot&quot;,
+      &quot;offset&quot;: 8388608,
+      &quot;size&quot;: 209715200,
+      &quot;grow&quot;: false,
+      &quot;guid&quot;: &quot;b51886f3-052d-4165-8256-057473a9cd3d&quot;,
+      &quot;type_guid&quot;: &quot;c12a7328-f81f-11d2-ba4b-00a0c93ec93b&quot;,
+      &quot;flags&quot;: &quot;0x0000000000000000&quot;,
+      &quot;ignore&quot;: false,
+      &quot;ab&quot;: false,
+      &quot;ab_expanded&quot;: false,
+      &quot;position&quot;: 0
+    },
+    {
+      &quot;label&quot;: &quot;fs&quot;,
+      &quot;offset&quot;: 218103808,
+      &quot;size&quot;: 29844570112,
+      &quot;grow&quot;: true,
+      &quot;guid&quot;: &quot;e4deb623-3881-41f1-a3fc-1295f6e2b013&quot;,
+      &quot;type_guid&quot;: &quot;0fc63daf-8483-4772-8e79-3d69d8477de4&quot;,
+      &quot;flags&quot;: &quot;0x0000000000000000&quot;,
+      &quot;ignore&quot;: false,
+      &quot;ab&quot;: false,
+      &quot;ab_expanded&quot;: false,
+      &quot;position&quot;: 0
+    }
+  ]
+}
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

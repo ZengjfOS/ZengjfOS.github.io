@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SoC设备树DTS分析</a></li>
+<li><a class="reference internal" href="#bash">配置bash环境变量</a></li>
+<li><a class="reference internal" href="#soc-datasheet">SoC Datasheet</a></li>
+<li><a class="reference internal" href="#gpio-uart-i2c-dts">GPIO UART I2C DTS分析</a></li>
+<li><a class="reference internal" href="#dtsdriver">DTS如何关联Driver</a></li>
+<li><a class="reference internal" href="#device-driver-match">Device Driver match</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="socdts">
+<h1>SoC设备树DTS分析<a class="headerlink" href="#socdts" title="Permalink to this headline"></a></h1>
+<p>怎么分析芯片设备树</p>
+</section>
+<section id="bash">
+<h1>配置bash环境变量<a class="headerlink" href="#bash" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>tail ~/.bashrc</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...省略</span>
+
+<span class="n">LINUX_SRC</span><span class="o">=/</span><span class="n">home</span><span class="o">/</span><span class="n">pi</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">rpi</span><span class="o">-</span><span class="mf">5.4</span><span class="o">.</span><span class="n">y</span>
+<span class="n">alias</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;cd $</span><span class="si">{LINUX_SRC}</span><span class="s2">&quot;</span>
+<span class="n">alias</span> <span class="n">dts</span><span class="o">=</span><span class="s2">&quot;cd $</span><span class="si">{LINUX_SRC}</span><span class="s2">/arch/arm/boot/dts&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>便于代码目录跳转</p></li>
+</ul>
+</section>
+<section id="soc-datasheet">
+<h1>SoC Datasheet<a class="headerlink" href="#soc-datasheet" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.raspberrypi.org/documentation/hardware/raspberrypi/datasheets.md">Raspberry Pi 4 B Datasheets</a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/390960ac1fe336e957b60f693a990499/rpi_DATA_2711_1p0.pdf"><span class="xref download myst">rpi_DATA_2711_1p0.pdf</span></a></p></li>
+</ul>
+</section>
+<section id="gpio-uart-i2c-dts">
+<h1>GPIO UART I2C DTS分析<a class="headerlink" href="#gpio-uart-i2c-dts" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>arch/arm/boot/dts/bcm2711-rpi-4-b.dts</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">arch</span><span class="o">/</span><span class="n">arm</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span>                             <span class="c1"># dts目录</span>
+  <span class="o">*</span> <span class="n">bcm2711</span><span class="o">-</span><span class="n">rpi</span><span class="o">-</span><span class="mi">4</span><span class="o">-</span><span class="n">b</span><span class="o">.</span><span class="n">dts</span>                         <span class="c1"># 一般是产品的名字称，包含整个产品控制器的描述</span>
+    <span class="o">*</span> <span class="c1">#include &quot;bcm2711.dtsi&quot;                   # 一般是芯片的名称，包含基本芯片的控制器的基本描述</span>
+      <span class="o">*</span> <span class="c1">#include &quot;bcm283x.dtsi&quot;                 # 芯片是在原来芯片基础上设计的，继承原先的基础配置</span>
+        <span class="o">*</span> <span class="n">gpio</span>                                  <span class="c1"># pin脚复用配置</span>
+        <span class="o">*</span> <span class="n">uart0</span> <span class="o">~</span> <span class="mi">1</span>
+        <span class="o">*</span> <span class="n">i2c0if</span>
+        <span class="o">*</span> <span class="n">i2c1</span>
+      <span class="o">*</span> <span class="n">uart2</span> <span class="o">~</span> <span class="mi">5</span>
+      <span class="o">*</span> <span class="n">i2c3</span> <span class="o">~</span> <span class="mi">6</span>
+</pre></div>
+</div>
+</li>
+<li><p>Chapter 3. BSC</p>
+<ul class="simple">
+<li><p>i2c</p></li>
+</ul>
+</li>
+<li><p>Chapter 5. General Purpose I/O (GPIO)</p>
+<ul class="simple">
+<li><p>gpio</p></li>
+</ul>
+</li>
+<li><p>Chapter 11. UART</p>
+<ul class="simple">
+<li><p>uart</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="dtsdriver">
+<h1>DTS如何关联Driver<a class="headerlink" href="#dtsdriver" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>arch/arm/boot/dts/bcm2711-rpi-4-b.dts</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">arch</span><span class="o">/</span><span class="n">arm</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">dts</span>                                               <span class="c1"># dts目录</span>
+  <span class="o">*</span> <span class="n">bcm2711</span><span class="o">-</span><span class="n">rpi</span><span class="o">-</span><span class="mi">4</span><span class="o">-</span><span class="n">b</span><span class="o">.</span><span class="n">dts</span>                                           <span class="c1"># dts文件</span>
+      <span class="o">*</span> <span class="n">i2c3</span><span class="p">:</span> <span class="n">i2c</span><span class="o">@</span><span class="mf">7e205600</span>                                        <span class="c1"># i2c3控制器</span>
+        <span class="o">*</span> <span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;brcm,bcm2711-i2c&quot;</span><span class="p">,</span> <span class="s2">&quot;brcm,bcm2835-i2c&quot;</span><span class="p">;</span>    <span class="c1"># 控制器与驱动match字段</span>
+          <span class="o">*</span> <span class="n">cd</span>  <span class="n">drivers</span><span class="o">/</span><span class="n">i2c</span>                                       <span class="c1"># 查找i2c驱动目录</span>
+            <span class="o">*</span> <span class="n">ack</span> <span class="n">brcm</span><span class="p">,</span><span class="n">bcm2711</span><span class="o">-</span><span class="n">i2c</span>                                <span class="c1"># 查找match字段</span>
+              <span class="o">*</span> <span class="n">busses</span><span class="o">/</span><span class="n">i2c</span><span class="o">-</span><span class="n">bcm2835</span><span class="o">.</span><span class="n">c</span>                              <span class="c1"># 驱动文件</span>
+                <span class="o">*</span> <span class="p">{</span> <span class="o">.</span><span class="n">compatible</span> <span class="o">=</span> <span class="s2">&quot;brcm,bcm2711-i2c&quot;</span> <span class="p">},</span>           <span class="c1"># 驱动match字段</span>
+</pre></div>
+</div>
+</li>
+<li><p>of: Open Firmware</p></li>
+</ul>
+</section>
+<section id="device-driver-match">
+<h1>Device Driver match<a class="headerlink" href="#device-driver-match" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>打印probe内核调用栈：</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/drivers/i2c/busses/i2c-bcm2835.c b/drivers/i2c/busses/i2c-bcm2835.c</span><span class="w"></span>
+<span class="gh">index 9f4f496..792f20e 100644</span><span class="w"></span>
+<span class="gd">--- a/drivers/i2c/busses/i2c-bcm2835.c</span><span class="w"></span>
+<span class="gi">+++ b/drivers/i2c/busses/i2c-bcm2835.c</span><span class="w"></span>
+<span class="gu">@@ -517,6 +517,8 @@ static int bcm2835_i2c_probe(struct platform_device *pdev)</span><span class="w"></span>
+<span class="w"> </span>       struct clk *mclk;<span class="w"></span>
+<span class="w"> </span>       u32 bus_clk_rate;<span class="w"></span>
+
+<span class="gi">+       dump_stack();</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>       i2c_dev = devm_kzalloc(&amp;pdev-&gt;dev, sizeof(*i2c_dev), GFP_KERNEL);<span class="w"></span>
+<span class="w"> </span>       if (!i2c_dev)<span class="w"></span>
+<span class="w"> </span>               return -ENOMEM;<span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>KERNEL=kernel7l</p></li>
+<li><p>make -j4 zImage modules dtbs</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">CALL</span>    <span class="n">scripts</span><span class="o">/</span><span class="n">atomic</span><span class="o">/</span><span class="n">check</span><span class="o">-</span><span class="n">atomics</span><span class="o">.</span><span class="n">sh</span>
+  <span class="n">CALL</span>    <span class="n">scripts</span><span class="o">/</span><span class="n">checksyscalls</span><span class="o">.</span><span class="n">sh</span>
+  <span class="n">CHK</span>     <span class="n">include</span><span class="o">/</span><span class="n">generated</span><span class="o">/</span><span class="nb">compile</span><span class="o">.</span><span class="n">h</span>
+  <span class="n">CC</span> <span class="p">[</span><span class="n">M</span><span class="p">]</span>  <span class="n">drivers</span><span class="o">/</span><span class="n">i2c</span><span class="o">/</span><span class="n">busses</span><span class="o">/</span><span class="n">i2c</span><span class="o">-</span><span class="n">bcm2835</span><span class="o">.</span><span class="n">o</span>
+  <span class="n">Kernel</span><span class="p">:</span> <span class="n">arch</span><span class="o">/</span><span class="n">arm</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">Image</span> <span class="ow">is</span> <span class="n">ready</span>
+  <span class="n">Building</span> <span class="n">modules</span><span class="p">,</span> <span class="n">stage</span> <span class="mf">2.</span>
+  <span class="n">MODPOST</span> <span class="mi">1626</span> <span class="n">modules</span>
+  <span class="n">Kernel</span><span class="p">:</span> <span class="n">arch</span><span class="o">/</span><span class="n">arm</span><span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">zImage</span> <span class="ow">is</span> <span class="n">ready</span>
+  <span class="n">CC</span> <span class="p">[</span><span class="n">M</span><span class="p">]</span>  <span class="n">drivers</span><span class="o">/</span><span class="n">i2c</span><span class="o">/</span><span class="n">busses</span><span class="o">/</span><span class="n">i2c</span><span class="o">-</span><span class="n">bcm2835</span><span class="o">.</span><span class="n">mod</span><span class="o">.</span><span class="n">o</span>
+  <span class="n">LD</span> <span class="p">[</span><span class="n">M</span><span class="p">]</span>  <span class="n">drivers</span><span class="o">/</span><span class="n">i2c</span><span class="o">/</span><span class="n">busses</span><span class="o">/</span><span class="n">i2c</span><span class="o">-</span><span class="n">bcm2835</span><span class="o">.</span><span class="n">ko</span>
+</pre></div>
+</div>
+</li>
+<li><p>uname -a</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Linux</span> <span class="n">raspberrypi</span> <span class="mf">5.4.83</span><span class="o">-</span><span class="n">v7l</span> <span class="c1">#1 SMP Wed Feb 10 09:33:55 GMT 2021 armv7l GNU/Linux</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo cp drivers/i2c/busses/i2c-bcm2835.ko /lib/modules/5.4.83-v7l/kernel/drivers/i2c/busses/i2c-bcm2835.ko</p></li>
+<li><p>sudo raspi-config</p>
+<ul class="simple">
+<li><p>i2c</p></li>
+<li><p>vim /boot/config.txt</p>
+<ul>
+<li><p>dtparam=i2c_arm=on</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>dmesg</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span><span class="n">省略</span>
+<span class="p">[</span>  <span class="mf">287.688821</span><span class="p">]</span> <span class="n">OF</span><span class="p">:</span> <span class="n">overlay</span><span class="p">:</span> <span class="n">WARNING</span><span class="p">:</span> <span class="n">memory</span> <span class="n">leak</span> <span class="n">will</span> <span class="n">occur</span> <span class="k">if</span> <span class="n">overlay</span> <span class="n">removed</span><span class="p">,</span> <span class="nb">property</span><span class="p">:</span> <span class="o">/</span><span class="n">soc</span><span class="o">/</span><span class="n">i2c</span><span class="o">@</span><span class="mf">7e804000</span><span class="o">/</span><span class="n">status</span>
+<span class="p">[</span>  <span class="mf">287.730053</span><span class="p">]</span> <span class="n">CPU</span><span class="p">:</span> <span class="mi">1</span> <span class="n">PID</span><span class="p">:</span> <span class="mi">787</span> <span class="n">Comm</span><span class="p">:</span> <span class="n">systemd</span><span class="o">-</span><span class="n">udevd</span> <span class="n">Tainted</span><span class="p">:</span> <span class="n">G</span>         <span class="n">C</span>        <span class="mf">5.4.83</span><span class="o">-</span><span class="n">v7l</span> <span class="c1">#1</span>
+<span class="p">[</span>  <span class="mf">287.730060</span><span class="p">]</span> <span class="n">Hardware</span> <span class="n">name</span><span class="p">:</span> <span class="n">BCM2711</span>
+<span class="p">[</span>  <span class="mf">287.730063</span><span class="p">]</span> <span class="n">Backtrace</span><span class="p">:</span>
+<span class="p">[</span>  <span class="mf">287.730080</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c020dfb0</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">dump_backtrace</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c020e330</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">show_stack</span><span class="o">+</span><span class="mh">0x20</span><span class="o">/</span><span class="mh">0x24</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730086</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="n">ffffffff</span> <span class="n">r6</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r5</span><span class="p">:</span><span class="n">a0000013</span> <span class="n">r4</span><span class="p">:</span><span class="n">c129fab0</span>
+<span class="p">[</span>  <span class="mf">287.730095</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c020e310</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">show_stack</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0a76c34</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">dump_stack</span><span class="o">+</span><span class="mh">0xd8</span><span class="o">/</span><span class="mh">0x11c</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730113</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0a76b5c</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">dump_stack</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">bf36a9b4</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bcm2835_i2c_probe</span><span class="o">+</span><span class="mh">0x34</span><span class="o">/</span><span class="mh">0x388</span> <span class="p">[</span><span class="n">i2c_bcm2835</span><span class="p">])</span>
+<span class="p">[</span>  <span class="mf">287.730118</span><span class="p">]</span>  <span class="n">r10</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r9</span><span class="p">:</span><span class="mi">00000023</span> <span class="n">r8</span><span class="p">:</span><span class="n">c1204fc8</span> <span class="n">r7</span><span class="p">:</span><span class="n">d6a05e00</span> <span class="n">r6</span><span class="p">:</span><span class="n">d6a05e10</span> <span class="n">r5</span><span class="p">:</span><span class="mi">00000000</span>
+<span class="p">[</span>  <span class="mf">287.730122</span><span class="p">]</span>  <span class="n">r4</span><span class="p">:</span><span class="n">d6a05e10</span> <span class="n">r3</span><span class="p">:</span><span class="n">cbd15570</span>
+<span class="p">[</span>  <span class="mf">287.730133</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">bf36a980</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bcm2835_i2c_probe</span> <span class="p">[</span><span class="n">i2c_bcm2835</span><span class="p">])</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07969ec</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">platform_drv_probe</span><span class="o">+</span><span class="mh">0x58</span><span class="o">/</span><span class="mh">0xa8</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730138</span><span class="p">]</span>  <span class="n">r9</span><span class="p">:</span><span class="mi">00000023</span> <span class="n">r8</span><span class="p">:</span><span class="n">bf36c014</span> <span class="n">r7</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r6</span><span class="p">:</span><span class="n">bf36c014</span> <span class="n">r5</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r4</span><span class="p">:</span><span class="n">d6a05e10</span>
+<span class="p">[</span>  <span class="mf">287.730145</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0796994</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">platform_drv_probe</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07949c0</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">really_probe</span><span class="o">+</span><span class="mh">0x1f0</span><span class="o">/</span><span class="mh">0x354</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730150</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r6</span><span class="p">:</span><span class="n">c13616b4</span> <span class="n">r5</span><span class="p">:</span><span class="n">d6a05e10</span> <span class="n">r4</span><span class="p">:</span><span class="n">c13616b0</span>
+<span class="p">[</span>  <span class="mf">287.730156</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07947d0</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">really_probe</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0794d1c</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">driver_probe_device</span><span class="o">+</span><span class="mh">0x70</span><span class="o">/</span><span class="mh">0x184</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730161</span><span class="p">]</span>  <span class="n">r10</span><span class="p">:</span><span class="n">c1204fc8</span> <span class="n">r9</span><span class="p">:</span><span class="n">d5a8ff30</span> <span class="n">r8</span><span class="p">:</span><span class="n">bf36c080</span> <span class="n">r7</span><span class="p">:</span><span class="n">c0795028</span> <span class="n">r6</span><span class="p">:</span><span class="n">bf36c014</span> <span class="n">r5</span><span class="p">:</span><span class="n">bf36c014</span>
+<span class="p">[</span>  <span class="mf">287.730164</span><span class="p">]</span>  <span class="n">r4</span><span class="p">:</span><span class="n">d6a05e10</span> <span class="n">r3</span><span class="p">:</span><span class="mi">00000000</span>
+<span class="p">[</span>  <span class="mf">287.730171</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0794cac</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">driver_probe_device</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0795020</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">device_driver_attach</span><span class="o">+</span><span class="mh">0x68</span><span class="o">/</span><span class="mh">0x70</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730176</span><span class="p">]</span>  <span class="n">r9</span><span class="p">:</span><span class="n">d5a8ff30</span> <span class="n">r8</span><span class="p">:</span><span class="n">bf36c080</span> <span class="n">r7</span><span class="p">:</span><span class="n">c0795028</span> <span class="n">r6</span><span class="p">:</span><span class="n">bf36c014</span> <span class="n">r5</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r4</span><span class="p">:</span><span class="n">d6a05e10</span>
+<span class="p">[</span>  <span class="mf">287.730182</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0794fb8</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">device_driver_attach</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0795090</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">__driver_attach</span><span class="o">+</span><span class="mh">0x68</span><span class="o">/</span><span class="mh">0xdc</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730187</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="n">c0795028</span> <span class="n">r6</span><span class="p">:</span><span class="n">d6a05e10</span> <span class="n">r5</span><span class="p">:</span><span class="n">bf36c014</span> <span class="n">r4</span><span class="p">:</span><span class="mi">00000000</span>
+<span class="p">[</span>  <span class="mf">287.730193</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0795028</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">__driver_attach</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07929c8</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bus_for_each_dev</span><span class="o">+</span><span class="mh">0x84</span><span class="o">/</span><span class="mh">0xc4</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730197</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="n">c0795028</span> <span class="n">r6</span><span class="p">:</span><span class="n">bf36c014</span> <span class="n">r5</span><span class="p">:</span><span class="n">c1204fc8</span> <span class="n">r4</span><span class="p">:</span><span class="n">d5943db4</span>
+<span class="p">[</span>  <span class="mf">287.730203</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0792944</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bus_for_each_dev</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0794218</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">driver_attach</span><span class="o">+</span><span class="mh">0x2c</span><span class="o">/</span><span class="mh">0x30</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730207</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r6</span><span class="p">:</span><span class="n">d736ae80</span> <span class="n">r5</span><span class="p">:</span><span class="n">c12713b8</span> <span class="n">r4</span><span class="p">:</span><span class="n">bf36c014</span>
+<span class="p">[</span>  <span class="mf">287.730214</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07941ec</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">driver_attach</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0793c30</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bus_add_driver</span><span class="o">+</span><span class="mh">0x1c8</span><span class="o">/</span><span class="mh">0x1e8</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730220</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0793a68</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bus_add_driver</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c079574c</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">driver_register</span><span class="o">+</span><span class="mh">0x84</span><span class="o">/</span><span class="mh">0x118</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730224</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r6</span><span class="p">:</span><span class="n">d60a2d00</span> <span class="n">r5</span><span class="p">:</span><span class="n">bf077000</span> <span class="n">r4</span><span class="p">:</span><span class="n">bf36c014</span>
+<span class="p">[</span>  <span class="mf">287.730231</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07956c8</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">driver_register</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0796940</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">__platform_driver_register</span><span class="o">+</span><span class="mh">0x50</span><span class="o">/</span><span class="mh">0x58</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730234</span><span class="p">]</span>  <span class="n">r5</span><span class="p">:</span><span class="n">bf077000</span> <span class="n">r4</span><span class="p">:</span><span class="n">c1204fc8</span>
+<span class="p">[</span>  <span class="mf">287.730244</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c07968f0</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">__platform_driver_register</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">bf077028</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bcm2835_i2c_driver_init</span><span class="o">+</span><span class="mh">0x28</span><span class="o">/</span><span class="mh">0x1000</span> <span class="p">[</span><span class="n">i2c_bcm2835</span><span class="p">])</span>
+<span class="p">[</span>  <span class="mf">287.730252</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">bf077000</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">bcm2835_i2c_driver_init</span> <span class="p">[</span><span class="n">i2c_bcm2835</span><span class="p">])</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02030c4</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">do_one_initcall</span><span class="o">+</span><span class="mh">0x50</span><span class="o">/</span><span class="mh">0x25c</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730260</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c0203074</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">do_one_initcall</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02c28fc</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">do_init_module</span><span class="o">+</span><span class="mh">0x70</span><span class="o">/</span><span class="mh">0x264</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730265</span><span class="p">]</span>  <span class="n">r8</span><span class="p">:</span><span class="n">bf36c080</span> <span class="n">r7</span><span class="p">:</span><span class="n">d60a2d40</span> <span class="n">r6</span><span class="p">:</span><span class="n">d60a2d00</span> <span class="n">r5</span><span class="p">:</span><span class="n">d60a2740</span> <span class="n">r4</span><span class="p">:</span><span class="n">bf36c080</span>
+<span class="p">[</span>  <span class="mf">287.730271</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02c288c</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">do_init_module</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02c4f58</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">load_module</span><span class="o">+</span><span class="mh">0x236c</span><span class="o">/</span><span class="mh">0x2670</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730274</span><span class="p">]</span>  <span class="n">r6</span><span class="p">:</span><span class="n">d60a2d00</span> <span class="n">r5</span><span class="p">:</span><span class="mi">00000002</span> <span class="n">r4</span><span class="p">:</span><span class="mi">00000002</span>
+<span class="p">[</span>  <span class="mf">287.730280</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02c2bec</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">load_module</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02c54c0</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">sys_finit_module</span><span class="o">+</span><span class="mh">0xd4</span><span class="o">/</span><span class="mh">0xec</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730285</span><span class="p">]</span>  <span class="n">r10</span><span class="p">:</span><span class="mi">0000017</span><span class="n">b</span> <span class="n">r9</span><span class="p">:</span><span class="n">d5a8e000</span> <span class="n">r8</span><span class="p">:</span><span class="n">c02011c4</span> <span class="n">r7</span><span class="p">:</span><span class="mi">00000006</span> <span class="n">r6</span><span class="p">:</span><span class="n">b6e2f8e0</span> <span class="n">r5</span><span class="p">:</span><span class="mi">00000000</span>
+<span class="p">[</span>  <span class="mf">287.730288</span><span class="p">]</span>  <span class="n">r4</span><span class="p">:</span><span class="n">c1204fc8</span>
+<span class="p">[</span>  <span class="mf">287.730294</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02c53ec</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">sys_finit_module</span><span class="p">)</span> <span class="kn">from</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">c02011a4</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="n">__sys_trace_return</span><span class="o">+</span><span class="mh">0x0</span><span class="o">/</span><span class="mh">0x1c</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730298</span><span class="p">]</span> <span class="ne">Exception</span> <span class="n">stack</span><span class="p">(</span><span class="mh">0xd5a8ffa8</span> <span class="n">to</span> <span class="mh">0xd5a8fff0</span><span class="p">)</span>
+<span class="p">[</span>  <span class="mf">287.730303</span><span class="p">]</span> <span class="n">ffa0</span><span class="p">:</span>                   <span class="n">fdfcc000</span> <span class="mf">00e13</span><span class="n">b90</span> <span class="mi">00000006</span> <span class="n">b6e2f8e0</span> <span class="mi">00000000</span> <span class="n">b6e303f4</span>
+<span class="p">[</span>  <span class="mf">287.730308</span><span class="p">]</span> <span class="n">ffc0</span><span class="p">:</span> <span class="n">fdfcc000</span> <span class="mf">00e13</span><span class="n">b90</span> <span class="mi">00000000</span> <span class="mi">0000017</span><span class="n">b</span> <span class="mf">00e1</span><span class="n">ee40</span> <span class="mi">0049</span><span class="n">b1dc</span> <span class="mf">00e49</span><span class="n">ca0</span> <span class="mi">00000000</span>
+<span class="p">[</span>  <span class="mf">287.730312</span><span class="p">]</span> <span class="n">ffe0</span><span class="p">:</span> <span class="n">bebbd228</span> <span class="n">bebbd218</span> <span class="n">b6e269d8</span> <span class="n">b6f16af0</span>
+<span class="p">[</span>  <span class="mf">287.730316</span><span class="p">]</span>  <span class="n">r7</span><span class="p">:</span><span class="mi">0000017</span><span class="n">b</span> <span class="n">r6</span><span class="p">:</span><span class="mi">00000000</span> <span class="n">r5</span><span class="p">:</span><span class="mf">00e13</span><span class="n">b90</span> <span class="n">r4</span><span class="p">:</span><span class="n">fdfcc000</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

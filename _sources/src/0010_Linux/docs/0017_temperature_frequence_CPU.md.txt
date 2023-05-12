@@ -1,0 +1,18 @@
+# temperature frequence CPU
+
+获取CPU温度、频率
+
+# 温度
+
+* cat /sys/class/thermal/thermal_zone0/temp
+  ```
+  34563
+  ```
+
+# 频率
+
+* /sys/devices/system/cpu
+  * sudo cat cpu0/cpufreq/cpuinfo_cur_freq
+  * sudo cat cpu1/cpufreq/cpuinfo_cur_freq
+  * sudo cat cpu2/cpufreq/cpuinfo_cur_freq
+  * sudo cat cpu3/cpufreq/cpuinfo_cur_freq

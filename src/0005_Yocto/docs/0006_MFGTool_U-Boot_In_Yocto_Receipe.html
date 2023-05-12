@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">MFGTool U-Boot Compile In Yocto Receipe</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">原理</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfgtool-u-boot-compile-in-yocto-receipe">
+<h1>MFGTool U-Boot Compile In Yocto Receipe<a class="headerlink" href="#mfgtool-u-boot-compile-in-yocto-receipe" title="Permalink to this headline"></a></h1>
+<p>分析MFGTool的U-Boot在Yocto中的编译</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/28827764/workdir-in-yocto-receipe">WORKDIR in yocto receipe</a></p></li>
+<li><p>https://www.yoctoproject.org/docs/2.1/ref-manual/ref-manual.html#var-WORKDIR</p></li>
+<li><p><a class="reference external" href="https://community.nxp.com/thread/366592">Clean/Rebuild target using bitbake</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>原理<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>The WORKDIR directory is defined as follows: <code class="docutils literal notranslate"><span class="pre">${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/${PN}/${EXTENDPE}${PV}-${PR}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TMPDIR}</span></code> will be the folder named “tmp” within your Yocto build directory.</p></li>
+<li><p>以i.MX6编译U-Boot的mfgtool为例：</p>
+<ul>
+<li><p>查找所有和mfgtool相关的receipe：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">mfgtool_4</span><span class="mf">.1.15</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">classes</span><span class="o">/</span><span class="n">mfgtool</span><span class="o">-</span><span class="n">initramfs</span><span class="o">-</span><span class="n">image</span><span class="o">.</span><span class="n">bbclass</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">-</span><span class="n">initramfs</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">packagegroups</span><span class="o">/</span><span class="n">packagegroup</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">filesystem</span><span class="o">-</span><span class="n">layer</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">packagegroups</span><span class="o">/</span><span class="n">packagegroup</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">bbappend</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">mfgtool_2015</span><span class="mf">.04</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">arm</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">packagegroup</span><span class="o">/</span><span class="n">packagegroup</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">bbappend</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">kernel</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">mfgtool_4</span><span class="mf">.1.15</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">mfgtool_2016</span><span class="mf">.03</span><span class="o">.</span><span class="n">bb</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MACHINE=imx6dlsabresd</span> <span class="pre">DISTRO=fsl-imx-x11</span> <span class="pre">source</span> <span class="pre">./fsl-setup-release.sh</span> <span class="pre">-b</span> <span class="pre">imx6q-x11</span></code></p></li>
+<li><p>查看依赖：<code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">fsl-image-mfgtool-initramfs</span> <span class="pre">-g</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">task-depends.dot</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="s2">&quot;u-boot-imx-mfgtool.do_package&quot;</span> <span class="p">[</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;u-boot-imx-mfgtool do_package</span><span class="se">\n</span><span class="s2">:2016.03-r0</span><span class="se">\n</span><span class="s2">/home/zengjf/fsl-release-bsp/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/u-boot/u-boot-imx-mfgtool_2016.03.bb&quot;</span><span class="p">]</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/u-boot/u-boot-imx-mfgtool_2016.03.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Copyright (C) 2014 O.S. Systems Software LTDA.
+# Copyright (C) 2014-2016 Freescale Semiconductor
+
+require u-boot-imx_${PV}.bb                   # PV=2016.03
+require recipes-bsp/u-boot/u-boot-mfgtool.inc
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/u-boot/u-boot-imx_2016.03.bb</span></code></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright (C) 2013-2016 Freescale Semiconductor</span>
+
+<span class="nv">DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;U-Boot provided by Freescale with focus on  i.MX reference boards.&quot;</span>
+require recipes-bsp/u-boot/u-boot.inc
+
+<span class="nv">PROVIDES</span> <span class="o">+=</span> <span class="s2">&quot;u-boot&quot;</span>
+
+<span class="nv">LICENSE</span> <span class="o">=</span> <span class="s2">&quot;GPLv2+&quot;</span>
+<span class="nv">LIC_FILES_CHKSUM</span> <span class="o">=</span> <span class="s2">&quot;file://Licenses/gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263&quot;</span>
+
+<span class="nv">SRCBRANCH</span> <span class="o">=</span> <span class="s2">&quot;imx_v2016.03_4.1.15_2.0.0_ga&quot;</span>
+UBOOT_SRC ?<span class="o">=</span> <span class="s2">&quot;git://git.freescale.com/imx/uboot-imx.git;protocol=git&quot;</span>
+<span class="nv">SRC_URI</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">UBOOT_SRC</span><span class="si">}</span><span class="s2">;branch=</span><span class="si">${</span><span class="nv">SRCBRANCH</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">SRCREV</span> <span class="o">=</span> <span class="s2">&quot;a57b13b942d59719e3621179e98bd8a0ab235088&quot;</span>
+
+<span class="nv">S</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">WORKDIR</span><span class="si">}</span><span class="s2">/git&quot;</span>
+
+inherit fsl-u-boot-localversion
+
+LOCALVERSION ?<span class="o">=</span> <span class="s2">&quot;-</span><span class="si">${</span><span class="nv">SRCBRANCH</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="nv">PACKAGE_ARCH</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">MACHINE_ARCH</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">COMPATIBLE_MACHINE</span> <span class="o">=</span> <span class="s2">&quot;(mx6|mx6ul|mx6sll|mx7)&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">sources/poky/meta/recipes-bsp/u-boot/u-boot.inc</span></code></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="nv">SUMMARY</span> <span class="o">=</span> <span class="s2">&quot;Universal Boot Loader for embedded devices&quot;</span>
+<span class="nv">HOMEPAGE</span> <span class="o">=</span> <span class="s2">&quot;http://www.denx.de/wiki/U-Boot/WebHome&quot;</span>
+<span class="nv">SECTION</span> <span class="o">=</span> <span class="s2">&quot;bootloaders&quot;</span>
+<span class="nv">PROVIDES</span> <span class="o">=</span> <span class="s2">&quot;virtual/bootloader&quot;</span>
+
+<span class="nv">LICENSE</span> <span class="o">=</span> <span class="s2">&quot;GPLv2+&quot;</span>
+<span class="nv">LIC_FILES_CHKSUM</span> <span class="o">=</span> <span class="s2">&quot;file://Licenses/README;md5=a2c678cfd4a4d97135585cad908541c6&quot;</span>
+
+<span class="nv">SRC_URI</span> <span class="o">=</span> <span class="s2">&quot;git://git.denx.de/u-boot.git;branch=master&quot;</span>
+
+<span class="nv">S</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$WORKDIR</span><span class="s2">/git&quot;</span>
+
+<span class="nv">PACKAGE_ARCH</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$MACHINE_ARCH</span><span class="s2">&quot;</span>
+
+inherit uboot-config deploy
+
+<span class="nv">EXTRA_OEMAKE</span> <span class="o">=</span> <span class="s1">&#39;CROSS_COMPILE=$TARGET_PREFIX CC=&quot;${TARGET_PREFIX}gcc $TOOLCHAIN_OPTIONS&quot; V=1&#39;</span>
+<span class="nv">EXTRA_OEMAKE</span> <span class="o">+=</span> <span class="s1">&#39;HOSTCC=&quot;$BUILD_CC $BUILD_CFLAGS $BUILD_LDFLAGS&quot;&#39;</span>
+
+PACKAGECONFIG ??<span class="o">=</span> <span class="s2">&quot;openssl&quot;</span>
+<span class="c1"># u-boot will compile its own tools during the build, with specific</span>
+<span class="c1"># configurations (aka when CONFIG_FIT_SIGNATURE is enabled) openssl is needed as</span>
+<span class="c1"># a host build dependency.</span>
+PACKAGECONFIG<span class="o">[</span>openssl<span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;,,openssl-native&quot;</span>
+
+<span class="c1"># Allow setting an additional version string that will be picked up by the</span>
+<span class="c1"># u-boot build system and appended to the u-boot version.  If the .scmversion</span>
+<span class="c1"># file already exists it will not be overwritten.</span>
+UBOOT_LOCALVERSION ?<span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Some versions of u-boot use .bin and others use .img.  By default use .bin</span>
+<span class="c1"># but enable individual recipes to change this value.</span>
+UBOOT_SUFFIX ??<span class="o">=</span> <span class="s2">&quot;bin&quot;</span>
+UBOOT_IMAGE ?<span class="o">=</span> <span class="s2">&quot;u-boot-</span><span class="nv">$MACHINE</span><span class="s2">-</span><span class="nv">$PV</span><span class="s2">-</span><span class="nv">$PR</span><span class="s2">.</span><span class="nv">$UBOOT_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_BINARY ?<span class="o">=</span> <span class="s2">&quot;u-boot.</span><span class="nv">$UBOOT_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_SYMLINK ?<span class="o">=</span> <span class="s2">&quot;u-boot-</span><span class="nv">$MACHINE</span><span class="s2">.</span><span class="nv">$UBOOT_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_MAKE_TARGET ?<span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+
+<span class="c1"># Output the ELF generated. Some platforms can use the ELF file and directly</span>
+<span class="c1"># load it (JTAG booting, QEMU) additionally the ELF can be used for debugging</span>
+<span class="c1"># purposes.</span>
+UBOOT_ELF ?<span class="o">=</span> <span class="s2">&quot;&quot;</span>
+UBOOT_ELF_SUFFIX ?<span class="o">=</span> <span class="s2">&quot;elf&quot;</span>
+UBOOT_ELF_IMAGE ?<span class="o">=</span> <span class="s2">&quot;u-boot-</span><span class="nv">$MACHINE</span><span class="s2">-</span><span class="nv">$PV</span><span class="s2">-</span><span class="nv">$PR</span><span class="s2">.</span><span class="nv">$UBOOT_ELF_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_ELF_BINARY ?<span class="o">=</span> <span class="s2">&quot;u-boot.</span><span class="nv">$UBOOT_ELF_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_ELF_SYMLINK ?<span class="o">=</span> <span class="s2">&quot;u-boot-</span><span class="nv">$MACHINE</span><span class="s2">.</span><span class="nv">$UBOOT_ELF_SUFFIX</span><span class="s2">&quot;</span>
+
+<span class="c1"># Some versions of u-boot build an SPL (Second Program Loader) image that</span>
+<span class="c1"># should be packaged along with the u-boot binary as well as placed in the</span>
+<span class="c1"># deploy directory.  For those versions they can set the following variables</span>
+<span class="c1"># to allow packaging the SPL.</span>
+SPL_BINARY ?<span class="o">=</span> <span class="s2">&quot;&quot;</span>
+SPL_BINARYNAME ?<span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="p">@os.path.basename(d.getVar(</span><span class="s2">&quot;SPL_BINARY&quot;</span><span class="p">, True))</span><span class="si">}</span><span class="s2">&quot;</span>
+SPL_IMAGE ?<span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$SPL_BINARYNAME</span><span class="s2">-</span><span class="nv">$MACHINE</span><span class="s2">-</span><span class="nv">$PV</span><span class="s2">-</span><span class="nv">$PR</span><span class="s2">&quot;</span>
+SPL_SYMLINK ?<span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$SPL_BINARYNAME</span><span class="s2">-</span><span class="nv">$MACHINE</span><span class="s2">&quot;</span>
+
+<span class="c1"># Additional environment variables or a script can be installed alongside</span>
+<span class="c1"># u-boot to be used automatically on boot.  This file, typically &#39;uEnv.txt&#39;</span>
+<span class="c1"># or &#39;boot.scr&#39;, should be packaged along with u-boot as well as placed in the</span>
+<span class="c1"># deploy directory.  Machine configurations needing one of these files should</span>
+<span class="c1"># include it in the SRC_URI and set the UBOOT_ENV parameter.</span>
+UBOOT_ENV_SUFFIX ?<span class="o">=</span> <span class="s2">&quot;txt&quot;</span>
+UBOOT_ENV ?<span class="o">=</span> <span class="s2">&quot;&quot;</span>
+UBOOT_ENV_BINARY ?<span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$UBOOT_ENV</span><span class="s2">.</span><span class="nv">$UBOOT_ENV_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_ENV_IMAGE ?<span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$UBOOT_ENV</span><span class="s2">-</span><span class="nv">$MACHINE</span><span class="s2">-</span><span class="nv">$PV</span><span class="s2">-</span><span class="nv">$PR</span><span class="s2">.</span><span class="nv">$UBOOT_ENV_SUFFIX</span><span class="s2">&quot;</span>
+UBOOT_ENV_SYMLINK ?<span class="o">=</span> <span class="s2">&quot;</span><span class="nv">$UBOOT_ENV</span><span class="s2">-</span><span class="nv">$MACHINE</span><span class="s2">.</span><span class="nv">$UBOOT_ENV_SUFFIX</span><span class="s2">&quot;</span>
+
+do_compile <span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;</span><span class="si">${</span><span class="p">@bb.utils.contains(</span><span class="s1">&#39;DISTRO_FEATURES&#39;</span><span class="p">, </span><span class="s1">&#39;ld-is-gold&#39;</span><span class="p">, </span><span class="s1">&#39;ld-is-gold&#39;</span><span class="p">, </span><span class="s1">&#39;&#39;</span><span class="p">, d)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;ld-is-gold&quot;</span>  <span class="p">;</span> <span class="k">then</span>
+        sed -i <span class="s1">&#39;s/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g&#39;</span> config.mk
+    <span class="k">fi</span>
+
+    <span class="nb">unset</span> LDFLAGS
+    <span class="nb">unset</span> CFLAGS
+    <span class="nb">unset</span> CPPFLAGS
+
+    <span class="k">if</span> <span class="nb">test</span> ! -e <span class="nv">$B</span>/.scmversion -a ! -e <span class="nv">$S</span>/.scmversion 
+    <span class="k">then</span>
+        <span class="nb">echo</span> <span class="nv">$UBOOT_LOCALVERSION</span> &gt; <span class="nv">$B</span>/.scmversion
+        <span class="nb">echo</span> <span class="nv">$UBOOT_LOCALVERSION</span> &gt; <span class="nv">$S</span>/.scmversion
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+            <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+            <span class="k">for</span> <span class="nb">type</span>  <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                <span class="k">then</span>
+                    <span class="c1"># 1. cat imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/temp/run.do_compile.16791</span>
+                    <span class="c1">#     [...省略]</span>
+                    <span class="c1">#     oe_runmake O=${config} ${config}</span>
+                    <span class="c1">#     oe_runmake O=${config} u-boot.imx</span>
+                    <span class="c1">#     [...省略]</span>
+                    <span class="c1"># 2. cat imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/temp/log.do_compile.16791</span>
+                    <span class="c1">#     [...省略]</span>
+                    <span class="c1">#     NOTE: make -j 8 CROSS_COMPILE=arm-poky-linux-gnueabi- CC=arm-poky-linux-gnueabi-gcc  --sysroot=/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/imx6dlsabresd V=1 HOSTCC=gcc  -isystem/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -L/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/lib -L/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/lib -Wl,-rpath-link,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/lib -Wl,-rpath-link,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/lib -Wl,-rpath,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/lib -Wl,-rpath,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/lib -Wl,-O1 O=mx6dlsabresd_config mx6dlsabresd_config</span>
+                    <span class="c1">#     make -C /home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/mx6dlsabresd_config KBUILD_SRC=/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git \</span>
+                    <span class="c1">#             -f /home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/Makefile mx6dlsabresd_config</span>
+                    <span class="c1">#     make[1]: Entering directory `/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/mx6dlsabresd_config&#39;</span>
+                    <span class="c1">#     make -f ../scripts/Makefile.build obj=scripts/basic</span>
+                    <span class="c1">#     ln -fsn .. source</span>
+                    <span class="c1">#     /bin/bash ../scripts/mkmakefile \</span>
+                    <span class="c1">#                 .. . 2016 03</span>
+                    <span class="c1">#     rm -f .tmp_quiet_recordmcount</span>
+                    <span class="c1">#       GEN     ./Makefile</span>
+                    <span class="c1">#     make -f ../scripts/Makefile.build obj=scripts/kconfig mx6dlsabresd_config</span>
+                    <span class="c1">#     make[2]: `../mx6dlsabresd_config&#39; is up to date.</span>
+                    <span class="c1">#     make[1]: Leaving directory `/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/mx6dlsabresd_config&#39;</span>
+                    <span class="c1">#     NOTE: make -j 8 CROSS_COMPILE=arm-poky-linux-gnueabi- CC=arm-poky-linux-gnueabi-gcc  --sysroot=/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/imx6dlsabresd V=1 HOSTCC=gcc  -isystem/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/include -O2 -pipe -L/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/lib -L/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/lib -Wl,-rpath-link,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/lib -Wl,-rpath-link,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/lib -Wl,-rpath,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/usr/lib -Wl,-rpath,/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/sysroots/x86_64-linux/lib -Wl,-O1 O=mx6dlsabresd_config u-boot.imx</span>
+                    <span class="c1">#     make -C /home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/mx6dlsabresd_config KBUILD_SRC=/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git \</span>
+                    <span class="c1">#             -f /home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/Makefile u-boot.imx</span>
+                    <span class="c1">#     make[1]: Entering directory `/home/aplex/sbc7819/fsl-release-bsp/imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/mx6dlsabresd_config&#39;</span>
+                    <span class="c1">#     set -e; : &#39;  CHK     include/config/uboot.release&#39;; mkdir -p include/config/;   echo &quot;2016.03$(/bin/bash ../scripts/setlocalversion ..)&quot; &lt; include/config/auto.conf &gt; include/config/uboot.release.tmp; if [ -r include/config/uboot.release ] &amp;&amp; cmp -s include/config/uboot.release include/config/uboot.release.tmp; then rm -f include/config/uboot.release.tmp; else : &#39;  UPD     include/config/uboot.release&#39;; mv -f include/config/uboot.release.tmp include/config/uboot.release; fi</span>
+                    <span class="c1">#     [...省略]</span>
+                    <span class="c1">#     make -f ../scripts/Makefile.build obj=arch/arm/imx-common u-boot.imx</span>
+                    <span class="c1">#     mkdir -p board/freescale/mx6sabresd/</span>
+                    <span class="c1">#       ./tools/mkimage -n board/freescale/mx6sabresd/mx6dlsabresd.cfg.cfgtmp -T imximage -e 0x17800000 -d u-boot.bin u-boot.imx</span>
+                    <span class="c1">#     Image Type:   Freescale IMX Boot Image</span>
+                    <span class="c1">#     Image Ver:    2 (i.MX53/6/7 compatible)</span>
+                    <span class="c1">#     Mode:         DCD</span>
+                    <span class="c1">#     Data Size:    479232 Bytes = 468.00 kB = 0.46 MB</span>
+                    <span class="c1">#     Load Address: 177ff420</span>
+                    <span class="c1">#     Entry Point:  17800000</span>
+                    oe_runmake <span class="nv">O</span><span class="o">=</span><span class="nv">$config</span> <span class="nv">$config</span>
+                    oe_runmake <span class="nv">O</span><span class="o">=</span><span class="nv">$config</span> <span class="nv">$UBOOT_MAKE_TARGET</span>
+                    cp  <span class="nv">$S</span>/<span class="nv">$config</span>/<span class="nv">$UBOOT_BINARY</span>  <span class="nv">$S</span>/<span class="nv">$config</span>/u-boot-<span class="nv">$type</span>.<span class="nv">$UBOOT_SUFFIX</span>
+                <span class="k">fi</span>
+            <span class="k">done</span>
+            <span class="nb">unset</span>  j
+        <span class="k">done</span>
+        <span class="nb">unset</span>  i
+    <span class="k">else</span>
+        oe_runmake <span class="nv">$UBOOT_MACHINE</span>
+        oe_runmake <span class="nv">$UBOOT_MAKE_TARGET</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+do_install <span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+            <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+            <span class="k">for</span> <span class="nb">type</span> <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                <span class="k">then</span>
+                    install -d <span class="nv">$D</span>/boot
+                    install <span class="nv">$S</span>/<span class="nv">$config</span>/u-boot-<span class="nv">$type</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$D</span>/boot/u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span>
+                    ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_BINARY</span>-<span class="nv">$type</span>
+                    ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_BINARY</span>
+                <span class="k">fi</span>
+            <span class="k">done</span>
+            <span class="nb">unset</span>  j
+        <span class="k">done</span>
+        <span class="nb">unset</span>  i
+    <span class="k">else</span>
+        install -d <span class="nv">$D</span>/boot
+        install <span class="nv">$S</span>/<span class="nv">$UBOOT_BINARY</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_IMAGE</span>
+        ln -sf <span class="nv">$UBOOT_IMAGE</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_BINARY</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_ELF</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+        <span class="k">then</span>
+            <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">for</span> <span class="nb">type</span> <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                    <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                    <span class="k">then</span>
+                        install <span class="nv">$S</span>/<span class="nv">$config</span>/<span class="nv">$UBOOT_ELF</span> <span class="nv">$D</span>/boot/u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span>
+                        ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_BINARY</span>-<span class="nv">$type</span>
+                        ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_BINARY</span>
+                    <span class="k">fi</span>
+                <span class="k">done</span>
+                <span class="nb">unset</span> j
+            <span class="k">done</span>
+            <span class="nb">unset</span> i
+        <span class="k">else</span>
+            install <span class="nv">$S</span>/<span class="nv">$UBOOT_ELF</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_ELF_IMAGE</span>
+            ln -sf <span class="nv">$UBOOT_ELF_IMAGE</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_ELF_BINARY</span>
+        <span class="k">fi</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> -e <span class="nv">$WORKDIR</span>/fw_env.config  <span class="p">;</span> <span class="k">then</span>
+        install -d <span class="nv">$D</span><span class="si">${</span><span class="nv">sysconfdir</span><span class="si">}</span>
+        install -m <span class="m">644</span> <span class="nv">$WORKDIR</span>/fw_env.config <span class="nv">$D</span><span class="si">${</span><span class="nv">sysconfdir</span><span class="si">}</span>/fw_env.config
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$SPL_BINARY</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+        <span class="k">then</span>
+            <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">for</span> <span class="nb">type</span> <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                    <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                    <span class="k">then</span>
+                        install <span class="nv">$S</span>/<span class="nv">$config</span>/<span class="nv">$SPL_BINARY</span> <span class="nv">$D</span>/boot/<span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>
+                        ln -sf <span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span> <span class="nv">$D</span>/boot/<span class="nv">$SPL_BINARYNAME</span>-<span class="nv">$type</span>
+                        ln -sf <span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span> <span class="nv">$D</span>/boot/<span class="nv">$SPL_BINARYNAME</span>
+                    <span class="k">fi</span>
+                <span class="k">done</span>
+                <span class="nb">unset</span>  j
+            <span class="k">done</span>
+            <span class="nb">unset</span>  i
+        <span class="k">else</span>
+            install <span class="nv">$S</span>/<span class="nv">$SPL_BINARY</span> <span class="nv">$D</span>/boot/<span class="nv">$SPL_IMAGE</span>
+            ln -sf <span class="nv">$SPL_IMAGE</span> <span class="nv">$D</span>/boot/<span class="nv">$SPL_BINARYNAME</span>
+        <span class="k">fi</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_ENV</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        install <span class="nv">$WORKDIR</span>/<span class="nv">$UBOOT_ENV_BINARY</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_ENV_IMAGE</span>
+        ln -sf <span class="nv">$UBOOT_ENV_IMAGE</span> <span class="nv">$D</span>/boot/<span class="nv">$UBOOT_ENV_BINARY</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+FILES_<span class="nv">$PN</span> <span class="o">=</span> <span class="s2">&quot;/boot </span><span class="nv">$sysconfdir</span><span class="s2">&quot;</span>
+
+do_deploy <span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+            <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+            <span class="k">for</span> <span class="nb">type</span> <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                <span class="k">then</span>
+                    install -d <span class="nv">$DEPLOYDIR</span>
+                    install <span class="nv">$S</span>/<span class="nv">$config</span>/u-boot-<span class="nv">$type</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$DEPLOYDIR</span>/u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span>
+                    <span class="nb">cd</span> <span class="nv">$DEPLOYDIR</span>
+                    ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$UBOOT_SYMLINK</span>-<span class="nv">$type</span>
+                    ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$UBOOT_SYMLINK</span>
+                    ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$UBOOT_BINARY</span>-<span class="nv">$type</span>
+                    ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_SUFFIX</span> <span class="nv">$UBOOT_BINARY</span>
+                <span class="k">fi</span>
+            <span class="k">done</span>
+            <span class="nb">unset</span>  j
+        <span class="k">done</span>
+        <span class="nb">unset</span>  i
+    <span class="k">else</span>
+        install -d <span class="nv">$DEPLOYDIR</span>
+        install <span class="nv">$S</span>/<span class="nv">$UBOOT_BINARY</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_IMAGE</span>
+        <span class="nb">cd</span> <span class="nv">$DEPLOYDIR</span>
+        rm -f <span class="nv">$UBOOT_BINARY</span> <span class="nv">$UBOOT_SYMLINK</span>
+        ln -sf <span class="nv">$UBOOT_IMAGE</span> <span class="nv">$UBOOT_SYMLINK</span>
+        ln -sf <span class="nv">$UBOOT_IMAGE</span> <span class="nv">$UBOOT_BINARY</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_ELF</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+        <span class="k">then</span>
+            <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">for</span> <span class="nb">type</span> <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                    <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                    <span class="k">then</span>
+                        install <span class="nv">$S</span>/<span class="nv">$config</span>/<span class="nv">$UBOOT_ELF</span> <span class="nv">$DEPLOYDIR</span>/u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span>
+                        ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_BINARY</span>-<span class="nv">$type</span>
+                        ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_BINARY</span>
+                        ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_SYMLINK</span>-<span class="nv">$type</span>
+                        ln -sf u-boot-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>.<span class="nv">$UBOOT_ELF_SUFFIX</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_SYMLINK</span>
+                    <span class="k">fi</span>
+                <span class="k">done</span>
+                <span class="nb">unset</span> j
+            <span class="k">done</span>
+            <span class="nb">unset</span> i
+        <span class="k">else</span>
+            install <span class="nv">$S</span>/<span class="nv">$UBOOT_ELF</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_IMAGE</span>
+            ln -sf <span class="nv">$UBOOT_ELF_IMAGE</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_BINARY</span>
+            ln -sf <span class="nv">$UBOOT_ELF_IMAGE</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ELF_SYMLINK</span>
+        <span class="k">fi</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$SPL_BINARY</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_CONFIG</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+        <span class="k">then</span>
+            <span class="k">for</span> config <span class="k">in</span> <span class="nv">$UBOOT_MACHINE</span><span class="p">;</span> <span class="k">do</span>
+                <span class="nv">i</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$i</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                <span class="k">for</span> <span class="nb">type</span> <span class="k">in</span> <span class="nv">$UBOOT_CONFIG</span><span class="p">;</span> <span class="k">do</span>
+                    <span class="nv">j</span><span class="o">=</span><span class="sb">`</span>expr <span class="nv">$j</span> + <span class="m">1</span><span class="sb">`</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="nb">test</span> <span class="nv">$j</span> -eq <span class="nv">$i</span> 
+                    <span class="k">then</span>
+                        install <span class="nv">$S</span>/<span class="nv">$config</span>/<span class="nv">$SPL_BINARY</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span>
+                        rm -f <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_BINARYNAME</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_SYMLINK</span>-<span class="nv">$type</span>
+                        ln -sf <span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_BINARYNAME</span>-<span class="nv">$type</span>
+                        ln -sf <span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_BINARYNAME</span>
+                        ln -sf <span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_SYMLINK</span>-<span class="nv">$type</span>
+                        ln -sf <span class="nv">$SPL_IMAGE</span>-<span class="nv">$type</span>-<span class="nv">$PV</span>-<span class="nv">$PR</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_SYMLINK</span>
+                    <span class="k">fi</span>
+                <span class="k">done</span>
+                <span class="nb">unset</span>  j
+            <span class="k">done</span>
+            <span class="nb">unset</span>  i
+        <span class="k">else</span>
+            install <span class="nv">$S</span>/<span class="nv">$SPL_BINARY</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_IMAGE</span>
+            rm -f <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_BINARYNAME</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_SYMLINK</span>
+            ln -sf <span class="nv">$SPL_IMAGE</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_BINARYNAME</span>
+            ln -sf <span class="nv">$SPL_IMAGE</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$SPL_SYMLINK</span>
+        <span class="k">fi</span>
+    <span class="k">fi</span>
+
+    <span class="k">if</span> <span class="nb">test</span> <span class="s2">&quot;x</span><span class="nv">$UBOOT_ENV</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
+    <span class="k">then</span>
+        install <span class="nv">$WORKDIR</span>/<span class="nv">$UBOOT_ENV_BINARY</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ENV_IMAGE</span>
+        rm -f <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ENV_BINARY</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ENV_SYMLINK</span>
+        ln -sf <span class="nv">$UBOOT_ENV_IMAGE</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ENV_BINARY</span>
+        ln -sf <span class="nv">$UBOOT_ENV_IMAGE</span> <span class="nv">$DEPLOYDIR</span>/<span class="nv">$UBOOT_ENV_SYMLINK</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">sources/meta-fsl-arm/classes/fsl-u-boot-localversion.bbclass</span></code></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Freescale U-Boot LOCALVERSION extension</span>
+<span class="c1">#</span>
+<span class="c1"># This allow to easy reuse of code between different U-Boot recipes</span>
+<span class="c1">#</span>
+<span class="c1"># The following options are supported:</span>
+<span class="c1">#</span>
+<span class="c1">#  SCMVERSION        Puts the Git hash in U-Boot local version</span>
+<span class="c1">#  LOCALVERSION      Value used in LOCALVERSION (default to &#39;+fslc&#39;)</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2014 (C) O.S. Systems Software LTDA.</span>
+
+SCMVERSION ??<span class="o">=</span> <span class="s2">&quot;y&quot;</span>
+LOCALVERSION ??<span class="o">=</span> <span class="s2">&quot;+fslc&quot;</span>
+
+<span class="nv">UBOOT_LOCALVERSION</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">LOCALVERSION</span><span class="si">}</span><span class="s2">&quot;</span>
+
+do_compile_prepend<span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">SCMVERSION</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+                <span class="c1"># Add GIT revision to the local version</span>
+                <span class="nv">head</span><span class="o">=</span><span class="sb">`</span>git rev-parse --verify --short HEAD <span class="m">2</span>&gt; /dev/null<span class="sb">`</span>
+                <span class="nb">printf</span> <span class="s2">&quot;%s%s%s&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">UBOOT_LOCALVERSION</span><span class="si">}</span><span class="s2">&quot;</span> +g <span class="nv">$head</span> &gt; <span class="si">${</span><span class="nv">S</span><span class="si">}</span>/.scmversion
+                <span class="nb">printf</span> <span class="s2">&quot;%s%s%s&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">UBOOT_LOCALVERSION</span><span class="si">}</span><span class="s2">&quot;</span> +g <span class="nv">$head</span> &gt; <span class="si">${</span><span class="nv">B</span><span class="si">}</span>/.scmversion
+    <span class="k">else</span>
+                <span class="nb">printf</span> <span class="s2">&quot;%s&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">UBOOT_LOCALVERSION</span><span class="si">}</span><span class="s2">&quot;</span> &gt; <span class="si">${</span><span class="nv">S</span><span class="si">}</span>/.scmversion
+                <span class="nb">printf</span> <span class="s2">&quot;%s&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">UBOOT_LOCALVERSION</span><span class="si">}</span><span class="s2">&quot;</span> &gt; <span class="si">${</span><span class="nv">B</span><span class="si">}</span>/.scmversion
+        <span class="k">fi</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">sources/meta-fsl-arm/recipes-bsp/u-boot/u-boot-mfgtool.inc</span></code></p>
+<div class="highlight-Shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Produces a Manufacturing Tool compatible U-Boot</span>
+<span class="c1">#</span>
+<span class="c1"># This makes a separated binary set for Manufacturing Tool use</span>
+<span class="c1"># without clobbering the U-Boot used for normal use.</span>
+<span class="c1">#</span>
+<span class="c1"># This file must to be included after the original u-boot.inc file,</span>
+<span class="c1"># as it overrides the need values.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2014 O.S. Systems Software LTDA.</span>
+
+<span class="c1"># Adjust provides</span>
+<span class="nv">PROVIDES</span> <span class="o">=</span> <span class="s2">&quot;u-boot-mfgtool&quot;</span>
+
+<span class="c1"># Use &#39;mfgtool&#39; config</span>
+<span class="nv">UBOOT_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;mfgtool&quot;</span>
+
+<span class="c1"># Add &#39;mfgtool&#39; suffix</span>
+<span class="nv">UBOOT_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;u-boot-</span><span class="si">${</span><span class="nv">MACHINE</span><span class="si">}</span><span class="s2">-mfgtool-</span><span class="si">${</span><span class="nv">PV</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">PR</span><span class="si">}</span><span class="s2">.</span><span class="si">${</span><span class="nv">UBOOT_SUFFIX</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">UBOOT_SYMLINK</span> <span class="o">=</span> <span class="s2">&quot;u-boot-</span><span class="si">${</span><span class="nv">MACHINE</span><span class="si">}</span><span class="s2">-mfgtool.</span><span class="si">${</span><span class="nv">UBOOT_SUFFIX</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">SPL_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">SPL_BINARY</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">MACHINE</span><span class="si">}</span><span class="s2">-mfgtool-</span><span class="si">${</span><span class="nv">PV</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">PR</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">SPL_SYMLINK</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">SPL_BINARY</span><span class="si">}</span><span class="s2">-mfgtool-</span><span class="si">${</span><span class="nv">MACHINE</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>WORKDIR: <code class="docutils literal notranslate"><span class="pre">imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0</span></code></p></li>
+<li><p>单独编译u-boot: <code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">u-boot-imx-mfgtool</span></code></p></li>
+<li><p>Compile Log: <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/temp/log*</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">do_compile</span>         <span class="n">log</span><span class="o">.</span><span class="n">do_deploy</span><span class="mf">.16348</span>   <span class="n">log</span><span class="o">.</span><span class="n">do_package</span>            <span class="n">log</span><span class="o">.</span><span class="n">do_package_qa</span><span class="mf">.16324</span>         <span class="n">log</span><span class="o">.</span><span class="n">do_populate_lic</span>            <span class="n">log</span><span class="o">.</span><span class="n">do_unpack</span><span class="mf">.5868</span>
+<span class="n">log</span><span class="o">.</span><span class="n">do_compile</span><span class="mf">.6802</span>    <span class="n">log</span><span class="o">.</span><span class="n">do_fetch</span>          <span class="n">log</span><span class="o">.</span><span class="n">do_package</span><span class="mf">.14236</span>      <span class="n">log</span><span class="o">.</span><span class="n">do_package_write_rpm</span>        <span class="n">log</span><span class="o">.</span><span class="n">do_populate_lic</span><span class="mf">.15027</span>      <span class="n">log</span><span class="o">.</span><span class="n">task_order</span>
+<span class="n">log</span><span class="o">.</span><span class="n">do_configure</span>       <span class="n">log</span><span class="o">.</span><span class="n">do_fetch</span><span class="mf">.5838</span>     <span class="n">log</span><span class="o">.</span><span class="n">do_packagedata</span>        <span class="n">log</span><span class="o">.</span><span class="n">do_package_write_rpm</span><span class="mf">.15578</span>  <span class="n">log</span><span class="o">.</span><span class="n">do_populate_sysroot</span>
+<span class="n">log</span><span class="o">.</span><span class="n">do_configure</span><span class="mf">.6681</span>  <span class="n">log</span><span class="o">.</span><span class="n">do_install</span>        <span class="n">log</span><span class="o">.</span><span class="n">do_packagedata</span><span class="mf">.14598</span>  <span class="n">log</span><span class="o">.</span><span class="n">do_patch</span>                    <span class="n">log</span><span class="o">.</span><span class="n">do_populate_sysroot</span><span class="mf">.13944</span>
+<span class="n">log</span><span class="o">.</span><span class="n">do_deploy</span>          <span class="n">log</span><span class="o">.</span><span class="n">do_install</span><span class="mf">.12192</span>  <span class="n">log</span><span class="o">.</span><span class="n">do_package_qa</span>         <span class="n">log</span><span class="o">.</span><span class="n">do_patch</span><span class="mf">.6645</span>               <span class="n">log</span><span class="o">.</span><span class="n">do_unpack</span>
+</pre></div>
+</div>
+</li>
+<li><p>重新编译：</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">-f</span> <span class="pre">-c</span> <span class="pre">compile</span> <span class="pre">u-boot-imx-mfgtool</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">-f</span> <span class="pre">-c</span> <span class="pre">install</span> <span class="pre">u-boot-imx-mfgtool</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">-f</span> <span class="pre">-c</span> <span class="pre">deploy</span> <span class="pre">u-boot-imx-mfgtool</span></code></p></li>
+<li><p>在make之前，clean一下的做法：<code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">sources/poky/meta/recipes-bsp/u-boot/u-boot.inc</span></code></p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span>[...省略]
+oe_runmake O=${config} clean
+oe_runmake O=${config} ${config}
+oe_runmake O=${config} ${UBOOT_MAKE_TARGET}
+cp  ${S}/${config}/${UBOOT_BINARY}  ${S}/${config}/u-boot-${type}.${UBOOT_SUFFIX}
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p>查看新生成的u-boot：<code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">imx6q-x11/tmp/deploy/images/imx6dlsabresd$</span> <span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">u-boot*</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">29</span>  <span class="mi">7</span><span class="n">月</span>  <span class="mi">3</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">imx</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">24</span>  <span class="mi">6</span><span class="n">月</span> <span class="mi">21</span> <span class="mi">09</span><span class="p">:</span><span class="mi">02</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx6dlsabresd</span><span class="o">.</span><span class="n">imx</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">24</span>  <span class="mi">6</span><span class="n">月</span> <span class="mi">21</span> <span class="mi">09</span><span class="p">:</span><span class="mi">02</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx6dlsabresd</span><span class="o">.</span><span class="n">imx</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">29</span>  <span class="mi">7</span><span class="n">月</span>  <span class="mi">3</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx6dlsabresd</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">imx</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">29</span>  <span class="mi">7</span><span class="n">月</span>  <span class="mi">3</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx6dlsabresd</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">.</span><span class="n">imx</span><span class="o">-</span><span class="n">mfgtool</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">29</span>  <span class="mi">7</span><span class="n">月</span>  <span class="mi">3</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">imx</span><span class="o">-</span><span class="n">mfgtool</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">aplex</span> <span class="n">aplex</span>     <span class="mi">24</span>  <span class="mi">6</span><span class="n">月</span> <span class="mi">21</span> <span class="mi">09</span><span class="p">:</span><span class="mi">02</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">imx</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="o">-</span><span class="n">rwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">2</span> <span class="n">aplex</span> <span class="n">aplex</span> <span class="mi">486400</span>  <span class="mi">7</span><span class="n">月</span>  <span class="mi">3</span> <span class="mi">13</span><span class="p">:</span><span class="mi">35</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">mfgtool</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+<span class="o">-</span><span class="n">rwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">2</span> <span class="n">aplex</span> <span class="n">aplex</span> <span class="mi">478208</span>  <span class="mi">6</span><span class="n">月</span> <span class="mi">13</span> <span class="mi">17</span><span class="p">:</span><span class="mi">55</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2016.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">imx</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>修改mfgtools U-Boot BOOTDELAY: <code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">imx6q-x11/tmp/work/imx6dlsabresd-poky-linux-gnueabi/u-boot-imx-mfgtool/2016.03-r0/git/mx6dlsabresd_config/source/common/autoboot.c</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">bootdelay_process</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="cp">#if !defined(CONFIG_FSL_FASTBOOT) &amp;&amp; defined(is_boot_from_usb)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_boot_from_usb</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">disconnect_from_pc</span><span class="p">();</span><span class="w"></span>
+<span class="w">                </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Boot from USB for mfgtools</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">bootdelay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">set_default_env</span><span class="p">(</span><span class="s">&quot;Use default environment for \</span>
+<span class="s">                                 mfgtools</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Normal Boot</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="cp">#endif</span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>DCD Table地址信息： <code class="docutils literal notranslate"><span class="pre">od</span> <span class="pre">-x</span> <span class="pre">-j</span> <span class="pre">0x2c</span> <span class="pre">-N</span> <span class="pre">4</span> <span class="pre">u-boot.imx</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0000054</span> <span class="mi">02</span><span class="n">d2</span> <span class="mi">40</span><span class="n">f0</span>     <span class="c1"># bigend: d202 f040</span>
+<span class="mi">0000060</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+# ashmem
+
+Android Shared Memory
+
+# 参考文档
+
+* http://androidxref.com/4.4.2_r1/xref/frameworks/native/libs/ui/GraphicBufferAllocator.cpp#38
+  * 使用老版本的代码对原理分析比较适合
+* [Ashmem(Android共享内存)使用方法和原理](https://zhuanlan.zhihu.com/p/146671611)
+* [Android图形缓冲区分配过程源码分析](https://blog.csdn.net/yangwen123/article/details/12231687)
+* [Android系统匿名共享内存Ashmem（Anonymous Shared Memory）驱动程序源代码分析](https://blog.csdn.net/Luoshengyang/article/details/6664554)
+* [Android核心分析（25）------Android GDI之共享缓冲区机制](http://www.uml.org.cn/mobiledev/201109303.asp)
+
+# 简介
+
+Ashmem即Android Shared Memory, 是Android提供的一种内存共享的机制。
+
+# 使用
+
+* Java层借助MemoryFile或者SharedMemory。
+* Native层借助MemoryHeapBase或者MemoryBase。
+* Native层直接调用libc的ashmem_create_region和mmap系统调用。
+* MemoryFile基于SharedMemory。MemoryBase基于MemoryHeapBase。SharedMemory、MemoryHeapBase都是基于ashmem_create_region/mmap。
+
+# ashmem fd的传递：
+
+Binder机制不仅支持binder对象的传递，还支持文件描述符的传递。fd经过binder驱动时，binder驱动会将源进程的fd转换成目标进程的fd，转换过程为：取出发送方binder数据里的fd，通过fd找到文件对象，然后为目标进程创建fd，将目标进程fd和文件对象进行关联，将发送方binder数据里的fd改为目标进程的fd，然后将数据发送给目标进程。这个过程相当于文件在目标进程又打开了一次，目标进程使用的是自己的fd，但和源进程都指向的是同一个文件。这样源进程和目标进程就都可以map到同一片内存了。
+
+# systemui
+
+* ps -A | grep systemui
+  ```
+  u0_a121        1363    486 14798012 193616 do_epoll_wait      0 S com.android.systemui
+  ```
+  * 1363
+* cd /proc/1363

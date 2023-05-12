@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/login.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">README</a></li>
+<li><a class="reference internal" href="#install-libs">Install libs</a></li>
+<li><a class="reference internal" href="#how-to-select-additional-packages">How to select additional packages</a></li>
+<li><a class="reference internal" href="#docs">docs</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Permalink to this headline"></a></h1>
+<p>分析Yocto编译原理，能做的事情和Buildroot类似，不过更重要的是芯片大厂都参与维护，知名度更高</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/1.5.1/dev-manual/dev-manual.html#dev-manual-intro">The Yocto Project Development Manual</a></p></li>
+<li><p><a class="reference external" href="https://www.nxp.com/webapp/Download?colCode=L4.1.15_2.0.0-LINUX-DOCS&amp;Parent_nodeId=1337695836026701499367&amp;Parent_pageType=product&amp;Parent_nodeId=1337695836026701499367&amp;Parent_pageType=product">L4.1.15_2.0.0_LINUX_DOCS</a></p></li>
+</ul>
+</section>
+<section id="install-libs">
+<h1>Install libs<a class="headerlink" href="#install-libs" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">gawk</span> <span class="pre">wget</span> <span class="pre">git-core</span> <span class="pre">diffstat</span> <span class="pre">unzip</span> <span class="pre">texinfo</span> <span class="pre">gcc-multilib</span> <span class="pre">build-essential</span> <span class="pre">chrpath</span> <span class="pre">socat</span> <span class="pre">libsdl1.2-dev</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libsdl1.2-dev</span> <span class="pre">xterm</span> <span class="pre">sed</span> <span class="pre">cvs</span> <span class="pre">subversion</span> <span class="pre">coreutils</span> <span class="pre">texi2html</span> <span class="pre">docbook-utils</span> <span class="pre">python-pysqlite2</span> <span class="pre">help2man</span> <span class="pre">make</span> <span class="pre">gcc</span> <span class="pre">g++</span> <span class="pre">desktop-file-utils</span> <span class="pre">libgl1-mesa-dev</span> <span class="pre">libglu1-mesa-dev</span> <span class="pre">mercurial</span> <span class="pre">autoconf</span> <span class="pre">automake</span> <span class="pre">groff</span> <span class="pre">curl</span> <span class="pre">lzop</span> <span class="pre">asciidoc</span></code></p></li>
+<li><p>i.MX layers host packages for a Ubuntu 12.04 host setup only are:<br />
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">uboot-mkimage</span></code></p></li>
+<li><p>i.MX layers host packages for a Ubuntu 14.04 host setup only are:<br />
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">u-boot-tools</span></code></p></li>
+<li><p>Repo: https://github.com/ZoroZeng/manifest</p></li>
+</ul>
+</section>
+<section id="how-to-select-additional-packages">
+<h1>How to select additional packages<a class="headerlink" href="#how-to-select-additional-packages" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.yoctoproject.org/docs/1.5.1/dev-manual/dev-manual.html#usingpoky-extend-customimage">YOCTO Customizing Images Doc</a></p></li>
+<li><p>Search YOCTO Recipes: https://layers.openembedded.org/layerindex/branch/master/recipes/</p></li>
+<li><p>《i.MX Yocto Project User’s Guide.pdf》 – A.4 How to select additional packages</p></li>
+</ul>
+</section>
+<section id="docs">
+<h1>docs<a class="headerlink" href="#docs" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>NO.</p></th>
+<th class="text-left head"><p>文件名称</p></th>
+<th class="text-left head"><p>摘要</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>0017</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0017_ATF_SCFW_M4.html"><span class="doc std std-doc">ATF_SCFW_M4</span></a></p></td>
+<td class="text-left"><p>ATF SCFW M4编译原理</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0016</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0016_rootfs_add_gcc_g%2B%2B.html"><span class="doc std std-doc">rootfs_add_gcc_g++</span></a></p></td>
+<td class="text-left"><p>尝试在rootfs中加入gcc、g++</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0015</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0015_copy_file_to_rootfs.html"><span class="doc std std-doc">copy_file_to_rootfs</span></a></p></td>
+<td class="text-left"><p>自动添加文件到rootfs</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0014</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0014_run_do_function.html"><span class="doc std std-doc">run_do_function</span></a></p></td>
+<td class="text-left"><p>Yocto run do函数</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0013</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0013_u-boot_generate.html"><span class="doc std std-doc">u-boot_generate</span></a></p></td>
+<td class="text-left"><p>u-boot生成原理</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0012</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0012_boot-img_generate.html"><span class="doc std std-doc">boot-img_generate</span></a></p></td>
+<td class="text-left"><p>boot.img合成原理</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0011</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0011_bitbake_variable_override.html"><span class="doc std std-doc">bitbake_variable_override</span></a></p></td>
+<td class="text-left"><p>bitback变量覆盖</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0010</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0010_bitbake_Hello-World.html"><span class="doc std std-doc">bitbake_Hello-World</span></a></p></td>
+<td class="text-left"><p>添加Hello World bb</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0009</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0009_YOCTO_SD_Image_Generate.html"><span class="doc std std-doc">YOCTO_SD_Image_Generate</span></a></p></td>
+<td class="text-left"><p>分析Yocto SD卡镜像合成</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0008</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0008_Yocto_Toolchain.html"><span class="doc std std-doc">Yocto_Toolchain</span></a></p></td>
+<td class="text-left"><p>编译Yocto编译工具链</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0007</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0007_MFGTool_initramfs_Boot_Root_Filesystem.html"><span class="doc std std-doc">MFGTool_initramfs_Boot_Root_Filesystem</span></a></p></td>
+<td class="text-left"><p>分析MFGTool的initramfs</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0006</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0006_MFGTool_U-Boot_In_Yocto_Receipe.html"><span class="doc std std-doc">MFGTool_U-Boot_In_Yocto_Receipe</span></a></p></td>
+<td class="text-left"><p>分析MFGTool的U-Boot在Yocto中的编译</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0005</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0005_Repo_Default_Config.html"><span class="doc std std-doc">Repo_Default_Config</span></a></p></td>
+<td class="text-left"><p>Yocto Repo</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0004</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0004_Add_New_layer_And_Recipe.html"><span class="doc std std-doc">Add_New_layer_And_Recipe</span></a></p></td>
+<td class="text-left"><p>Yocto添加新的Layer和Recipe</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0003</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0003_Operation_bb_File.html"><span class="doc std std-doc">Operation_bb_File</span></a></p></td>
+<td class="text-left"><p>生成bb可视化文件</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0002</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0002_Read_Manual.html"><span class="doc std std-doc">Read_Manual</span></a></p></td>
+<td class="text-left"><p>Yocto参考手册</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0001</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0001_fsl-setup-release_setup-environment.html"><span class="doc std std-doc">fsl-setup-release_setup-environment</span></a></p></td>
+<td class="text-left"><p>Freescal i.MX6 Yocto编译</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

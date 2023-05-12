@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ashmem handle</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#native-handle-t">native_handle_t</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ashmem-handle">
+<h1>ashmem handle<a class="headerlink" href="#ashmem-handle" title="Permalink to this headline"></a></h1>
+<p>Android Shared Memory</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0005_ashmem.html"><span class="doc std std-doc">0005_ashmem.md</span></a></p></li>
+<li><p><a class="reference external" href="http://www.uml.org.cn/mobiledev/201109303.asp">Android核心分析（25）——Android GDI之共享缓冲区机制</a></p></li>
+</ul>
+</section>
+<section id="native-handle-t">
+<h1>native_handle_t<a class="headerlink" href="#native-handle-t" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.uml.org.cn/mobiledev/201109303.asp">Android核心分析（25）——Android GDI之共享缓冲区机制</a></p></li>
+<li><p>共享内存的fd被包装在handle中，其可以通过binder进行传递</p></li>
+<li><p>Parcel中有专门处理handle的readNativeHandle函数</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">GraphicBuffer</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">status_t</span> <span class="n">GraphicBuffer</span><span class="p">::</span><span class="n">initWithSize</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">inWidth</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">inHeight</span><span class="p">,</span> <span class="n">PixelFormat</span> <span class="n">inFormat</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">inLayerCount</span><span class="p">,</span> <span class="n">uint64_t</span> <span class="n">inUsage</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">string</span> <span class="n">requestorName</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">GraphicBufferAllocator</span><span class="o">&amp;</span> <span class="n">allocator</span> <span class="o">=</span> <span class="n">GraphicBufferAllocator</span><span class="p">::</span><span class="n">get</span><span class="p">();</span>
+    <span class="o">*</span> <span class="n">status_t</span> <span class="n">err</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">inWidth</span><span class="p">,</span> <span class="n">inHeight</span><span class="p">,</span> <span class="n">inFormat</span><span class="p">,</span> <span class="n">inLayerCount</span><span class="p">,</span> <span class="n">inUsage</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">handle</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">outStride</span><span class="p">,</span> <span class="n">mId</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">move</span><span class="p">(</span><span class="n">requestorName</span><span class="p">));</span>
+      <span class="o">*</span> <span class="o">&amp;</span><span class="n">handle</span><span class="p">;</span>
+        <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">nativebase</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">nativebase</span><span class="o">/</span><span class="n">nativebase</span><span class="o">.</span><span class="n">h</span>
+          <span class="o">*</span> <span class="n">const</span> <span class="n">native_handle_t</span><span class="o">*</span> <span class="n">handle</span><span class="p">;</span>
+            <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">binder</span><span class="o">/</span><span class="n">Parcel</span><span class="o">.</span><span class="n">cpp</span>
+              <span class="o">*</span> <span class="n">native_handle</span><span class="o">*</span> <span class="n">Parcel</span><span class="p">::</span><span class="n">readNativeHandle</span><span class="p">()</span> <span class="n">const</span>
+                <span class="o">*</span> <span class="n">h</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fcntl</span><span class="p">(</span><span class="n">readFileDescriptor</span><span class="p">(),</span> <span class="n">F_DUPFD_CLOEXEC</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">allocator</span><span class="o">.</span><span class="n">allocate</span><span class="p">((</span><span class="o">...</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">GraphicBufferAllocator</span><span class="o">.</span><span class="n">cpp</span>
+          <span class="o">*</span> <span class="n">status_t</span> <span class="n">GraphicBufferAllocator</span><span class="p">::</span><span class="n">allocate</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+            <span class="o">*</span> <span class="k">return</span> <span class="n">allocateHelper</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">layerCount</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">requestorName</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">status_t</span> <span class="n">error</span> <span class="o">=</span> <span class="n">mAllocator</span><span class="o">-&gt;</span><span class="n">allocate</span><span class="p">(</span><span class="n">requestorName</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span> <span class="n">layerCount</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">importBuffer</span><span class="p">);</span>
+                <span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">libs</span><span class="o">/</span><span class="n">ui</span><span class="o">/</span><span class="n">Gralloc2</span><span class="o">.</span><span class="n">cpp</span>
+                  <span class="o">*</span> <span class="n">status_t</span> <span class="n">Gralloc2Allocator</span><span class="p">::</span><span class="n">allocate</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                    <span class="o">*</span> <span class="n">auto</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">mAllocator</span><span class="o">-&gt;</span><span class="n">allocate</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="n">outBufferHandles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">native_handle_clone</span><span class="p">(</span><span class="n">tmpBuffers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getNativeHandle</span><span class="p">());</span>
+</pre></div>
+</div>
+<p><img alt="0005_native_handle.png" src="../../../_images/0005_native_handle.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

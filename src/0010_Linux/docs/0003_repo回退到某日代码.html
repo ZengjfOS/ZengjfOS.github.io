@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">repo回退到某日代码</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#git">git回退版本思路</a></li>
+<li><a class="reference internal" href="#id2">repo回退版本</a></li>
+<li><a class="reference internal" href="#log">可调时间及格式化查看log</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="repo">
+<h1>repo回退到某日代码<a class="headerlink" href="#repo" title="Permalink to this headline"></a></h1>
+<p>repo大规模回退版本编译</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/qianxuedegushi/article/details/119824878">使用repo命令统一回退项目中各git版本库到指定日期</a></p></li>
+</ul>
+</section>
+<section id="git">
+<h1>git回退版本思路<a class="headerlink" href="#git" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>git log –before “2022-07-16 00:00” -1</p></li>
+<li><p>git log –before “2022-07-15 23:59” -1</p></li>
+<li><p>git log –before “2022-07-15 23:59” -1 –pretty=format:”%H”</p></li>
+<li><p>dateInfo=2022-07-15; git log –before “${dateInfo} 23:59” -1 –pretty=format:”%H”</p></li>
+<li><p>获取commit id</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">dateInfo</span><span class="o">=</span><span class="m">2022</span>-07-15<span class="p">;</span> <span class="nv">commitID</span><span class="o">=</span><span class="sb">`</span>git log --before <span class="s2">&quot;</span><span class="si">${</span><span class="nv">dateInfo</span><span class="si">}</span><span class="s2"> 23:59&quot;</span> -1 --pretty<span class="o">=</span>format:<span class="s2">&quot;%H&quot;</span><span class="sb">`</span><span class="p">;</span> <span class="nb">echo</span> <span class="si">${</span><span class="nv">commitID</span><span class="si">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>reset</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">dateInfo</span><span class="o">=</span><span class="m">2022</span>-07-15<span class="p">;</span> <span class="nv">commitID</span><span class="o">=</span><span class="sb">`</span>git log --before <span class="s2">&quot;</span><span class="si">${</span><span class="nv">dateInfo</span><span class="si">}</span><span class="s2"> 23:59&quot;</span> -1 --pretty<span class="o">=</span>format:<span class="s2">&quot;%H&quot;</span><span class="sb">`</span><span class="p">;</span> git reset --hard <span class="si">${</span><span class="nv">commitID</span><span class="si">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>repo回退版本<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>repo forall -c “git checkout dev”</p></li>
+<li><p>直接设置时间</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">repo</span> <span class="n">forall</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;dateInfo=2022-07-18; commitID=`git log --before &quot;$</span><span class="si">{dateInfo}</span><span class="s1"> 23:59&quot; -1 --pretty=format:&quot;%H&quot;`; git reset --hard $</span><span class="si">{commitID}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>内部的反引号是需要在仓库中执行，所以只能使用单引号，特别需要注意</p></li>
+<li><p>repo forall -c ‘git log -1 –pretty=oneline’</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="log">
+<h1>可调时间及格式化查看log<a class="headerlink" href="#log" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>repo forall -c “git checkout dev”</p></li>
+<li><p>export日期</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">dateInfo</span><span class="o">=</span><span class="m">2022</span>-07-18 <span class="o">&amp;&amp;</span> repo forall -c <span class="s1">&#39;commitID=`git log --before &quot;${dateInfo} 23:59&quot; -1 --pretty=format:&quot;%H&quot;`; git reset --hard ${commitID}&#39;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>内部的反引号是需要在仓库中执行，所以只能使用单引号，所以采用export导出日期信息才能在单引号脚本执行中引用到</p></li>
+</ul>
+</li>
+<li><p>采用markdown表格输出</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;commit id | date | author name | module | commit log&quot;</span><span class="p">;</span><span class="nb">echo</span> <span class="s2">&quot;---|---|---|---|---&quot;</span><span class="p">;</span>repo forall -c <span class="s1">&#39;git log -1 --pretty=format:&quot;%H | %ai | %an | `basename $PWD` | %s&quot;&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/1b83b77af611f8f06069e4cd7826f821/0003_RepoExcel.py"><span class="xref download myst">0003_RepoExcel.py</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

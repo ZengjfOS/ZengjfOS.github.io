@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Bluetooth HFP</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#android-audio-hal">Android Audio HAL</a><ul>
+<li><a class="reference internal" href="#hal-logcat">获取HAL Logcat信息</a></li>
+<li><a class="reference internal" href="#source-code">Source Code</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hfpclient">hfpclient</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-bluetooth-hfp">
+<h1>Android Bluetooth HFP<a class="headerlink" href="#android-bluetooth-hfp" title="Permalink to this headline"></a></h1>
+<p>Android P蓝牙语音通话时，声道怎么切换的？</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.xuebuyuan.com/684621.html">audioflinger学习笔记</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/lizzywu/article/details/8107502">Bluetooth sco audio是什么？</a></p></li>
+</ul>
+<p>蓝牙基带技术支持两种连接方式：</p>
+<ul class="simple">
+<li><p>面向连接（SCO）方式：主要用于话音传输；</p></li>
+<li><p>无连接(ACL)方式：主要用于分组数据传输。</p></li>
+</ul>
+</section>
+<section id="android-audio-hal">
+<h1>Android Audio HAL<a class="headerlink" href="#android-audio-hal" title="Permalink to this headline"></a></h1>
+<section id="hal-logcat">
+<h2>获取HAL Logcat信息<a class="headerlink" href="#hal-logcat" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">logcat</span> <span class="pre">-s</span> <span class="pre">audio_hw_primary</span></code></p>
+</section>
+<section id="source-code">
+<h2>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">vendor/nxp-opensource/imx/alsa/tinyalsa_hal.c</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">adev_set_parameters</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">audio_hw_device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">kvpairs</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">imx_audio_device</span><span class="w"> </span><span class="o">*</span><span class="n">adev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">imx_audio_device</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">dev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">str_parms</span><span class="w"> </span><span class="o">*</span><span class="n">parms</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">str</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">value</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;%s: enter: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">kvpairs</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">parms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_parms_create_str</span><span class="p">(</span><span class="n">kvpairs</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_parms_get_str</span><span class="p">(</span><span class="n">parms</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_KEY_TTY_MODE</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">tty_mode</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_VALUE_TTY_OFF</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">tty_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TTY_MODE_OFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_VALUE_TTY_VCO</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">tty_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TTY_MODE_VCO</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_VALUE_TTY_HCO</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">tty_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TTY_MODE_HCO</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_VALUE_TTY_FULL</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">tty_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TTY_MODE_FULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">done</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tty_mode</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">tty_mode</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">tty_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tty_mode</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">mode</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">AUDIO_MODE_IN_CALL</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">select_output_device</span><span class="p">(</span><span class="n">adev</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_parms_get_str</span><span class="p">(</span><span class="n">parms</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_KEY_BT_NREC</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_VALUE_ON</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">bluetooth_nrec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">bluetooth_nrec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_parms_get_str</span><span class="p">(</span><span class="n">parms</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;screen_state&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">AUDIO_PARAMETER_VALUE_ON</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">low_power</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">adev</span><span class="o">-&gt;</span><span class="n">low_power</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_parms_get_str</span><span class="p">(</span><span class="n">parms</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;hfp_set_sampling_rate&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoi</span><span class="p">(</span><span class="n">value</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;hfp_set_sampling_rate, %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rate</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">pcm_config_sco_in</span><span class="p">.</span><span class="n">rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rate</span><span class="p">;</span><span class="w">                                                    </span><span class="c1">// 蓝牙语音声卡采样率</span>
+<span class="w">        </span><span class="n">pcm_config_sco_out</span><span class="p">.</span><span class="n">rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rate</span><span class="p">;</span><span class="w">                                                   </span><span class="c1">// 蓝牙语音声卡采样率</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str_parms_get_str</span><span class="p">(</span><span class="n">parms</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;hfp_enable&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">value</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">strcmp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sco_task_create</span><span class="p">(</span><span class="n">adev</span><span class="p">);</span><span class="w">                                                  </span><span class="c1">// 处理任务</span>
+<span class="w">            </span><span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;sco_task_create, ret %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sco_task_destroy</span><span class="p">(</span><span class="n">adev</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;sco_task_destroy, ret %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="nl">done</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">str_parms_destroy</span><span class="p">(</span><span class="n">parms</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;%s: exit with code(%d)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">__func__</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="hfpclient">
+<h1>hfpclient<a class="headerlink" href="#hfpclient" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>源代码：<code class="docutils literal notranslate"><span class="pre">packages/apps/Bluetooth/src/com/android/bluetooth/hfpclient</span></code></p></li>
+<li><p>状态监听事件处理源代码：<code class="docutils literal notranslate"><span class="pre">packages/apps/Bluetooth/src/com/android/bluetooth/hfpclient/HeadsetClientStateMachine.java</span></code></p>
+<div class="highlight-Java notranslate"><div class="highlight"><pre><span></span><span class="c1">// in Connected state</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">processAudioEvent</span><span class="p">(</span><span class="kt">int</span> <span class="n">state</span><span class="p">,</span> <span class="n">BluetoothDevice</span> <span class="n">device</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// message from old device</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">mCurrentDevice</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">device</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Audio changed on disconnected device: &quot;</span> <span class="o">+</span> <span class="n">device</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="n">HeadsetClientHalConstants</span><span class="p">.</span><span class="na">AUDIO_STATE_CONNECTED_MSBC</span><span class="p">:</span>
+            <span class="n">mAudioWbs</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+            <span class="c1">// fall through</span>
+        <span class="k">case</span> <span class="n">HeadsetClientHalConstants</span><span class="p">.</span><span class="na">AUDIO_STATE_CONNECTED</span><span class="p">:</span>
+            <span class="c1">// Audio state is split in two parts, the audio focus is maintained by the</span>
+            <span class="c1">// entity exercising this service (typically the Telecom stack) and audio</span>
+            <span class="c1">// routing is handled by the bluetooth stack itself. The only reason to do so is</span>
+            <span class="c1">// because Bluetooth SCO connection from the HF role is not entirely supported</span>
+            <span class="c1">// for routing and volume purposes.</span>
+            <span class="c1">// NOTE: All calls here are routed via the setParameters which changes the</span>
+            <span class="c1">// routing at the Audio HAL level.</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">mService</span><span class="p">.</span><span class="na">isScoRouted</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">StackEvent</span> <span class="n">event</span> <span class="o">=</span>
+                        <span class="k">new</span> <span class="n">StackEvent</span><span class="p">(</span><span class="n">StackEvent</span><span class="p">.</span><span class="na">EVENT_TYPE_AUDIO_STATE_CHANGED</span><span class="p">);</span>
+                <span class="n">event</span><span class="p">.</span><span class="na">valueInt</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
+                <span class="n">event</span><span class="p">.</span><span class="na">device</span> <span class="o">=</span> <span class="n">device</span><span class="p">;</span>
+                <span class="n">sendMessageDelayed</span><span class="p">(</span><span class="n">StackEvent</span><span class="p">.</span><span class="na">STACK_EVENT</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">ROUTING_DELAY_MS</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">mAudioState</span> <span class="o">=</span> <span class="n">BluetoothHeadsetClient</span><span class="p">.</span><span class="na">STATE_AUDIO_CONNECTED</span><span class="p">;</span>
+
+            <span class="c1">// We need to set the volume after switching into HFP mode as some Audio HALs</span>
+            <span class="c1">// reset the volume to a known-default on mode switch.</span>
+            <span class="kd">final</span> <span class="kt">int</span> <span class="n">amVol</span> <span class="o">=</span> <span class="n">mAudioManager</span><span class="p">.</span><span class="na">getStreamVolume</span><span class="p">(</span><span class="n">AudioManager</span><span class="p">.</span><span class="na">STREAM_VOICE_CALL</span><span class="p">);</span>
+            <span class="kd">final</span> <span class="kt">int</span> <span class="n">hfVol</span> <span class="o">=</span> <span class="n">amToHfVol</span><span class="p">(</span><span class="n">amVol</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">DBG</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;hfp_enable=true mAudioWbs is &quot;</span> <span class="o">+</span> <span class="n">mAudioWbs</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mAudioWbs</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">DBG</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Setting sampling rate as 16000&quot;</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="n">mAudioManager</span><span class="p">.</span><span class="na">setParameters</span><span class="p">(</span><span class="s">&quot;hfp_set_sampling_rate=16000&quot;</span><span class="p">);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">DBG</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Setting sampling rate as 8000&quot;</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="n">mAudioManager</span><span class="p">.</span><span class="na">setParameters</span><span class="p">(</span><span class="s">&quot;hfp_set_sampling_rate=8000&quot;</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">DBG</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;hf_volume &quot;</span> <span class="o">+</span> <span class="n">hfVol</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">routeHfpAudio</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+            <span class="n">mAudioFocusRequest</span> <span class="o">=</span> <span class="n">requestAudioFocus</span><span class="p">();</span>
+            <span class="n">mAudioManager</span><span class="p">.</span><span class="na">setParameters</span><span class="p">(</span><span class="s">&quot;hfp_volume=&quot;</span> <span class="o">+</span> <span class="n">hfVol</span><span class="p">);</span>
+            <span class="n">transitionTo</span><span class="p">(</span><span class="n">mAudioOn</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+
+        <span class="k">case</span> <span class="n">HeadsetClientHalConstants</span><span class="p">.</span><span class="na">AUDIO_STATE_CONNECTING</span><span class="p">:</span>
+            <span class="c1">// No state transition is involved, fire broadcast immediately</span>
+            <span class="n">broadcastAudioState</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">BluetoothHeadsetClient</span><span class="p">.</span><span class="na">STATE_AUDIO_CONNECTING</span><span class="p">,</span>
+                    <span class="n">mAudioState</span><span class="p">);</span>
+            <span class="n">mAudioState</span> <span class="o">=</span> <span class="n">BluetoothHeadsetClient</span><span class="p">.</span><span class="na">STATE_AUDIO_CONNECTING</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+
+        <span class="k">case</span> <span class="n">HeadsetClientHalConstants</span><span class="p">.</span><span class="na">AUDIO_STATE_DISCONNECTED</span><span class="p">:</span>
+            <span class="c1">// No state transition is involved, fire broadcast immediately</span>
+            <span class="n">broadcastAudioState</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">BluetoothHeadsetClient</span><span class="p">.</span><span class="na">STATE_AUDIO_DISCONNECTED</span><span class="p">,</span>
+                    <span class="n">mAudioState</span><span class="p">);</span>
+            <span class="n">mAudioState</span> <span class="o">=</span> <span class="n">BluetoothHeadsetClient</span><span class="p">.</span><span class="na">STATE_AUDIO_DISCONNECTED</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+
+        <span class="k">default</span><span class="p">:</span>
+            <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Audio State Device: &quot;</span> <span class="o">+</span> <span class="n">device</span> <span class="o">+</span> <span class="s">&quot; bad state: &quot;</span> <span class="o">+</span> <span class="n">state</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

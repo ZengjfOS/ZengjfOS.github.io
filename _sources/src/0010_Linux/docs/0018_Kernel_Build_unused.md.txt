@@ -1,0 +1,21 @@
+# Kernel Build unused
+
+内核编译出现没有使用的变量或者函数
+
+# 参考文档
+
+* [linux makefile 编译标记 EXTRA_CFLAGS 简介](https://www.huaweicloud.com/articles/509ada5d8900bc0134de1f0ffbea133c.html)
+
+# diff
+
+```diff
+diff --git a/kernel-4.19/drivers/misc/mediatek/sensors-1.0/magnetometer/mmc5603/Makefile b/kernel-4.19/drivers/misc/mediatek/sensors-1.0/magnetometer/mmc5603/Makefile
+index 9d4bbae..416a2b6 100755
+--- a/kernel-4.19/drivers/misc/mediatek/sensors-1.0/magnetometer/mmc5603/Makefile
++++ b/kernel-4.19/drivers/misc/mediatek/sensors-1.0/magnetometer/mmc5603/Makefile
+@@ -1,3 +1,4 @@
++EXTRA_CFLAGS += -Wno-unused-variable -Wno-unused-function -Wno-unused-label
+ ccflags-y += -I$(srctree)/drivers/misc/mediatek/sensors-1.0/magnetometer/inc
+ ccflags-y += -I$(srctree)/drivers/misc/mediatek/sensors-1.0/hwmon/include
+
+```

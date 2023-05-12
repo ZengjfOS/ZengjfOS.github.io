@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ashmem</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简介</a></li>
+<li><a class="reference internal" href="#id3">使用</a></li>
+<li><a class="reference internal" href="#ashmem-fd">ashmem fd的传递：</a></li>
+<li><a class="reference internal" href="#systemui">systemui</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ashmem">
+<h1>ashmem<a class="headerlink" href="#ashmem" title="Permalink to this headline"></a></h1>
+<p>Android Shared Memory</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>http://androidxref.com/4.4.2_r1/xref/frameworks/native/libs/ui/GraphicBufferAllocator.cpp#38</p>
+<ul>
+<li><p>使用老版本的代码对原理分析比较适合</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://zhuanlan.zhihu.com/p/146671611">Ashmem(Android共享内存)使用方法和原理</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/yangwen123/article/details/12231687">Android图形缓冲区分配过程源码分析</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/Luoshengyang/article/details/6664554">Android系统匿名共享内存Ashmem（Anonymous Shared Memory）驱动程序源代码分析</a></p></li>
+<li><p><a class="reference external" href="http://www.uml.org.cn/mobiledev/201109303.asp">Android核心分析（25）——Android GDI之共享缓冲区机制</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简介<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>Ashmem即Android Shared Memory, 是Android提供的一种内存共享的机制。</p>
+</section>
+<section id="id3">
+<h1>使用<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Java层借助MemoryFile或者SharedMemory。</p></li>
+<li><p>Native层借助MemoryHeapBase或者MemoryBase。</p></li>
+<li><p>Native层直接调用libc的ashmem_create_region和mmap系统调用。</p></li>
+<li><p>MemoryFile基于SharedMemory。MemoryBase基于MemoryHeapBase。SharedMemory、MemoryHeapBase都是基于ashmem_create_region/mmap。</p></li>
+</ul>
+</section>
+<section id="ashmem-fd">
+<h1>ashmem fd的传递：<a class="headerlink" href="#ashmem-fd" title="Permalink to this headline"></a></h1>
+<p>Binder机制不仅支持binder对象的传递，还支持文件描述符的传递。fd经过binder驱动时，binder驱动会将源进程的fd转换成目标进程的fd，转换过程为：取出发送方binder数据里的fd，通过fd找到文件对象，然后为目标进程创建fd，将目标进程fd和文件对象进行关联，将发送方binder数据里的fd改为目标进程的fd，然后将数据发送给目标进程。这个过程相当于文件在目标进程又打开了一次，目标进程使用的是自己的fd，但和源进程都指向的是同一个文件。这样源进程和目标进程就都可以map到同一片内存了。</p>
+</section>
+<section id="systemui">
+<h1>systemui<a class="headerlink" href="#systemui" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>ps -A | grep systemui</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">u0_a121</span>        <span class="mi">1363</span>    <span class="mi">486</span> <span class="mi">14798012</span> <span class="mi">193616</span> <span class="n">do_epoll_wait</span>      <span class="mi">0</span> <span class="n">S</span> <span class="n">com</span><span class="o">.</span><span class="n">android</span><span class="o">.</span><span class="n">systemui</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>1363</p></li>
+</ul>
+</li>
+<li><p>cd /proc/1363</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

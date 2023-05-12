@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">硬件PWM控制风扇</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#pin">pin</a></li>
+<li><a class="reference internal" href="#dtbo">dtbo</a></li>
+<li><a class="reference internal" href="#steps">steps</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pwm">
+<h1>硬件PWM控制风扇<a class="headerlink" href="#pwm" title="Permalink to this headline"></a></h1>
+<p>PWM控制风扇</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://www.kernel.org/doc/Documentation/pwm.txt</p></li>
+</ul>
+</section>
+<section id="pin">
+<h1>pin<a class="headerlink" href="#pin" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://datasheets.raspberrypi.org/bcm2711/bcm2711-peripherals.pdf</p>
+<ul>
+<li><p>Chapter 5. General Purpose I/O (GPIO)</p>
+<ul>
+<li><p>5.3. Alternative Function Assignments</p>
+<ul>
+<li><p>GPIO12</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="dtbo">
+<h1>dtbo<a class="headerlink" href="#dtbo" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>arch/arm/boot/dts/overlays/pwm-overlay.dts</p></li>
+<li><p>arch/arm/boot/dts/overlays/README</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Name</span><span class="p">:</span>   <span class="n">pwm</span>
+<span class="n">Info</span><span class="p">:</span>   <span class="n">Configures</span> <span class="n">a</span> <span class="n">single</span> <span class="n">PWM</span> <span class="n">channel</span>
+        <span class="n">Legal</span> <span class="n">pin</span><span class="p">,</span><span class="n">function</span> <span class="n">combinations</span> <span class="k">for</span> <span class="n">each</span> <span class="n">channel</span><span class="p">:</span>
+          <span class="n">PWM0</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">(</span><span class="n">Alt0</span><span class="p">)</span> <span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="p">(</span><span class="n">Alt5</span><span class="p">)</span> <span class="mi">40</span><span class="p">,</span><span class="mi">4</span><span class="p">(</span><span class="n">Alt0</span><span class="p">)</span>            <span class="mi">52</span><span class="p">,</span><span class="mi">5</span><span class="p">(</span><span class="n">Alt1</span><span class="p">)</span>
+          <span class="n">PWM1</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span><span class="mi">4</span><span class="p">(</span><span class="n">Alt0</span><span class="p">)</span> <span class="mi">19</span><span class="p">,</span><span class="mi">2</span><span class="p">(</span><span class="n">Alt5</span><span class="p">)</span> <span class="mi">41</span><span class="p">,</span><span class="mi">4</span><span class="p">(</span><span class="n">Alt0</span><span class="p">)</span> <span class="mi">45</span><span class="p">,</span><span class="mi">4</span><span class="p">(</span><span class="n">Alt0</span><span class="p">)</span> <span class="mi">53</span><span class="p">,</span><span class="mi">5</span><span class="p">(</span><span class="n">Alt1</span><span class="p">)</span>
+        <span class="n">N</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="p">:</span>
+          <span class="mi">1</span><span class="p">)</span> <span class="n">Pin</span> <span class="mi">18</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">only</span> <span class="n">one</span> <span class="n">available</span> <span class="n">on</span> <span class="nb">all</span> <span class="n">platforms</span><span class="p">,</span> <span class="ow">and</span>
+             <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">one</span> <span class="n">used</span> <span class="n">by</span> <span class="n">the</span> <span class="n">I2S</span> <span class="n">audio</span> <span class="n">interface</span><span class="o">.</span>
+             <span class="n">Pins</span> <span class="mi">12</span> <span class="ow">and</span> <span class="mi">13</span> <span class="n">might</span> <span class="n">be</span> <span class="n">better</span> <span class="n">choices</span> <span class="n">on</span> <span class="n">an</span> <span class="n">A</span><span class="o">+</span><span class="p">,</span> <span class="n">B</span><span class="o">+</span> <span class="ow">or</span> <span class="n">Pi2</span><span class="o">.</span>
+          <span class="mi">2</span><span class="p">)</span> <span class="n">The</span> <span class="n">onboard</span> <span class="n">analogue</span> <span class="n">audio</span> <span class="n">output</span> <span class="n">uses</span> <span class="n">both</span> <span class="n">PWM</span> <span class="n">channels</span><span class="o">.</span>
+          <span class="mi">3</span><span class="p">)</span> <span class="n">So</span> <span class="n">be</span> <span class="n">careful</span> <span class="n">mixing</span> <span class="n">audio</span> <span class="ow">and</span> <span class="n">PWM</span><span class="o">.</span>
+          <span class="mi">4</span><span class="p">)</span> <span class="n">Currently</span> <span class="n">the</span> <span class="n">clock</span> <span class="n">must</span> <span class="n">have</span> <span class="n">been</span> <span class="n">enabled</span> <span class="ow">and</span> <span class="n">configured</span>
+             <span class="n">by</span> <span class="n">other</span> <span class="n">means</span><span class="o">.</span>
+<span class="n">Load</span><span class="p">:</span>   <span class="n">dtoverlay</span><span class="o">=</span><span class="n">pwm</span><span class="p">,</span><span class="o">&lt;</span><span class="n">param</span><span class="o">&gt;=&lt;</span><span class="n">val</span><span class="o">&gt;</span>
+<span class="n">Params</span><span class="p">:</span> <span class="n">pin</span>                     <span class="n">Output</span> <span class="n">pin</span> <span class="p">(</span><span class="n">default</span> <span class="mi">18</span><span class="p">)</span> <span class="o">-</span> <span class="n">see</span> <span class="n">table</span>
+        <span class="n">func</span>                    <span class="n">Pin</span> <span class="n">function</span> <span class="p">(</span><span class="n">default</span> <span class="mi">2</span> <span class="o">=</span> <span class="n">Alt5</span><span class="p">)</span> <span class="o">-</span> <span class="n">see</span> <span class="n">above</span>
+        <span class="n">clock</span>                   <span class="n">PWM</span> <span class="n">clock</span> <span class="n">frequency</span> <span class="p">(</span><span class="n">informational</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>/boot/config.txt</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dtoverlay</span><span class="o">=</span><span class="n">pwm</span><span class="p">,</span><span class="n">pin</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">func</span><span class="o">=</span><span class="mi">4</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="steps">
+<h1>steps<a class="headerlink" href="#steps" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>https://github.com/LowLevelOfLogic/RaspberryPi/tree/IP_Camera</p>
+<ul class="simple">
+<li><p>python3 stream.py</p></li>
+<li><p>http://192.168.3.8:5000/</p></li>
+</ul>
+</li>
+<li><p>cd /sys/class/pwm/pwmchip0</p></li>
+<li><p>echo 0 &gt; export</p></li>
+<li><p>ls</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">capture</span>  <span class="n">duty_cycle</span>  <span class="n">enable</span>  <span class="n">period</span>  <span class="n">polarity</span>  <span class="n">power</span>  <span class="n">uevent</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>period<br />
+The total period of the PWM signal (read/write). Value is in nanoseconds and is the sum of the active and inactive time of the PWM.</p></li>
+<li><p>duty_cycle<br />
+The active time of the PWM signal (read/write). Value is in nanoseconds and must be less than the period.</p></li>
+</ul>
+</li>
+<li><p>cd pwm0</p></li>
+<li><p>echo 1000000 &gt; period</p></li>
+<li><p>echo 500000 &gt; duty_cycle</p></li>
+<li><p>echo 1 &gt; enable<br />
+<img alt="0025-DSView_PWM_Info.png" src="../../../_images/0025-DSView_PWM_Info.png" /></p>
+<ul class="simple">
+<li><p>宽度：500us</p></li>
+<li><p>周期：1ms</p></li>
+<li><p>频率：1KHz</p></li>
+<li><p>占空比：50%</p></li>
+</ul>
+</li>
+<li><p>频率太低，能听到刺耳的声音，将频率拉高；</p></li>
+<li><p>echo 5000 &gt; duty_cycle</p></li>
+<li><p>echo 10000 &gt; period</p>
+<ul class="simple">
+<li><p>宽度：5us</p></li>
+<li><p>周期：10us</p></li>
+<li><p>频率：100KHz</p></li>
+<li><p>占空比：50%</p></li>
+</ul>
+</li>
+<li><p>https://github.com/LowLevelOfLogic/RaspberryPi/tree/FanHAT</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

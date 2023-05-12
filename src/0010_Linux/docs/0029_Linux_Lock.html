@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Linux Lock</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">原子操作</a></li>
+<li><a class="reference internal" href="#id3">自旋锁</a></li>
+<li><a class="reference internal" href="#id4">信号量</a></li>
+<li><a class="reference internal" href="#id5">互斥锁</a></li>
+<li><a class="reference internal" href="#id6">完成量</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linux-lock">
+<h1>Linux Lock<a class="headerlink" href="#linux-lock" title="Permalink to this headline"></a></h1>
+<p>常见的几种内核驱动涉及的锁，理解原子操作比较重要</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/xiaoaid01/article/details/52092590">linux中关于原子操作</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/armlinuxww/article/details/9025409">spinlock与linux内核调度的关系</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>原子操作<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>对于arm来说，单条汇编指令都是原子的，多核smp也是，因为有<strong>总线仲裁</strong>所以cpu可以单独占用总线直到指令结束，多核系统中的原子操作通常使用内存栅障（memory barrier）来实现，即一个CPU核在执行原子操作时，其他CPU核必须停止对内存操作或者不对指定的内存进行操作，这样才能避免数据竞争问题。但是对于load update store这个过程可能被中断、抢占，所以arm指令集有增加了<code class="docutils literal notranslate"><span class="pre">ldrex</span></code>/<code class="docutils literal notranslate"><span class="pre">strex</span></code>这样的实现load update store的原子指令。</p>
+</section>
+<section id="id3">
+<h1>自旋锁<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>本质是执行原子操作，所以该操作完成之前其他执行单元不可能访问这个内存变量，<code class="docutils literal notranslate"><span class="pre">while</span></code>循环一直检测该原子变量，无法进入sleep；</p></li>
+<li><p>单处理器非抢占内核下：自旋锁会在编译时被忽略；</p></li>
+<li><p>单处理器抢占内核下：自旋锁仅仅当作一个设置内核抢占的开关；</p></li>
+<li><p>多处理器下：此时才能完全发挥出自旋锁的作用，自旋锁在内核中主要用来防止多处理器中并发访问临界区，防止内核抢占造成的竞争。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h1>信号量<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>信号量是一个特殊的变量，程序对其访问都是原子操作，且只允许对它进行等待（即P(信号变量))和发送（即V(信号变量))信息操作。最简单的信号量是只能取0和1的变量，这也是信号量最常见的一种形式，叫做二进制信号量。而可以取多个正整数的信号量被称为通用信号量。大多数情况下讨论二进制信号量。</p></li>
+<li><p>会进入sleep，不能在中断使用；</p></li>
+</ul>
+</section>
+<section id="id5">
+<h1>互斥锁<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>互斥体实现了”互相排斥”（mutual exclusion）同步的简单形式（所以名为互斥体(mutex)）。互斥体禁止多个线程同时进入受保护的代码”临界区”（critical section）。因此，在任意时刻，只有一个线程被允许进入这样的代码保护区。mutex实际上是count=1情况下的semaphore。</p></li>
+<li><p>会进入sleep，不能在中断使用；</p></li>
+</ul>
+</section>
+<section id="id6">
+<h1>完成量<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>completion是内核中的一种同步机制，该机制主要借助等待队列实现同步，该同步机制是一种简单的同步机制。</p></li>
+<li><p>会进入sleep，不能在中断使用；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

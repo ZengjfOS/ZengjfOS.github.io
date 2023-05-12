@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ATF SCFW M4</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">编译操作流程</a></li>
+<li><a class="reference internal" href="#atf-analysis">ATF analysis</a></li>
+<li><a class="reference internal" href="#sc-firmware-analysis">SC Firmware analysis</a></li>
+<li><a class="reference internal" href="#m4-firmware-analysis">M4 Firmware analysis</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="atf-scfw-m4">
+<h1>ATF SCFW M4<a class="headerlink" href="#atf-scfw-m4" title="Permalink to this headline"></a></h1>
+<p>ATF SCFW M4编译原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="0013_u-boot_generate.html"><span class="doc std std-doc">0013_u-boot_generate.md</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>编译操作流程<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>创建或者进入编译环境：</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">DISTRO=fsl-imx-wayland</span> <span class="pre">MACHINE=imx8qmmek</span> <span class="pre">source</span> <span class="pre">./fsl-setup-release.sh</span> <span class="pre">-b</span> <span class="pre">imx8-build-wayland</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">setup-environment</span> <span class="pre">imx8-build-wayland</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">imx-atf</span> <span class="pre">-c</span> <span class="pre">compile</span> <span class="pre">-f</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">imx-atf</span> <span class="pre">-c</span> <span class="pre">deploy</span> <span class="pre">-f</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">imx-boot</span> <span class="pre">-c</span> <span class="pre">compile</span> <span class="pre">-f</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">imx-boot</span> <span class="pre">-c</span> <span class="pre">deploy</span> <span class="pre">-f</span></code></p></li>
+</ul>
+</section>
+<section id="atf-analysis">
+<h1>ATF analysis<a class="headerlink" href="#atf-analysis" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-mkimage/imx-boot_0.2.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_compile () {
+    [...省略]
+    # mkimage for i.MX8
+    for target in ${IMXBOOT_TARGETS}; do
+        echo &quot;building ${SOC_TARGET} - ${target}&quot;
+        make SOC=${SOC_TARGET} ${target}
+        if [ -e &quot;${S}/${SOC_DIR}/flash.bin&quot; ]; then
+            cp ${S}/${SOC_DIR}/flash.bin ${S}/${BOOT_CONFIG_MACHINE}-${target}
+        fi
+    done
+}
+</pre></div>
+</div>
+</li>
+<li><p>check imx-boot type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>zengjf@UbuntuServer:imx8qmmek$ ls -al imx-boot-imx8qmmek-sd.bin
+lrwxrwxrwx 2 zengjf zengjf 40 Sep 24 11:45 imx-boot-imx8qmmek-sd.bin -&gt; imx-boot-imx8qmmek-sd.bin-flash_linux_m4
+zengjf@UbuntuServer:imx8qmmek$ pwd
+/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${target}</span></code>: <code class="docutils literal notranslate"><span class="pre">flash_linux_m4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-boot/0.2-r0/git/iMX8QM/soc.mak</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+
+u-boot-hash.bin: u-boot.bin
+        ./$(MKIMG) -commit &gt; head.hash
+        @cat u-boot.bin head.hash &gt; u-boot-hash.bin
+
+u-boot-atf.bin: u-boot-hash.bin bl31.bin
+        @cp bl31.bin u-boot-atf.bin
+        @dd if=u-boot-hash.bin of=u-boot-atf.bin bs=1K seek=128
+        @if [ -f &quot;hdmitxfw.bin&quot; ] &amp;&amp; [ -f &quot;hdmirxfw.bin&quot; ]; then \
+        objcopy -I binary -O binary --pad-to 0x20000 --gap-fill=0x0 hdmitxfw.bin hdmitxfw-pad.bin; \
+        objcopy -I binary -O binary --pad-to 0x20000 --gap-fill=0x0 hdmirxfw.bin hdmirxfw-pad.bin; \
+        cat u-boot-atf.bin hdmitxfw-pad.bin hdmirxfw-pad.bin &gt; u-boot-atf-hdmi.bin; \
+        cp u-boot-atf-hdmi.bin u-boot-atf.bin; \
+        fi
+
+[...省略]
+
+flash_linux_m4: $(MKIMG) mx8qm-ahab-container.img scfw_tcm.bin u-boot-spl.bin m4_image.bin m4_1_image.bin u-boot-atf-container.img
+        ./$(MKIMG) -soc QM -rev B0 -dcd skip -append mx8qm-ahab-container.img -c -flags 0x00200000 -scfw scfw_tcm.bin -ap u-boot-spl.bin a53 0x00100000 -p3 -m4 m4_image.bin 0 0x34FE0000 -p4 -m4 m4_1_image.bin 1 0x38FE0000 -out flash.bin
+        cp flash.bin boot-spl-container.img
+        @flashbin_size=`wc -c flash.bin | awk &#39;{print $$1}&#39;`; \
+                   pad_cnt=$$(((flashbin_size + 0x400 - 1) / 0x400)); \
+                   echo &quot;append u-boot-atf-container.img at $$pad_cnt KB&quot;; \
+                   dd if=u-boot-atf-container.img of=flash.bin bs=1K seek=$$pad_cnt;
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bl31.bin</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-mkimage/imx-boot_0.2.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>elif [ &quot;${SOC_TARGET}&quot; = &quot;iMX8QM&quot; ]; then
+    echo 8QM boot binary build
+    cp ${DEPLOY_DIR_IMAGE}/${BOOT_TOOLS}/${SC_FIRMWARE_NAME} ${S}/${SOC_DIR}/scfw_tcm.bin
+    cp ${DEPLOY_DIR_IMAGE}/${BOOT_TOOLS}/${ATF_MACHINE_NAME} ${S}/${SOC_DIR}/bl31.bin
+    cp ${DEPLOY_DIR_IMAGE}/${UBOOT_NAME}                     ${S}/${SOC_DIR}/u-boot.bin
+    if ${DEPLOY_OPTEE}; then
+        cp ${DEPLOY_DIR_IMAGE}/u-boot-spl.bin-${MACHINE}-${UBOOT_CONFIG} ${S}/${SOC_DIR}/u-boot-spl.bin
+    fi
+
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_0_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m40.bin ${S}/${SOC_DIR}/m40_tcm.bin
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_1_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m41.bin ${S}/${SOC_DIR}/m41_tcm.bin
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_0_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m40.bin ${S}/${SOC_DIR}/m4_image.bin
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_1_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m41.bin ${S}/${SOC_DIR}/m4_1_image.bin
+
+    cp ${DEPLOY_DIR_IMAGE}/mx8qm-ahab-container.img ${S}/${SOC_DIR}/
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${BOOT_TOOLS}</span></code>: <code class="docutils literal notranslate"><span class="pre">imx-boot-tools</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-atf/imx-atf_2.0.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_deploy () {
+    install -d ${DEPLOYDIR}/${BOOT_TOOLS}
+    install -m 0644 ${S}/build/${SOC_ATF}/release/bl31.bin ${DEPLOYDIR}/${BOOT_TOOLS}/bl31-${SOC_ATF}.bin
+    # Deploy opteee version
+    if [ &quot;${BUILD_OPTEE}&quot; = &quot;true&quot; ]; then
+        install -m 0644 ${S}/build-optee/${SOC_ATF}/release/bl31.bin ${DEPLOYDIR}/${BOOT_TOOLS}/bl31-${SOC_ATF}.bin-optee
+    fi
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">tmp/work/imx8qmmek-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/git</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">acknowledgements</span><span class="o">.</span><span class="n">rst</span>  <span class="n">bl2</span>   <span class="n">bl31</span>  <span class="n">build</span>        <span class="n">common</span>            <span class="n">dco</span><span class="o">.</span><span class="n">txt</span>  <span class="n">drivers</span>  <span class="n">include</span>  <span class="n">license</span><span class="o">.</span><span class="n">rst</span>      <span class="n">Makefile</span>      <span class="n">plat</span>        <span class="n">services</span>
+<span class="n">bl1</span>                   <span class="n">bl2u</span>  <span class="n">bl32</span>  <span class="n">build</span><span class="o">-</span><span class="n">optee</span>  <span class="n">contributing</span><span class="o">.</span><span class="n">rst</span>  <span class="n">docs</span>     <span class="n">fdts</span>     <span class="n">lib</span>      <span class="n">maintainers</span><span class="o">.</span><span class="n">rst</span>  <span class="n">make_helpers</span>  <span class="n">readme</span><span class="o">.</span><span class="n">rst</span>  <span class="n">tools</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-atf/imx-atf_2.0.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_compile () {
+    export CROSS_COMPILE=&quot;${TARGET_PREFIX}&quot;
+    cd ${S}
+    # Clear LDFLAGS to avoid the option -Wl recognize issue
+    unset LDFLAGS
+
+    echo &quot;-&gt; Build ${SOC_ATF} bl31.bin&quot;
+    # Set BUIL_STRING with the revision info
+    BUILD_STRING=&quot;&quot;
+    if [ -e ${S}/.revision ]; then
+        cur_rev=`cat ${S}/.revision`
+        echo &quot; Current revision is ${cur_rev} .&quot;
+        BUILD_STRING=&quot;BUILD_STRING=${cur_rev}&quot;
+    else
+        echo &quot; No .revision found! &quot;
+    fi
+    oe_runmake clean PLAT=${SOC_ATF}
+    oe_runmake ${BUILD_STRING} PLAT=${SOC_ATF} bl31
+
+    # Build opteee version
+    if [ &quot;${BUILD_OPTEE}&quot; = &quot;true&quot; ]; then
+        oe_runmake clean PLAT=${SOC_ATF} BUILD_BASE=build-optee
+        oe_runmake ${BUILD_STRING} PLAT=${SOC_ATF} BUILD_BASE=build-optee SPD=opteed bl31
+    fi
+    unset CROSS_COMPILE
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/temp/run.do_compile</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_compile() {
+    export CROSS_COMPILE=&quot;aarch64-poky-linux-&quot;
+    cd /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/git
+    # Clear LDFLAGS to avoid the option -Wl recognize issue
+    unset LDFLAGS
+
+    echo &quot;-&gt; Build imx8qm bl31.bin&quot;
+    # Set BUIL_STRING with the revision info
+    BUILD_STRING=&quot;&quot;
+    if [ -e /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/git/.revision ]; then
+        cur_rev=`cat /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-atf/2.0+gitAUTOINC+1cb68fa0a0-r0/git/.revision`
+        echo &quot; Current revision is ${cur_rev} .&quot;
+        BUILD_STRING=&quot;BUILD_STRING=${cur_rev}&quot;
+    else
+        echo &quot; No .revision found! &quot;
+    fi
+    oe_runmake clean PLAT=imx8qm
+    oe_runmake ${BUILD_STRING} PLAT=imx8qm bl31
+
+    # Build opteee version
+    if [ &quot;true&quot; = &quot;true&quot; ]; then
+        oe_runmake clean PLAT=imx8qm BUILD_BASE=build-optee
+        oe_runmake ${BUILD_STRING} PLAT=imx8qm BUILD_BASE=build-optee SPD=opteed bl31
+    fi
+    unset CROSS_COMPILE
+}
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="sc-firmware-analysis">
+<h1>SC Firmware analysis<a class="headerlink" href="#sc-firmware-analysis" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-sc-firmware/imx-sc-firmware_1.2.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+inherit fsl-eula2-unpack2 pkgconfig deploy
+[...省略]
+do_deploy() {
+    install -Dm 0644 ${S}/${SC_FIRMWARE_NAME} ${DEPLOYDIR}/${BOOT_TOOLS}/${SC_FIRMWARE_NAME}
+    ln -sf ${SC_FIRMWARE_NAME} ${DEPLOYDIR}/${BOOT_TOOLS}/${symlink_name}
+}
+[...省略]
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/deploy-imx-sc-firmware/imx-boot-tools</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mx8qm</span><span class="o">-</span><span class="n">mek</span><span class="o">-</span><span class="n">scfw</span><span class="o">-</span><span class="n">tcm</span><span class="o">.</span><span class="n">bin</span>  <span class="n">scfw_tcm</span><span class="o">.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/deploy/images/imx8qmmek/imx-boot-tools</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bl31</span><span class="o">-</span><span class="n">imx8qm</span><span class="o">.</span><span class="n">bin</span>        <span class="n">m40_tcm</span><span class="o">.</span><span class="n">bin</span>     <span class="n">m41_tcm</span><span class="o">.</span><span class="n">bin</span>   <span class="n">mkimage_imx8</span>              <span class="n">mx8qm</span><span class="o">-</span><span class="n">mek</span><span class="o">-</span><span class="n">scfw</span><span class="o">-</span><span class="n">tcm</span><span class="o">.</span><span class="n">bin</span>  <span class="n">soc</span><span class="o">.</span><span class="n">mak</span>  <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span>
+<span class="n">bl31</span><span class="o">-</span><span class="n">imx8qm</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">optee</span>  <span class="n">m4_1_image</span><span class="o">.</span><span class="n">bin</span>  <span class="n">m4_image</span><span class="o">.</span><span class="n">bin</span>  <span class="n">mx8qm</span><span class="o">-</span><span class="n">ahab</span><span class="o">-</span><span class="n">container</span><span class="o">.</span><span class="n">img</span>  <span class="n">scfw_tcm</span><span class="o">.</span><span class="n">bin</span>            <span class="n">tee</span><span class="o">.</span><span class="n">bin</span>  <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/classes/fsl-eula2-unpack2.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">IMX_PACKAGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{PV}</span><span class="s2">&quot;</span>
+
+<span class="n">SRC_URI</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{FSL_MIRROR}</span><span class="s2">$</span><span class="si">{IMX_PACKAGE_NAME}</span><span class="s2">.bin;fsl-eula=true&quot;</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{WORKDIR}</span><span class="s2">/$</span><span class="si">{IMX_PACKAGE_NAME}</span><span class="s2">&quot;</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-freescale/conf/layer.conf</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>IMX_MIRROR ?= &quot;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/&quot;
+[...省略]
+FSL_MIRROR ?= &quot;${IMX_MIRROR}&quot;
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/temp/log.fetch</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+DEBUG: Executing python function clean_recipe_sysroot
+DEBUG: Python function clean_recipe_sysroot finished
+DEBUG: Executing python function extend_recipe_sysroot
+NOTE: Direct dependencies are []
+NOTE: Installed into sysroot: []
+NOTE: Skipping as already exists in sysroot: []
+DEBUG: Python function extend_recipe_sysroot finished
+DEBUG: Executing python function do_fetch
+DEBUG: Executing python function base_do_fetch
+DEBUG: Trying PREMIRRORS
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;bzr&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;cvs&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;git&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;gitsm&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;hg&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;osc&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;p4&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;)])] comparing [&#39;svn&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: Trying Upstream
+DEBUG: Fetching https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin;fsl-eula=true using command &#39;/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate -P /home/zengjf/imx8-yocto-ga/downloads/ &#39;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;&#39;
+DEBUG: Fetcher accessed the network with the command /usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate -P /home/zengjf/imx8-yocto-ga/downloads/ &#39;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39;
+DEBUG: Running export PSEUDO_DISABLED=1; export PATH=&quot;/home/zengjf/imx8-yocto-ga/sources/poky/scripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/usr/bin/aarch64-poky-linux:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot/usr/bin/crossscripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/usr/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/usr/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/bin:/home/zengjf/imx8-yocto-ga/sources/poky/bitbake/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/hosttools&quot;; export HOME=&quot;/home/zengjf&quot;; /usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate -P /home/zengjf/imx8-yocto-ga/downloads/ &#39;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin&#39; --progress=dot -v
+--2019-04-20 00:03:54--  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.2.bin
+Resolving www.nxp.com (www.nxp.com)... 23.209.3.145
+Connecting to www.nxp.com (www.nxp.com)|23.209.3.145|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 445882 (435K) [application/octet-stream]
+Saving to: ‘/home/zengjf/imx8-yocto-ga/downloads/imx-sc-firmware-1.2.bin’
+
+
+2019-04-20 00:04:21 (22.4 KB/s) - ‘/home/zengjf/imx8-yocto-ga/downloads/imx-sc-firmware-1.2.bin’ saved [445882/445882]
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/temp/log.do_unpack</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">do_unpack</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Freescale</span> <span class="n">EULA</span> <span class="n">has</span> <span class="n">been</span> <span class="n">accepted</span> <span class="k">for</span> <span class="s1">&#39;imx-sc-firmware&#39;</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">fsl_bin_do_unpack</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Handling</span> <span class="n">file</span> <span class="s1">&#39;imx-sc-firmware-1.2.bin&#39;</span> <span class="k">as</span> <span class="n">a</span> <span class="n">Freescale</span><span class="s1">&#39;s EULA binary.</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Running</span> <span class="n">export</span> <span class="n">PSEUDO_DISABLED</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s2">&quot;/home/zengjf/imx8-yocto-ga/sources/poky/scripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/usr/bin/aarch64-poky-linux:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot/usr/bin/crossscripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/usr/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/usr/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/imx-sc-firmware/1.2-r0/recipe-sysroot-native/bin:/home/zengjf/imx8-yocto-ga/sources/poky/bitbake/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/hosttools&quot;</span><span class="p">;</span> <span class="n">export</span> <span class="n">HOME</span><span class="o">=</span><span class="s2">&quot;/home/zengjf&quot;</span><span class="p">;</span> <span class="n">sh</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">downloads</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">sc</span><span class="o">-</span><span class="n">firmware</span><span class="o">-</span><span class="mf">1.2</span><span class="o">.</span><span class="n">bin</span> <span class="o">--</span><span class="n">auto</span><span class="o">-</span><span class="n">accept</span> <span class="o">--</span><span class="n">force</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">fsl_bin_do_unpack</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">base_do_unpack</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Unpacking</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">downloads</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">sc</span><span class="o">-</span><span class="n">firmware</span><span class="o">-</span><span class="mf">1.2</span><span class="o">.</span><span class="n">bin</span> <span class="n">to</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">wayland</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">sc</span><span class="o">-</span><span class="n">firmware</span><span class="o">/</span><span class="mf">1.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">base_do_unpack</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">do_unpack</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">do_qa_unpack</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">do_qa_unpack</span> <span class="n">finished</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="m4-firmware-analysis">
+<h1>M4 Firmware analysis<a class="headerlink" href="#m4-firmware-analysis" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-mkimage/imx-boot_0.2.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>elif [ &quot;${SOC_TARGET}&quot; = &quot;iMX8QM&quot; ]; then
+    echo 8QM boot binary build
+    cp ${DEPLOY_DIR_IMAGE}/${BOOT_TOOLS}/${SC_FIRMWARE_NAME} ${S}/${SOC_DIR}/scfw_tcm.bin
+    cp ${DEPLOY_DIR_IMAGE}/${BOOT_TOOLS}/${ATF_MACHINE_NAME} ${S}/${SOC_DIR}/bl31.bin
+    cp ${DEPLOY_DIR_IMAGE}/${UBOOT_NAME}                     ${S}/${SOC_DIR}/u-boot.bin
+    if ${DEPLOY_OPTEE}; then
+        cp ${DEPLOY_DIR_IMAGE}/u-boot-spl.bin-${MACHINE}-${UBOOT_CONFIG} ${S}/${SOC_DIR}/u-boot-spl.bin
+    fi
+
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_0_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m40.bin ${S}/${SOC_DIR}/m40_tcm.bin
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_1_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m41.bin ${S}/${SOC_DIR}/m41_tcm.bin
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_0_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m40.bin ${S}/${SOC_DIR}/m4_image.bin
+    cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_1_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m41.bin ${S}/${SOC_DIR}/m4_1_image.bin
+
+    cp ${DEPLOY_DIR_IMAGE}/mx8qm-ahab-container.img ${S}/${SOC_DIR}/
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">tmp/deploy/images/imx8qmmek/imx8qm_m4*</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_hello_world_m40</span><span class="o">.</span><span class="n">bin</span>                            <span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_1_TCM_power_mode_switch_m41</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m40</span><span class="o">.</span><span class="n">bin</span>  <span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_1_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m41</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_rpmsg_lite_str_echo_rtos_m40</span><span class="o">.</span><span class="n">bin</span>               <span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_1_TCM_rpmsg_lite_str_echo_rtos_m41</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">tmp</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">/</span><span class="n">imx8qm_m4_1_TCM_hello_world_m41</span><span class="o">.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">find</span> <span class="pre">*</span> <span class="pre">-iname</span> <span class="pre">imx8qm_m4_0_TCM_hello_world_m40.bin</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aarch64</span><span class="o">-</span><span class="n">mx8</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="mf">2.5.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">package</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_hello_world_m40</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">aarch64</span><span class="o">-</span><span class="n">mx8</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="mf">2.5.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">packages</span><span class="o">-</span><span class="n">split</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_hello_world_m40</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">aarch64</span><span class="o">-</span><span class="n">mx8</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="mf">2.5.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">imx8qm</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demo</span><span class="o">-</span><span class="mf">2.5.2</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_hello_world_m40</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">aarch64</span><span class="o">-</span><span class="n">mx8</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="mf">2.5.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">deploy</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_hello_world_m40</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">aarch64</span><span class="o">-</span><span class="n">mx8</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="mf">2.5.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">image</span><span class="o">/</span><span class="n">imx8qm_m4_0_TCM_hello_world_m40</span><span class="o">.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">find</span> <span class="pre">*</span> <span class="pre">-iname</span> <span class="pre">imx-m4-demos*</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos_2</span><span class="mf">.5.2</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos_2</span><span class="mf">.3.0</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos_2</span><span class="mf">.5.0</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">-</span><span class="mf">2.</span><span class="n">inc</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos_2</span><span class="mf">.5.1</span><span class="o">.</span><span class="n">bb</span>
+<span class="n">meta</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">bsp</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">imx</span><span class="o">/</span><span class="n">meta</span><span class="o">-</span><span class="n">sdk</span><span class="o">/</span><span class="n">recipes</span><span class="o">-</span><span class="n">fsl</span><span class="o">/</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos_1</span><span class="mf">.0.1</span><span class="o">.</span><span class="n">bb</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-sdk/recipes-fsl/m4-demos/imx-m4-demos_2.5.2.bb</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-sdk/recipes-fsl/m4-demos/imx-m4-demos-2.inc</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">IMX_PACKAGE_NAME</span> <span class="pre">=</span> <span class="pre">&quot;${SOC}-m4-demo-${PV}&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/classes/fsl-eula2-unpack2.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">IMX_PACKAGE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{PV}</span><span class="s2">&quot;</span>
+
+<span class="n">SRC_URI</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{FSL_MIRROR}</span><span class="s2">$</span><span class="si">{IMX_PACKAGE_NAME}</span><span class="s2">.bin;fsl-eula=true&quot;</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{WORKDIR}</span><span class="s2">/$</span><span class="si">{IMX_PACKAGE_NAME}</span><span class="s2">&quot;</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-freescale/conf/layer.conf</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>IMX_MIRROR ?= &quot;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/&quot;
+[...省略]
+FSL_MIRROR ?= &quot;${IMX_MIRROR}&quot;
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/temp/log.do_fetch</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DEBUG: Executing python function clean_recipe_sysroot
+DEBUG: Python function clean_recipe_sysroot finished
+DEBUG: Executing python function extend_recipe_sysroot
+NOTE: Direct dependencies are []
+NOTE: Installed into sysroot: []
+NOTE: Skipping as already exists in sysroot: []
+DEBUG: Python function extend_recipe_sysroot finished
+DEBUG: Executing python function do_fetch
+DEBUG: Executing python function base_do_fetch
+DEBUG: Trying PREMIRRORS
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;bzr&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;cvs&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;git&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;gitsm&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;hg&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;osc&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;p4&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: For url [&#39;https&#39;, &#39;www.nxp.com&#39;, &#39;/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;, &#39;&#39;, &#39;&#39;, OrderedDict([(&#39;fsl-eula&#39;, &#39;true&#39;), (&#39;name&#39;, &#39;imx8qm&#39;)])] comparing [&#39;svn&#39;, &#39;.*&#39;, &#39;/.*&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()] to [&#39;http&#39;, &#39;downloads.yoctoproject.org&#39;, &#39;/mirror/sources/&#39;, &#39;&#39;, &#39;&#39;, OrderedDict()]
+DEBUG: Trying Upstream
+DEBUG: Fetching https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin;fsl-eula=true;name=imx8qm using command &#39;/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate -P /home/zengjf/imx8-yocto-ga/downloads/ &#39;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;&#39;
+DEBUG: Fetcher accessed the network with the command /usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate -P /home/zengjf/imx8-yocto-ga/downloads/ &#39;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39;
+DEBUG: Running export PSEUDO_DISABLED=1; export PATH=&quot;/home/zengjf/imx8-yocto-ga/sources/poky/scripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/usr/bin/aarch64-poky-linux:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot/usr/bin/crossscripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/usr/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/usr/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/bin:/home/zengjf/imx8-yocto-ga/sources/poky/bitbake/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/hosttools&quot;; export HOME=&quot;/home/zengjf&quot;; /usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate -P /home/zengjf/imx8-yocto-ga/downloads/ &#39;https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin&#39; --progress=dot -v
+--2019-04-20 00:49:08--  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.5.2.bin
+Resolving www.nxp.com (www.nxp.com)... 2.21.26.24
+Connecting to www.nxp.com (www.nxp.com)|2.21.26.24|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 96711 (94K) [application/octet-stream]
+Saving to: ‘/home/zengjf/imx8-yocto-ga/downloads/imx8qm-m4-demo-2.5.2.bin’
+
+
+2019-04-20 00:49:14 (92.7 KB/s) - ‘/home/zengjf/imx8-yocto-ga/downloads/imx8qm-m4-demo-2.5.2.bin’ saved [96711/96711]
+
+DEBUG: Python function base_do_fetch finished
+DEBUG: Python function do_fetch finished
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/temp/log.do_unpack</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">do_unpack</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Freescale</span> <span class="n">EULA</span> <span class="n">has</span> <span class="n">been</span> <span class="n">accepted</span> <span class="k">for</span> <span class="s1">&#39;imx-m4-demos&#39;</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">fsl_bin_do_unpack</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Handling</span> <span class="n">file</span> <span class="s1">&#39;imx8qm-m4-demo-2.5.2.bin&#39;</span> <span class="k">as</span> <span class="n">a</span> <span class="n">Freescale</span><span class="s1">&#39;s EULA binary.</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Running</span> <span class="n">export</span> <span class="n">PSEUDO_DISABLED</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s2">&quot;/home/zengjf/imx8-yocto-ga/sources/poky/scripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/usr/bin/aarch64-poky-linux:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot/usr/bin/crossscripts:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/usr/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/usr/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/sbin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/aarch64-mx8-poky-linux/imx-m4-demos/2.5.2-r0/recipe-sysroot-native/bin:/home/zengjf/imx8-yocto-ga/sources/poky/bitbake/bin:/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/hosttools&quot;</span><span class="p">;</span> <span class="n">export</span> <span class="n">HOME</span><span class="o">=</span><span class="s2">&quot;/home/zengjf&quot;</span><span class="p">;</span> <span class="n">sh</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">downloads</span><span class="o">/</span><span class="n">imx8qm</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demo</span><span class="o">-</span><span class="mf">2.5.2</span><span class="o">.</span><span class="n">bin</span> <span class="o">--</span><span class="n">auto</span><span class="o">-</span><span class="n">accept</span> <span class="o">--</span><span class="n">force</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">fsl_bin_do_unpack</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">base_do_unpack</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Unpacking</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">downloads</span><span class="o">/</span><span class="n">imx8qm</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demo</span><span class="o">-</span><span class="mf">2.5.2</span><span class="o">.</span><span class="n">bin</span> <span class="n">to</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">wayland</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">aarch64</span><span class="o">-</span><span class="n">mx8</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">imx</span><span class="o">-</span><span class="n">m4</span><span class="o">-</span><span class="n">demos</span><span class="o">/</span><span class="mf">2.5.2</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">base_do_unpack</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">do_unpack</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">do_qa_unpack</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">do_qa_unpack</span> <span class="n">finished</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+# recovery倒地机器人
+
+recovery倒地机器人原理
+
+# 参考文档
+
+* [0031_init_svc_console.md](0031_init_svc_console.md)
+* [Android如何在No command下进入recovery](http://tjtech.me/how-to-enter-recovery-menu-under-no-command.html)
+
+# 调试
+
+* userdebug版本
+* adb root
+* adb pull tmp .
+  * recovery.log
+
+# NO_COMMAND
+
+bootable/recovery/recovery_ui/screen_ui.cpp
+
+```c
+const GRSurface* ScreenRecoveryUI::GetCurrentText() const {
+  switch (current_icon_) {
+    case ERASING:
+      return erasing_text_.get();
+    case ERROR:
+      return error_text_.get();
+    case INSTALLING_UPDATE:
+      return installing_text_.get();
+    case NO_COMMAND:
+      return no_command_text_.get();
+    case NONE:
+      abort();
+  }
+}
+```
+
+* recovery显示调用关系
+* [0031_init_svc_console.md](0031_init_svc_console.md)
+  * 如果默认打开了ro.debuglogger，导致不会出现倒地机器人
+  * 按Power键后，在按音量+按键进入recovery菜单
+
+```
+* bootable/recovery/recovery_main.cpp
+  └── int main(int argc, char** argv)
+      ├── device->ResetUI(new StubRecoveryUI());
+      │   └── new StubRecoveryUI()
+      │       └── bootable/recovery/recovery_ui/include/recovery_ui/stub_ui.h 
+      │           └── class StubRecoveryUI : public RecoveryUI
+      └── while (true)
+          └── auto ret = fastboot ? StartFastboot(device, args) : start_recovery(device, args);
+              └── bootable/recovery/recovery.cpp
+                  └── Device::BuiltinAction start_recovery(Device* device, const std::vector<std::string>& args)
+                      ├── static constexpr struct option OPTIONS[]
+                      ├── while ((arg = getopt_long(args_to_parse.size() - 1, args_to_parse.data(), "", OPTIONS, &option_index)) != -1)
+                      ├── auto ui = device->GetUI();
+                      ├── else if (!just_exit)
+                      │   ├── if (IsRoDebuggable())
+                      │   │   └── static bool IsRoDebuggable()
+                      │   │       └── return android::base::GetBoolProperty("ro.debuggable", false);
+                      │   └── ui->SetBackground(RecoveryUI::NO_COMMAND);
+                      │       └── bootable/recovery/recovery_ui/screen_ui.cpp
+                      │           └── void ScreenRecoveryUI::SetBackground(Icon icon)
+                      │               └── update_screen_locked();
+                      │                   └── bootable/recovery/recovery_ui/screen_ui.cpp
+                      │                       └── void ScreenRecoveryUI::update_screen_locked()
+                      │                           └── draw_screen_locked()
+                      │                               └── if (!show_text)
+                      │                                   ├── draw_background_locked();
+                      │                                   │   └── const auto& text_surface = GetCurrentText();
+                      │                                   │       └── switch (current_icon_)
+                      │                                   │           └── case NO_COMMAND:
+                      │                                   │               └── return no_command_text_.get();
+                      │                                   │                   └── no_command_text_ = LoadLocalizedBitmap("no_command_text");
+                      │                                   └── draw_foreground_locked();
+                      └── if (status != INSTALL_REBOOT)
+                          └── if (status == INSTALL_NONE || ui->IsTextVisible())
+                              └── auto temp = PromptAndWait(device, status);
+                                  └── for (;;)
+```

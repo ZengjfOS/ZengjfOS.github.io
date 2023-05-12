@@ -1,0 +1,426 @@
+# LXC namespace cgroup
+
+namespace做资源隔离, cgroup做资源限制，cgroup也是一种namespace
+
+# 参考文档
+
+* [Cgroups /sys/fs/cgroup is empty on ubuntu](https://stackoverflow.com/questions/27454848/cgroups-sys-fs-cgroup-is-empty-on-ubuntu)
+* https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt
+* https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt
+* https://www.kernel.org/doc/Documentation/namespaces/compatibility-list.txt
+
+# 基本概念
+
+* namespace做资源隔离
+* cgroup(Control Group)做资源限制
+* cgroup是一种namespace
+* 子进程自动成为父进程cgroup的成员，可按需求将子进程移到不同的cgroup中。
+
+# Namespace
+
+* UTS namespace：对主机名和域名进行隔离。为什么要隔离主机名？因为主机名可以代替IP来访问。如果不隔离，同名访问会出冲突。
+* IPC namespace：Linux提供很多种进程通信机制，IPC namespace针对System V和POSIX消息队列，这些IPC机制会使用标识符来区别不同的消息队列，然后两个进程通过标识符找到对应的消息队列。IPC namespace使得 相同的标识符在两个namespace代表不同的消息队列，因此两个namespace中的进程不能通过IPC来通信。
+* PID namespace：隔离进程号，不同namespace的进程可以使用相同的进程号。当创建一个PID namespace时，第一个进程的PID是1，即init进程。它负责回收所有孤儿进程的资源，所有发给init进程的信号都会被屏蔽。
+* Mount namespace：隔离文件挂载点，每个进程能看到的文件系统都记录在/proc/$$/mounts里。在一个namespace里挂载、卸载的动作不会影响到其他namespace。
+* Network namespace：隔离网络资源。每个namespace都有自己的网络设备、IP、路由表、/proc/net 目录、端口号等。网络隔离可以保证独立使用网络资源，比如开发两个web应用可以使用80端口。新创建的Network namespace只有loopback一个网络设备，需要手动添加网络设备。
+* User namespace：隔离用户和用户组。它的厉害之处在于，可以让宿主机上的一个普通用户在namespace里成为0号用户，也就是root用户。这样普通用户可以在容器内"随心所欲"，但是影响也仅限在容器内。
+
+查看进程所属的namespace
+
+* ls -al /proc/$$/ns
+  ```
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 cgroup -> 'cgroup:[4026531835]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 ipc -> 'ipc:[4026531839]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 mnt -> 'mnt:[4026531840]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 net -> 'net:[4026531905]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 pid -> 'pid:[4026531836]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 pid_for_children -> 'pid:[4026531836]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 user -> 'user:[4026531837]'
+  lrwxrwxrwx 1 root root 0 Feb 23 10:26 uts -> 'uts:[4026531838]'
+  ```
+* 从上面的命令可知，在Linux里面，每个进程都会有自己的ns信息
+
+可以通过三个系统调用的方式
+
+* clone：创建新的进程和新的namespace，新创建的进程attach到新创建的namespace
+* unshare：不创建新的进程，创建新的namespace并把当前进程attach上
+* setns：attach进程到已有的namespace上
+
+flag标记位 | 功能 | 隔离的资源 | Linux 内核版本支持
+---|---|---|---
+CLONE_NEWIPC    | 在新的IPC namespace启动新进程	    | 进程间通信，包括信号量、消息队列和共享内存  | since 2.6.19
+CLONE_NEWNET    | 在新的network namespace启动新进程 | 网络设备、网络栈、端口                    | since 2.6.24
+CLONE_NEWNS     | 在新的mount namespace启动新进程	  | 挂载点（文件系统）                        | since 2.6.19
+CLONE_NEWPID    | 在新的PID namespace启动新进程	    | 进程编号（新的进程树）                    | since 2.6.24
+CLONE_NEWUSER   | 在新的user namespace启动新进程    | 用户和用户组                              | 在2.6.23引入，在3.5和3.8有更新
+CLONE_NEWUTS    | 在新的UTS namespace启动新进程	    | 主机名和域名                              | since 2.6.19
+CLONE_NEWCGROUP | 在新的cgroup namespace启动新进程  | CPU、内存、磁盘读写等                     | since 4.6
+
+* CLONE_NEWIPC示例：demo_ipc.c
+  ```cpp
+  #define _GNU_SOURCE
+  #include <sys/types.h>
+  #include <sys/wait.h>
+  #include <sys/utsname.h>
+  #include <sched.h>
+  #include <stdio.h>
+  #include <signal.h>
+  #include <unistd.h>
+  
+  #define STACK_SIZE (1024*1024)
+  
+  static char child_stack[STACK_SIZE];
+  char* const child_args[] = {
+      "/bin/bash",
+      NULL
+  };
+  
+  int child_main(void * args) {
+      printf("in child process\n");
+      sethostname("NewHostName", 12);
+      execv(child_args[0], child_args);
+      printf("quit child process¡­\n");
+      return 1;
+  }
+  
+  int main(){
+      printf("start parent process...\n");
+      int child_pid = clone(child_main, child_stack + STACK_SIZE, CLONE_NEWIPC | CLONE_NEWUTS | SIGCHLD, NULL);
+      waitpid(child_pid, NULL, 0);
+      printf("quit parent process...\n");
+      return 0;
+  }
+  ```
+* gcc demo_ipc.c -o demo_ipc
+* ipcs -q
+  ```
+  ------ Message Queues --------
+  key        msqid      owner      perms      used-bytes   messages
+  ```
+* ipcmk -Q test
+* ipcs -q
+  ```
+  ------ Message Queues --------
+  key        msqid      owner      perms      used-bytes   messages
+  0xfd43bfb8 0          pi         644        0            0
+  ```
+* sudo ./demo_ipc
+  * ipcs -q
+    ```
+    ------ Message Queues --------
+    key        msqid      owner      perms      used-bytes   messages
+    ```
+  * ipcmk -Q test
+  * ipcs -q
+    ```
+    ------ Message Queues --------
+    key        msqid      owner      perms      used-bytes   messages
+    0xb615860e 0          root       644        0            0
+    ```
+* ipcs -q
+  ```
+  ------ Message Queues --------
+  key        msqid      owner      perms      used-bytes   messages
+  0xfd43bfb8 0          pi         644        0            0
+  ```
+* 两边都看不见，谁都不待见谁
+
+
+# CLONE_NEWCGROUP
+
+Cgroup 是 Control group 的简称，是 Linux 内核提供的一个特性，用于限制和隔离一组进程对系统资源的使用。对不同资源的具体管理是由各个子系统分工完成的。
+
+子系统      | 作用
+------------|----
+devices	    | 设备权限控制
+cpuset      | 分配指定的CPU和内存节点
+CPU	        | 控制CPU使用率
+cpuacct	    | 统计CPU使用情况
+memory      | 限制内存的使用上限
+freezer	    | 暂停Cgroup 中的进程
+net_cls	    | 配合流控限制网络带宽
+net_prio    | 设置进程的网络流量优先级
+perf_event  | 允许 Perf 工具基于 Cgroup 分组做性能检测
+huge_tlb    | 限制 HugeTLB 的使用
+
+如何为Cgroup分配限制的资源
+
+* 进入/sys/fs/cgroup/memory目录，创建一个test文件夹就相当于创建了一个control group了，进入test目录，你会发现test目录下自动创建了许多文件；
+* 限制内存使用我们就可以设置memory.limit_in_bytes；
+* 将当前进程ID加入到这个test中：`echo $$ > tasks`；
+* 这样就将当前这个终端进程加入到了内存限制的cgroup中了，如果需要删除cgroup只要删除刚创建的目录就可以了；
+* ps aux | grep init
+  ```
+  root         1  0.0  0.0  33916  8152 ?        Ss   09:11   0:05 /sbin/init splash
+  root      4943  0.0  0.0   1860    40 ?        Ss   17:37   0:00 init
+  root      4954  0.0  0.0   1860    48 pts/5    Ss+  17:37   0:00 init
+  pi        5068  0.0  0.0   7352   576 pts/4    S+   17:42   0:00 grep --color=auto init
+  ```
+* cat /proc/4943/cgroup
+  ```
+  9:pids:/lxc/zengjf
+  8:cpu,cpuacct:/lxc/zengjf
+  7:freezer:/lxc/zengjf
+  6:devices:/lxc/zengjf
+  5:blkio:/lxc/zengjf
+  4:cpuset:/lxc/zengjf
+  3:memory:/lxc/zengjf
+  2:net_cls:/lxc/zengjf
+  1:name=systemd:/lxc/zengjf
+  0::/lxc/zengjf
+  ```
+* https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/cgroups/cgfsng.c#L1281
+  * cgfsng_payload_create()
+    * create_path_for_hierarchy()
+
+# lxc cgroup什么时候创建
+
+* ls /sys/fs/cgroup/devices/
+  ```
+  cgroup.clone_children  devices.allow  notify_on_release  tasks
+  cgroup.procs           devices.deny   release_agent      user.slice
+  cgroup.sane_behavior   devices.list   system.slice
+  ```
+* sudo lxc-start -n zengjf -l TRACE -o lxc.log
+* sudo cat lxc.log
+  ```
+  lxc-start zengjf 20210223121435.318 TRACE    commands - commands.c:lxc_cmd:300 - Connection refused - Command "get_init_pid" failed to connect command socket
+  lxc-start zengjf 20210223121435.322 TRACE    commands - commands.c:lxc_cmd:300 - Connection refused - Command "get_state" failed to connect command socket
+  lxc-start zengjf 20210223121435.349 TRACE    start - start.c:lxc_init_handler:748 - Created anonymous pair {4,5} of unix sockets
+  lxc-start zengjf 20210223121435.349 TRACE    commands - commands.c:lxc_cmd_init:1248 - Creating abstract unix socket "/var/lib/lxc/zengjf/command"
+  lxc-start zengjf 20210223121435.349 TRACE    start - start.c:lxc_init_handler:760 - Unix domain socket 6 for command server is ready
+  lxc-start zengjf 20210223121435.367 WARN     initutils - initutils.c:setproctitle:324 - Invalid argument - Failed to set cmdline
+  lxc-start zengjf 20210223121435.368 INFO     lxccontainer - lxccontainer.c:do_lxcapi_start:959 - Failed to set process title to [lxc monitor] /var/lib/lxc zengjf
+  lxc-start zengjf 20210223121435.385 TRACE    start - start.c:lxc_start:2064 - Doing lxc_start
+  lxc-start zengjf 20210223121435.387 INFO     lsm - lsm/lsm.c:lsm_init:50 - LSM security driver nop
+  lxc-start zengjf 20210223121435.387 TRACE    start - start.c:lxc_init:777 - Initialized LSM
+  lxc-start zengjf 20210223121435.387 TRACE    start - start.c:lxc_init:784 - Read seccomp policy
+  lxc-start zengjf 20210223121435.388 TRACE    start - start.c:lxc_serve_state_clients:466 - Set container state to STARTING
+  lxc-start zengjf 20210223121435.388 TRACE    start - start.c:lxc_serve_state_clients:469 - No state clients registered
+  lxc-start zengjf 20210223121435.388 TRACE    start - start.c:lxc_init:792 - Set container state to "STARTING"
+  lxc-start zengjf 20210223121435.392 TRACE    start - start.c:lxc_init:855 - Set environment variables
+  lxc-start zengjf 20210223121435.393 TRACE    start - start.c:lxc_init:862 - Ran pre-start hooks
+  lxc-start zengjf 20210223121435.393 TRACE    start - start.c:setup_signal_fd:359 - Created signal file descriptor 7
+  lxc-start zengjf 20210223121435.393 TRACE    start - start.c:lxc_init:873 - Set up signal fd
+  lxc-start zengjf 20210223121435.410 DEBUG    terminal - terminal.c:lxc_terminal_peer_default:707 - No such device - The process does not have a controlling terminal
+  lxc-start zengjf 20210223121435.410 TRACE    start - start.c:lxc_init:881 - Created console
+  lxc-start zengjf 20210223121435.410 TRACE    start - start.c:lxc_init:888 - Chowned console
+  lxc-start zengjf 20210223121435.413 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1031 - basecginfo is:
+  lxc-start zengjf 20210223121435.413 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1032 - 9:net_cls:/
+  8:cpuset:/
+  7:blkio:/
+  6:pids:/
+  5:freezer:/
+  4:memory:/
+  3:devices:/
+  2:cpu,cpuacct:/
+  1:name=systemd:/init.scope
+  0::/init.scope
+  
+  lxc-start zengjf 20210223121435.413 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 0: net_cls
+  lxc-start zengjf 20210223121435.414 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 1: cpuset
+  lxc-start zengjf 20210223121435.414 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 2: blkio
+  lxc-start zengjf 20210223121435.414 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 3: pids
+  lxc-start zengjf 20210223121435.414 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 4: freezer
+  lxc-start zengjf 20210223121435.414 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 5: memory
+  lxc-start zengjf 20210223121435.414 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 6: devices
+  lxc-start zengjf 20210223121435.415 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 7: cpu
+  lxc-start zengjf 20210223121435.415 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 8: cpuacct
+  lxc-start zengjf 20210223121435.415 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1035 - kernel subsystem 9: cgroup2
+  lxc-start zengjf 20210223121435.416 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:1038 - named subsystem 0: name=systemd
+  lxc-start zengjf 20210223121435.418 TRACE    cgfsng - cgroups/cgfsng.c:cg_hybrid_init:2431 - No controllers are enabled for delegation in the unified hierarchy
+  lxc-start zengjf 20210223121435.423 TRACE    cgfsng - cgroups/cgfsng.c:cg_hybrid_init:2459 - Writable cgroup hierarchies:
+  lxc-start zengjf 20210223121435.423 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1012 -   Hierarchies:
+  lxc-start zengjf 20210223121435.423 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   0: base_cgroup: /
+  lxc-start zengjf 20210223121435.423 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/unified
+  lxc-start zengjf 20210223121435.424 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.424 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   1: base_cgroup: /
+  lxc-start zengjf 20210223121435.424 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/systemd
+  lxc-start zengjf 20210223121435.424 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.424 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: name=systemd
+  lxc-start zengjf 20210223121435.425 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   2: base_cgroup: /
+  lxc-start zengjf 20210223121435.425 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/cpu,cpuacct
+  lxc-start zengjf 20210223121435.425 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.425 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: cpu
+  lxc-start zengjf 20210223121435.425 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       1: cpuacct
+  lxc-start zengjf 20210223121435.425 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   3: base_cgroup: /
+  lxc-start zengjf 20210223121435.426 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/devices
+  lxc-start zengjf 20210223121435.426 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.426 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: devices
+  lxc-start zengjf 20210223121435.426 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   4: base_cgroup: /
+  lxc-start zengjf 20210223121435.426 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/memory
+  lxc-start zengjf 20210223121435.426 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.427 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: memory
+  lxc-start zengjf 20210223121435.427 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   5: base_cgroup: /
+  lxc-start zengjf 20210223121435.427 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/freezer
+  lxc-start zengjf 20210223121435.427 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.427 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: freezer
+  lxc-start zengjf 20210223121435.428 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   6: base_cgroup: /
+  lxc-start zengjf 20210223121435.428 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/pids
+  lxc-start zengjf 20210223121435.428 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.428 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: pids
+  lxc-start zengjf 20210223121435.428 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   7: base_cgroup: /
+  lxc-start zengjf 20210223121435.429 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/blkio
+  lxc-start zengjf 20210223121435.429 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.429 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: blkio
+  lxc-start zengjf 20210223121435.429 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   8: base_cgroup: /
+  lxc-start zengjf 20210223121435.429 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/cpuset
+  lxc-start zengjf 20210223121435.430 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.430 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: cpuset
+  lxc-start zengjf 20210223121435.430 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1017 -   9: base_cgroup: /
+  lxc-start zengjf 20210223121435.430 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1018 -       mountpoint:  /sys/fs/cgroup/net_cls
+  lxc-start zengjf 20210223121435.430 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1019 -       controllers:
+  lxc-start zengjf 20210223121435.430 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:1021 -       0: net_cls
+  lxc-start zengjf 20210223121435.431 TRACE    cgroup - cgroups/cgroup.c:cgroup_init:56 - Initialized cgroup driver cgfsng
+  lxc-start zengjf 20210223121435.431 TRACE    cgroup - cgroups/cgroup.c:cgroup_init:61 - Running with hybrid cgroup layout
+  lxc-start zengjf 20210223121435.431 TRACE    start - start.c:lxc_init:895 - Initialized cgroup driver
+  lxc-start zengjf 20210223121435.431 TRACE    start - start.c:lxc_init:902 - Initialized LSM
+  lxc-start zengjf 20210223121435.432 INFO     start - start.c:lxc_init:904 - Container "zengjf" is initialized
+  lxc-start zengjf 20210223121435.453 TRACE    cgfsng - cgroups/cgfsng.c:cg_legacy_filter_and_set_cpus:434 - No isolated cpus detected
+  lxc-start zengjf 20210223121435.454 DEBUG    cgfsng - cgroups/cgfsng.c:cg_legacy_handle_cpuset_hierarchy:620 - "cgroup.clone_children" was already set to "1"
+  lxc-start zengjf 20210223121435.485 TRACE    start - start.c:lxc_spawn:1696 - Cloned child process 1174
+  lxc-start zengjf 20210223121435.486 INFO     start - start.c:lxc_spawn:1700 - Cloned CLONE_NEWNS
+  lxc-start zengjf 20210223121435.487 INFO     start - start.c:lxc_spawn:1700 - Cloned CLONE_NEWPID
+  lxc-start zengjf 20210223121435.487 INFO     start - start.c:lxc_spawn:1700 - Cloned CLONE_NEWUTS
+  lxc-start zengjf 20210223121435.487 INFO     start - start.c:lxc_spawn:1700 - Cloned CLONE_NEWIPC
+  lxc-start zengjf 20210223121435.487 INFO     start - start.c:lxc_spawn:1700 - Cloned CLONE_NEWNET
+  lxc-start zengjf 20210223121435.488 DEBUG    start - start.c:lxc_try_preserve_namespaces:196 - Preserved mnt namespace via fd 15
+  lxc-start zengjf 20210223121435.489 DEBUG    start - start.c:lxc_try_preserve_namespaces:196 - Preserved pid namespace via fd 16
+  lxc-start zengjf 20210223121435.489 DEBUG    start - start.c:lxc_try_preserve_namespaces:196 - Preserved uts namespace via fd 17
+  lxc-start zengjf 20210223121435.490 DEBUG    start - start.c:lxc_try_preserve_namespaces:196 - Preserved ipc namespace via fd 18
+  lxc-start zengjf 20210223121435.490 DEBUG    start - start.c:lxc_try_preserve_namespaces:196 - Preserved net namespace via fd 19
+  lxc-start zengjf 20210223121435.492 INFO     cgfsng - cgroups/cgfsng.c:__cg_legacy_setup_limits:2237 - Limits for the legacy cgroup hierarchies have been setup
+  lxc-start zengjf 20210223121435.502 DEBUG    start - start.c:lxc_spawn:1754 - Preserved net namespace via fd 10
+  lxc-start zengjf 20210223121435.503 TRACE    start - start.c:lxc_spawn:1760 - Allocated new network namespace id
+  lxc-start zengjf 20210223121435.507 INFO     start - start.c:do_start:1254 - Unshared CLONE_NEWCGROUP
+  lxc-start zengjf 20210223121435.514 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/" as MS_SLAVE
+  lxc-start zengjf 20210223121435.515 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/dev" as MS_SLAVE
+  lxc-start zengjf 20210223121435.515 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/dev/shm" as MS_SLAVE
+  lxc-start zengjf 20210223121435.515 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/dev/pts" as MS_SLAVE
+  lxc-start zengjf 20210223121435.515 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/dev/mqueue" as MS_SLAVE
+  lxc-start zengjf 20210223121435.516 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys" as MS_SLAVE
+  lxc-start zengjf 20210223121435.516 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/kernel/security" as MS_SLAVE
+  lxc-start zengjf 20210223121435.516 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup" as MS_SLAVE
+  lxc-start zengjf 20210223121435.517 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/unified" as MS_SLAVE
+  lxc-start zengjf 20210223121435.517 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/systemd" as MS_SLAVE
+  lxc-start zengjf 20210223121435.517 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/cpu,cpuacct" as MS_SLAVE
+  lxc-start zengjf 20210223121435.517 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/devices" as MS_SLAVE
+  lxc-start zengjf 20210223121435.518 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/memory" as MS_SLAVE
+  lxc-start zengjf 20210223121435.518 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/freezer" as MS_SLAVE
+  lxc-start zengjf 20210223121435.518 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/pids" as MS_SLAVE
+  lxc-start zengjf 20210223121435.519 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/blkio" as MS_SLAVE
+  lxc-start zengjf 20210223121435.519 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/cpuset" as MS_SLAVE
+  lxc-start zengjf 20210223121435.519 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/cgroup/net_cls" as MS_SLAVE
+  lxc-start zengjf 20210223121435.519 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/bpf" as MS_SLAVE
+  lxc-start zengjf 20210223121435.520 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/kernel/debug" as MS_SLAVE
+  lxc-start zengjf 20210223121435.520 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/kernel/config" as MS_SLAVE
+  lxc-start zengjf 20210223121435.520 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/sys/fs/fuse/connections" as MS_SLAVE
+  lxc-start zengjf 20210223121435.521 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/proc" as MS_SLAVE
+  lxc-start zengjf 20210223121435.521 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/proc/sys/fs/binfmt_misc" as MS_SLAVE
+  lxc-start zengjf 20210223121435.521 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/proc/sys/fs/binfmt_misc" as MS_SLAVE
+  lxc-start zengjf 20210223121435.521 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/run" as MS_SLAVE
+  lxc-start zengjf 20210223121435.522 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/run/lock" as MS_SLAVE
+  lxc-start zengjf 20210223121435.522 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/run/rpc_pipefs" as MS_SLAVE
+  lxc-start zengjf 20210223121435.522 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/run/user/110" as MS_SLAVE
+  lxc-start zengjf 20210223121435.522 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/run/user/1000" as MS_SLAVE
+  lxc-start zengjf 20210223121435.523 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/snap/core18/1989" as MS_SLAVE
+  lxc-start zengjf 20210223121435.523 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/snap/core/10827" as MS_SLAVE
+  lxc-start zengjf 20210223121435.523 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/snap/core18/1948" as MS_SLAVE
+  lxc-start zengjf 20210223121435.524 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/snap/core/10584" as MS_SLAVE
+  lxc-start zengjf 20210223121435.524 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/boot" as MS_SLAVE
+  lxc-start zengjf 20210223121435.524 TRACE    conf - conf.c:remount_all_slave:3369 - Remounted "/var/lib/lxcfs" as MS_SLAVE
+  lxc-start zengjf 20210223121435.525 TRACE    conf - conf.c:remount_all_slave:3373 - Remounted all mount table entries as MS_SLAVE
+  lxc-start zengjf 20210223121435.526 DEBUG    storage - storage/storage.c:get_storage_by_name:231 - Detected rootfs type "dir"
+  lxc-start zengjf 20210223121435.526 TRACE    dir - storage/dir.c:dir_mount:203 - Mounted "/var/lib/lxc/zengjf/rootfs" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs"
+  lxc-start zengjf 20210223121435.527 DEBUG    conf - conf.c:lxc_mount_rootfs:1332 - Mounted rootfs "/var/lib/lxc/zengjf/rootfs" onto "/usr/lib/arm-linux-gnueabihf/lxc/rootfs" with options "(null)"
+  lxc-start zengjf 20210223121435.527 INFO     conf - conf.c:setup_utsname:791 - Set hostname to "zengjf"
+  lxc-start zengjf 20210223121435.528 INFO     network - network.c:lxc_setup_network_in_child_namespaces:3053 - network has been setup
+  lxc-start zengjf 20210223121435.528 TRACE    network - network.c:lxc_network_send_name_and_ifindex_to_parent:3134 - Sent network device names and ifindices to parent
+  lxc-start zengjf 20210223121435.528 INFO     conf - conf.c:mount_autodev:1118 - Preparing "/dev"
+  lxc-start zengjf 20210223121435.531 TRACE    conf - conf.c:mount_autodev:1142 - Mounted tmpfs on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev"
+  lxc-start zengjf 20210223121435.532 INFO     conf - conf.c:mount_autodev:1165 - Prepared "/dev"
+  lxc-start zengjf 20210223121435.546 INFO     conf - conf.c:lxc_fill_autodev:1209 - Populating "/dev"
+  lxc-start zengjf 20210223121435.546 DEBUG    conf - conf.c:lxc_fill_autodev:1224 - Created device node "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/full"
+  lxc-start zengjf 20210223121435.547 DEBUG    conf - conf.c:lxc_fill_autodev:1224 - Created device node "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/null"
+  lxc-start zengjf 20210223121435.547 DEBUG    conf - conf.c:lxc_fill_autodev:1224 - Created device node "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/random"
+  lxc-start zengjf 20210223121435.548 DEBUG    conf - conf.c:lxc_fill_autodev:1224 - Created device node "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/tty"
+  lxc-start zengjf 20210223121435.548 DEBUG    conf - conf.c:lxc_fill_autodev:1224 - Created device node "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/urandom"
+  lxc-start zengjf 20210223121435.548 DEBUG    conf - conf.c:lxc_fill_autodev:1224 - Created device node "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/zero"
+  lxc-start zengjf 20210223121435.549 INFO     conf - conf.c:lxc_fill_autodev:1286 - Populated "/dev"
+  lxc-start zengjf 20210223121435.552 DEBUG    conf - conf.c:mount_entry:2027 - Remounting "/dev/binder" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/binder" to respect bind or remount options
+  lxc-start zengjf 20210223121435.552 DEBUG    conf - conf.c:mount_entry:2048 - Flags for "/dev/binder" were 4096, required extra flags are 0
+  lxc-start zengjf 20210223121435.552 DEBUG    conf - conf.c:mount_entry:2058 - Mountflags already were 4096, skipping remount
+  lxc-start zengjf 20210223121435.552 DEBUG    conf - conf.c:mount_entry:2102 - Mounted "/dev/binder" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/binder" with filesystem type "none"
+  lxc-start zengjf 20210223121435.554 WARN     conf - conf.c:mount_entry_on_absolute_rootfs:2282 - Ignoring mount point "/dev/shm"
+  lxc-start zengjf 20210223121435.555 DEBUG    conf - conf.c:mount_entry:2027 - Remounting "/lib" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/lib" to respect bind or remount options
+  lxc-start zengjf 20210223121435.556 DEBUG    conf - conf.c:mount_entry:2048 - Flags for "/lib" were 1024, required extra flags are 1
+  lxc-start zengjf 20210223121435.556 DEBUG    conf - conf.c:mount_entry:2102 - Mounted "/lib" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/lib" with filesystem type "none"
+  lxc-start zengjf 20210223121435.585 DEBUG    conf - conf.c:mount_entry:2027 - Remounting "/usr/lib" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/usr/lib" to respect bind or remount options
+  lxc-start zengjf 20210223121435.586 DEBUG    conf - conf.c:mount_entry:2048 - Flags for "/usr/lib" were 1024, required extra flags are 1
+  lxc-start zengjf 20210223121435.586 DEBUG    conf - conf.c:mount_entry:2102 - Mounted "/usr/lib" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/usr/lib" with filesystem type "none"
+  lxc-start zengjf 20210223121435.587 DEBUG    conf - conf.c:mount_entry:2027 - Remounting "/sys/kernel/security" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/sys/kernel/security" to respect bind or remount options
+  lxc-start zengjf 20210223121435.588 DEBUG    conf - conf.c:mount_entry:2048 - Flags for "/sys/kernel/security" were 4110, required extra flags are 15
+  lxc-start zengjf 20210223121435.588 DEBUG    conf - conf.c:mount_entry:2102 - Mounted "/sys/kernel/security" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/sys/kernel/security" with filesystem type "none"
+  lxc-start zengjf 20210223121435.590 DEBUG    conf - conf.c:mount_entry:2102 - Mounted "proc" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/.lxc/proc" with filesystem type "proc"
+  lxc-start zengjf 20210223121435.592 DEBUG    conf - conf.c:mount_entry:2102 - Mounted "sys" on "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/.lxc/sys" with filesystem type "sysfs"
+  lxc-start zengjf 20210223121435.592 INFO     conf - conf.c:mount_file_entries:2333 - Finished setting up mounts
+  lxc-start zengjf 20210223121435.594 DEBUG    conf - conf.c:lxc_setup_dev_console:1771 - Mounted pts device "/dev/pts/1" onto "/usr/lib/arm-linux-gnueabihf/lxc/rootfs/dev/console"
+  lxc-start zengjf 20210223121435.595 INFO     utils - utils.c:lxc_mount_proc_if_needed:1231 - I am 1, /proc/self points to "1"
+  lxc-start zengjf 20210223121435.123 TRACE    conf - conf.c:lxc_pivot_root:1540 - pivot_root("/usr/lib/arm-linux-gnueabihf/lxc/rootfs") successful
+  lxc-start zengjf 20210223121435.123 WARN     conf - conf.c:lxc_setup_devpts:1616 - Invalid argument - Failed to unmount old devpts instance
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:lxc_setup_devpts:1653 - Mount new devpts instance with options "gid=5,newinstance,ptmxmode=0666,mode=0620,max=1"
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:lxc_setup_devpts:1672 - Created dummy "/dev/ptmx" file as bind mount target
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:lxc_setup_devpts:1677 - Bind mounted "/dev/pts/ptmx" to "/dev/ptmx"
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:lxc_allocate_ttys:989 - Created tty "/dev/pts/0" with master fd 11 and slave fd 14
+  lxc-start zengjf 20210223121435.124 INFO     conf - conf.c:lxc_allocate_ttys:1005 - Finished creating 1 tty devices
+  lxc-start zengjf 20210223121435.124 TRACE    conf - conf.c:lxc_send_ttys_to_parent:1057 - Sent tty "/dev/pts/0" with master fd 11 and slave fd 14 to parent
+  lxc-start zengjf 20210223121435.124 TRACE    conf - conf.c:lxc_send_ttys_to_parent:1063 - Sent 1 ttys to parent
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:lxc_setup_ttys:940 - Bind mounted "/dev/pts/0" onto "/dev/tty1"
+  lxc-start zengjf 20210223121435.124 INFO     conf - conf.c:lxc_setup_ttys:949 - Finished setting up 1 /dev/tty<N> device(s)
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:setup_caps:2526 - Dropped sys_module (16) capability
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:setup_caps:2526 - Dropped mac_admin (33) capability
+  lxc-start zengjf 20210223121435.124 DEBUG    conf - conf.c:setup_caps:2526 - Dropped mac_override (32) capability
+  lxc-start zengjf 20210223121435.125 DEBUG    conf - conf.c:setup_caps:2526 - Dropped sys_time (25) capability
+  lxc-start zengjf 20210223121435.125 DEBUG    conf - conf.c:setup_caps:2529 - Capabilities have been setup
+  lxc-start zengjf 20210223121435.125 NOTICE   conf - conf.c:lxc_setup:3716 - The container "zengjf" is set up
+  lxc-start zengjf 20210223121435.125 DEBUG    cgfsng - cgroups/cgfsng.c:__cg_legacy_setup_limits:2232 - Set controller "devices.allow" set to "c 10:0 rwm"
+  lxc-start zengjf 20210223121435.125 INFO     cgfsng - cgroups/cgfsng.c:__cg_legacy_setup_limits:2237 - Limits for the legacy cgroup hierarchies have been setup
+  lxc-start zengjf 20210223121435.125 TRACE    start - start.c:lxc_spawn:1817 - Set up legacy device cgroup controller limits
+  lxc-start zengjf 20210223121435.125 DEBUG    start - start.c:lxc_spawn:1829 - Preserved cgroup namespace via fd 20
+  lxc-start zengjf 20210223121435.125 NOTICE   utils - utils.c:lxc_setgroups:1400 - Dropped additional groups
+  lxc-start zengjf 20210223121435.125 NOTICE   start - start.c:start:2037 - Exec'ing "/sbin/init"
+  lxc-start zengjf 20210223121435.132 TRACE    confile_utils - confile_utils.c:lxc_log_configured_netdevs:271 - index: 0
+  lxc-start zengjf 20210223121435.132 TRACE    confile_utils - confile_utils.c:lxc_log_configured_netdevs:272 - ifindex: 0
+  lxc-start zengjf 20210223121435.132 TRACE    confile_utils - confile_utils.c:lxc_log_configured_netdevs:314 - type: empty
+  lxc-start zengjf 20210223121435.132 TRACE    start - start.c:lxc_recv_ttys_from_child:1477 - Received pty with master fd 21 and slave fd 22 from parent
+  lxc-start zengjf 20210223121435.132 TRACE    start - start.c:lxc_recv_ttys_from_child:1483 - Received 1 ttys from child
+  lxc-start zengjf 20210223121435.133 NOTICE   start - start.c:post_start:2048 - Started "/sbin/init" with pid "1174"
+  lxc-start zengjf 20210223121435.133 TRACE    start - start.c:lxc_serve_state_socket_pair:536 - Sent container state "RUNNING" to 5
+  lxc-start zengjf 20210223121435.133 TRACE    start - start.c:lxc_serve_state_clients:466 - Set container state to RUNNING
+  lxc-start zengjf 20210223121435.133 TRACE    start - start.c:lxc_serve_state_clients:469 - No state clients registered
+  lxc-start zengjf 20210223121435.133 DEBUG    lxccontainer - lxccontainer.c:wait_on_daemonized_start:830 - First child 1172 exited
+  lxc-start zengjf 20210223121435.133 TRACE    lxccontainer - lxccontainer.c:wait_on_daemonized_start:846 - Container is in "RUNNING" state
+  lxc-start zengjf 20210223121435.133 TRACE    start - start.c:lxc_poll:622 - Mainloop is ready
+  ```
+* ls /sys/fs/cgroup/devices/
+  ```
+  cgroup.clone_children  devices.allow  lxc                system.slice
+  cgroup.procs           devices.deny   notify_on_release  tasks
+  cgroup.sane_behavior   devices.list   release_agent      user.slice
+  ```
+* 创建容器，创建cgroup namespace，将进程id设置到cgroup namespace流程
+  ```
+  * https://github.com/lxc/lxc/blob/stable-3.0/src/lxc/start.c#L1592
+    * static int lxc_spawn(struct lxc_handler *handler)
+      * cgroup_ops->payload_create(cgroup_ops, handler)                         # 创建cgroup namespace
+      * handler->pid = lxc_raw_clone_cb(do_start, handler, CLONE_PIDFD | handler->ns_on_clone_flags, &handler->pidfd);
+        * static int do_start(void *data)
+          * ret = unshare(CLONE_NEWCGROUP);
+          * ret = lxc_setup(handler);
+            * NOTICE("The container \"%s\" is set up", name);
+      * lxc_try_preserve_namespaces(handler, handler->ns_on_clone_flags, handler->pid)
+      * cgroup_ops->payload_enter(cgroup_ops, handler)
+        * __cgfsng_ops static bool cgfsng_payload_enter(struct cgroup_ops *ops, struct lxc_handler *handler)
+          * ret = lxc_writeat(h->cgfd_con, "cgroup.procs", pidstr, len);        # 设置pid到cgroup namespace
+            * cgroup.procs 文件中的 PID 列表才是我们通常意义上的进程列表 
+  ```

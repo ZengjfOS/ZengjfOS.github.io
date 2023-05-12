@@ -1,0 +1,108 @@
+# Android Fastboot
+
+bootloader fastboot命令处理原理
+
+# 参考文档
+
+* https://github.com/mediatek-android-development/android_kernel_mediatek_mt6761-62-4.9
+* [Android FRP功能分析（Factory Reset Protection）](https://mabin004.github.io/2018/07/25/Android-FRP%E5%8A%9F%E8%83%BD%E5%88%86%E6%9E%90%EF%BC%88Factory-Reset-Protection%EF%BC%89/)
+
+# fastboot烧录GSI
+
+* 开机后，插入USB（ADB）线连接电脑
+* 进入fastboot模式：
+  * 命令进入：
+    * adb reboot bootloader
+      * fastboot是bootloader阶段的一个功能
+  * 按Power + 音量加键
+* 查看是否进入fastboot模式
+  * fastboot devices
+* unlock
+  * fastboot flashing unlock
+* 重启到fastboot烧录模式(recovery模式)
+  * fastboot reboot fastboot
+* 烧录gsi固件 
+  * fastboot flash system system.img
+  * fastboot flash system_a system.img
+  * fastboot flash system_b system.img
+  * 还可以烧录modem
+    * fastboot erase modem
+    * fastboot flash modem NON-HLOS.bin 
+* lock
+  * fastboot reboot bootloader
+  * fastboot flashing lock
+* 退出fastboot模式
+  * fastboot reboot
+
+# 启动模式
+
+* vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6589/uboot/inc/asm/arch/boot_mode.h
+  ```CPP
+  /* boot type definitions */
+  typedef enum {
+          NORMAL_BOOT = 0,
+          META_BOOT = 1,
+          RECOVERY_BOOT = 2,
+          SW_REBOOT = 3,
+          FACTORY_BOOT = 4,
+          ADVMETA_BOOT = 5,
+          ATE_FACTORY_BOOT = 6,
+          ALARM_BOOT = 7,
+          KERNEL_POWER_OFF_CHARGING_BOOT = 8,
+          LOW_POWER_OFF_CHARGING_BOOT = 9,
+          FASTBOOT = 99,
+          DOWNLOAD_BOOT = 100,
+          UNKNOWN_BOOT
+  } BOOTMODE;
+  ```
+
+# Boot Mode
+
+* 高通平台在app/aboot/aboot.c中有调用aboot_init函数，而联发科平台则在app/mt_boot/mt_boot.c中有调用mt_boot_init函数。
+* fastboot命令处理如下：
+  * 启动模式获取
+    ```
+    * vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/boot_mode.c
+      └── void boot_mode_select(void)
+          ├── Check_RTC_PDN1_bit13()
+          │   ├── g_boot_mode = FASTBOOT;
+          │   └── Set_Clr_RTC_PDN1_bit13(false);
+          ├── g_boot_mode == FASTBOOT
+          │   └── dprintf(CRITICAL, "[FASTBOOT] reboot to boot loader\n");
+          └── Check_RTC_Recovery_Mode()
+              └── g_boot_mode = RECOVERY_BOOT;
+    ```
+  * 进入fastboot，getvar、flash、unlock简要分析
+    ```
+    * vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/mt_boot.c
+      └── void aboot_init(const struct app_descriptor *app)
+          └── reboot_mode == FASTBOOT_MODE
+              └── goto fastboot;
+                  └── fastboot_init(target_get_scratch_address(), sz);
+                      └── vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/fastboot.c
+                          └── int fastboot_init(void *base, unsigned size)
+                              ├── fastboot_register("getvar:", cmd_getvar, TRUE, FALSE);
+                              │   └── fastboot_publish("version", "0.5");
+                              │       └── pc端访问命令：fastboot getvar version
+                              │           └── version: 0.5
+                              ├── fastboot_register("flash:", cmd_flash_mmc, TRUE, TRUE);
+                              │   └── void cmd_flash_mmc(const char *arg, void *data, unsigned sz)
+                              │       └── result = flash_storage(arg, data, sz);
+                              │           └── result = cmd_flash_mmc_standard(arg, data, sz);
+                              │               └── result = cmd_flash_mmc_sparse_img(arg, data, sz);
+                              │                   ├── index = partition_get_index(arg);
+                              │                   ├── ptn = partition_get_offset(index);
+                              │                   └── for (chunk=0; chunk<sparse_header->total_chunks; chunk++)
+                              │                       └── emmc_write(part_id, ptn + ((unsigned long long)total_blocks*sparse_header->blk_sz) , data, chunk_data_sz) != chunk_data_sz
+                              └── fastboot_register("flashing unlock",fastboot_oem_unlock, TRUE, FALSE);
+                                  ├── ret = fastboot_get_unlock_perm(&unlock_allowed);
+                                  │   ├── part_ret = partition_exists("frp");
+                                  │   ├── size = partition_get_size_by_name("frp");
+                                  │   └── ret = partition_read("frp", unlock_allowed_flag_offset, (u8 *)unlock_allowed, sizeof(unsigned int)); 
+                                  │       ├── FRP（Factory Reset Protection）
+                                  │       └── *unlock_allowed = 0;
+                                  └── ret = fastboot_oem_unlock_chk();
+                                      ├── ret = fastboot_oem_key_chk()
+                                      ├── ret = fastboot_data_part_wipe()
+                                      └── ret = sec_set_device_lock(0);
+  ```

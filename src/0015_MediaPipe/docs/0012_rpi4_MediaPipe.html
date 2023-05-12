@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">rpi4 MediaPipe</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#system-version">system version</a></li>
+<li><a class="reference internal" href="#opencv-install">OpenCV Install</a></li>
+<li><a class="reference internal" href="#tensorflow-lite">安装 TensorFlow Lite 解释器</a></li>
+<li><a class="reference internal" href="#mediapipe-hands">MediaPipe Hands</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rpi4-mediapipe">
+<h1>rpi4 MediaPipe<a class="headerlink" href="#rpi4-mediapipe" title="Permalink to this headline"></a></h1>
+<p>树莓派系统安装MediaPipe，FPS只能达到6帧</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://google.github.io/mediapipe/solutions/hands#python-solution-api">MediaPipe Hands</a></p></li>
+</ul>
+</section>
+<section id="system-version">
+<h1>system version<a class="headerlink" href="#system-version" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>rpi system download</p>
+<ul class="simple">
+<li><p>https://downloads.raspberrypi.org/</p></li>
+<li><p>https://downloads.raspberrypi.org/raspios_full_armhf/images/</p></li>
+</ul>
+</li>
+<li><p>cat /proc/version</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Linux</span> <span class="n">version</span> <span class="mf">5.4.83</span><span class="o">-</span><span class="n">v7l</span> <span class="p">(</span><span class="n">pi</span><span class="nd">@raspberrypi</span><span class="p">)</span> <span class="p">(</span><span class="n">gcc</span> <span class="n">version</span> <span class="mf">8.3.0</span> <span class="p">(</span><span class="n">Raspbian</span> <span class="mf">8.3.0</span><span class="o">-</span><span class="mi">6</span><span class="o">+</span><span class="n">rpi1</span><span class="p">))</span> <span class="c1">#1 SMP Sun Mar 21 02:17:27 GMT 2021</span>
+</pre></div>
+</div>
+</li>
+<li><p>https://downloads.raspberrypi.org/raspios_full_armhf/images/raspios_full_armhf-2021-03-25/</p></li>
+<li><p>python3 –version</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Python</span> <span class="mf">3.7.3</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><a class="reference internal" href="0009_BuildPythonSource.html"><span class="doc std std-doc">0009_BuildPythonSource.md</span></a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="opencv-install">
+<h1>OpenCV Install<a class="headerlink" href="#opencv-install" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">cat</span> <span class="pre">/etc/apt/sources.list</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">raspbian</span><span class="o">/</span><span class="n">raspbian</span><span class="o">/</span> <span class="n">buster</span> <span class="n">main</span> <span class="n">non</span><span class="o">-</span><span class="n">free</span> <span class="n">contrib</span> <span class="n">rpi</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">raspbian</span><span class="o">/</span><span class="n">raspbian</span><span class="o">/</span> <span class="n">buster</span> <span class="n">main</span> <span class="n">non</span><span class="o">-</span><span class="n">free</span> <span class="n">contrib</span> <span class="n">rpi</span>
+
+<span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">raspberrypi</span><span class="o">/</span> <span class="n">buster</span> <span class="n">main</span> <span class="n">ui</span>
+</pre></div>
+</div>
+</li>
+<li><p>sudo apt-get update</p></li>
+<li><p>sudo apt-get install libgtk2.0-dev</p>
+<ul class="simple">
+<li><p>opencv image show会用到gtk</p></li>
+</ul>
+</li>
+<li><p>获取支持的opencv-python版本，version.py脚本内容如下</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">parse_version</span>
+
+<span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://pypi.python.org/pypi/</span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s1">/json&#39;</span>
+    <span class="n">releases</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="s1">&#39;releases&#39;</span><span class="p">]</span>
+    <span class="c1"># return sorted(releases, key=parse_version, reverse=True)</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">releases</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">parse_version</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">versions</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p>python3 version.py opencv-python</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">3.1.0</span>
+<span class="mf">3.1.0.0</span>
+<span class="mf">3.1.0.1</span>
+<span class="mf">3.1.0.2</span>
+<span class="mf">3.1.0.3</span>
+<span class="mf">3.1.0.4</span>
+<span class="mf">3.1.0.5</span>
+<span class="mf">3.2.0.6</span>
+<span class="mf">3.2.0.7</span>
+<span class="mf">3.2.0.8</span>
+<span class="mf">3.3.0.10</span>
+<span class="mf">3.3.0.9</span>
+<span class="mf">3.3.1.11</span>
+<span class="mf">3.4.0.12</span>
+<span class="mf">3.4.0.14</span>
+<span class="mf">3.4.1.15</span>
+<span class="mf">3.4.10.35</span>
+<span class="mf">3.4.10.37</span>
+<span class="mf">3.4.11.39</span>
+<span class="mf">3.4.11.41</span>
+<span class="mf">3.4.11.43</span>
+<span class="mf">3.4.11.45</span>
+<span class="mf">3.4.13.47</span>
+<span class="mf">3.4.14.51</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>sudo pip3 install opencv-python==3.1.0</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Looking</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span><span class="p">,</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">tuna</span><span class="o">.</span><span class="n">tsinghua</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span><span class="n">cn</span><span class="o">/</span><span class="n">simple</span>
+<span class="n">Collecting</span> <span class="n">opencv</span><span class="o">-</span><span class="n">python</span><span class="o">==</span><span class="mf">3.1.0</span>
+  <span class="n">Could</span> <span class="ow">not</span> <span class="n">find</span> <span class="n">a</span> <span class="n">version</span> <span class="n">that</span> <span class="n">satisfies</span> <span class="n">the</span> <span class="n">requirement</span> <span class="n">opencv</span><span class="o">-</span><span class="n">python</span><span class="o">==</span><span class="mf">3.1.0</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">versions</span><span class="p">:</span> <span class="mf">3.4.0.14</span><span class="p">,</span> <span class="mf">3.4.10.37</span><span class="p">,</span> <span class="mf">3.4.11.39</span><span class="p">,</span> <span class="mf">3.4.11.41</span><span class="p">,</span> <span class="mf">3.4.11.43</span><span class="p">,</span> <span class="mf">3.4.11.45</span><span class="p">,</span> <span class="mf">3.4.13.47</span><span class="p">,</span> <span class="mf">3.4.15.55</span><span class="p">,</span> <span class="mf">3.4.16.57</span><span class="p">,</span> <span class="mf">3.4.16.59</span><span class="p">,</span> <span class="mf">3.4.17.61</span><span class="p">,</span> <span class="mf">4.3.0.38</span><span class="p">,</span> <span class="mf">4.4.0.40</span><span class="p">,</span> <span class="mf">4.4.0.42</span><span class="p">,</span> <span class="mf">4.4.0.44</span><span class="p">,</span> <span class="mf">4.4.0.46</span><span class="p">,</span> <span class="mf">4.5.1.48</span><span class="p">,</span> <span class="mf">4.5.3.56</span><span class="p">,</span> <span class="mf">4.5.4.58</span><span class="p">,</span> <span class="mf">4.5.4.60</span><span class="p">,</span> <span class="mf">4.5.5.62</span><span class="p">)</span>
+<span class="n">No</span> <span class="n">matching</span> <span class="n">distribution</span> <span class="n">found</span> <span class="k">for</span> <span class="n">opencv</span><span class="o">-</span><span class="n">python</span><span class="o">==</span><span class="mf">3.1.0</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>3.4.0.14</p>
+<ul>
+<li><p>sudo apt-get install qt4-default</p>
+<ul>
+<li><p>3.4.0.14依赖qt4</p></li>
+</ul>
+</li>
+<li><p>export MAKEFLAGS=”-j$(nproc)”</p></li>
+<li><p>sudo pip3 install opencv-python==3.4.0.14</p>
+<ul>
+<li><p>[树莓派安装opencv报错：make[2]: *** <a class="reference external" href="https://blog.csdn.net/qq_44357371/article/details/105966714">modules/python3/CMakeFiles/opencv_python3.dir/build.make:56…</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>sudo pip3 install opencv-python==4.3.0.38</p>
+<ul>
+<li><p>安装成功</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="tensorflow-lite">
+<h1>安装 TensorFlow Lite 解释器<a class="headerlink" href="#tensorflow-lite" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://www.tensorflow.org/lite/guide/python?hl=zh-cn#%E5%AE%89%E8%A3%85_tensorflow_lite_%E8%A7%A3%E9%87%8A%E5%99%A8</p>
+<ul>
+<li><p>pip3 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl</p>
+<ul>
+<li><p>cp37</p>
+<ul>
+<li><p>python 3.7</p></li>
+</ul>
+</li>
+<li><p>tflite_runtime-2.1.0</p>
+<ul>
+<li><p>tensorflow lite 2.1.0</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="0008_TF_fix_Version_tflite.html"><span class="doc std std-doc">0008_TF_fix_Version_tflite.md</span></a></p></li>
+</ul>
+</section>
+<section id="mediapipe-hands">
+<h1>MediaPipe Hands<a class="headerlink" href="#mediapipe-hands" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>sudo pip3 install mediapipe-rpi4</p></li>
+<li><p><a class="reference external" href="https://google.github.io/mediapipe/solutions/hands#python-solution-api">MediaPipe Hands</a></p></li>
+<li><p>在树莓派上运行，fps：6，性能上比不上直接在Android运行</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">mediapipe</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">mp_drawing</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">solutions</span><span class="o">.</span><span class="n">drawing_utils</span>
+<span class="n">mp_drawing_styles</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">solutions</span><span class="o">.</span><span class="n">drawing_styles</span>
+<span class="n">mp_hands</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">solutions</span><span class="o">.</span><span class="n">hands</span>
+
+<span class="c1"># For static images:</span>
+<span class="n">IMAGE_FILES</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">with</span> <span class="n">mp_hands</span><span class="o">.</span><span class="n">Hands</span><span class="p">(</span>
+    <span class="n">static_image_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_num_hands</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">min_detection_confidence</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">as</span> <span class="n">hands</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">IMAGE_FILES</span><span class="p">):</span>
+    <span class="c1"># Read an image, flip it around y-axis for correct handedness output (see</span>
+    <span class="c1"># above).</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">file</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Convert the BGR image to RGB before processing.</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">hands</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
+
+    <span class="c1"># Print handedness and draw hand landmarks on the image.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Handedness:&#39;</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_handedness</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_hand_landmarks</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="n">image_height</span><span class="p">,</span> <span class="n">image_width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">annotated_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">hand_landmarks</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_hand_landmarks</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;hand_landmarks:&#39;</span><span class="p">,</span> <span class="n">hand_landmarks</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span>
+          <span class="sa">f</span><span class="s1">&#39;Index finger tip coordinates: (&#39;</span><span class="p">,</span>
+          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hand_landmarks</span><span class="o">.</span><span class="n">landmark</span><span class="p">[</span><span class="n">mp_hands</span><span class="o">.</span><span class="n">HandLandmark</span><span class="o">.</span><span class="n">INDEX_FINGER_TIP</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">image_width</span><span class="si">}</span><span class="s1">, &#39;</span>
+          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">hand_landmarks</span><span class="o">.</span><span class="n">landmark</span><span class="p">[</span><span class="n">mp_hands</span><span class="o">.</span><span class="n">HandLandmark</span><span class="o">.</span><span class="n">INDEX_FINGER_TIP</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">image_height</span><span class="si">}</span><span class="s1">)&#39;</span>
+      <span class="p">)</span>
+      <span class="n">mp_drawing</span><span class="o">.</span><span class="n">draw_landmarks</span><span class="p">(</span>
+          <span class="n">annotated_image</span><span class="p">,</span>
+          <span class="n">hand_landmarks</span><span class="p">,</span>
+          <span class="n">mp_hands</span><span class="o">.</span><span class="n">HAND_CONNECTIONS</span><span class="p">,</span>
+          <span class="n">mp_drawing_styles</span><span class="o">.</span><span class="n">get_default_hand_landmarks_style</span><span class="p">(),</span>
+          <span class="n">mp_drawing_styles</span><span class="o">.</span><span class="n">get_default_hand_connections_style</span><span class="p">())</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span>
+        <span class="s1">&#39;/tmp/annotated_image&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">annotated_image</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="c1"># Draw hand world landmarks.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_hand_world_landmarks</span><span class="p">:</span>
+      <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">hand_world_landmarks</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_hand_world_landmarks</span><span class="p">:</span>
+      <span class="n">mp_drawing</span><span class="o">.</span><span class="n">plot_landmarks</span><span class="p">(</span>
+        <span class="n">hand_world_landmarks</span><span class="p">,</span> <span class="n">mp_hands</span><span class="o">.</span><span class="n">HAND_CONNECTIONS</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># used to record the time when we processed last frame</span>
+<span class="n">prev_frame_time</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># used to record the time at which we processed current frame</span>
+<span class="n">new_frame_time</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># For webcam input:</span>
+<span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">mp_hands</span><span class="o">.</span><span class="n">Hands</span><span class="p">(</span>
+    <span class="n">min_detection_confidence</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">min_tracking_confidence</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">as</span> <span class="n">hands</span><span class="p">:</span>
+  <span class="k">while</span> <span class="n">cap</span><span class="o">.</span><span class="n">isOpened</span><span class="p">():</span>
+    <span class="n">success</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ignoring empty camera frame.&quot;</span><span class="p">)</span>
+      <span class="c1"># If loading a video, use &#39;break&#39; instead of &#39;continue&#39;.</span>
+      <span class="k">continue</span>
+
+    <span class="c1"># To improve performance, optionally mark the image as not writeable to</span>
+    <span class="c1"># pass by reference.</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">hands</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+    <span class="c1"># Draw the hand annotations on the image.</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">writeable</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2BGR</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_hand_landmarks</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">hand_landmarks</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">multi_hand_landmarks</span><span class="p">:</span>
+        <span class="n">mp_drawing</span><span class="o">.</span><span class="n">draw_landmarks</span><span class="p">(</span>
+            <span class="n">image</span><span class="p">,</span>
+            <span class="n">hand_landmarks</span><span class="p">,</span>
+            <span class="n">mp_hands</span><span class="o">.</span><span class="n">HAND_CONNECTIONS</span><span class="p">,</span>
+            <span class="n">mp_drawing_styles</span><span class="o">.</span><span class="n">get_default_hand_landmarks_style</span><span class="p">(),</span>
+            <span class="n">mp_drawing_styles</span><span class="o">.</span><span class="n">get_default_hand_connections_style</span><span class="p">())</span>
+
+    <span class="c1"># font which we will be using to display FPS</span>
+    <span class="n">font</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span>
+    <span class="c1"># time when we finish processing for this frame</span>
+    <span class="n">new_frame_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># Calculating the fps</span>
+
+    <span class="c1"># fps will be number of frame processed in given time frame</span>
+    <span class="c1"># since their will be most of time error of 0.001 second</span>
+    <span class="c1"># we will be subtracting it to get more accurate result</span>
+    <span class="n">fps</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">new_frame_time</span><span class="o">-</span><span class="n">prev_frame_time</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">new_frame_time</span><span class="o">-</span><span class="n">prev_frame_time</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; ms&quot;</span><span class="p">)</span>
+    <span class="n">prev_frame_time</span> <span class="o">=</span> <span class="n">new_frame_time</span>
+
+    <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">)),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">70</span><span class="p">),</span> <span class="n">font</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">LINE_AA</span><span class="p">)</span>
+
+    <span class="c1"># Flip the image horizontally for a selfie-view display.</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;MediaPipe Hands&#39;</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="o">==</span> <span class="mi">27</span><span class="p">:</span>
+      <span class="k">break</span>
+<span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

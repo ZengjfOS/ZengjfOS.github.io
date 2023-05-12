@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">TF Magic Wand</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#serial-plotter">Serial Plotter</a></li>
+<li><a class="reference internal" href="#arduino-web-editor">arduino web editor</a></li>
+<li><a class="reference internal" href="#arduino-ide">arduino ide</a></li>
+<li><a class="reference internal" href="#data-capture">data capture</a></li>
+<li><a class="reference internal" href="#train">Train</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tf-magic-wand">
+<h1>TF Magic Wand<a class="headerlink" href="#tf-magic-wand" title="Permalink to this headline"></a></h1>
+<p>看Arduino Nano 33 BLE模块的Magic Wand的训练数据</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.tensorflow.org/2019/11/how-to-get-started-with-machine.html?hl=zh_cn">How-to Get Started with Machine Learning on Arduino</a></p></li>
+<li><p><a class="reference external" href="https://medium.com/&#64;devdevcharlie/play-street-fighter-with-body-movements-using-arduino-and-tensorflow-js-6b0e4734e118">Play Street Fighter with body movements using Arduino and Tensorflow.js</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/experimental">experimental</a></p></li>
+<li><p><a class="reference external" href="https://arduinogetstarted.com/tutorials/arduino-serial-plotter">Serial Plotter</a></p></li>
+<li><p><a class="reference external" href="https://github.com/arduino/ArduinoTensorFlowLiteTutorials/tree/master/GestureToEmoji">Machine Learning on Arduino</a></p></li>
+</ul>
+</section>
+<section id="serial-plotter">
+<h1>Serial Plotter<a class="headerlink" href="#serial-plotter" title="Permalink to this headline"></a></h1>
+<p>https://arduinogetstarted.com/tutorials/arduino-serial-plotter</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * Created by ArduinoGetStarted.com</span>
+<span class="cm"> *</span>
+<span class="cm"> * This example code is in the public domain</span>
+<span class="cm"> *</span>
+<span class="cm"> * Tutorial page: https://arduinogetstarted.com/tutorials/arduino-serial-plotter</span>
+<span class="cm"> */</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">loop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">360</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">y1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">180</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">y2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">((</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">90</span><span class="p">)</span><span class="o">*</span><span class="w"> </span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">180</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">y3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">((</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">180</span><span class="p">)</span><span class="o">*</span><span class="w"> </span><span class="n">M_PI</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">180</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">y1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// a space &#39; &#39; or  tab &#39;\t&#39; character is printed between the two values.</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">y2</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// a space &#39; &#39; or  tab &#39;\t&#39; character is printed between the two values.</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">y3</span><span class="p">);</span><span class="w"> </span><span class="c1">// the last value is followed by a carriage return and a newline characters.</span>
+
+<span class="w">    </span><span class="n">delay</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>每帧数据都以<code class="docutils literal notranslate"><span class="pre">\r\n</span></code>结尾</p></li>
+<li><p>多条曲线数据放在一帧中，每条曲线的帧数据以空格或者<code class="docutils literal notranslate"><span class="pre">\t</span></code>分割</p></li>
+</ul>
+<p><img alt="0001_arduino_serial_plotter.png" src="../../../_images/0001_arduino_serial_plotter.png" /></p>
+</section>
+<section id="arduino-web-editor">
+<h1>arduino web editor<a class="headerlink" href="#arduino-web-editor" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://create.arduino.cc/editor</p>
+<ul>
+<li><p>直接看示例代码</p></li>
+</ul>
+</li>
+</ul>
+<p><img alt="0001_Arduino_Web_Editor.png" src="../../../_images/0001_Arduino_Web_Editor.png" /></p>
+</section>
+<section id="arduino-ide">
+<h1>arduino ide<a class="headerlink" href="#arduino-ide" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>[Tools] -&gt; [Manage Libraries…] -&gt; 检索: tensorflow -&gt; [Arduino_TensorFlowLite by TensorFlow Authors]</p></li>
+<li><p>[File] -&gt; [Examples] -&gt; [Arduino_TensorFlowLite]</p></li>
+</ul>
+</section>
+<section id="data-capture">
+<h1>data capture<a class="headerlink" href="#data-capture" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/arduino/ArduinoTensorFlowLiteTutorials/blob/master/GestureToEmoji/ArduinoSketches/IMU_Capture/IMU_Capture.ino</p></li>
+<li><p>用<code class="docutils literal notranslate"><span class="pre">,</span></code>分割的数据，Serial Plotter还是能显示曲线</p></li>
+<li><p>从代码可知，是连续采样119次数据</p></li>
+</ul>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm">  IMU Capture</span>
+<span class="cm">  This example uses the on-board IMU to start reading acceleration and gyroscope</span>
+<span class="cm">  data from on-board IMU and prints it to the Serial Monitor for one second</span>
+<span class="cm">  when the significant motion is detected.</span>
+<span class="cm">  You can also use the Serial Plotter to graph the data.</span>
+<span class="cm">  The circuit:</span>
+<span class="cm">  - Arduino Nano 33 BLE or Arduino Nano 33 BLE Sense board.</span>
+<span class="cm">  Created by Don Coleman, Sandeep Mistry</span>
+<span class="cm">  Modified by Dominic Pajak, Sandeep Mistry</span>
+<span class="cm">  This example code is in the public domain.</span>
+<span class="cm">*/</span><span class="w"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Arduino_LSM9DS1.h&gt;</span><span class="cp"></span>
+
+<span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">accelerationThreshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.5</span><span class="p">;</span><span class="w"> </span><span class="c1">// threshold of significant in G&#39;s</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numSamples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">119</span><span class="p">;</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">samplesRead</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numSamples</span><span class="p">;</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Serial</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IMU</span><span class="p">.</span><span class="n">begin</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;Failed to initialize IMU!&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// print the header</span>
+<span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;aX,aY,aZ,gX,gY,gZ&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">loop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">aX</span><span class="p">,</span><span class="w"> </span><span class="n">aY</span><span class="p">,</span><span class="w"> </span><span class="n">aZ</span><span class="p">,</span><span class="w"> </span><span class="n">gX</span><span class="p">,</span><span class="w"> </span><span class="n">gY</span><span class="p">,</span><span class="w"> </span><span class="n">gZ</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// wait for significant motion</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">samplesRead</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">numSamples</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IMU</span><span class="p">.</span><span class="n">accelerationAvailable</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// read the acceleration data</span>
+<span class="w">      </span><span class="n">IMU</span><span class="p">.</span><span class="n">readAcceleration</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span><span class="w"> </span><span class="n">aY</span><span class="p">,</span><span class="w"> </span><span class="n">aZ</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// sum up the absolutes</span>
+<span class="w">      </span><span class="kt">float</span><span class="w"> </span><span class="n">aSum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fabs</span><span class="p">(</span><span class="n">aX</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fabs</span><span class="p">(</span><span class="n">aY</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fabs</span><span class="p">(</span><span class="n">aZ</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// check if it&#39;s above the threshold</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">aSum</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">accelerationThreshold</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// reset the sample read count</span>
+<span class="w">        </span><span class="n">samplesRead</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// check if the all the required samples have been read since</span>
+<span class="w">  </span><span class="c1">// the last time the significant motion was detected</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">samplesRead</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">numSamples</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// check if both new acceleration and gyroscope data is</span>
+<span class="w">    </span><span class="c1">// available</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IMU</span><span class="p">.</span><span class="n">accelerationAvailable</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">IMU</span><span class="p">.</span><span class="n">gyroscopeAvailable</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// read the acceleration and gyroscope data</span>
+<span class="w">      </span><span class="n">IMU</span><span class="p">.</span><span class="n">readAcceleration</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span><span class="w"> </span><span class="n">aY</span><span class="p">,</span><span class="w"> </span><span class="n">aZ</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">IMU</span><span class="p">.</span><span class="n">readGyroscope</span><span class="p">(</span><span class="n">gX</span><span class="p">,</span><span class="w"> </span><span class="n">gY</span><span class="p">,</span><span class="w"> </span><span class="n">gZ</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">      </span><span class="n">samplesRead</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// print the data in CSV format</span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">aY</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">aZ</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">gX</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">gY</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">gZ</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">samplesRead</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">numSamples</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// add an empty line if it&#39;s the last sample</span>
+<span class="w">        </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">();</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p><img alt="0001_IMU_Data.png" src="../../../_images/0001_IMU_Data.png" /></p>
+</section>
+<section id="train">
+<h1>Train<a class="headerlink" href="#train" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/arduino/ArduinoTensorFlowLiteTutorials/tree/master/GestureToEmoji</p>
+<ul>
+<li><p>arduino_tinyml_workshop.ipynb</p></li>
+</ul>
+</li>
+<li><p>如下是用于训练的数据，其实本质上就是对加速度计、陀螺仪数据进行建模；</p></li>
+<li><p>从上面采集数据的代码可知，加速度计、陀螺仪数据是达到了一定的阈值以后的数据。</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TensorFlow version = </span><span class="si">{</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set a fixed random seed value, for reproducibility, this will allow us to get</span>
+<span class="c1"># the same random numbers each time the notebook is run</span>
+<span class="n">SEED</span> <span class="o">=</span> <span class="mi">1337</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+<span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
+
+<span class="c1"># the list of gestures that data is available for</span>
+<span class="n">GESTURES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;punch&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;flex&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">SAMPLES_PER_GESTURE</span> <span class="o">=</span> <span class="mi">119</span>
+
+<span class="n">NUM_GESTURES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">GESTURES</span><span class="p">)</span>
+
+<span class="c1"># create a one-hot encoded matrix that is used in the output</span>
+<span class="n">ONE_HOT_ENCODED_GESTURES</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">NUM_GESTURES</span><span class="p">)</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># read each csv file and push an input and output</span>
+<span class="k">for</span> <span class="n">gesture_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_GESTURES</span><span class="p">):</span>
+  <span class="n">gesture</span> <span class="o">=</span> <span class="n">GESTURES</span><span class="p">[</span><span class="n">gesture_index</span><span class="p">]</span>
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing index </span><span class="si">{</span><span class="n">gesture_index</span><span class="si">}</span><span class="s2"> for gesture &#39;</span><span class="si">{</span><span class="n">gesture</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+  
+  <span class="n">output</span> <span class="o">=</span> <span class="n">ONE_HOT_ENCODED_GESTURES</span><span class="p">[</span><span class="n">gesture_index</span><span class="p">]</span>
+  
+  <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;/content/&quot;</span> <span class="o">+</span> <span class="n">gesture</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+  
+  <span class="c1"># calculate the number of gesture recordings in the file</span>
+  <span class="n">num_recordings</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">SAMPLES_PER_GESTURE</span><span class="p">)</span>
+  
+  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">There are </span><span class="si">{</span><span class="n">num_recordings</span><span class="si">}</span><span class="s2"> recordings of the </span><span class="si">{</span><span class="n">gesture</span><span class="si">}</span><span class="s2"> gesture.&quot;</span><span class="p">)</span>
+  
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_recordings</span><span class="p">):</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">SAMPLES_PER_GESTURE</span><span class="p">):</span>
+      <span class="n">index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">SAMPLES_PER_GESTURE</span> <span class="o">+</span> <span class="n">j</span>
+      <span class="c1"># normalize the input data, between 0 to 1:</span>
+      <span class="c1"># - acceleration is between: -4 to +4</span>
+      <span class="c1"># - gyroscope is between: -2000 to +2000</span>
+      <span class="n">tensor</span> <span class="o">+=</span> <span class="p">[</span>
+          <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;aX&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span>
+          <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;aY&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span>
+          <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;aZ&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span><span class="p">,</span>
+          <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;gX&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4000</span><span class="p">,</span>
+          <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;gY&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4000</span><span class="p">,</span>
+          <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;gZ&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2000</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4000</span>
+      <span class="p">]</span>
+
+    <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="c1"># convert the list to numpy array</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data set parsing and preparation complete.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

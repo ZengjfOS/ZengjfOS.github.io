@@ -1,0 +1,63 @@
+# Python OTG Keyboard
+
+通过Python控制Type-C OTG模拟键盘
+
+# 参考文档
+
+* https://github.com/raspberrypisig/pizero-usb-hid-keyboard
+
+# 源代码
+
+* [0011_Python_OTG_Keyboard](refers/0011_Python_OTG_Keyboard)
+
+# dwc2
+
+* /boot/config.txt
+  * 添加行：
+    * dtoverlay=dwc2
+* reboot
+
+# hid device
+
+* hid/rpi-hid.sh
+
+# hid_gadget_test测试
+
+* cd lib
+* python3 hid_gadget_test.py
+
+```
+hid_gadget_test.c openDevice() fname: /dev/hidg0
+/dev/hidg0: No such file or directory
+1
+hid_gadget_test.c sendkeys() type: m, data: /dev/hidg0
+1
+hid_gadget_test.c sendkeys() type: k, data: /dev/hidg0
+1
+hid_gadget_test.c sendkeys() type: j, data: /dev/hidg0
+1
+hid_gadget_test.c closeDevice()
+0
+```
+
+# tflite
+
+* python3 main.py
+
+```
+hid_gadget_test.c openDevice() fname: /dev/hidg0
+/dev/hidg0: No such file or directory
+1
+[{'name': 'dropout_input', 'index': 1, 'shape': array([ 1, 63]), 'dtype': <class 'numpy.float32'>, 'quantization': (0.0, 0), 'quantization_parameters': {'scales': array([], dtype=float32), 'zero_points': array([], dtype=int32), 'quantized_dimension': 0}}]
+[{'name': 'Identity', 'index': 0, 'shape': array([1, 3]), 'dtype': <class 'numpy.float32'>, 'quantization': (0.0, 0), 'quantization_parameters': {'scales': array([], dtype=float32), 'zero_points': array([], dtype=int32), 'quantized_dimension': 0}}]
+[5.4742295e-06 2.4527573e-05 9.9996996e-01]
+2
+hid_gadget_test.c sendkeys() type: m, data: c
+1
+hid_gadget_test.c sendkeys() type: k, data: c
+1
+hid_gadget_test.c sendkeys() type: j, data: c
+1
+hid_gadget_test.c closeDevice()
+0
+```

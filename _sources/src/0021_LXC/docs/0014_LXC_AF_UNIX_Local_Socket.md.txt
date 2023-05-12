@@ -1,0 +1,26 @@
+# LXC AF_UNIX Local Socket
+
+AF_UNIX跨Namespace通信，父子进程可以用pipe
+
+# 参考文档
+
+* [Using AF_UNIX address family](https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_72/rzab6/uafunix.htm)
+* [Separation Anxiety: A Tutorial for Isolating Your System with Linux Namespaces](https://www.toptal.com/linux/separation-anxiety-isolating-your-system-with-linux-namespaces)
+  * Cross-Namespace Communication
+    * The "init" process can establish a communication channel between the parent namespace and the child namespace. This channel can be based on UNIX sockets or can even use TCP. 
+* [Support unix domain sockets across namespaces](https://lwn.net/Articles/392006/)
+* [[PATCH 0/8] Support unix domain sockets across namespaces](https://containers.osdl.narkive.com/xsCg9yZu/patch-0-8-support-unix-domain-sockets-across-namespaces)
+
+# steps
+
+* https://github.com/ZengjfOS/RaspberryPi/tree/CrossNamespace
+  * make
+* sudo cp server /var/lib/lxc/zengjf/rootfs/
+* sudo lxc-start zengjf
+* sudo lxc-console zengjf
+  * ./server
+    ```
+    Ready for client connect().
+    250 bytes of data were received
+    ```
+* ./client /var/lib/lxc/zengjf/rootfs/tmp/server

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/login.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ASoC</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#docs">docs</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asoc">
+<h1>ASoC<a class="headerlink" href="#asoc" title="Permalink to this headline"></a></h1>
+<p>分析i.MX6 CS42888 ASoC驱动工作原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/latest/source">Linux Source Code Online</a></p></li>
+<li><p><a class="reference external" href="https://www.kernel.org/doc/html/v4.11/sound/soc/index.html">ALSA SoC Layer</a></p></li>
+<li><p><a class="reference external" href="https://github.com/torvalds/linux/blob/master/arch/arm/boot/dts/imx6qdl-sabreauto.dtsi#L124">sound-cs42888 dts</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tinyalsa/tinyalsa">Tiny library to interface with ALSA in the Linux kernel</a></p></li>
+</ul>
+</section>
+<section id="docs">
+<h1>docs<a class="headerlink" href="#docs" title="Permalink to this headline"></a></h1>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-center head"><p>NO.</p></th>
+<th class="text-left head"><p>文件名称</p></th>
+<th class="text-left head"><p>摘要</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p>0022</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0022_sound-xtor/README.html"><span class="doc std std-doc">sound-xtor</span></a></p></td>
+<td class="text-left"><p>蓝牙PCM连接对应的声卡配置</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0021</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0021_Android_Bluetooth_HFP.html"><span class="doc std std-doc">Android_Bluetooth_HFP</span></a></p></td>
+<td class="text-left"><p>Android P蓝牙语音通话时，声道怎么切换的？</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0020</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0020_PCM_Interface_I2S_Master-Slave.html"><span class="doc std std-doc">PCM_Interface_I2S_Master-Slave</span></a></p></td>
+<td class="text-left"><p>PCM接口I2S数据格式，主从I2S谁来发送BCLK/LRCLK?</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0019</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0019_Generate_wavfile/README.html"><span class="doc std std-doc">Generate_wavfile</span></a></p></td>
+<td class="text-left"><p>如何生成特定wav文件来测试声卡</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0018</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0018_ALSA_Period.html"><span class="doc std std-doc">ALSA_Period</span></a></p></td>
+<td class="text-left"><p>理解ALSA中Period的概念，理解它才能理解应用层软件如何操作声卡</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0017</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0017_I2S_Frame.html"><span class="doc std std-doc">I2S_Frame</span></a></p></td>
+<td class="text-left"><p>I2S进行声音数据传输的时候，如何表示一帧声音数据，在Linux应用层软件进行PCM数据存储的时候，也是一帧一帧的对数据进行储存</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0016</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0016_tinycap.html"><span class="doc std std-doc">tinycap</span></a></p></td>
+<td class="text-left"><p>主要是了解一下一般的录音的用户层是如何操作的</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0015</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0015_dapm-event.html"><span class="doc std std-doc">dapm-event</span></a></p></td>
+<td class="text-left"><p>dapm并没有外部设备节点控制，如何进行操作的呢？</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0014</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0014_widget_dapm-control.html"><span class="doc std std-doc">widget_dapm-control</span></a></p></td>
+<td class="text-left"><p>widget和widget连接的route中的control在哪里进行操作？</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0013</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0013_tinymix.html"><span class="doc std std-doc">tinymix</span></a></p></td>
+<td class="text-left"><p>主要是分析tinymix如何获取声卡的controls以及如果要操作control的时候，系统的调用流程</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0012</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0012_Control_Device.html"><span class="doc std std-doc">Control_Device</span></a></p></td>
+<td class="text-left"><p>声卡的control设备节点是怎么生成的，回调函数在哪里？</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0011</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0011_tinyplay.html"><span class="doc std std-doc">tinyplay</span></a></p></td>
+<td class="text-left"><p>aplay代码量有点大，分析一下tinyplay，看看wav文件数据是如何写道PCM设备节点中去的</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0010</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0010_snd_pcm_new.html"><span class="doc std std-doc">snd_pcm_new</span></a></p></td>
+<td class="text-left"><p>看一下pcm的创建过程</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0009</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0009_RPI_ALSA_Tinyalsa.html"><span class="doc std std-doc">RPI_ALSA_Tinyalsa</span></a></p></td>
+<td class="text-left"><p>看一下树莓派的声卡情况</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0008</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0008_widget-control-route_Add_To_Card.html"><span class="doc std std-doc">widget-control-route_Add_To_Card</span></a></p></td>
+<td class="text-left"><p>component中widget/contorl/route添加到Card中的流程</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0007</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0007_component_probe.html"><span class="doc std std-doc">component_probe</span></a></p></td>
+<td class="text-left"><p>了解一下component中的那些widgets/controls/routes/dai/probe等如何被调用起作用的</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0006</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0006_bind_dai_link.html"><span class="doc std std-doc">bind_dai_link</span></a></p></td>
+<td class="text-left"><p>pcm runtime(rtd)在这里绑定需要dai_link涉及到的CPU/Platform/Codec component</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0005</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0005_dai_link_component.html"><span class="doc std std-doc">dai_link_component</span></a></p></td>
+<td class="text-left"><p>dai_link的真实面目</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0004</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0004_ASoC_Machine_Driver.html"><span class="doc std std-doc">ASoC_Machine_Driver</span></a></p></td>
+<td class="text-left"><p>主板声卡功能注册</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0003</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0003_ASoC_Platform_Driver.html"><span class="doc std std-doc">ASoC_Platform_Driver</span></a></p></td>
+<td class="text-left"><p>芯片平台声卡接口设备注册</p></td>
+</tr>
+<tr class="row-even"><td class="text-center"><p>0002</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0002_ASoC_Codec_Class_Driver.html"><span class="doc std std-doc">ASoC_Codec_Class_Driver</span></a></p></td>
+<td class="text-left"><p>Codec compnent信息注册</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p>0001</p></td>
+<td class="text-left"><p><a class="reference internal" href="docs/0001_DTS.html"><span class="doc std std-doc">DTS</span></a></p></td>
+<td class="text-left"><p>CS42888声卡设备树示例</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

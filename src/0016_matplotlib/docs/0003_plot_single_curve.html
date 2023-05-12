@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">plot single curve</a></li>
+<li><a class="reference internal" href="#monotonecubicspline">MonotoneCubicSpline</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="plot-single-curve">
+<h1>plot single curve<a class="headerlink" href="#plot-single-curve" title="Permalink to this headline"></a></h1>
+<p>绘制一条MonotoneCubicSpline曲线</p>
+</section>
+<section id="monotonecubicspline">
+<h1>MonotoneCubicSpline<a class="headerlink" href="#monotonecubicspline" title="Permalink to this headline"></a></h1>
+<p><a class="reference download internal" download="" href="../../../_downloads/8674d3b2e074f914472a3567617ea1ff/0003_MonotoneCubicSpline.py"><span class="xref download myst">0003_MonotoneCubicSpline.py</span></a></p>
+<p><img alt="0003_MonotoneCubicSpline.png" src="../../../_images/0003_MonotoneCubicSpline.png" /></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># _*_ coding: utf-8 _*_</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">CubicSpline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">PluginsPy</span>
+
+<span class="nd">@PluginsPy</span><span class="o">.</span><span class="n">addRun</span>
+<span class="k">class</span> <span class="nc">MonotoneCubicSpline</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    可视化SimpleMappingStrategy实例变量MonotoneCubicSpline数据</span>
+<span class="sd">    @lux(50): get Brightness at this lux</span>
+<span class="sd">    @show(yes): yes to show MonotoneCubicSpline image, otherwise to no</span>
+<span class="sd">    @data(default/MonotoneCubicSpline.json): MonotoneCubicSpline曲线数据</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        示例数据，从Android中通过dumpsys display命令，获取的SimpleMappingStrategy实例变量MonotoneCubicSpline数据</span>
+<span class="sd">        SimpleMappingStrategy</span>
+<span class="sd">          mSpline=MonotoneCubicSpline{[(0.0, 0.027559055: 0.0017224409), (128.0, 0.2480315: 0.0013841044), (256.0, 0.38188976: 5.302923E-4), (384.0, 0.4055118: 1.5908774E-4), (512.0, 0.42913386: 1.8454727E-4), (640.0, 0.4527559: 1.8454727E-4), (768.0, 0.47637796: 1.8454727E-4), (896.0, 0.5: 1.8454716E-4), (1024.0, 0.52362204: 1.8454721E-4), (2048.0, 0.71259844: 1.6244003E-4), (4096.0, 1.0: 0.0), (6144.0, 1.0: 0.0), (8192.0, 1.0: 0.0), (10240.0, 1.0: 0.0), (12288.0, 1.0: 0.0), (14336.0, 1.0: 0.0), (16384.0, 1.0: 0.0), (18432.0, 1.0: 0.0)]}</span>
+<span class="sd">          mMaxGamma=3.0</span>
+<span class="sd">          mAutoBrightnessAdjustment=0.0</span>
+<span class="sd">          mUserLux=-1.0</span>
+<span class="sd">          mUserBrightness=-1.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.027559055</span><span class="p">,</span> <span class="mf">0.0017224409</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">128.0</span><span class="p">,</span> <span class="mf">0.2480315</span><span class="p">,</span> <span class="mf">0.0013841044</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">256.0</span><span class="p">,</span> <span class="mf">0.38188976</span><span class="p">,</span> <span class="mf">5.302923E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">384.0</span><span class="p">,</span> <span class="mf">0.4055118</span><span class="p">,</span> <span class="mf">1.5908774E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">512.0</span><span class="p">,</span> <span class="mf">0.42913386</span><span class="p">,</span> <span class="mf">1.8454727E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">640.0</span><span class="p">,</span> <span class="mf">0.4527559</span><span class="p">,</span> <span class="mf">1.8454727E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">768.0</span><span class="p">,</span> <span class="mf">0.47637796</span><span class="p">,</span> <span class="mf">1.8454727E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">896.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.8454716E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">1024.0</span><span class="p">,</span> <span class="mf">0.52362204</span><span class="p">,</span> <span class="mf">1.8454721E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">2048.0</span><span class="p">,</span> <span class="mf">0.71259844</span><span class="p">,</span> <span class="mf">1.6244003E-4</span><span class="p">),</span> 
+            <span class="p">(</span><span class="mf">4096.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> 
+            <span class="c1"># (6144.0, 1.0, 0.0), </span>
+            <span class="c1"># (8192.0, 1.0, 0.0), </span>
+            <span class="c1"># (10240.0, 1.0, 0.0), </span>
+            <span class="c1"># (12288.0, 1.0, 0.0), </span>
+            <span class="c1"># (14336.0, 1.0, 0.0), </span>
+            <span class="c1"># (16384.0, 1.0, 0.0), </span>
+            <span class="c1"># (18432.0, 1.0, 0.0)</span>
+        <span class="p">]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+
+        <span class="n">X1</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">Y1</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+            <span class="n">X1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># Brightness量程(0 ~ 1)转为PWM量程(0 ~ 255)</span>
+            <span class="n">Y1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span>
+            <span class="c1"># 不转换PWM量程(0 ~ 255)的原因是和Android数据方便对比，Android默认Brightness量程(0 ~ 1)</span>
+            <span class="c1"># Y1.append(data[i][1])</span>
+    
+        <span class="c1"># 生成曲线</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">CubicSpline</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="n">Y1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;show&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
+            <span class="c1"># 生成曲线x轴坐标点</span>
+            <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">X1</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">X1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># 绘制曲线，有x轴坐标点生成y坐标点：cs(xs)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">cs</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">)</span>
+            <span class="c1"># 绘制点以及文本</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+                <span class="c1"># 绘制点</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Y1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+                <span class="c1"># 加入字符显示的偏移</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">15</span><span class="p">,</span> <span class="n">Y1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.02</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Y1</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;X LUX&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Y PWM(0 ~ 255)&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Android (Light Sensor) &amp; (LCD PWM) Mapper&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 单独计算一个值</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;input lux: &quot;</span> <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;lux&quot;</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Brightness: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;lux&quot;</span><span class="p">]))))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span> <span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;main&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

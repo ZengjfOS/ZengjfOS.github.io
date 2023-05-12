@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">u-boot generate</a></li>
+<li><a class="reference internal" href="#u-boot">u-boot代码分析</a></li>
+<li><a class="reference internal" href="#imx-boot">imx-boot</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="u-boot-generate">
+<h1>u-boot generate<a class="headerlink" href="#u-boot-generate" title="Permalink to this headline"></a></h1>
+<p>u-boot生成原理</p>
+</section>
+<section id="u-boot">
+<h1>u-boot代码分析<a class="headerlink" href="#u-boot" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/classes/image_types_fsl.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>generate_imx_sdcard () {
+        [...省略]
+
+        # Burn bootloader
+        case &quot;${IMAGE_BOOTLOADER}&quot; in
+                imx-bootlets)
+                bberror &quot;The imx-bootlets is not supported for i.MX based machines&quot;
+                exit 1
+                ;;
+                imx-boot)
+                dd if=${DEPLOY_DIR_IMAGE}/imx-boot-${MACHINE}-${UBOOT_CONFIG}.bin of=${SDCARD} conv=notrunc seek=${IMX_BOOT_SEEK} bs=1K
+                ;;
+                u-boot)
+                if [ -n &quot;${SPL_BINARY}&quot; ]; then
+                    if [ -n &quot;${SPL_SEEK}&quot; ]; then
+                        dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=${SPL_SEEK} bs=1K
+                        dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=${UBOOT_SEEK} bs=1K
+                    else
+                        dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${SDCARD} conv=notrunc seek=2 bs=512
+                        dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=69 bs=1K
+                    fi
+                else
+                    dd if=${DEPLOY_DIR_IMAGE}/u-boot-${MACHINE}.${UBOOT_SUFFIX_SDCARD} of=${SDCARD} conv=notrunc seek=2 bs=512
+                fi
+                ;;
+                barebox)
+                dd if=${DEPLOY_DIR_IMAGE}/barebox-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 skip=1 bs=512
+                dd if=${DEPLOY_DIR_IMAGE}/bareboxenv-${MACHINE}.bin of=${SDCARD} conv=notrunc seek=1 bs=512k
+                ;;
+                &quot;&quot;)
+                ;;
+                *)
+                bberror &quot;Unknown IMAGE_BOOTLOADER value&quot;
+                exit 1
+                ;;
+        esac
+
+        [...省略]
+}
+</pre></div>
+</div>
+</li>
+<li><p>运行时<code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/temp/run.do_image_sdcard</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>generate_imx_sdcard() {
+        [...省略]
+
+        # Burn bootloader
+        case &quot;imx-boot&quot; in
+                imx-bootlets)
+                bberror &quot;The imx-bootlets is not supported for i.MX based machines&quot;
+                exit 1
+                ;;
+                imx-boot)
+                dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/imx-boot-imx8qmmek-sd.bin of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=32 bs=1K
+                ;;
+                u-boot)
+                if [ -n &quot;${SPL_BINARY}&quot; ]; then
+                    if [ -n &quot;${SPL_SEEK}&quot; ]; then
+                        dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/${SPL_BINARY} of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=${SPL_SEEK} bs=1K
+                        dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/u-boot-imx8qmmek.bin of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=${UBOOT_SEEK} bs=1K
+                    else
+                        dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/${SPL_BINARY} of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=2 bs=512
+                        dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/u-boot-imx8qmmek.bin of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=69 bs=1K
+                    fi
+                else
+                    dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/u-boot-imx8qmmek.bin of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=2 bs=512
+                fi
+                ;;
+                barebox)
+                dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/barebox-imx8qmmek.bin of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=1 skip=1 bs=512
+                dd if=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/deploy/images/imx8qmmek/bareboxenv-imx8qmmek.bin of=/home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/fsl-image-validation-imx/1.0-r0/deploy-fsl-image-validation-imx-image-complete/fsl-image-validation-imx-imx8qmmek-20190726063617.rootfs.sdcard conv=notrunc seek=1 bs=512k
+                ;;
+                &quot;&quot;)
+                ;;
+                *)
+                bberror &quot;Unknown IMAGE_BOOTLOADER value&quot;
+                exit 1
+                ;;
+        esac
+
+        [...省略]
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/conf/machine/imx8qmmek.conf</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="c1"># BOOT_SPACE = &quot;65536&quot;</span>
+<span class="n">BOOT_SPACE</span> <span class="o">=</span> <span class="s2">&quot;131070&quot;</span>
+<span class="n">IMAGE_BOOTLOADER</span> <span class="o">=</span> <span class="s2">&quot;imx-boot&quot;</span>
+<span class="n">IMX_BOOT_SEEK</span> <span class="o">=</span> <span class="s2">&quot;32&quot;</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">fsl-image-qt5-validation-imx</span> <span class="pre">-g</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">recipe-depends.dot</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">u-boot</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">imx</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;fsl-image-qt5-validation-imx&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;u-boot-imx&quot;</span>
+<span class="s2">&quot;imx-boot&quot;</span> <span class="o">-&gt;</span> <span class="s2">&quot;u-boot-imx&quot;</span>
+<span class="s2">&quot;u-boot-imx&quot;</span> <span class="p">[</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;u-boot-imx</span><span class="se">\n</span><span class="s2">:2018.03-r0</span><span class="se">\n</span><span class="s2">/home/zengjf/imx8-yocto-ga/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/u-boot/u-boot-imx_2018.03.bb&quot;</span><span class="p">]</span>
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/u-boot/u-boot-imx_2018.03.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copyright (C) 2013-2016 Freescale Semiconductor</span>
+<span class="c1"># Copyright 2017-2018 NXP</span>
+
+<span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;i.MX U-Boot suppporting i.MX reference boards.&quot;</span>
+<span class="n">require</span> <span class="n">recipes</span><span class="o">-</span><span class="n">bsp</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">/</span><span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">inc</span>
+<span class="n">inherit</span> <span class="n">pythonnative</span>
+
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poky/meta/recipes-bsp/u-boot/u-boot.inc</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+do_deploy () {
+    if [ -n &quot;${UBOOT_CONFIG}&quot; ]
+    then
+        for config in ${UBOOT_MACHINE}; do
+            i=$(expr $i + 1);
+            for type in ${UBOOT_CONFIG}; do
+                j=$(expr $j + 1);
+                if [ $j -eq $i ]
+                then
+                    install -d ${DEPLOYDIR}
+                    install -m 644 ${B}/${config}/u-boot-${type}.${UBOOT_SUFFIX} ${DEPLOYDIR}/u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX}
+                    cd ${DEPLOYDIR}
+                    ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${UBOOT_SYMLINK}-${type}
+                    ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${UBOOT_SYMLINK}
+                    ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${UBOOT_BINARY}-${type}
+                    ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_SUFFIX} ${UBOOT_BINARY}
+                fi
+            done
+            unset  j
+        done
+        unset  i
+    else
+        install -d ${DEPLOYDIR}
+        install -m 644 ${B}/${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
+        cd ${DEPLOYDIR}
+        rm -f ${UBOOT_BINARY} ${UBOOT_SYMLINK}
+        ln -sf ${UBOOT_IMAGE} ${UBOOT_SYMLINK}
+        ln -sf ${UBOOT_IMAGE} ${UBOOT_BINARY}
+   fi
+
+    if [ -n &quot;${UBOOT_ELF}&quot; ]
+    then
+        if [ -n &quot;${UBOOT_CONFIG}&quot; ]
+        then
+            for config in ${UBOOT_MACHINE}; do
+                i=$(expr $i + 1);
+                for type in ${UBOOT_CONFIG}; do
+                    j=$(expr $j + 1);
+                    if [ $j -eq $i ]
+                    then
+                        install -m 644 ${B}/${config}/${UBOOT_ELF} ${DEPLOYDIR}/u-boot-${type}-${PV}-${PR}.${UBOOT_ELF_SUFFIX}
+                        ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_ELF_SUFFIX} ${DEPLOYDIR}/${UBOOT_ELF_BINARY}-${type}
+                        ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_ELF_SUFFIX} ${DEPLOYDIR}/${UBOOT_ELF_BINARY}
+                        ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_ELF_SUFFIX} ${DEPLOYDIR}/${UBOOT_ELF_SYMLINK}-${type}
+                        ln -sf u-boot-${type}-${PV}-${PR}.${UBOOT_ELF_SUFFIX} ${DEPLOYDIR}/${UBOOT_ELF_SYMLINK}
+                    fi
+                done
+                unset j
+            done
+            unset i
+        else
+            install -m 644 ${B}/${UBOOT_ELF} ${DEPLOYDIR}/${UBOOT_ELF_IMAGE}
+            ln -sf ${UBOOT_ELF_IMAGE} ${DEPLOYDIR}/${UBOOT_ELF_BINARY}
+            ln -sf ${UBOOT_ELF_IMAGE} ${DEPLOYDIR}/${UBOOT_ELF_SYMLINK}
+        fi
+    fi
+
+
+     if [ -n &quot;${SPL_BINARY}&quot; ]
+     then
+         if [ -n &quot;${UBOOT_CONFIG}&quot; ]
+         then
+             for config in ${UBOOT_MACHINE}; do
+                 i=$(expr $i + 1);
+                 for type in ${UBOOT_CONFIG}; do
+                     j=$(expr $j + 1);
+                     if [ $j -eq $i ]
+                     then
+                         install -m 644 ${B}/${config}/${SPL_BINARY} ${DEPLOYDIR}/${SPL_IMAGE}-${type}-${PV}-${PR}
+                         rm -f ${DEPLOYDIR}/${SPL_BINARYNAME} ${DEPLOYDIR}/${SPL_SYMLINK}-${type}
+                         ln -sf ${SPL_IMAGE}-${type}-${PV}-${PR} ${DEPLOYDIR}/${SPL_BINARYNAME}-${type}
+                         ln -sf ${SPL_IMAGE}-${type}-${PV}-${PR} ${DEPLOYDIR}/${SPL_BINARYNAME}
+                         ln -sf ${SPL_IMAGE}-${type}-${PV}-${PR} ${DEPLOYDIR}/${SPL_SYMLINK}-${type}
+                         ln -sf ${SPL_IMAGE}-${type}-${PV}-${PR} ${DEPLOYDIR}/${SPL_SYMLINK}
+                     fi
+                 done
+                 unset  j
+             done
+             unset  i
+         else
+             install -m 644 ${B}/${SPL_BINARY} ${DEPLOYDIR}/${SPL_IMAGE}
+             rm -f ${DEPLOYDIR}/${SPL_BINARYNAME} ${DEPLOYDIR}/${SPL_SYMLINK}
+             ln -sf ${SPL_IMAGE} ${DEPLOYDIR}/${SPL_BINARYNAME}
+             ln -sf ${SPL_IMAGE} ${DEPLOYDIR}/${SPL_SYMLINK}
+         fi
+     fi
+
+
+    if [ -n &quot;${UBOOT_ENV}&quot; ]
+    then
+        install -m 644 ${WORKDIR}/${UBOOT_ENV_BINARY} ${DEPLOYDIR}/${UBOOT_ENV_IMAGE}
+        rm -f ${DEPLOYDIR}/${UBOOT_ENV_BINARY} ${DEPLOYDIR}/${UBOOT_ENV_SYMLINK}
+        ln -sf ${UBOOT_ENV_IMAGE} ${DEPLOYDIR}/${UBOOT_ENV_BINARY}
+        ln -sf ${UBOOT_ENV_IMAGE} ${DEPLOYDIR}/${UBOOT_ENV_SYMLINK}
+    fi
+
+    if [ &quot;${UBOOT_EXTLINUX}&quot; = &quot;1&quot; ]
+    then
+        install -m 644 ${UBOOT_EXTLINUX_CONFIG} ${DEPLOYDIR}/${UBOOT_EXTLINUX_SYMLINK}
+        ln -sf ${UBOOT_EXTLINUX_SYMLINK} ${DEPLOYDIR}/${UBOOT_EXTLINUX_CONF_NAME}-${MACHINE}
+        ln -sf ${UBOOT_EXTLINUX_SYMLINK} ${DEPLOYDIR}/${UBOOT_EXTLINUX_CONF_NAME}
+    fi
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/temp/run.do_deploy</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_deploy() {
+    if [ -n &quot;sd&quot; ]
+    then
+        for config in  imx8qm_mek_defconfig; do
+            i=$(expr $i + 1);
+            for type in sd; do
+                j=$(expr $j + 1);
+                if [ $j -eq $i ]
+                then
+                    install -d /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx
+                    install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/${config}/u-boot-${type}.bin /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-${type}-2018.03-r0.bin
+                    cd /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx
+                    ln -sf u-boot-${type}-2018.03-r0.bin u-boot-imx8qmmek.bin-${type}
+                    ln -sf u-boot-${type}-2018.03-r0.bin u-boot-imx8qmmek.bin
+                    ln -sf u-boot-${type}-2018.03-r0.bin u-boot.bin-${type}
+                    ln -sf u-boot-${type}-2018.03-r0.bin u-boot.bin
+                fi
+            done
+            unset  j
+        done
+        unset  i
+    else
+        install -d /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx
+        install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/u-boot.bin /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-imx8qmmek-2018.03-r0.bin
+        cd /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx
+        rm -f u-boot.bin u-boot-imx8qmmek.bin
+        ln -sf u-boot-imx8qmmek-2018.03-r0.bin u-boot-imx8qmmek.bin
+        ln -sf u-boot-imx8qmmek-2018.03-r0.bin u-boot.bin
+   fi
+
+    if [ -n &quot;&quot; ]
+    then
+        if [ -n &quot;sd&quot; ]
+        then
+            for config in  imx8qm_mek_defconfig; do
+                i=$(expr $i + 1);
+                for type in sd; do
+                    j=$(expr $j + 1);
+                    if [ $j -eq $i ]
+                    then
+                        install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/${config}/ /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-${type}-2018.03-r0.elf
+                        ln -sf u-boot-${type}-2018.03-r0.elf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot.elf-${type}
+                        ln -sf u-boot-${type}-2018.03-r0.elf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot.elf
+                        ln -sf u-boot-${type}-2018.03-r0.elf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-imx8qmmek.elf-${type}
+                        ln -sf u-boot-${type}-2018.03-r0.elf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-imx8qmmek.elf
+                    fi
+                done
+                unset j
+            done
+            unset i
+        else
+            install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/ /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-imx8qmmek-2018.03-r0.elf
+            ln -sf u-boot-imx8qmmek-2018.03-r0.elf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot.elf
+            ln -sf u-boot-imx8qmmek-2018.03-r0.elf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/u-boot-imx8qmmek.elf
+        fi
+    fi
+
+
+     if [ -n &quot;&quot; ]
+     then
+         if [ -n &quot;sd&quot; ]
+         then
+             for config in  imx8qm_mek_defconfig; do
+                 i=$(expr $i + 1);
+                 for type in sd; do
+                     j=$(expr $j + 1);
+                     if [ $j -eq $i ]
+                     then
+                         install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/${config}/ /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek-2018.03-r0-${type}-2018.03-r0
+                         rm -f /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/ /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek-${type}
+                         ln -sf -imx8qmmek-2018.03-r0-${type}-2018.03-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-${type}
+                         ln -sf -imx8qmmek-2018.03-r0-${type}-2018.03-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/
+                         ln -sf -imx8qmmek-2018.03-r0-${type}-2018.03-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek-${type}
+                         ln -sf -imx8qmmek-2018.03-r0-${type}-2018.03-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek
+                     fi
+                 done
+                 unset  j
+             done
+             unset  i
+         else
+             install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/ /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek-2018.03-r0
+             rm -f /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/ /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek
+             ln -sf -imx8qmmek-2018.03-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/
+             ln -sf -imx8qmmek-2018.03-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek
+         fi
+     fi
+
+
+    if [ -n &quot;&quot; ]
+    then
+        install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/.txt /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek-2018.03-r0.txt
+        rm -f /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/.txt /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek.txt
+        ln -sf -imx8qmmek-2018.03-r0.txt /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/.txt
+        ln -sf -imx8qmmek-2018.03-r0.txt /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/-imx8qmmek.txt
+    fi
+
+    if [ &quot;${UBOOT_EXTLINUX}&quot; = &quot;1&quot; ]
+    then
+        install -m 644 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/build/extlinux.conf /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/extlinux.conf-imx8qmmek-r0
+        ln -sf extlinux.conf-imx8qmmek-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/extlinux.conf-imx8qmmek
+        ln -sf extlinux.conf-imx8qmmek-r0 /home/zengjf/imx8-yocto-ga/imx8-build-wayland/tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx/extlinux.conf
+    fi
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="mi">644</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="o">.</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span> <span class="mi">16</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="o">..</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span> <span class="mi">649522</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</li>
+<li><p>SPL version output: <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/work/imx8qmmek-poky-linux/u-boot-imx/2018.03-r0/deploy-u-boot-imx</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="mi">768</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="o">.</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span> <span class="mi">21</span> <span class="n">zengjf</span> <span class="n">zengjf</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">22</span> <span class="mi">17</span><span class="p">:</span><span class="mi">06</span> <span class="o">..</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span> <span class="mi">692594</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">49</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">49</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>  <span class="mi">78773</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">49</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">49</span> <span class="n">Jul</span> <span class="mi">16</span> <span class="mi">12</span><span class="p">:</span><span class="mi">25</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">spl</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span>
+</pre></div>
+</div>
+</li>
+<li><p>修改<code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/classes/image_types_fsl.bbclass</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>generate_imx_sdcard () {
+        [...省略]
+        # Burn bootloader
+        bbdebug 2 &quot;generate_imx_sdcard IMAGE_BOOTLOADER: ${IMAGE_BOOTLOADER}&quot;
+        case &quot;${IMAGE_BOOTLOADER}&quot; in
+                imx-bootlets)
+                [...省略]
+                imx-boot)
+                dd if=${DEPLOY_DIR_IMAGE}/imx-boot-${MACHINE}-${UBOOT_CONFIG}.bin of=${SDCARD} conv=notrunc seek=${IMX_BOOT_SEEK} bs=1K
+                [...省略]
+        esac
+        [...省略]
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitbake</span> <span class="pre">fsl-image-qt5-validation-imx</span> <span class="pre">-DD</span> <span class="pre">-c</span> <span class="pre">do_image_sdcard</span> <span class="pre">-f</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">extend_recipe_sysroot</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">shell</span> <span class="n">function</span> <span class="n">do_image_sdcard</span>
+<span class="mi">0</span><span class="o">+</span><span class="mi">0</span> <span class="n">records</span> <span class="ow">in</span>
+<span class="mi">0</span><span class="o">+</span><span class="mi">0</span> <span class="n">records</span> <span class="n">out</span>
+<span class="mi">0</span> <span class="nb">bytes</span> <span class="n">copied</span><span class="p">,</span> <span class="mf">0.000196454</span> <span class="n">s</span><span class="p">,</span> <span class="mf">0.0</span> <span class="n">kB</span><span class="o">/</span><span class="n">s</span>
+<span class="n">Model</span><span class="p">:</span>  <span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<span class="n">Disk</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">wayland</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">/</span><span class="mf">1.0</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">deploy</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">complete</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">20190726082314.</span><span class="n">rootfs</span><span class="o">.</span><span class="n">sdcard</span><span class="p">:</span> <span class="mi">1250</span><span class="n">MB</span>
+<span class="n">Sector</span> <span class="n">size</span> <span class="p">(</span><span class="n">logical</span><span class="o">/</span><span class="n">physical</span><span class="p">):</span> <span class="mi">512</span><span class="n">B</span><span class="o">/</span><span class="mi">512</span><span class="n">B</span>
+<span class="n">Partition</span> <span class="n">Table</span><span class="p">:</span> <span class="n">msdos</span>
+<span class="n">Disk</span> <span class="n">Flags</span><span class="p">:</span>
+
+<span class="n">Number</span>  <span class="n">Start</span>   <span class="n">End</span>     <span class="n">Size</span>    <span class="n">Type</span>     <span class="n">File</span> <span class="n">system</span>  <span class="n">Flags</span>
+ <span class="mi">1</span>      <span class="mi">8389</span><span class="n">kB</span>  <span class="mi">143</span><span class="n">MB</span>   <span class="mi">134</span><span class="n">MB</span>   <span class="n">primary</span>               <span class="n">lba</span>
+ <span class="mi">2</span>      <span class="mi">143</span><span class="n">MB</span>   <span class="mi">1242</span><span class="n">MB</span>  <span class="mi">1099</span><span class="n">MB</span>  <span class="n">primary</span>
+
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">generate_imx_sdcard</span> <span class="n">IMAGE_BOOTLOADER</span><span class="p">:</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span>
+<span class="mi">950</span><span class="o">+</span><span class="mi">0</span> <span class="n">records</span> <span class="ow">in</span>
+<span class="mi">950</span><span class="o">+</span><span class="mi">0</span> <span class="n">records</span> <span class="n">out</span>
+<span class="mi">972800</span> <span class="nb">bytes</span> <span class="p">(</span><span class="mi">973</span> <span class="n">kB</span><span class="p">,</span> <span class="mi">950</span> <span class="n">KiB</span><span class="p">)</span> <span class="n">copied</span><span class="p">,</span> <span class="mf">0.576254</span> <span class="n">s</span><span class="p">,</span> <span class="mf">1.7</span> <span class="n">MB</span><span class="o">/</span><span class="n">s</span>
+<span class="n">mkfs</span><span class="o">.</span><span class="n">fat</span><span class="p">:</span> <span class="n">warning</span> <span class="o">-</span> <span class="n">lowercase</span> <span class="n">labels</span> <span class="n">might</span> <span class="ow">not</span> <span class="n">work</span> <span class="n">properly</span> <span class="k">with</span> <span class="n">DOS</span> <span class="ow">or</span> <span class="n">Windows</span>
+<span class="n">mkfs</span><span class="o">.</span><span class="n">fat</span> <span class="mf">4.1</span> <span class="p">(</span><span class="mi">2017</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">24</span><span class="p">)</span>
+<span class="mi">16</span><span class="o">+</span><span class="mi">0</span> <span class="n">records</span> <span class="ow">in</span>
+<span class="mi">16</span><span class="o">+</span><span class="mi">0</span> <span class="n">records</span> <span class="n">out</span>
+<span class="mi">134217728</span> <span class="nb">bytes</span> <span class="p">(</span><span class="mi">134</span> <span class="n">MB</span><span class="p">,</span> <span class="mi">128</span> <span class="n">MiB</span><span class="p">)</span> <span class="n">copied</span><span class="p">,</span> <span class="mf">0.551393</span> <span class="n">s</span><span class="p">,</span> <span class="mi">243</span> <span class="n">MB</span><span class="o">/</span><span class="n">s</span>
+<span class="mi">7</span><span class="o">+</span><span class="mi">1</span> <span class="n">records</span> <span class="ow">in</span>
+<span class="mi">7</span><span class="o">+</span><span class="mi">1</span> <span class="n">records</span> <span class="n">out</span>
+<span class="mi">1098907648</span> <span class="nb">bytes</span> <span class="p">(</span><span class="mf">1.1</span> <span class="n">GB</span><span class="p">,</span> <span class="mf">1.0</span> <span class="n">GiB</span><span class="p">)</span> <span class="n">copied</span><span class="p">,</span> <span class="mf">2.61798</span> <span class="n">s</span><span class="p">,</span> <span class="mi">420</span> <span class="n">MB</span><span class="o">/</span><span class="n">s</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Shell</span> <span class="n">function</span> <span class="n">do_image_sdcard</span> <span class="n">finished</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Executing</span> <span class="n">python</span> <span class="n">function</span> <span class="n">create_symlinks</span>
+<span class="n">NOTE</span><span class="p">:</span> <span class="n">Creating</span> <span class="n">symlink</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">yocto</span><span class="o">-</span><span class="n">ga</span><span class="o">/</span><span class="n">imx8</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">wayland</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">poky</span><span class="o">-</span><span class="n">linux</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">/</span><span class="mf">1.0</span><span class="o">-</span><span class="n">r0</span><span class="o">/</span><span class="n">deploy</span><span class="o">-</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">complete</span><span class="o">/</span><span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">sdcard</span><span class="o">.</span><span class="n">bz2</span> <span class="o">-&gt;</span> <span class="n">fsl</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">qt5</span><span class="o">-</span><span class="n">validation</span><span class="o">-</span><span class="n">imx</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="mf">20190726082314.</span><span class="n">rootfs</span><span class="o">.</span><span class="n">sdcard</span><span class="o">.</span><span class="n">bz2</span>
+<span class="n">DEBUG</span><span class="p">:</span> <span class="n">Python</span> <span class="n">function</span> <span class="n">create_symlinks</span> <span class="n">finished</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEBUG:</span> <span class="pre">generate_imx_sdcard</span> <span class="pre">IMAGE_BOOTLOADER:</span> <span class="pre">imx-boot</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">u-boot-sd-2018.03-r0.bin</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/deploy/images/imx8qmmek/u-boot*</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span> <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span>     <span class="mi">24</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">sd</span> <span class="o">-&gt;</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">2</span> <span class="n">zengjf</span> <span class="n">zengjf</span> <span class="mi">649522</span> <span class="n">Jul</span> <span class="mi">10</span> <span class="mi">14</span><span class="p">:</span><span class="mi">57</span> <span class="n">u</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">sd</span><span class="o">-</span><span class="mf">2018.03</span><span class="o">-</span><span class="n">r0</span><span class="o">.</span><span class="n">bin</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="imx-boot">
+<h1>imx-boot<a class="headerlink" href="#imx-boot" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-mkimage/imx-boot_0.2.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+UBOOT_NAME = &quot;u-boot-${MACHINE}.bin-${UBOOT_CONFIG}&quot;                              # u-boot-imx8qmmek.bin-sd
+BOOT_CONFIG_MACHINE = &quot;${BOOT_NAME}-${MACHINE}-${UBOOT_CONFIG}.bin&quot;               # imx-boot-imx8qmmek-sd.bin
+[...省略]
+do_compile () {
+    if [ &quot;${SOC_TARGET}&quot; = &quot;iMX8M&quot; -o &quot;${SOC_TARGET}&quot; = &quot;iMX8MM&quot; ]; then
+        [...省略]
+    elif [ &quot;${SOC_TARGET}&quot; = &quot;iMX8QM&quot; ]; then
+        echo 8QM boot binary build
+        cp ${DEPLOY_DIR_IMAGE}/${BOOT_TOOLS}/${SC_FIRMWARE_NAME} ${S}/${SOC_DIR}/scfw_tcm.bin
+        cp ${DEPLOY_DIR_IMAGE}/${BOOT_TOOLS}/${ATF_MACHINE_NAME} ${S}/${SOC_DIR}/bl31.bin
+        cp ${DEPLOY_DIR_IMAGE}/${UBOOT_NAME}                     ${S}/${SOC_DIR}/u-boot.bin
+
+        cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_0_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m40.bin ${S}/${SOC_DIR}/m40_tcm.bin
+        cp ${DEPLOY_DIR_IMAGE}/imx8qm_m4_1_TCM_rpmsg_lite_pingpong_rtos_linux_remote_m41.bin ${S}/${SOC_DIR}/m41_tcm.bin
+        cp ${DEPLOY_DIR_IMAGE}/mx8qm-ahab-container.img ${S}/${SOC_DIR}/
+
+    else
+        [...省略]
+    fi
+
+    # Copy TEE binary to SoC target folder to mkimage
+    if ${DEPLOY_OPTEE}; then
+        cp ${DEPLOY_DIR_IMAGE}/tee.bin             ${S}/${SOC_DIR}/
+    fi
+
+    # mkimage for i.MX8
+    for target in ${IMXBOOT_TARGETS}; do
+        echo &quot;building ${SOC_TARGET} - ${target}&quot;
+        make SOC=${SOC_TARGET} ${target}                                          # make SOC=iMX8QM flash_b0
+        if [ -e &quot;${S}/${SOC_DIR}/flash.bin&quot; ]; then
+            cp ${S}/${SOC_DIR}/flash.bin ${S}/${BOOT_CONFIG_MACHINE}-${target}    # imx-boot-imx8qmmek-sd.bin-flash_b0
+        fi
+    done
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">SOC=iMX8QM</span> <span class="pre">flash_b0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-boot/0.2-r0/git/Makefile</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+MKIMG = $(PWD)/mkimage_imx8
+CC = gcc
+CFLAGS ?= -g -O2 -Wall -std=c99 -static
+INCLUDE += $(CURR_DIR)/src
+
+SRCS = src/imx8qm.c  src/imx8qx.c src/imx8qxb0.c src/mkimage_imx8.c
+
+ifneq ($(findstring iMX8M,$(SOC)),)
+SOC_DIR = iMX8M
+endif
+SOC_DIR ?= $(SOC)
+
+vpath $(INCLUDE)
+
+.PHONY:  clean all bin
+
+.DEFAULT:
+        @$(MAKE) -s --no-print-directory bin
+        @$(MAKE) --no-print-directory -C $(SOC_DIR) -f soc.mak $@
+
+#print out usage as the default target
+all: $(MKIMG) help
+
+clean:
+        @rm -f $(MKIMG)
+        @rm -f src/build_info.h
+        @$(MAKE) --no-print-directory -C iMX8QM -f soc.mak clean
+        @$(MAKE) --no-print-directory -C iMX8QX -f soc.mak  clean
+        @$(MAKE) --no-print-directory -C iMX8M -f soc.mak  clean
+        @$(MAKE) --no-print-directory -C iMX8dv -f soc.mak  clean
+
+$(MKIMG): src/build_info.h $(SRCS)
+        @echo &quot;Compiling mkimage_imx8&quot;
+        $(CC) $(CFLAGS) $(SRCS) -o $(MKIMG) -I src
+
+bin: $(MKIMG)
+
+src/build_info.h:
+        @echo -n &#39;#define MKIMAGE_COMMIT 0x&#39; &gt; src/build_info.h
+        @git rev-parse --short=8 HEAD &gt;&gt; src/build_info.h
+        @echo &#39;&#39; &gt;&gt; src/build_info.h
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;$(MAKE)</span> <span class="pre">--no-print-directory</span> <span class="pre">-C</span> <span class="pre">$(SOC_DIR)</span> <span class="pre">-f</span> <span class="pre">soc.mak</span> <span class="pre">$&#64;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-boot/0.2-r0/git/iMX8QM/soc.mak</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[...省略]
+u-boot-hash.bin: u-boot.bin
+        ./$(MKIMG) -commit &gt; head.hash
+        @cat u-boot.bin head.hash &gt; u-boot-hash.bin
+
+u-boot-atf.bin: u-boot-hash.bin bl31.bin
+        @cp bl31.bin u-boot-atf.bin
+        @dd if=u-boot-hash.bin of=u-boot-atf.bin bs=1K seek=128
+        @if [ -f &quot;hdmitxfw.bin&quot; ] &amp;&amp; [ -f &quot;hdmirxfw.bin&quot; ]; then \
+        objcopy -I binary -O binary --pad-to 0x20000 --gap-fill=0x0 hdmitxfw.bin hdmitxfw-pad.bin; \
+        objcopy -I binary -O binary --pad-to 0x20000 --gap-fill=0x0 hdmirxfw.bin hdmirxfw-pad.bin; \
+        cat u-boot-atf.bin hdmitxfw-pad.bin hdmirxfw-pad.bin &gt; u-boot-atf-hdmi.bin; \
+        cp u-boot-atf-hdmi.bin u-boot-atf.bin; \
+        fi
+
+[...省略]
+flash_b0: $(MKIMG) mx8qm-ahab-container.img scfw_tcm.bin u-boot-atf.bin
+        ./$(MKIMG) -soc QM -rev B0 -append mx8qm-ahab-container.img -c -scfw scfw_tcm.bin -ap u-boot-atf.bin a53 0x80000000 -out flash.bin
+[...省略]
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp/work/imx8qmmek-poky-linux/imx-boot/0.2-r0/git/imx-boot-imx8qmmek-sd.bin-flash_b0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta-fsl-bsp-release/imx/meta-bsp/recipes-bsp/imx-mkimage/imx-boot_0.2.bb</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>do_deploy () {
+    [...省略]
+
+    # copy the generated boot image to deploy path
+    for target in ${IMXBOOT_TARGETS}; do                                                # flash_b0
+        # Use first &quot;target&quot; as IMAGE_IMXBOOT_TARGET
+        if [ &quot;$IMAGE_IMXBOOT_TARGET&quot; = &quot;&quot; ]; then
+            IMAGE_IMXBOOT_TARGET=&quot;$target&quot;
+            echo &quot;Set boot target as $IMAGE_IMXBOOT_TARGET&quot;
+        fi
+        install -m 0644 ${S}/${BOOT_CONFIG_MACHINE}-${target} ${DEPLOYDIR}              # imx-boot-imx8qmmek-sd.bin-flash_b0
+    done
+    cd ${DEPLOYDIR}
+    ln -sf ${BOOT_CONFIG_MACHINE}-${IMAGE_IMXBOOT_TARGET} ${BOOT_CONFIG_MACHINE}        # ln -sf imx-boot-imx8qmmek-sd.bin-${IMAGE_IMXBOOT_TARGET} imx-boot-imx8qmmek-sd.bin
+    cd -
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/work/imx8qmmek-poky-linux/imx-boot/0.2-r0/deploy-imx-boot/*</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">total</span> <span class="mi">964</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">3</span> <span class="n">wugn</span> <span class="n">wugn</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="o">.</span>
+<span class="n">drwxrwxr</span><span class="o">-</span><span class="n">x</span> <span class="mi">15</span> <span class="n">wugn</span> <span class="n">wugn</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="o">..</span>
+<span class="n">lrwxrwxrwx</span>  <span class="mi">2</span> <span class="n">wugn</span> <span class="n">wugn</span>     <span class="mi">34</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">flash_b0</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>  <span class="mi">2</span> <span class="n">wugn</span> <span class="n">wugn</span> <span class="mi">972800</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">flash_b0</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">2</span> <span class="n">wugn</span> <span class="n">wugn</span>   <span class="mi">4096</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">tools</span>
+
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-al</span> <span class="pre">tmp/deploy/images/imx8qmmek/imx-boot-imx8qmmek-sd.bin</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lrwxrwxrwx</span> <span class="mi">2</span> <span class="n">wugn</span> <span class="n">wugn</span>     <span class="mi">34</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span><span class="o">.</span><span class="n">bin</span> <span class="o">-&gt;</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">flash_b0</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">2</span> <span class="n">wugn</span> <span class="n">wugn</span> <span class="mi">972800</span> <span class="n">Jul</span> <span class="mi">24</span> <span class="mi">15</span><span class="p">:</span><span class="mi">49</span> <span class="n">imx</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">imx8qmmek</span><span class="o">-</span><span class="n">sd</span><span class="o">.</span><span class="n">bin</span><span class="o">-</span><span class="n">flash_b0</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

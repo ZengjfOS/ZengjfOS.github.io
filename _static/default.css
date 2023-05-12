@@ -1,0 +1,22 @@
+.wy-nav-content {
+    max-width: none;
+}
+
+div.body {
+    max-width: none;
+}
+
+/**
+ * 1. Wide table handling is not flexible, how to override the CSS? #117
+ *     https://github.com/readthedocs/sphinx_rtd_theme/issues/117
+ */
+/* override table width restrictions */
+.wy-table-responsive table td, .wy-table-responsive table th {
+    white-space: normal;
+}
+
+.wy-table-responsive {
+    margin-bottom: 24px;
+    max-width: 100%;
+    overflow: visible;
+}

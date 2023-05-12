@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ASoC Machine Driver</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#asoc-audio">ASoC audio设备树匹配</a></li>
+<li><a class="reference internal" href="#machine-route-widget">Machine route/widget</a></li>
+<li><a class="reference internal" href="#fsl-asoc-card-probe">fsl_asoc_card_probe解析</a></li>
+<li><a class="reference internal" href="#dai-link">dai_link数组结构展开</a></li>
+<li><a class="reference internal" href="#id2">声卡注册流程</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asoc-machine-driver">
+<h1>ASoC Machine Driver<a class="headerlink" href="#asoc-machine-driver" title="Permalink to this headline"></a></h1>
+<p>主板声卡功能注册</p>
+<ul class="simple">
+<li><p>主要是获取设备中定义的route并初始化card；</p></li>
+<li><p>用预定好的route、wiget初始化card；</p></li>
+<li><p><a class="reference internal" href="0005_dai_link_component.html"><span class="doc std std-doc">初始化dai_link</span></a>；</p></li>
+</ul>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/Vincentywj/article/details/77676583">Android音频驱动-ASOC之PCM Device创建</a></p></li>
+</ul>
+</section>
+<section id="asoc-audio">
+<h1>ASoC audio设备树匹配<a class="headerlink" href="#asoc-audio" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><span class="xref myst">CS42888声卡设备树示例</span></p></li>
+<li><p><a class="reference external" href="https://github.com/torvalds/linux/blob/master/sound/soc/fsl/fsl-asoc-card.c#L698">fsl,imx-audio-cs42888 fsl_asoc_card_driver</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">of_device_id</span><span class="w"> </span><span class="n">fsl_asoc_card_dt_ids</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-ac97&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-cs42888&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-cs427x&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-sgtl5000&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-wm8962&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-wm8960&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">MODULE_DEVICE_TABLE</span><span class="p">(</span><span class="n">of</span><span class="p">,</span><span class="w"> </span><span class="n">fsl_asoc_card_dt_ids</span><span class="p">);</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_driver</span><span class="w"> </span><span class="n">fsl_asoc_card_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_probe</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl-asoc-card&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">pm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">snd_soc_pm_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">of_match_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_dt_ids</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">module_platform_driver</span><span class="p">(</span><span class="n">fsl_asoc_card_driver</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="machine-route-widget">
+<h1>Machine route/widget<a class="headerlink" href="#machine-route-widget" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>of_dapm_routes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">audio</span><span class="o">-</span><span class="n">routing</span> <span class="o">=</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT1L&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT1R&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT2L&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT2R&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT3L&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT3R&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT4L&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Line Out Jack&quot;</span><span class="p">,</span> <span class="s2">&quot;AOUT4R&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AIN1L&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AIN1R&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AIN2L&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AIN2R&quot;</span><span class="p">,</span> <span class="s2">&quot;Line In Jack&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>dapm_routes</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_route</span><span class="w"> </span><span class="n">audio_map</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* 1st half -- Normal DAPM routes */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* 2nd half -- ASRC DAPM routes */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASRC-Playback&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;ASRC-Capture&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>dapm_widgets</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Add all possible widgets into here without being redundant */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="n">fsl_asoc_card_dapm_widgets</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * #define SND_SOC_DAPM_LINE(wname, wevent) \</span>
+<span class="cm">     * {    .id = snd_soc_dapm_line, .name = wname, .kcontrol_news = NULL, \</span>
+<span class="cm">     *     .num_kcontrols = 0, .reg = SND_SOC_NOPM, .event = wevent, \</span>
+<span class="cm">     *     .event_flags = SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD}</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_LINE</span><span class="p">(</span><span class="s">&quot;Line Out Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_LINE</span><span class="p">(</span><span class="s">&quot;Line In Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_HP</span><span class="p">(</span><span class="s">&quot;Headphone Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_SPK</span><span class="p">(</span><span class="s">&quot;Ext Spk&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_MIC</span><span class="p">(</span><span class="s">&quot;Mic Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_MIC</span><span class="p">(</span><span class="s">&quot;AMIC&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">SND_SOC_DAPM_MIC</span><span class="p">(</span><span class="s">&quot;DMIC&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>audio-routing解析</p>
+<ul>
+<li><p>fsl_asoc_card_probe</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">fsl_asoc_card_probe</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">pdev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">dapm_routes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_is_ac97</span><span class="p">(</span><span class="n">priv</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"></span>
+<span class="w">               </span><span class="nl">audio_map_ac97</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">audio_map</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">late_probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_late_probe</span><span class="p">;</span><span class="w">                                 </span><span class="c1">// late_probe函数</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_dapm_routes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">audio_map</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">dapm_widgets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_dapm_widgets</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_dapm_widgets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">fsl_asoc_card_dapm_widgets</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_of_parse_audio_routing</span><span class="p">(</span><span class="o">&amp;</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;audio-routing&quot;</span><span class="p">);</span><span class="w">               </span><span class="c1">// 对设备树的audio-routing进行提取</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to parse audio-routing: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L3529">snd_soc_of_parse_audio_routing(&amp;priv-&gt;card, “audio-routing”)</a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="fsl-asoc-card-probe">
+<h1>fsl_asoc_card_probe解析<a class="headerlink" href="#fsl-asoc-card-probe" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">fsl_asoc_card_probe</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">pdev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">device_node</span><span class="w"> </span><span class="o">*</span><span class="n">cpu_np</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">codec_np</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">asrc_np</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">device_node</span><span class="w"> </span><span class="o">*</span><span class="n">np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">.</span><span class="n">of_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">asrc_pdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">cpu_pdev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">fsl_asoc_card_priv</span><span class="w"> </span><span class="o">*</span><span class="n">priv</span><span class="p">;</span><span class="w">                                        </span><span class="c1">// 这个结构体需要看一下</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">i2c_client</span><span class="w"> </span><span class="o">*</span><span class="n">codec_dev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">codec_dai_name</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">u32</span><span class="w"> </span><span class="n">width</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">priv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_kzalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">priv</span><span class="p">),</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">priv</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cpu_np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_parse_phandle</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;audio-cpu&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">                          </span><span class="c1">// 获取esai设备树</span>
+<span class="w">    </span><span class="cm">/* Give a chance to old DT binding */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">cpu_np</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">cpu_np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_parse_phandle</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ssi-controller&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">cpu_np</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU phandle missing or invalid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">cpu_pdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_find_device_by_node</span><span class="p">(</span><span class="n">cpu_np</span><span class="p">);</span><span class="w">                              </span><span class="c1">// 根据设备树找到平台设备</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">cpu_pdev</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to find CPU DAI device</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">codec_np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_parse_phandle</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;audio-codec&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">                      </span><span class="c1">// 获取cs42888设备树</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">codec_np</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">codec_dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_find_i2c_device_by_node</span><span class="p">(</span><span class="n">codec_np</span><span class="p">);</span><span class="w">                   </span><span class="c1">// 获取i2c平台设备</span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">codec_dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">asrc_np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_parse_phandle</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;audio-asrc&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">                        </span><span class="c1">// 获取asrc设备树</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">asrc_np</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">asrc_pdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_find_device_by_node</span><span class="p">(</span><span class="n">asrc_np</span><span class="p">);</span><span class="w">                        </span><span class="c1">// 获取asrc平台设备</span>
+
+<span class="w">    </span><span class="cm">/* Get the MCLK rate only, and leave it controlled by CODEC drivers */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">codec_dev</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">clk</span><span class="w"> </span><span class="o">*</span><span class="n">codec_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clk_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">codec_dev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">codec_clk</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">codec_priv</span><span class="p">.</span><span class="n">mclk_freq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clk_get_rate</span><span class="p">(</span><span class="n">codec_clk</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">clk_put</span><span class="p">(</span><span class="n">codec_clk</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Default sample rate and format, will be updated in hw_params() */</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">sample_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">44100</span><span class="p">;</span><span class="w">                                              </span><span class="c1">// 默认采样率</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">sample_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_FORMAT_S16_LE</span><span class="p">;</span><span class="w">                          </span><span class="c1">// 采样深度</span>
+
+<span class="w">    </span><span class="cm">/* Assign a default DAI format, and allow each card to overwrite it */</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DAI_FMT_BASE</span><span class="p">;</span><span class="w">                                           </span><span class="c1">// DAI格式</span>
+
+<span class="w">    </span><span class="cm">/* Diversify the card configurations */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">of_device_is_compatible</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fsl,imx-audio-cs42888&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">             </span><span class="c1">// 我们跟的就是他了</span>
+<span class="w">        </span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;cs42888&quot;</span><span class="p">;</span><span class="w">                                         </span><span class="c1">// 获取到了codec dai name</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">set_bias_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_freq</span><span class="p">[</span><span class="n">TX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">codec_priv</span><span class="p">.</span><span class="n">mclk_freq</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_freq</span><span class="p">[</span><span class="n">RX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">codec_priv</span><span class="p">.</span><span class="n">mclk_freq</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_dir</span><span class="p">[</span><span class="n">TX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_CLOCK_OUT</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_dir</span><span class="p">[</span><span class="n">RX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_CLOCK_OUT</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">slot_width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">SND_SOC_DAIFMT_CBS_CFS</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">fsl_asoc_card_is_ac97</span><span class="p">(</span><span class="n">priv</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">codec_dev</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to find codec device</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Common settings for corresponding Freescale CPU DAI driver */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">of_node_name_eq</span><span class="p">(</span><span class="n">cpu_np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ssi&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* Only SSI needs to configure AUDMUX */</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_audmux_init</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="n">priv</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to init audmux</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">of_node_name_eq</span><span class="p">(</span><span class="n">cpu_np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;esai&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">                           </span><span class="c1">// 接口用的是esai</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ESAI_HCKT_EXTAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ESAI_HCKR_EXTAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">of_node_name_eq</span><span class="p">(</span><span class="n">cpu_np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sai&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FSL_SAI_CLK_MAST1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">cpu_priv</span><span class="p">.</span><span class="n">sysclk_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FSL_SAI_CLK_MAST1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">snprintf</span><span class="p">(</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;%s-audio&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">         </span><span class="n">fsl_asoc_card_is_ac97</span><span class="p">(</span><span class="n">priv</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;ac97&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"></span>
+<span class="w">         </span><span class="n">codec_dev</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w">                                                  </span><span class="c1">// codec_dev-&gt;name = cs42888</span>
+
+<span class="w">    </span><span class="cm">/* Initialize sound card */</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">pdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span><span class="w">                                               </span><span class="c1">// cs42888-audio</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">dai_link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">;</span><span class="w">                                       </span><span class="c1">// 声卡的dai_link和priv的dai_link是一样的，后面主要操作priv的dai_link</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * static const struct snd_soc_dapm_route audio_map[] = {</span>
+<span class="cm">     *     /* 1st half -- Normal DAPM routes */</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="cm">/* 2nd half -- ASRC DAPM routes */</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASRC-Playback&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="s">&quot;ASRC-Capture&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">     </span><span class="o">*/</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">dapm_routes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_is_ac97</span><span class="p">(</span><span class="n">priv</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"></span>
+<span class="w">                 </span><span class="nl">audio_map_ac97</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">audio_map</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">late_probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_late_probe</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_dapm_routes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">audio_map</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * /* Add all possible widgets into here without being redundant */</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="n">fsl_asoc_card_dapm_widgets</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="cm">/**</span>
+<span class="cm">     *      * #define SND_SOC_DAPM_LINE(wname, wevent) \</span>
+<span class="cm">     *      * {    .id = snd_soc_dapm_line, .name = wname, .kcontrol_news = NULL, \</span>
+<span class="cm">     *      *     .num_kcontrols = 0, .reg = SND_SOC_NOPM, .event = wevent, \</span>
+<span class="cm">     *      *     .event_flags = SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD}</span>
+<span class="cm">     *      */</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_LINE</span><span class="p">(</span><span class="s">&quot;Line Out Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_LINE</span><span class="p">(</span><span class="s">&quot;Line In Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_HP</span><span class="p">(</span><span class="s">&quot;Headphone Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_SPK</span><span class="p">(</span><span class="s">&quot;Ext Spk&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_MIC</span><span class="p">(</span><span class="s">&quot;Mic Jack&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_MIC</span><span class="p">(</span><span class="s">&quot;AMIC&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="n">SND_SOC_DAPM_MIC</span><span class="p">(</span><span class="s">&quot;DMIC&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">     </span><span class="o">*/</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">dapm_widgets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_asoc_card_dapm_widgets</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_dapm_widgets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">fsl_asoc_card_dapm_widgets</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Drop the second half of DAPM routes -- ASRC */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">asrc_pdev</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_dapm_routes</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * static struct snd_soc_dai_link fsl_asoc_card_dai[] = {</span>
+<span class="cm">     *     /* Default ASoC DAI Link*/</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_asoc_card_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="cm">/* DPCM Link between Front-End and Back-End (Optional) */</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-FE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-FE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">codec_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy-dai&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">dpcm_playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">dpcm_capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">dynamic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">{</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-BE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-BE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">platform_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">be_hw_params_fixup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">be_hw_params_fixup</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_asoc_card_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">dpcm_playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">dpcm_capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">         </span><span class="p">.</span><span class="n">no_pcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w">     </span><span class="p">},</span><span class="w"></span>
+<span class="w">     </span><span class="o">*</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">     </span><span class="o">*/</span><span class="w"></span>
+<span class="w">    </span><span class="n">memcpy</span><span class="p">(</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">,</span><span class="w"> </span><span class="n">fsl_asoc_card_dai</span><span class="p">,</span><span class="w"></span>
+<span class="w">           </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * audio-routing =</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT1L&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT1R&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT2L&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT2R&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT3L&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT3R&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT4L&quot;,</span>
+<span class="cm">     *     &quot;Line Out Jack&quot;, &quot;AOUT4R&quot;,</span>
+<span class="cm">     *     &quot;AIN1L&quot;, &quot;Line In Jack&quot;,</span>
+<span class="cm">     *     &quot;AIN1R&quot;, &quot;Line In Jack&quot;,</span>
+<span class="cm">     *     &quot;AIN2L&quot;, &quot;Line In Jack&quot;,</span>
+<span class="cm">     *     &quot;AIN2R&quot;, &quot;Line In Jack&quot;;</span>
+<span class="cm">     *</span>
+<span class="cm">     * card-&gt;num_of_dapm_routes = num_routes;           // 设备树定义的route数量</span>
+<span class="cm">     * card-&gt;of_dapm_routes = routes;                   // 设备树定义的route</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_of_parse_audio_routing</span><span class="p">(</span><span class="o">&amp;</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;audio-routing&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to parse audio-routing: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Normal DAI Link */</span><span class="w">                                                   </span><span class="c1">// 这里一定要注意priv-&gt;dai_link和后面priv-&gt;card-&gt;dai_link指针指向同一个地方</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">;</span><span class="w">                                 </span><span class="c1">// dai_link[0]cpu设备树节点为esai设备树</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">;</span><span class="w">                      </span><span class="c1">// dai_link[0]的codec DAI名字</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">fsl_asoc_card_is_ac97</span><span class="p">(</span><span class="n">priv</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">;</span><span class="w">                         </span><span class="c1">// dai_link[0]codec设备树节点为cs42888设备树</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">u32</span><span class="w"> </span><span class="n">idx</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_property_read_u32</span><span class="p">(</span><span class="n">cpu_np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cell-index&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">idx</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;cannot get CPU index property</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">codec_name</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">                </span><span class="n">devm_kasprintf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">,</span><span class="w"></span>
+<span class="w">                           </span><span class="s">&quot;ac97-codec.%u&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                           </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="n">idx</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">codec_name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">platform_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">;</span><span class="w">                        </span><span class="c1">// dai_link[0]平台设备树节点为esai设备树</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">;</span><span class="w">                          </span><span class="c1">// dai_link[0]帧格式</span>
+<span class="w">    </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_links</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                                           </span><span class="c1">// 当前支持的dai link的个数</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">asrc_pdev</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* DPCM DAI Links only if ASRC exsits */</span><span class="w"></span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">;</span><span class="w">                        </span><span class="c1">// dai_link[1]cpu设备树节点为asrc设备树</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">platform_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">;</span><span class="w">                   </span><span class="c1">// dai_link[1]平台设备树节点为asrc设备树</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">;</span><span class="w">              </span><span class="c1">// dai_link[0]的codec DAI名字</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">;</span><span class="w">                     </span><span class="c1">// dai_link[0]codec设备树节点为cs42888设备树</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">codec_name</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">                </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">codec_name</span><span class="p">;</span><span class="w">                           </span><span class="c1">// 这个目前没有赋值</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">;</span><span class="w">                         </span><span class="c1">// dai_link[1]cpu设备树节点为asrc设备树</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">;</span><span class="w">                      </span><span class="c1">// dai_link[0]帧格式</span>
+<span class="w">        </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">.</span><span class="n">num_links</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">                                       </span><span class="c1">// 当前支持的dai link的个数</span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_property_read_u32</span><span class="p">(</span><span class="n">asrc_np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fsl,asrc-rate&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                       </span><span class="o">&amp;</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">asrc_rate</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get output rate</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_property_read_u32</span><span class="p">(</span><span class="n">asrc_np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fsl,asrc-width&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">width</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get output rate</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">asrc_fail</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">width</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">24</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">asrc_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_FORMAT_S24_LE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">asrc_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_FORMAT_S16_LE</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Finish card registering */</span><span class="w"></span>
+<span class="w">    </span><span class="n">platform_set_drvdata</span><span class="p">(</span><span class="n">pdev</span><span class="p">,</span><span class="w"> </span><span class="n">priv</span><span class="p">);</span><span class="w">                                       </span><span class="c1">// dev-&gt;driver_data = data;</span>
+<span class="w">    </span><span class="n">snd_soc_card_set_drvdata</span><span class="p">(</span><span class="o">&amp;</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">priv</span><span class="p">);</span><span class="w">                            </span><span class="c1">// card-&gt;drvdata = data;</span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_snd_soc_register_card</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="n">EPROBE_DEFER</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;snd_soc_register_card failed (%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+
+<span class="nl">asrc_fail</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">of_node_put</span><span class="p">(</span><span class="n">asrc_np</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">of_node_put</span><span class="p">(</span><span class="n">codec_np</span><span class="p">);</span><span class="w"></span>
+<span class="nl">fail</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">of_node_put</span><span class="p">(</span><span class="n">cpu_np</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="dai-link">
+<h1>dai_link数组结构展开<a class="headerlink" href="#dai-link" title="Permalink to this headline"></a></h1>
+<p><span class="xref myst">dai_link被解析成<code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">snd_soc_dai_link_component</span></code>代码分析</span></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="n">fsl_asoc_card_dai</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* Default ASoC DAI Link*/</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_asoc_card_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* DPCM Link between Front-End and Back-End (Optional) */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-FE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-FE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy-dai&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dynamic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">asrc_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-BE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;HiFi-ASRC-BE&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">platform_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">be_hw_params_fixup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">be_hw_params_fixup</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_asoc_card_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dpcm_capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">no_pcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_dai_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_dai_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">codec_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">codec_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">cpu_of_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_np</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dai_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>声卡注册流程<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* static int fsl_asoc_card_probe(struct platform_device *pdev)
+  * codec_dai_name = &quot;cs42888&quot;;
+  * priv-&gt;card.dai_link = priv-&gt;dai_link;                                   // 这个很重要，因为后面没有重复初始化了
+  * memcpy(priv-&gt;dai_link, fsl_asoc_card_dai, sizeof(struct snd_soc_dai_link) * ARRAY_SIZE(priv-&gt;dai_link));
+  * priv-&gt;dai_link[0].codec_of_node = codec_np;
+  * priv-&gt;dai_link[0].codec_dai_name = codec_dai_name;
+  * priv-&gt;card.num_links = 1;
+  * if (asrc_pdev) 
+    * priv-&gt;dai_link[2].codec_dai_name = codec_dai_name;
+    * priv-&gt;dai_link[2].codec_of_node = codec_np;
+    * priv-&gt;card.num_links = 3;
+  * ret = devm_snd_soc_register_card(&amp;pdev-&gt;dev, &amp;priv-&gt;card);
+    * ret = snd_soc_register_card(card);
+      * ret = soc_init_dai_link(card, link);
+        * ret = snd_soc_init_platform(card, link);                                // 初始化平台数据
+          * dai_link-&gt;platform      = platform;
+          * dai_link-&gt;legacy_platform = 1;
+          * platform-&gt;name          = dai_link-&gt;platform_name;
+          * platform-&gt;of_node      = dai_link-&gt;platform_of_node;
+          * platform-&gt;dai_name      = NULL;
+        * ret = snd_soc_init_multicodec(card, link);                              // 初始化codec数据
+          * dai_link-&gt;num_codecs = 1;
+          * dai_link-&gt;codecs[0].name = dai_link-&gt;codec_name;
+          * dai_link-&gt;codecs[0].of_node = dai_link-&gt;codec_of_node;
+          * dai_link-&gt;codecs[0].dai_name = dai_link-&gt;codec_dai_name;
+      * return snd_soc_bind_card(card);
+        * static int snd_soc_instantiate_card(struct snd_soc_card *card)
+          * ret = soc_bind_dai_link(card, dai_link);
+            * if (soc_is_dai_link_bound(card, dai_link))                          // 如果已经绑定了就不用再绑定
+            * rtd = soc_new_pcm_runtime(card, dai_link);
+            * cpu_dai_component.name = dai_link-&gt;cpu_name;
+            * cpu_dai_component.of_node = dai_link-&gt;cpu_of_node;                  // 使用of_node进行匹配
+            * rtd-&gt;cpu_dai = snd_soc_find_dai(&amp;cpu_dai_component);                // 查找能够匹配的of_node匹配上的DAI，不是名字
+              * for_each_component(component) 
+                * list_for_each_entry(component, &amp;component_list, list)
+                  * if (!snd_soc_is_matching_component(dlc, component))
+                    * if (dlc-&gt;of_node &amp;&amp; component_of_node != dlc-&gt;of_node) return 0;          // of_node进行匹配
+                    * if (dlc-&gt;name &amp;&amp; strcmp(component-&gt;name, dlc-&gt;name)) return 0;
+            * snd_soc_rtdcom_add(rtd, rtd-&gt;cpu_dai-&gt;component);                                 // esai dai
+            * snd_soc_rtdcom_add(rtd, codec_dais[i]-&gt;component);                                // codec dai
+            * snd_soc_rtdcom_add(rtd, component);                                               // platform
+          * ret = soc_probe_link_components(card, rtd, order);                                  // 调用component的probe函数
+            * ret = soc_probe_component(card, component);
+              * if (!strcmp(component-&gt;name, &quot;snd-soc-dummy&quot;)) return 0;
+              * ret = component-&gt;driver-&gt;probe(component);
+              * ret = component-&gt;init(component);
+          * ret = soc_probe_link_dais(card, rtd, order);
+            * ret = soc_new_pcm(rtd, num);                                        // &lt;--------到这里创建出PCM
+              * ret = snd_pcm_new(rtd-&gt;card-&gt;snd_card, new_name, num, playback, capture, &amp;pcm);
+                * return _snd_pcm_new(card, id, device, playback_count, capture_count, false, rpcm);
+                  * static struct snd_device_ops ops = { .dev_free = snd_pcm_dev_free, .dev_register = snd_pcm_dev_register, .dev_disconnect = snd_pcm_dev_disconnect, };
+                    * snd_pcm_dev_register                                                    // 这个回调函数会在声卡的注册阶段创建pcm设备节点/dev/snd/pcmCxxDxxp和/dev/snd/pcmCxxDxxc
+                      * err = snd_pcm_add(pcm);                                               // 将pcm加入到全局变量snd_pcm_devices，之后会创建/proc/asound/pcm文件
+                      * err = snd_register_device(devtype, pcm-&gt;card, pcm-&gt;device, &amp;snd_pcm_f_ops[cidx], pcm, &amp;pcm-&gt;streams[cidx].dev);
+                  * err = snd_pcm_new_stream(pcm, SNDRV_PCM_STREAM_PLAYBACK, playback_count);
+                  * err = snd_pcm_new_stream(pcm, SNDRV_PCM_STREAM_CAPTURE, capture_count);
+                  * err = snd_device_new(card, SNDRV_DEV_PCM, pcm, internal ? &amp;internal_ops : &amp;ops);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

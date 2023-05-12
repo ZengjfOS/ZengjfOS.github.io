@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SimpleBLEPeripheral GATT Definition Hack</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#logical-attribute-representation">Logical Attribute Representation</a></li>
+<li><a class="reference internal" href="#gatt-profile-hierarchy">GATT Profile Hierarchy</a><ul>
+<li><a class="reference internal" href="#service">Service</a></li>
+<li><a class="reference internal" href="#included-services">Included Services</a></li>
+<li><a class="reference internal" href="#characteristic">Characteristic</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simplebleperipheral-gatt">SimpleBLEPeripheral GATT</a></li>
+<li><a class="reference internal" href="#gatt-routines">GATT Routines</a></li>
+<li><a class="reference internal" href="#simplebleperipheral-test">SimpleBLEPeripheral Test</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simplebleperipheral-gatt-definition-hack">
+<h1>SimpleBLEPeripheral GATT Definition Hack<a class="headerlink" href="#simplebleperipheral-gatt-definition-hack" title="Permalink to this headline"></a></h1>
+<p>SimpleBLEPeripheral GATT分析</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=229737">Bluetooth 4.0 Core specifications - Bluetooth.org</a><br />
+<img alt="0008_Core_System_Package_GATT.png" src="../../../_images/0008_Core_System_Package_GATT.png" /></p></li>
+</ul>
+</section>
+<section id="logical-attribute-representation">
+<h1>Logical Attribute Representation<a class="headerlink" href="#logical-attribute-representation" title="Permalink to this headline"></a></h1>
+<p>Attribute是基础数据结构，其根据Atrribute Type中的UUID的不同，而变成<code class="docutils literal notranslate"><span class="pre">Service</span></code>/<code class="docutils literal notranslate"><span class="pre">Included</span> <span class="pre">Services</span></code>/<code class="docutils literal notranslate"><span class="pre">Characteristic</span></code>等不同的性质数据结构，可以认为Atrribute是一个房间（struct），根据房间的功能（UUID的不同）来确定其大体功能，譬如卧室、书房、会客室等；</p>
+<p><img alt="0008_GATT_Logical_Attribute_Representation.png" src="../../../_images/0008_GATT_Logical_Attribute_Representation.png" /></p>
+</section>
+<section id="gatt-profile-hierarchy">
+<h1>GATT Profile Hierarchy<a class="headerlink" href="#gatt-profile-hierarchy" title="Permalink to this headline"></a></h1>
+<p><img alt="0008_GATT_Profile_Hierarchy.png" src="../../../_images/0008_GATT_Profile_Hierarchy.png" /></p>
+<section id="service">
+<h2>Service<a class="headerlink" href="#service" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>In GATT, a service is defined by its service definition, There are two types of services: primary service and secondary service</p>
+<ul>
+<li><p>A primary service is a service that exposes the primary usable functionality of this device.</p></li>
+<li><p>A secondary service is a service that is only intended to be referenced from a primary service or another secondary service or other higher layer specification.</p></li>
+</ul>
+</li>
+</ul>
+<p><em>Service Declaration</em></p>
+<p><img alt="0008_GATT_Service_Declaration.png" src="../../../_images/0008_GATT_Service_Declaration.png" /></p>
+</section>
+<section id="included-services">
+<h2>Included Services<a class="headerlink" href="#included-services" title="Permalink to this headline"></a></h2>
+<p>An included service is a method to reference another service definition existing on the server into the service being defined.</p>
+<p><em>Included Declaration</em></p>
+<p><img alt="0008_GATT_Include_Declaration.png" src="../../../_images/0008_GATT_Include_Declaration.png" /></p>
+</section>
+<section id="characteristic">
+<h2>Characteristic<a class="headerlink" href="#characteristic" title="Permalink to this headline"></a></h2>
+<p>A characteristic is a value used in a service along with properties and configuration information about how the value is accessed and information about how the value is displayed or represented.</p>
+<p><em>Characteristic Declaration</em></p>
+<p><img alt="0008_GATT_Characteristic_Declaration.png" src="../../../_images/0008_GATT_Characteristic_Declaration.png" /></p>
+<p>Attribute Value Field in characteristic declaration</p>
+<p><img alt="0008_GATT_Attribute_Value_Field_In_Characteristic_Declaration.png" src="../../../_images/0008_GATT_Attribute_Value_Field_In_Characteristic_Declaration.png" /></p>
+<p>Characteristic Properties In the Attribute Value</p>
+<p><img alt="0008_GATT_Characteristic_Properties_Bit_Field_In_The_Attribute_Value.png" src="../../../_images/0008_GATT_Characteristic_Properties_Bit_Field_In_The_Attribute_Value.png" /></p>
+<p><em>Characteristic Value Declaration</em></p>
+<p><img alt="0008_GATT_Characteristic_Value_Declaration.png" src="../../../_images/0008_GATT_Characteristic_Value_Declaration.png" /></p>
+<p><em>Characteristic Descriptor Declarations</em></p>
+<ul class="simple">
+<li><p>Attribute Type 0x2900 for Characteristic Extended Properties</p></li>
+<li><p>Attribute Type 0x2901 for Characteristic User Description</p></li>
+<li><p>Attribute Type 0x2902 for Client Characteristic Configuration</p></li>
+<li><p>Attribute Type 0x2903 for Server Characteristic Configuration</p></li>
+<li><p>Attribute Type 0x2904 for Characteristic Presentation Format</p></li>
+</ul>
+</section>
+</section>
+<section id="simplebleperipheral-gatt">
+<h1>SimpleBLEPeripheral GATT<a class="headerlink" href="#simplebleperipheral-gatt" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="n">gattAttribute_t</span><span class="w"> </span><span class="n">simpleProfileAttrTbl</span><span class="p">[</span><span class="n">SERVAPP_NUM_ATTR_SUPPORTED</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Simple Profile Service: Service Declaration</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // Size of 16-bit Bluetooth UUID</span>
+<span class="cm">         * #define ATT_BT_UUID_SIZE                 2</span>
+<span class="cm">         *</span>
+<span class="cm">         * </span>
+<span class="cm">         * #define GATT_PRIMARY_SERVICE_UUID                  0x2800 // Primary Service</span>
+<span class="cm">         *</span>
+<span class="cm">         * // Primary Service UUID</span>
+<span class="cm">         * CONST uint8 primaryServiceUUID[ATT_BT_UUID_SIZE] =</span>
+<span class="cm">         * {</span>
+<span class="cm">         *   LO_UINT16( GATT_PRIMARY_SERVICE_UUID ), HI_UINT16( GATT_PRIMARY_SERVICE_UUID )</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">ATT_BT_UUID_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">primaryServiceUUID</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="cm">/* type */</span><span class="w">          </span><span class="c1">// {2, 0x2800}</span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * #define GATT_PERMIT_READ                 0x01 //!&lt; Attribute is Readable</span>
+<span class="cm">         * #define GATT_PERMIT_WRITE                0x02 //!&lt; Attribute is Writable</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHEN_READ          0x04 //!&lt; Read requires Authentication</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHEN_WRITE         0x08 //!&lt; Write requires Authentication</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHOR_READ          0x10 //!&lt; Read requires Authorization</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHOR_WRITE         0x20 //!&lt; Write requires Authorization</span>
+<span class="cm">         * #define GATT_PERMIT_ENCRYPT_READ         0x40 //!&lt; Read requires Encryption</span>
+<span class="cm">         * #define GATT_PERMIT_ENCRYPT_WRITE        0x80 //!&lt; Write requires Encryption</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">GATT_PERMIT_READ</span><span class="p">,</span><span class="w">                         </span><span class="cm">/* permissions */</span><span class="w"></span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="w">                                        </span><span class="cm">/* handle */</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // Simple Profile Service attribute</span>
+<span class="cm">         * static CONST gattAttrType_t simpleProfileService = { ATT_BT_UUID_SIZE, simpleProfileServUUID };</span>
+<span class="cm">         * </span>
+<span class="cm">         * // Simple Profile Service UUID</span>
+<span class="cm">         * #define SIMPLEPROFILE_SERV_UUID               0xFFF0</span>
+<span class="cm">         * </span>
+<span class="cm">         * // Simple GATT Profile Service UUID: 0xFFF0</span>
+<span class="cm">         * CONST uint8 simpleProfileServUUID[ATT_BT_UUID_SIZE] =</span>
+<span class="cm">         * { </span>
+<span class="cm">         *   LO_UINT16(SIMPLEPROFILE_SERV_UUID), HI_UINT16(SIMPLEPROFILE_SERV_UUID)</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">simpleProfileService</span><span class="w">            </span><span class="cm">/* pValue */</span><span class="w">      </span><span class="c1">// {2, 0xFFF0}</span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Characteristic 1 Declaration</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // GATT Declarations</span>
+<span class="cm">         * #define GATT_PRIMARY_SERVICE_UUID                  0x2800 // Primary Service</span>
+<span class="cm">         * #define GATT_SECONDARY_SERVICE_UUID                0x2801 // Secondary Service</span>
+<span class="cm">         * #define GATT_INCLUDE_UUID                          0x2802 // Include</span>
+<span class="cm">         * #define GATT_CHARACTER_UUID                        0x2803 // Characteristic</span>
+<span class="cm">         *</span>
+<span class="cm">         * // Characteristic UUID</span>
+<span class="cm">         * CONST uint8 characterUUID[ATT_BT_UUID_SIZE] =</span>
+<span class="cm">         * {</span>
+<span class="cm">         *   LO_UINT16( GATT_CHARACTER_UUID ), HI_UINT16( GATT_CHARACTER_UUID )</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">ATT_BT_UUID_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">characterUUID</span><span class="w"> </span><span class="p">},</span><span class="w">                        </span><span class="c1">// {2, 0x2803}</span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * #define GATT_PERMIT_READ                 0x01 //!&lt; Attribute is Readable</span>
+<span class="cm">         * #define GATT_PERMIT_WRITE                0x02 //!&lt; Attribute is Writable</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHEN_READ          0x04 //!&lt; Read requires Authentication</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHEN_WRITE         0x08 //!&lt; Write requires Authentication</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHOR_READ          0x10 //!&lt; Read requires Authorization</span>
+<span class="cm">         * #define GATT_PERMIT_AUTHOR_WRITE         0x20 //!&lt; Write requires Authorization</span>
+<span class="cm">         * #define GATT_PERMIT_ENCRYPT_READ         0x40 //!&lt; Read requires Encryption</span>
+<span class="cm">         * #define GATT_PERMIT_ENCRYPT_WRITE        0x80 //!&lt; Write requires Encryption</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">GATT_PERMIT_READ</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * #define GATT_PROP_BCAST                  0x01 //!&lt; Permits broadcasts of the Characteristic Value</span>
+<span class="cm">         * #define GATT_PROP_READ                   0x02 //!&lt; Permits reads of the Characteristic Value</span>
+<span class="cm">         * #define GATT_PROP_WRITE_NO_RSP           0x04 //!&lt; Permits writes of the Characteristic Value without response</span>
+<span class="cm">         * #define GATT_PROP_WRITE                  0x08 //!&lt; Permits writes of the Characteristic Value with response</span>
+<span class="cm">         * #define GATT_PROP_NOTIFY                 0x10 //!&lt; Permits notifications of a Characteristic Value without acknowledgement</span>
+<span class="cm">         * #define GATT_PROP_INDICATE               0x20 //!&lt; Permits indications of a Characteristic Value with acknowledgement</span>
+<span class="cm">         * #define GATT_PROP_AUTHEN                 0x40 //!&lt; Permits signed writes to the Characteristic Value</span>
+<span class="cm">         * #define GATT_PROP_EXTENDED               0x80 //!&lt; Additional characteristic properties are defined in the Characteristic Extended Properties Descriptor</span>
+<span class="cm">         * </span>
+<span class="cm">         * // Simple Profile Characteristic 1 Properties</span>
+<span class="cm">         * static uint8 simpleProfileChar1Props = GATT_PROP_READ | GATT_PROP_WRITE;</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">simpleProfileChar1Props</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Characteristic Value 1</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // Key Pressed UUID</span>
+<span class="cm">         * #define SIMPLEPROFILE_CHAR1_UUID            0xFFF1</span>
+<span class="cm">         * #define SIMPLEPROFILE_CHAR2_UUID            0xFFF2</span>
+<span class="cm">         * #define SIMPLEPROFILE_CHAR3_UUID            0xFFF3</span>
+<span class="cm">         * #define SIMPLEPROFILE_CHAR4_UUID            0xFFF4</span>
+<span class="cm">         * #define SIMPLEPROFILE_CHAR5_UUID            0xFFF5</span>
+<span class="cm">         *</span>
+<span class="cm">         * // Characteristic 1 UUID: 0xFFF1</span>
+<span class="cm">         * CONST uint8 simpleProfilechar1UUID[ATT_BT_UUID_SIZE] =</span>
+<span class="cm">         * { </span>
+<span class="cm">         *   LO_UINT16(SIMPLEPROFILE_CHAR1_UUID), HI_UINT16(SIMPLEPROFILE_CHAR1_UUID)</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">ATT_BT_UUID_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">simpleProfilechar1UUID</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">GATT_PERMIT_READ</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">GATT_PERMIT_WRITE</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // Characteristic 1 Value</span>
+<span class="cm">         * static uint8 simpleProfileChar1 = 0;</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">simpleProfileChar1</span><span class="w"> </span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Characteristic 1 User Description</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // GATT Descriptors</span>
+<span class="cm">         * #define GATT_CHAR_EXT_PROPS_UUID                   0x2900 // Characteristic Extended Properties</span>
+<span class="cm">         * #define GATT_CHAR_USER_DESC_UUID                   0x2901 // Characteristic User Description</span>
+<span class="cm">         * #define GATT_CLIENT_CHAR_CFG_UUID                  0x2902 // Client Characteristic Configuration</span>
+<span class="cm">         * #define GATT_SERV_CHAR_CFG_UUID                    0x2903 // Server Characteristic Configuration</span>
+<span class="cm">         * #define GATT_CHAR_FORMAT_UUID                      0x2904 // Characteristic Presentation Format</span>
+<span class="cm">         * #define GATT_CHAR_AGG_FORMAT_UUID                  0x2905 // Characteristic Aggregate Format</span>
+<span class="cm">         * #define GATT_VALID_RANGE_UUID                      0x2906 // Valid Range</span>
+<span class="cm">         * #define GATT_EXT_REPORT_REF_UUID                   0x2907 // External Report Reference Descriptor</span>
+<span class="cm">         * #define GATT_REPORT_REF_UUID                       0x2908 // Report Reference Descriptor</span>
+<span class="cm">         * </span>
+<span class="cm">         * // Characteristic User Description UUID</span>
+<span class="cm">         * CONST uint8 charUserDescUUID[ATT_BT_UUID_SIZE] =</span>
+<span class="cm">         * {</span>
+<span class="cm">         *   LO_UINT16( GATT_CHAR_USER_DESC_UUID ), HI_UINT16( GATT_CHAR_USER_DESC_UUID )</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">ATT_BT_UUID_SIZE</span><span class="p">,</span><span class="w"> </span><span class="n">charUserDescUUID</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">GATT_PERMIT_READ</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // Simple Profile Characteristic 1 User Description</span>
+<span class="cm">         * static uint8 simpleProfileChar1UserDesp[17] = &quot;Characteristic 1&quot;;</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">simpleProfileChar1UserDesp</span><span class="w"> </span>
+<span class="w">    </span><span class="p">},</span><span class="w">      </span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="gatt-routines">
+<h1>GATT Routines<a class="headerlink" href="#gatt-routines" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">main(void)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">osal_init_system()</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">osalInitTasks()</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">SimpleBLEPeripheral_Init(</span> <span class="pre">taskID</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">SimpleProfile_AddService(</span> <span class="pre">GATT_ALL_SERVICES</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span> <span class="pre">=</span> <span class="pre">GATTServApp_RegisterService(</span> <span class="pre">simpleProfileAttrTbl,</span> <span class="pre">GATT_NUM_ATTRS(</span> <span class="pre">simpleProfileAttrTbl</span> <span class="pre">),</span> <span class="pre">GATT_MAX_ENCRYPT_KEY_SIZE,</span> <span class="pre">&amp;simpleProfileCBs</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">gattAttribute_t</span> <span class="pre">simpleProfileAttrTbl[SERVAPP_NUM_ATTR_SUPPORTED]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simpleProfileCBs</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="c1">// Simple Profile Service Callbacks</span>
+<span class="n">CONST</span><span class="w"> </span><span class="n">gattServiceCBs_t</span><span class="w"> </span><span class="n">simpleProfileCBs</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">simpleProfile_ReadAttrCB</span><span class="p">,</span><span class="w">  </span><span class="c1">// Read callback function pointer</span>
+<span class="w">    </span><span class="n">simpleProfile_WriteAttrCB</span><span class="p">,</span><span class="w"> </span><span class="c1">// Write callback function pointer</span>
+<span class="w">    </span><span class="nb">NULL</span><span class="w">                       </span><span class="c1">// Authorization callback function pointer</span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VOID</span> <span class="pre">SimpleProfile_RegisterAppCBs(</span> <span class="pre">&amp;simpleBLEPeripheral_SimpleProfileCBs</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">bStatus_t</span><span class="w"> </span><span class="nf">SimpleProfile_RegisterAppCBs</span><span class="p">(</span><span class="w"> </span><span class="n">simpleProfileCBs_t</span><span class="w"> </span><span class="o">*</span><span class="n">appCallbacks</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">appCallbacks</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * typedef struct</span>
+<span class="cm">         * {</span>
+<span class="cm">         *     simpleProfileChange_t        pfnSimpleProfileChange;  // Called when characteristic value changes</span>
+<span class="cm">         * } simpleProfileCBs_t;</span>
+<span class="cm">         *</span>
+<span class="cm">         * // Simple GATT Profile Callbacks</span>
+<span class="cm">         * static simpleProfileCBs_t simpleBLEPeripheral_SimpleProfileCBs =</span>
+<span class="cm">         * {</span>
+<span class="cm">         *     simpleProfileChangeCB    // Charactersitic value change callback</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">simpleProfile_AppCBs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">appCallbacks</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">SUCCESS</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">bleAlreadyInRequestedMode</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">bStatus_t</span> <span class="pre">simpleProfile_WriteAttrCB(</span> <span class="pre">uint16</span> <span class="pre">connHandle,</span> <span class="pre">gattAttribute_t</span> <span class="pre">*pAttr,</span> <span class="pre">uint8</span> <span class="pre">*pValue,</span> <span class="pre">uint8</span> <span class="pre">len,</span> <span class="pre">uint16</span> <span class="pre">offset,</span> <span class="pre">uint8</span> <span class="pre">method</span> <span class="pre">)</span></code> 该函数是蓝牙库自己回调的</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">simpleProfile_AppCBs-&gt;pfnSimpleProfileChange(</span> <span class="pre">notifyApp</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">simpleProfileChangeCB</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">paramID</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">newValue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">switch</span><span class="p">(</span><span class="w"> </span><span class="n">paramID</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR1</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">SimpleProfile_GetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">newValue</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="cp">#if (defined HAL_LCD) &amp;&amp; (HAL_LCD == TRUE)</span>
+<span class="w">            </span><span class="n">HalLcdWriteStringValue</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Char 1:&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">uint16</span><span class="p">)(</span><span class="n">newValue</span><span class="p">),</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">  </span><span class="n">HAL_LCD_LINE_3</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif </span><span class="c1">// (defined HAL_LCD) &amp;&amp; (HAL_LCD == TRUE)</span>
+
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR3</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">SimpleProfile_GetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR3</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">newValue</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="cp">#if (defined HAL_LCD) &amp;&amp; (HAL_LCD == TRUE)</span>
+<span class="w">            </span><span class="n">HalLcdWriteStringValue</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Char 3:&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">uint16</span><span class="p">)(</span><span class="n">newValue</span><span class="p">),</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w">  </span><span class="n">HAL_LCD_LINE_3</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif </span><span class="c1">// (defined HAL_LCD) &amp;&amp; (HAL_LCD == TRUE)</span>
+
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// should not reach here!</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">SimpleProfile_GetParameter(</span> <span class="pre">SIMPLEPROFILE_CHAR1,</span> <span class="pre">&amp;newValue</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">bStatus_t</span><span class="w"> </span><span class="nf">SimpleProfile_GetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">bStatus_t</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SUCCESS</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">param</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR1</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simpleProfileChar1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR2</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simpleProfileChar2</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w">      </span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR3</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simpleProfileChar3</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w">  </span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR4</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simpleProfileChar4</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR5</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">VOID</span><span class="w"> </span><span class="n">memcpy</span><span class="p">(</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">simpleProfileChar5</span><span class="p">,</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR5_LEN</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w">      </span>
+
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">INVALIDPARAMETER</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bStatus_t</span> <span class="pre">SimpleProfile_SetParameter(</span> <span class="pre">uint8</span> <span class="pre">param,</span> <span class="pre">uint8</span> <span class="pre">len,</span> <span class="pre">void</span> <span class="pre">*value</span> <span class="pre">)</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">bStatus_t</span><span class="w"> </span><span class="nf">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">bStatus_t</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SUCCESS</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">param</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR1</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">simpleProfileChar1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bleInvalidRange</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR2</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">simpleProfileChar2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bleInvalidRange</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR3</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">simpleProfileChar3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bleInvalidRange</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR4</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">simpleProfileChar4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">((</span><span class="n">uint8</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="c1">// See if Notification has been enabled</span>
+<span class="w">                </span><span class="n">GATTServApp_ProcessCharCfg</span><span class="p">(</span><span class="w"> </span><span class="n">simpleProfileChar4Config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">simpleProfileChar4</span><span class="p">,</span><span class="w"> </span><span class="n">FALSE</span><span class="p">,</span><span class="w"></span>
+<span class="w">                        </span><span class="n">simpleProfileAttrTbl</span><span class="p">,</span><span class="w"> </span><span class="n">GATT_NUM_ATTRS</span><span class="p">(</span><span class="w"> </span><span class="n">simpleProfileAttrTbl</span><span class="w"> </span><span class="p">),</span><span class="w"></span>
+<span class="w">                        </span><span class="n">INVALID_TASK_ID</span><span class="p">,</span><span class="w"> </span><span class="n">simpleProfile_ReadAttrCB</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bleInvalidRange</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="nl">SIMPLEPROFILE_CHAR5</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR5_LEN</span><span class="w"> </span><span class="p">)</span><span class="w"> </span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">VOID</span><span class="w"> </span><span class="n">memcpy</span><span class="p">(</span><span class="w"> </span><span class="n">simpleProfileChar5</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR5_LEN</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bleInvalidRange</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">default</span><span class="o">:</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">INVALIDPARAMETER</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uint16</span> <span class="pre">SimpleBLEPeripheral_ProcessEvent(</span> <span class="pre">uint8</span> <span class="pre">task_id,</span> <span class="pre">uint16</span> <span class="pre">events</span> <span class="pre">)</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">performPeriodicTask()</span></code></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">performPeriodicTask</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">valueToCopy</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">stat</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Call to retrieve the value of the third characteristic in the profile</span>
+<span class="w">    </span><span class="n">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SimpleProfile_GetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR3</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">valueToCopy</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">stat</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SUCCESS</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/*</span>
+<span class="cm">         * Call to set that value of the fourth characteristic in the profile. Note</span>
+<span class="cm">         * that if notifications of the fourth characteristic have been enabled by</span>
+<span class="cm">         * a GATT client device, then a notification will be sent every time this</span>
+<span class="cm">         * function is called.</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR4</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">uint8</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">valueToCopy</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>GATT表<code class="docutils literal notranslate"><span class="pre">simpleProfileAttrTbl</span></code>在系统初始化阶段就被加载了。</p>
+</section>
+<section id="simplebleperipheral-test">
+<h1>SimpleBLEPeripheral Test<a class="headerlink" href="#simplebleperipheral-test" title="Permalink to this headline"></a></h1>
+<p><img alt="0008_GATT_SimpleBLEPeripheral_Write_And_Notify.jpg" src="../../../_images/0008_GATT_SimpleBLEPeripheral_Write_And_Notify.jpg" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Charge</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简述</a></li>
+<li><a class="reference internal" href="#id3">实际充电数据</a></li>
+<li><a class="reference internal" href="#id4">可视化代码参考</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="charge">
+<h1>Charge<a class="headerlink" href="#charge" title="Permalink to this headline"></a></h1>
+<p>放电后充电数据，发现只支持恒压阶段</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/c406a5f99bdbb7425ed33b2ec592315c/0001_SW6106_Datasheet_V1.0.pdf"><span class="xref download myst">0001_SW6106_Datasheet_V1.0.pdf</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/6c2cc66c7e25a0adc8afbef297d810e9/0001_SW6106_Register_Release_RG005_1_v1.2.pdf"><span class="xref download myst">0001_SW6106_Register_Release_RG005_1_v1.2.pdf</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简述<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>充电流程分为如下三个过程：涓流模式、恒流模式、恒压模式。</p>
+<ul class="simple">
+<li><p>当电池电压低于 3V 时，充电器处 于涓流模式：</p>
+<ul>
+<li><p>电池电压低于 1.5V 时，其充电电流为 200mA</p></li>
+<li><p>电池电压处于 1.5V 和 3V 之间时，其充电 电流为 300mA</p></li>
+</ul>
+</li>
+<li><p>当电池电压大于 3V 时，充电器进入恒流模式，此时按照设定的目标电流全速充电</p></li>
+<li><p>当电池电压上升到充电目标电压（比如 4.2V）时，充电器进入恒压模式，此时电流逐渐减小，而电池端电压保持不变</p></li>
+<li><p>当充电电流减小充电截止电流，即设定值的 10%与 300mA 中最小值时，充电结束</p></li>
+<li><p>充满后如果电池电压降低到比目标电压低 0.1V，则自动重新开始充电</p></li>
+</ul>
+<p><img alt="0007_charge_curve.png" src="../../../_images/0007_charge_curve.png" /></p>
+</section>
+<section id="id3">
+<h1>实际充电数据<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<p>0%到100%充电数据</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="refers/0007_batteryInfo_20221003051117.html"><span class="doc std std-doc">0007_batteryInfo_20221003051117.txt</span></a></p></li>
+</ul>
+<p>0%到100%充电数据可视化，有几个点采样貌似存在点问题</p>
+<p><img alt="0007_battery_charge.png" src="../../../_images/0007_battery_charge.png" /></p>
+<p>0%到100%充电数据可视化，删除几个采样问题点后数据图，<strong>经测试，无法放电到3V以下，下面实际的数据曲线看其实一直在恒压充电阶段</strong></p>
+<p><img alt="0007_charge_charge_modify.png" src="../../../_images/0007_charge_charge_modify.png" /></p>
+</section>
+<section id="id4">
+<h1>可视化代码参考<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../../_downloads/cedf60a1a4d9fe4d5a8bba297eddc1e3/0007_BatteryInfo.py"><span class="xref download myst">0007_BatteryInfo.py</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

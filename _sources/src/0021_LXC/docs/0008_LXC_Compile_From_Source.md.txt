@@ -1,0 +1,305 @@
+# LXC Compile From Source
+
+LXC编译、运行
+
+# 参考文档
+
+* [Cgroups /sys/fs/cgroup is empty on ubuntu](https://stackoverflow.com/questions/27454848/cgroups-sys-fs-cgroup-is-empty-on-ubuntu)
+* https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt
+* [lxc-start error: "unknown capability sys_module"](https://github.com/lxc/lxd/issues/2856)
+
+# steps
+
+* https://github.com/lxc/lxc/tree/stable-3.0
+* ./autogen.sh && ./configure && make
+  ```
+  ...省略
+  /bin/bash ../../libtool  --tag=CC   --mode=link gcc -DLXCROOTFSMOUNT=\"/usr/local/lib/lxc/rootfs\" -DLXCPATH=\"/usr/local/var/lib/lxc\" -DLXC_GLOBAL_CONF=\"/usr/local/etc/lxc/lxc.conf\" -DLXCINITDIR=\"/us
+  r/local/libexec\" -DLIBEXECDIR=\"/usr/local/libexec\" -DLXCTEMPLATEDIR=\"/usr/local/share/lxc/templates\" -DLXCTEMPLATECONFIG=\"/usr/local/share/lxc/config\" -DLOGPATH=\"/usr/local/var/log/lxc\" -DLXC_DEF
+  AULT_CONFIG=\"/usr/local/etc/lxc/default.conf\" -DLXC_USERNIC_DB=\"/run/lxc/nics\" -DLXC_USERNIC_CONF=\"/usr/local/etc/lxc/lxc-usernet\" -DDEFAULT_CGROUP_PATTERN=\"\" -DRUNTIME_PATH=\"/run\" -DSBINDIR=\"/
+  usr/local/sbin\" -I ../../src -I ../../src/lxc -I ../../src/lxc/storage -I ../../src/lxc/cgroups  -DHAVE_OPENSSL  -DHAVE_SELINUX  -g -O2 -fdiagnostics-color -Wimplicit-fallthrough=5 -Wcast-align -fno-stri
+  ct-aliasing -fstack-clash-protection -fstack-protector-strong --param=ssp-buffer-size=4 -g -Werror=implicit-function-declaration -Wlogical-op -Wmissing-include-dirs -Winit-self -Wunused-but-set-variable -
+  Wfloat-equal -Wsuggest-attribute=noreturn -Werror=return-type -Werror=incompatible-pointer-types -Wformat=2 -Wshadow -Wendif-labels -Werror=overflow -fdiagnostics-show-option -Werror=shift-count-overflow
+  -Werror=shift-overflow=2 -Wdate-time -Wnested-externs -fasynchronous-unwind-tables -pipe -fexceptions -Wvla -std=gnu11 -Werror -Wl,-E  -z relro -z now -o lxc-user-nic cmd/lxc_user_nic.o ../include/netns_i
+  faddrs.o log.o network.o parse.o raw_syscalls.o string_utils.o liblxc.la -lcap -lssl -lcrypto -lselinux -lutil -lpthread -lcap
+  ...省略
+  ```
+  * 编译输出的相关的宏定义：
+    * -DLXCROOTFSMOUNT=\"/usr/local/lib/lxc/rootfs\"
+    * -DLXCPATH=\"/usr/local/var/lib/lxc\"
+    * -DLXC_GLOBAL_CONF=\"/usr/local/etc/lxc/lxc.conf\"
+    * -DLXCINITDIR=\"/usr/local/libexec\"
+    * -DLIBEXECDIR=\"/usr/local/libexec\"
+    * -DLXCTEMPLATEDIR=\"/usr/local/share/lxc/templates\"
+    * -DLXCTEMPLATECONFIG=\"/usr/local/share/lxc/config\"
+    * -DLOGPATH=\"/usr/local/var/log/lxc\"
+    * -DLXC_DEFAULT_CONFIG=\"/usr/local/etc/lxc/default.conf\"
+    * -DLXC_USERNIC_DB=\"/run/lxc/nics\"
+    * -DLXC_USERNIC_CONF=\"/usr/local/etc/lxc/lxc-usernet\"
+    * -DDEFAULT_CGROUP_PATTERN=\"\"
+    * -DRUNTIME_PATH=\"/run\"
+    * -DSBINDIR=\"/usr/local/sbin\"
+    * -DHAVE_OPENSSL
+    * -DHAVE_SELINUX
+  * 移植到Android宏配置信息
+    * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/src/Android.bp#L1
+* cat /home/pi/.config/lxc/default.conf
+  ```
+  lxc.net.0.type = empty
+  lxc.apparmor.profile = generated
+  ```
+* /usr/share/lxc/templates/
+* ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+  ```
+  lxc-create: zengjf: utils.c: get_template_path: 921 Success - bad template: /usr/local/share/lxc/templates/lxc-busybox
+  lxc-create: zengjf: utils.c: get_template_path: 923 No such file or directory - bad template: busybox
+  lxc-create: zengjf: lxccontainer.c: do_lxcapi_create: 1779 Unknown template "busybox"
+  lxc-create: zengjf: tools/lxc_create.c: main: 319 Failed to create container zengjf
+  ```
+* sudo mkdir /usr/local/share/lxc -p
+* sudo cp templates /usr/local/share/lxc -r
+* ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+  ```
+  lxc-create: zengjf: utils.c: get_template_path: 921 Success - bad template: /usr/local/share/lxc/templates/lxc-busybox
+  lxc-create: zengjf: utils.c: get_template_path: 923 Permission denied - bad template: busybox
+  lxc-create: zengjf: lxccontainer.c: do_lxcapi_create: 1779 Unknown template "busybox"
+  lxc-create: zengjf: tools/lxc_create.c: main: 319 Failed to create container zengjf
+  ```
+* sudo chmod +x /usr/local/share/lxc/templates/lxc-busybox
+* ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+  ```
+  lxc-create: zengjf: utils.c: get_template_path: 921 Success - bad template: /usr/local/share/lxc/templates/lxc-busybox
+  lxc-create: zengjf: conf.c: chown_mapped_root: 3068 No uid mapping for container root
+  lxc-create: zengjf: lxccontainer.c: do_storage_create: 1279 Error chowning "/home/pi/.local/share/lxc/zengjf/rootfs" to container root
+  lxc-create: zengjf: conf.c: suggest_default_idmap: 4699 You must either run as root, or define uid mappings
+  lxc-create: zengjf: conf.c: suggest_default_idmap: 4700 To pass uid mappings to lxc-create, you could create
+  lxc-create: zengjf: conf.c: suggest_default_idmap: 4701 ~/.config/lxc/default.conf:
+  lxc-create: zengjf: conf.c: suggest_default_idmap: 4702 lxc.include = /usr/local/etc/lxc/default.conf
+  lxc-create: zengjf: conf.c: suggest_default_idmap: 4703 lxc.idmap = u 0 100000 65536
+  lxc-create: zengjf: conf.c: suggest_default_idmap: 4704 lxc.idmap = g 0 100000 65536
+  lxc-create: zengjf: lxccontainer.c: do_lxcapi_create: 1862 Failed to create (none) storage for zengjf
+  lxc-create: zengjf: tools/lxc_create.c: main: 319 Failed to create container zengjf
+  ```
+* sudo ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+  ```
+  lxc-create: zengjf: parse.c: lxc_file_for_each_line_mmap: 79 No such file or directory - Failed to open file "/usr/local/etc/lxc/default.conf"
+  lxc-create: zengjf: utils.c: get_template_path: 921 No such file or directory - bad template: /usr/local/share/lxc/templates/lxc-busybox
+  ```
+* sudo mkdir /usr/local/etc/lxc -p
+* sudo cp config/etc/default.conf.libvirt /usr/local/etc/lxc/default.conf
+* sudo ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+  ```
+  lxc-create: zengjf: tools/lxc_create.c: main: 266 Container already exists
+  ```
+* sudo cat lxc.log
+  ```
+  ...省略
+  lxc-create zengjf 20210223133141.848 TRACE    dir - storage/dir.c:dir_create:98 - Created directory "/usr/local/var/lib/lxc/zengjf/rootfs"
+  lxc-create zengjf 20210223133141.851 DEBUG    storage - storage/storage.c:get_storage_by_name:211 - Detected rootfs type "dir"
+  lxc-create zengjf 20210223133404.385 ERROR    lxc_create - tools/lxc_create.c:main:266 - Container already exists
+  ```
+* sudo rm /usr/local/var/lib/lxc/*
+* sudo ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+* sudo cat lxc.log
+  ```
+  ...省略
+  lxc-create zengjf 20210223134047.594 TRACE    dir - storage/dir.c:dir_create:98 - Created directory "/usr/local/var/lib/lxc/zengjf/rootfs"
+  lxc-create zengjf 20210223134047.755 DEBUG    storage - storage/storage.c:get_storage_by_name:211 - Detected rootfs type "dir"
+  ```
+* sudo ./src/lxc/lxc-ls
+  ```
+  zengjf
+  ```
+* sudo ./src/lxc/lxc-start -n zengjf -l TRACE -o lxc.log
+  ```
+  lxc-start: zengjf: lxccontainer.c: wait_on_daemonized_start: 834 Received container state "ABORTING" instead of "RUNNING"
+  lxc-start: zengjf: tools/lxc_start.c: main: 308 The container failed to start
+  lxc-start: zengjf: tools/lxc_start.c: main: 311 To get more details, run the container in foreground mode
+  lxc-start: zengjf: tools/lxc_start.c: main: 314 Additional information can be obtained by setting the --logfile and --logpriority options
+  ```
+* sudo cat lxc.log
+  ```
+  lxc-start zengjf 20210223135118.389 TRACE    commands - commands.c:lxc_cmd:281 - Connection refused - Command "get_init_pid" failed to connect command socket
+  lxc-start zengjf 20210223135118.390 TRACE    commands - commands.c:lxc_cmd:281 - Connection refused - Command "get_state" failed to connect command socket
+  lxc-start zengjf 20210223135118.390 TRACE    start - start.c:lxc_init_handler:742 - Created anonymous pair {4,5} of unix sockets
+  lxc-start zengjf 20210223135118.390 TRACE    commands - commands.c:lxc_cmd_init:1469 - Created abstract unix socket "/usr/local/var/lib/lxc/zengjf/command"
+  lxc-start zengjf 20210223135118.390 TRACE    start - start.c:lxc_init_handler:754 - Unix domain socket 6 for command server is ready
+  lxc-start zengjf 20210223135118.391 WARN     initutils - initutils.c:setproctitle:314 - Invalid argument - Failed to set cmdline
+  lxc-start zengjf 20210223135118.391 INFO     lxccontainer - lxccontainer.c:do_lxcapi_start:952 - Failed to set process title to [lxc monitor] /usr/local/var/lib/lxc zengjf
+  lxc-start zengjf 20210223135118.393 DEBUG    lxccontainer - lxccontainer.c:wait_on_daemonized_start:812 - First child 1091 exited
+  lxc-start zengjf 20210223135118.393 TRACE    start - start.c:lxc_start:2125 - Doing lxc_start
+  lxc-start zengjf 20210223135118.393 INFO     lsm - lsm/lsm.c:lsm_init:29 - LSM security driver nop
+  lxc-start zengjf 20210223135118.393 TRACE    start - start.c:lxc_init:779 - Initialized LSM
+  lxc-start zengjf 20210223135118.393 TRACE    start - start.c:lxc_init:786 - Read seccomp policy
+  lxc-start zengjf 20210223135118.393 TRACE    start - start.c:lxc_serve_state_clients:446 - Set container state to STARTING
+  lxc-start zengjf 20210223135118.393 TRACE    start - start.c:lxc_serve_state_clients:449 - No state clients registered
+  lxc-start zengjf 20210223135118.393 TRACE    start - start.c:lxc_init:794 - Set container state to "STARTING"
+  lxc-start zengjf 20210223135118.394 TRACE    start - start.c:lxc_init:857 - Set environment variables
+  lxc-start zengjf 20210223135118.394 TRACE    start - start.c:lxc_init:864 - Ran pre-start hooks
+  lxc-start zengjf 20210223135118.394 TRACE    start - start.c:setup_signal_fd:333 - Created signal file descriptor 8
+  lxc-start zengjf 20210223135118.394 TRACE    start - start.c:lxc_init:875 - Set up signal fd
+  lxc-start zengjf 20210223135118.395 DEBUG    terminal - terminal.c:lxc_terminal_peer_default:655 - No such device - The process does not have a controlling terminal
+  lxc-start zengjf 20210223135118.395 TRACE    start - start.c:lxc_init:883 - Created console
+  lxc-start zengjf 20210223135118.395 TRACE    start - start.c:lxc_init:890 - Chowned console
+  lxc-start zengjf 20210223135118.395 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:981 - basecginfo is:
+  lxc-start zengjf 20210223135118.395 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:982 - 9:devices:/
+  8:cpuset:/
+  7:blkio:/
+  6:net_cls:/
+  5:cpu,cpuacct:/
+  4:pids:/
+  3:freezer:/
+  2:memory:/
+  1:name=systemd:/init.scope
+  0::/init.scope
+  
+  lxc-start zengjf 20210223135118.395 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 0: devices
+  lxc-start zengjf 20210223135118.395 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 1: cpuset
+  lxc-start zengjf 20210223135118.395 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 2: blkio
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 3: net_cls
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 4: cpu
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 5: cpuacct
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 6: pids
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 7: freezer
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 8: memory
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:985 - kernel subsystem 9: cgroup2
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_basecg_debuginfo:988 - named subsystem 0: name=systemd
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:cg_hybrid_init:3037 - No controllers are enabled for delegation in the unified hierarchy
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:cg_hybrid_init:3063 - Writable cgroup hierarchies:
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:962 -   Hierarchies:
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   0: base_cgroup: /
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/unified
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   1: base_cgroup: /
+  lxc-start zengjf 20210223135118.396 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/systemd
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: name=systemd
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   2: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/memory
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: memory
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   3: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/freezer
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: freezer
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   4: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/pids
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: pids
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   5: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/cpu,cpuacct
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: cpu
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       1: cpuacct
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   6: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/net_cls
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: net_cls
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   7: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/blkio
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: blkio
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   8: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/cpuset
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: cpuset
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:967 -   9: base_cgroup: /
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:968 -       mountpoint:  /sys/fs/cgroup/devices
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:969 -       controllers:
+  lxc-start zengjf 20210223135118.397 TRACE    cgfsng - cgroups/cgfsng.c:lxc_cgfsng_print_hierarchies:971 -       0: devices
+  lxc-start zengjf 20210223135118.397 TRACE    cgroup - cgroups/cgroup.c:cgroup_init:40 - Initialized cgroup driver cgfsng
+  lxc-start zengjf 20210223135118.397 TRACE    cgroup - cgroups/cgroup.c:cgroup_init:45 - Running with hybrid cgroup layout
+  lxc-start zengjf 20210223135118.397 TRACE    start - start.c:lxc_init:897 - Initialized cgroup driver
+  lxc-start zengjf 20210223135118.397 INFO     start - start.c:lxc_init:899 - Container "zengjf" is initialized
+  lxc-start zengjf 20210223135118.399 TRACE    cgfsng - cgroups/cgfsng.c:cg_legacy_handle_cpuset_hierarchy:584 - "cgroup.clone_children" was already set to "1"
+  lxc-start zengjf 20210223135118.399 ERROR    cgfsng - cgroups/cgfsng.c:mkdir_eexist_on_last:1171 - File exists - Failed to create directory "/sys/fs/cgroup/cpuset//lxc.monitor.zengjf"
+  lxc-start zengjf 20210223135118.399 INFO     cgfsng - cgroups/cgfsng.c:cgfsng_monitor_create:1308 - The monitor process uses "lxc.monitor.zengjf" as cgroup
+  lxc-start zengjf 20210223135118.433 INFO     network - network.c:instantiate_veth:130 - Retrieved mtu 1500 from vethKAXOIY
+  lxc-start zengjf 20210223135118.435 ERROR    utils - utils.c:run_command_internal:1630 - Failed to exec command
+  lxc-start zengjf 20210223135118.436 ERROR    network - network.c:lxc_ovs_attach_bridge:1987 - Failed to attach "vethXMCAI0" to openvswitch bridge "virbr0": lxc-start: zengjf:
+  lxc-start zengjf 20210223135118.436 ERROR    network - network.c:instantiate_veth:152 - Operation not permitted - Failed to attach "vethXMCAI0" to bridge "virbr0"
+  lxc-start zengjf 20210223135118.494 ERROR    network - network.c:lxc_create_network_priv:2557 - Failed to create network device
+  lxc-start zengjf 20210223135118.494 ERROR    start - start.c:lxc_spawn:1653 - Failed to create the network
+  lxc-start zengjf 20210223135118.522 WARN     network - network.c:lxc_delete_network_priv:2709 - Failed to remove interface "vethXMCAI0" from "virbr0"
+  lxc-start zengjf 20210223135118.523 DEBUG    network - network.c:lxc_delete_network:3274 - Deleted network devices
+  lxc-start zengjf 20210223135118.523 TRACE    start - start.c:lxc_serve_state_socket_pair:516 - Sent container state "ABORTING" to 5
+  lxc-start zengjf 20210223135118.523 ERROR    lxccontainer - lxccontainer.c:wait_on_daemonized_start:834 - Received container state "ABORTING" instead of "RUNNING"
+  lxc-start zengjf 20210223135118.523 TRACE    start - start.c:lxc_serve_state_clients:446 - Set container state to ABORTING
+  lxc-start zengjf 20210223135118.523 TRACE    start - start.c:lxc_serve_state_clients:449 - No state clients registered
+  lxc-start zengjf 20210223135118.523 ERROR    lxc_start - tools/lxc_start.c:main:308 - The container failed to start
+  lxc-start zengjf 20210223135118.523 ERROR    lxc_start - tools/lxc_start.c:main:311 - To get more details, run the container in foreground mode
+  lxc-start zengjf 20210223135118.523 ERROR    lxc_start - tools/lxc_start.c:main:314 - Additional information can be obtained by setting the --logfile and --logpriority options
+  ```
+  * `lxc.cgroup.pattern`存在问题
+* sudo cp doc/lxc.system.conf /usr/local/etc/lxc/lxc.conf
+* sudo mkdir /usr/local/lib/lxc/rootfs -p
+* sudo ./src/lxc/lxc-start -n zengjf -l TRACE -o lxc.log
+  ```
+  lxc-start: zengjf: confile.c: parse_line: 2306 Unknown configuration key "lxc.apparmor.allow_nesting"
+  lxc-start: zengjf: parse.c: lxc_file_for_each_line_mmap: 121 Failed to parse config file "/var/lib/lxc/zengjf/config" at line "lxc.apparmor.allow_nesting = 1"
+  Failed to load config for zengjf
+  lxc-start: zengjf: tools/lxc_start.c: main: 242 Failed to create lxc_container
+  ```
+  * https://github.com/lxc/lxc/blob/stable-3.0/src/lxc/confile.c#L144
+    * /etc/lxc/default.conf
+    * /var/lib/lxc/zengjf/config
+    * 注释掉
+* sudo ./src/lxc/lxc-stop -n zengjf -l TRACE -o lxc.log
+
+# sys_module
+
+* sudo ./src/lxc/lxc-start -n zengjf -l TRACE -o lxc.log
+  * error
+    ```
+    lxc-start zengjf 20210415023758.369 ERROR    conf - conf.c:setup_caps:2446 - unknown capability sys_module
+    lxc-start zengjf 20210415023758.369 ERROR    conf - conf.c:lxc_setup:3676 - Failed to drop capabilities
+    lxc-start zengjf 20210415023758.369 ERROR    start - start.c:do_start:1291 - Failed to setup container "zengjf"
+    lxc-start zengjf 20210415023758.369 ERROR    sync - sync.c:__sync_wait:41 - An error occurred in another process (expected sequence number 5)
+    ```
+* sudo apt-get install -y libcap-dev
+  * ./autogen.sh
+  * ./configure
+  * make clean
+  * make
+
+# 编译配置操作
+
+* sudo mkdir -p /usr/local/etc/lxc
+* sudo cp doc/lxc.system.conf /usr/local/etc/lxc/lxc.conf
+* sudo mkdir -p /etc/lxc
+* sudo cp config/etc/default.conf.libvirt /etc/lxc/default.conf
+* sudo cp templates /usr/local/share/lxc -r
+  * sudo chmod +x /usr/local/share/lxc/templates/lxc-busybox
+* sudo ./src/lxc/lxc-create -n zengjf -t busybox -l TRACE -o lxc.log
+  ```
+  chmod: cannot access '/var/lib/lxc/zengjf/rootfs/bin/passwd': No such file or directory
+  ```
+  * diff修改示例
+    ```diff
+    diff --git a/templates/lxc-busybox.in b/templates/lxc-busybox.in
+    index 27d19c2b..ada17b35 100644
+    --- a/templates/lxc-busybox.in
+    +++ b/templates/lxc-busybox.in
+    @@ -109,7 +109,7 @@ ${rootfs}/usr/lib64"
+
+       # root user defined
+       cat <<EOF >> "${rootfs}/etc/passwd"
+    -root:x:0:0:root:/root:/bin/sh
+    +root::0:0:root:/root:/bin/sh
+     EOF
+
+       cat <<EOF >> "${rootfs}/etc/group"
+    @@ -202,6 +202,7 @@ configure_busybox()
+       (
+         cd "${rootfs}/bin" || return 1
+         ./busybox --list | grep -v busybox | xargs -n1 ln -s busybox
+    +    ln -s mkpasswd passwd
+       )
+
+       # relink /sbin/init
+    ```
+    * 禁用密码
+    * 建立passwd软链接，解决文件不存在问题
+  * sudo ./src/lxc/lxc-destroy zengjf
+* sudo mkdir /usr/local/lib/lxc/rootfs -p
+* sudo ./src/lxc/lxc-start -n zengjf -l TRACE -o lxc.log

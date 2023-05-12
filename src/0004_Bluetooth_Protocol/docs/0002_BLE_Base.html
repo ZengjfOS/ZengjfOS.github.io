@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">BLE Base</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">蓝牙4.0架构</a></li>
+<li><a class="reference internal" href="#osal">OSAL操作系统</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ble-base">
+<h1>BLE Base<a class="headerlink" href="#ble-base" title="Permalink to this headline"></a></h1>
+<p>BLE基本概念</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><strong>重点阅读这篇文档，下面这本书很多内容来自这篇文档</strong>：<code class="docutils literal notranslate"><span class="pre">C:\Texas</span> <span class="pre">Instruments\BLE-CC254x-1.4.2.2\Documents\TI_BLE_Software_Developer's_Guide.pdf</span></code></p></li>
+<li><p><a class="reference external" href="https://e2echina.ti.com/question_answer/wireless_connectivity/bluetooth/f/103/t/156405">蓝牙4.0 BLE开发完全手册 物联网开发技术实战电子书，基于CC2540</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>蓝牙4.0架构<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p><img alt="0002_Bluetooth_Protocol_Stack_ARCH.png" src="../../../_images/0002_Bluetooth_Protocol_Stack_ARCH.png" /></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Physical</span> <span class="pre">Layer</span></code>: <code class="docutils literal notranslate"><span class="pre">1Mbps</span></code>自适应跳频的<code class="docutils literal notranslate"><span class="pre">GFSK</span></code>射频；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Link</span> <span class="pre">Layer</span></code>: 用于控制设备的射频状态，个人觉得可以认为是网卡（MAC）的PHY；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Host</span> <span class="pre">Controller</span> <span class="pre">Interface</span></code>: 主机和控制器之间的标准通信接口，例如UART、SPI、USB；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Security</span> <span class="pre">Manager</span></code>: 配对和密钥分配方式，并且为协议栈其他层与另一个设备之间的安全连接和数据交互提供服务；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Attribute</span> <span class="pre">protocol</span></code>: 允许设备向另一个设备展示一块特定的数据，称之为属性；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Generic</span> <span class="pre">Attribute</span> <span class="pre">profile</span></code>: 定义了使用ATT的服务架构；</p></li>
+</ul>
+</section>
+<section id="osal">
+<h1>OSAL操作系统<a class="headerlink" href="#osal" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>蓝牙4.0 BLE协议栈包含了蓝牙4.0 BLE协议所规定的基本功能，这些功能是以函数的形式实现的；</p></li>
+<li><p>为了便于管理这些函数集，蓝牙4.0 BLE协议栈加入了一个小的操作系统，称为OSAL(操作系统抽象层)；</p></li>
+<li><p>BLE协议栈、profiles以及所有应用程序都是建立在OSAL基础上的；</p></li>
+<li><p>OSAL（Operating System Abstraction Layer），即操作系统抽象层：</p>
+<ul class="simple">
+<li><p>资源（Resource）：变量、数组、结构体；</p></li>
+<li><p>共享资源（Shared Resource）：被两个及以上任务使用的资源；</p></li>
+<li><p>任务（Task）：一个任务，又称作一个线程；</p></li>
+<li><p>多任务运行（Muti-task Running）：一个时间点只有一个任务在运行，采用任务调度策略将多任务进行调度；</p></li>
+<li><p>内核（Kernel）：在多任务系统种，内核负责管理各个任务；</p></li>
+<li><p>互斥（Mutual Exclusion）：解决共享数据的访问问题；</p></li>
+<li><p>消息队列（Message Queue）：任务间消息传递；</p></li>
+</ul>
+</li>
+<li><p>OSAL运行机理：</p>
+<ul>
+<li><p>在基于蓝牙4.0 BLE协议栈的应用程序开发过程中，更多的只是需要实现应用层的程序开发即可；</p></li>
+<li><p>可以把一个应用程序对象看作为一个任务；</p></li>
+<li><p>时间和任务的时间处理函数是怎么联系到一起？蓝牙4.0 BLE采用建立一个事件表，保存各个任务对应的事件，建立一个函数表，保存各个任务事件处理函数的地址，然后将这两张表建立某种对应的关系，当某一种事件发生时则查找函数表找到对应的事件处理函数即可；</p></li>
+<li><p>蓝牙4.0 BLE协议栈，三个变量非常重要：</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">tasksCnt</span></code>：保存了任务的总个数；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tasksEvents</span></code>：指向事件表的首地址；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tasksArr</span></code>：指向事件处理函数；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">taskEvents</span></code>和<code class="docutils literal notranslate"><span class="pre">tasksArr</span></code>的index是一一对应的：</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tasksEvents</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span><span class="w">  </span><span class="c1">// Task is highest priority that is ready.</span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">++</span><span class="n">idx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tasksCnt</span><span class="p">);</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">tasksCnt</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">uint16</span><span class="w"> </span><span class="n">events</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">halIntState_t</span><span class="w"> </span><span class="n">intState</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">HAL_ENTER_CRITICAL_SECTION</span><span class="p">(</span><span class="n">intState</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">events</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tasksEvents</span><span class="p">[</span><span class="n">idx</span><span class="p">];</span><span class="w">                  </span><span class="o">&lt;------------------+</span><span class="w"></span>
+<span class="w">  </span><span class="n">tasksEvents</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1">// Clear the Events for this task.      |</span>
+<span class="w">  </span><span class="n">HAL_EXIT_CRITICAL_SECTION</span><span class="p">(</span><span class="n">intState</span><span class="p">);</span><span class="w">                           </span><span class="o">|</span><span class="w"></span>
+<span class="w">                                                                 </span><span class="o">|</span><span class="w"></span>
+<span class="w">  </span><span class="n">activeTaskID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">;</span><span class="w">                                            </span><span class="o">|</span><span class="w">    </span>
+<span class="w">  </span><span class="n">events</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">tasksArr</span><span class="p">[</span><span class="n">idx</span><span class="p">])(</span><span class="w"> </span><span class="n">idx</span><span class="p">,</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="p">);</span><span class="w">    </span><span class="o">&lt;------------------+</span><span class="w">    </span>
+<span class="w">  </span><span class="n">activeTaskID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TASK_NO_TASK</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">HAL_ENTER_CRITICAL_SECTION</span><span class="p">(</span><span class="n">intState</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">tasksEvents</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">events</span><span class="p">;</span><span class="w">  </span><span class="c1">// Add back unprocessed events to the current task.</span>
+<span class="w">  </span><span class="n">HAL_EXIT_CRITICAL_SECTION</span><span class="p">(</span><span class="n">intState</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>通过<code class="docutils literal notranslate"><span class="pre">taskEvents</span></code>指针访问事件表的每一项，如果有事件发生，则查找函数表找到事件处理函数进行处理，处理完成后，继续访问事件表，查看是否有事件发生，无限循环；</p></li>
+<li><p>OSAL是一种基于事件驱动的轮询式操作系统。事件驱动是指发生事件后采取相应的事件处理方法，轮询指的是不断的查询是否有事件发生；</p></li>
+<li><p>蓝牙4.0 BLE协议栈使用unsigned short型变量，占2个字节，16bit，每个bit表示一个事件；</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">uint16</span><span class="w"> </span><span class="nf">SimpleBLEPeripheral_ProcessEvent</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">task_id</span><span class="p">,</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">VOID</span><span class="w"> </span><span class="n">task_id</span><span class="p">;</span><span class="w"> </span><span class="c1">// OSAL required parameter that isn&#39;t used in this function</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">SYS_EVENT_MSG</span><span class="w"> </span><span class="p">)</span><span class="w">   </span><span class="c1">// message from system</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="o">*</span><span class="n">pMsg</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// 获取消息体</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="n">pMsg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">osal_msg_receive</span><span class="p">(</span><span class="w"> </span><span class="n">simpleBLEPeripheral_TaskID</span><span class="w"> </span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// 处理消息</span>
+<span class="w">            </span><span class="n">simpleBLEPeripheral_ProcessOSALMsg</span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="n">osal_event_hdr_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">pMsg</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">            </span><span class="c1">// Release the OSAL message</span>
+<span class="w">            </span><span class="c1">// 释放消息</span>
+<span class="w">            </span><span class="n">VOID</span><span class="w"> </span><span class="n">osal_msg_deallocate</span><span class="p">(</span><span class="w"> </span><span class="n">pMsg</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// return unprocessed events</span>
+<span class="w">        </span><span class="c1">// 返回未处理的消息</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">events</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">SYS_EVENT_MSG</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 设备开始启动事件</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">SBP_START_DEVICE_EVT</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Start the Device</span>
+<span class="w">        </span><span class="n">VOID</span><span class="w"> </span><span class="n">GAPRole_StartDevice</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">simpleBLEPeripheral_PeripheralCBs</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Start Bond Manager</span>
+<span class="w">        </span><span class="n">VOID</span><span class="w"> </span><span class="n">GAPBondMgr_Register</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">simpleBLEPeripheral_BondMgrCBs</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Set timer for first periodic event</span>
+<span class="w">        </span><span class="n">osal_start_timerEx</span><span class="p">(</span><span class="w"> </span><span class="n">simpleBLEPeripheral_TaskID</span><span class="p">,</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT</span><span class="p">,</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT_PERIOD</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">SBP_START_DEVICE_EVT</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 周期性事件处理</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">events</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Restart timer</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT_PERIOD</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">osal_start_timerEx</span><span class="p">(</span><span class="w"> </span><span class="n">simpleBLEPeripheral_TaskID</span><span class="p">,</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT</span><span class="p">,</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT_PERIOD</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Perform periodic application task</span>
+<span class="w">        </span><span class="n">performPeriodicTask</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">events</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">SBP_PERIODIC_EVT</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Discard unknown events</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>协议栈已经给出了几个已经定义好的事件，由协议栈定义的事件称为系统强制事件，<code class="docutils literal notranslate"><span class="pre">SYS_EVENT_MSG</span></code>就是其中一个事件，<code class="docutils literal notranslate"><span class="pre">SYS_EVENT_MSG</span></code>的定义如下：<code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">SYS_EVENT_MSG</span>&#160;&#160;&#160; <span class="pre">0x8000</span></code>；</p></li>
+<li><p>OSAL维护了一个消息队列，每一个消息都会被放到这个消息队列中去，当任务接收到事件后，可以从消息队列种获取属于自己的消息，然后调用消息处理函数进行相应的处理即可；</p></li>
+<li><p>OSAL添加任务：</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="c1">// The order in this table must be identical to the task initialization calls below in osalInitTask.</span>
+<span class="k">const</span><span class="w"> </span><span class="n">pTaskEventHandlerFn</span><span class="w"> </span><span class="n">tasksArr</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">LL_ProcessEvent</span><span class="p">,</span><span class="w">                                                  </span><span class="c1">// task 0</span>
+<span class="w">    </span><span class="n">Hal_ProcessEvent</span><span class="p">,</span><span class="w">                                                 </span><span class="c1">// task 1</span>
+<span class="w">    </span><span class="n">HCI_ProcessEvent</span><span class="p">,</span><span class="w">                                                 </span><span class="c1">// task 2</span>
+<span class="cp">#if defined ( OSAL_CBTIMER_NUM_TASKS )</span>
+<span class="w">    </span><span class="n">OSAL_CBTIMER_PROCESS_EVENT</span><span class="p">(</span><span class="w"> </span><span class="n">osal_CbTimerProcessEvent</span><span class="w"> </span><span class="p">),</span><span class="w">           </span><span class="c1">// task 3</span>
+<span class="cp">#endif</span>
+<span class="w">    </span><span class="n">L2CAP_ProcessEvent</span><span class="p">,</span><span class="w">                                               </span><span class="c1">// task 4</span>
+<span class="w">    </span><span class="n">GAP_ProcessEvent</span><span class="p">,</span><span class="w">                                                 </span><span class="c1">// task 5</span>
+<span class="w">    </span><span class="n">SM_ProcessEvent</span><span class="p">,</span><span class="w">                                                  </span><span class="c1">// task 6</span>
+<span class="w">    </span><span class="n">GATT_ProcessEvent</span><span class="p">,</span><span class="w">                                                </span><span class="c1">// task 7</span>
+<span class="w">    </span><span class="n">GAPRole_ProcessEvent</span><span class="p">,</span><span class="w">                                             </span><span class="c1">// task 8</span>
+<span class="w">    </span><span class="n">GAPBondMgr_ProcessEvent</span><span class="p">,</span><span class="w">                                          </span><span class="c1">// task 9</span>
+<span class="w">    </span><span class="n">GATTServApp_ProcessEvent</span><span class="p">,</span><span class="w">                                         </span><span class="c1">// task 10</span>
+<span class="w">    </span><span class="n">SimpleBLEPeripheral_ProcessEvent</span><span class="w">                                  </span><span class="c1">// task 11</span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">tasksCnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">tasksArr</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">tasksArr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="n">uint16</span><span class="w"> </span><span class="o">*</span><span class="n">tasksEvents</span><span class="p">;</span><span class="w"></span>
+
+<span class="cm">/*********************************************************************</span>
+<span class="cm"> * FUNCTIONS</span>
+<span class="cm"> *********************************************************************/</span><span class="w"></span>
+
+<span class="cm">/*********************************************************************</span>
+<span class="cm"> * @fn      osalInitTasks</span>
+<span class="cm"> *</span>
+<span class="cm"> * @brief   This function invokes the initialization function for each task.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param   void</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return  none</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">osalInitTasks</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">uint8</span><span class="w"> </span><span class="n">taskID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">tasksEvents</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">uint16</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">osal_mem_alloc</span><span class="p">(</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tasksCnt</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">osal_memset</span><span class="p">(</span><span class="w"> </span><span class="n">tasksEvents</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tasksCnt</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* LL Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">LL_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Hal Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">Hal_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* HCI Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">HCI_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="cp">#if defined ( OSAL_CBTIMER_NUM_TASKS )</span>
+<span class="w">    </span><span class="cm">/* Callback Timer Tasks */</span><span class="w"></span>
+<span class="w">    </span><span class="n">osal_CbTimerInit</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">taskID</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">OSAL_CBTIMER_NUM_TASKS</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="cm">/* L2CAP Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">L2CAP_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* GAP Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">GAP_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* SM Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SM_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span>
+<span class="w">    </span><span class="cm">/* GATT Task */</span><span class="w"></span>
+<span class="w">    </span><span class="n">GATT_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Profiles */</span><span class="w"></span>
+<span class="w">    </span><span class="n">GAPRole_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">GAPBondMgr_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">GATTServApp_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="o">++</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Application */</span><span class="w"></span>
+<span class="w">    </span><span class="n">SimpleBLEPeripheral_Init</span><span class="p">(</span><span class="w"> </span><span class="n">taskID</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>OSAL应用编程接口：<code class="docutils literal notranslate"><span class="pre">C:\Texas</span> <span class="pre">Instruments\BLE-CC254x-1.4.2.2\Documents\osal\OSAL</span> <span class="pre">API.pdf</span></code></p></li>
+</ul>
+</li>
+<li><p>硬件抽象层：提供硬件服务而又不涉及太多硬件细节的层，为应用提供访问的GPIO、UART、ADC等硬件接口；</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">HAL</span> <span class="pre">Common</span></code>：文件夹包含协议栈、MAC和驱动中使用到相关配置文件，其中<code class="docutils literal notranslate"><span class="pre">hal_drivers.c</span></code>文件包含所有驱动初始化及相关事件处理机制，主要包含以下三个函数：</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Hal_Init()</span></code>：由<code class="docutils literal notranslate"><span class="pre">osalTaskAdd</span></code>调度，以便在OSAL中注册HAL的驱动；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HalDriverInit()</span></code>：由main()函数调用来初始化硬件驱动；</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Hal_ProcessEvent()</span></code>：这个函数用来处理OSAL中的HAL相关的驱动事件；</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

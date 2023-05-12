@@ -1,0 +1,9 @@
+# 所有文件执行dos2unix
+
+统一Markdown文件为unix格式
+
+# steps
+
+```
+find . -type f -name '*.md' | xargs dos2unix
+```

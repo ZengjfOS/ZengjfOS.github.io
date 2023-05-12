@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/login.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">uvc_ctrl_init_device</a><ul>
+<li><a class="reference internal" href="#id1">参考代码</a></li>
+<li><a class="reference internal" href="#id2">代码解析</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uvc-ctrl-init-device">
+<h1>uvc_ctrl_init_device<a class="headerlink" href="#uvc-ctrl-init-device" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>主要工作是解析VC中的控制信息，生成对应的控制方法；</p></li>
+<li><p>控制信息是从VC的描述符中提取出来的：</p></li>
+</ul>
+<section id="id1">
+<h2>参考代码<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.voidcn.com/article/p-sxqfydcg-gx.html">uvc摄像头代码解析5</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>代码解析<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>uvc_ctrl_init_device</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">uvc_ctrl_init_device</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_entity</span><span class="w"> </span><span class="o">*</span><span class="n">entity</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">INIT_WORK</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">async_ctrl</span><span class="p">.</span><span class="n">work</span><span class="p">,</span><span class="w"> </span><span class="n">uvc_ctrl_status_event_work</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Walk the entities list and instantiate controls */</span><span class="w"></span>
+<span class="w">    </span><span class="n">list_for_each_entry</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">entities</span><span class="p">,</span><span class="w"> </span><span class="n">list</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                 </span><span class="c1">// 迭代VC中检测到entity</span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_control</span><span class="w"> </span><span class="o">*</span><span class="n">ctrl</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">bControlSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">ncontrols</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">u8</span><span class="w"> </span><span class="o">*</span><span class="n">bmControls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// 获取对应entity中的bitmap和位控制大小(位控所占的字节)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UVC_ENTITY_TYPE</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_VC_EXTENSION_UNIT</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">bmControls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">extension</span><span class="p">.</span><span class="n">bmControls</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">bControlSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">extension</span><span class="p">.</span><span class="n">bControlSize</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UVC_ENTITY_TYPE</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_VC_PROCESSING_UNIT</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">bmControls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">processing</span><span class="p">.</span><span class="n">bmControls</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">bControlSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">processing</span><span class="p">.</span><span class="n">bControlSize</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UVC_ENTITY_TYPE</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_ITT_CAMERA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">bmControls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">camera</span><span class="p">.</span><span class="n">bmControls</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">bControlSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">camera</span><span class="p">.</span><span class="n">bControlSize</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Remove bogus/blacklisted controls */</span><span class="w"></span>
+<span class="w">        </span><span class="n">uvc_ctrl_prune_entity</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">entity</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Count supported controls and allocate the controls array */</span><span class="w"></span>
+<span class="w">        </span><span class="n">ncontrols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memweight</span><span class="p">(</span><span class="n">bmControls</span><span class="p">,</span><span class="w"> </span><span class="n">bControlSize</span><span class="p">);</span><span class="w">                        </span><span class="c1">// 需要多少位控</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ncontrols</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">controls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kcalloc</span><span class="p">(</span><span class="n">ncontrols</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">ctrl</span><span class="p">),</span><span class="w">                    </span><span class="c1">// 申请位控空间</span>
+<span class="w">                       </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">controls</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">ncontrols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ncontrols</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Initialize all supported controls */</span><span class="w"></span>
+<span class="w">        </span><span class="n">ctrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="o">-&gt;</span><span class="n">controls</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">bControlSize</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                </span><span class="c1">// 位控最大bit数</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uvc_test_bit</span><span class="p">(</span><span class="n">bmControls</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">                               </span><span class="c1">// 位控空间是否存在</span>
+<span class="w">                </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">entity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entity</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">uvc_ctrl_init_ctrl</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">ctrl</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">ctrl</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>uvc_ctrl_init_ctrl</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">uvc_ctrl_init_ctrl</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_control</span><span class="w"> </span><span class="o">*</span><span class="n">ctrl</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_control_info</span><span class="w"> </span><span class="o">*</span><span class="n">info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvc_ctrls</span><span class="p">;</span><span class="w">                                    </span><span class="c1">// 标准的位控</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_control_info</span><span class="w"> </span><span class="o">*</span><span class="n">iend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">uvc_ctrls</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_control_mapping</span><span class="w"> </span><span class="o">*</span><span class="n">mapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvc_ctrl_mappings</span><span class="p">;</span><span class="w">                      </span><span class="c1">// 位控映射</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">uvc_control_mapping</span><span class="w"> </span><span class="o">*</span><span class="n">mend</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">        </span><span class="n">mapping</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">uvc_ctrl_mappings</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* XU controls initialization requires querying the device for control</span>
+<span class="cm">     * information. As some buggy UVC devices will crash when queried</span>
+<span class="cm">     * repeatedly in a tight loop, delay XU controls initialization until</span>
+<span class="cm">     * first use.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UVC_ENTITY_TYPE</span><span class="p">(</span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">entity</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">UVC_VC_EXTENSION_UNIT</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="n">info</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">iend</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">info</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uvc_entity_match_guid</span><span class="p">(</span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">entity</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="o">-&gt;</span><span class="n">entity</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">index</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">info</span><span class="o">-&gt;</span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                               </span><span class="c1">// 根据索引进行匹配，说明这个是标准的，在UVC标准中已经定义好的</span>
+<span class="w">            </span><span class="n">uvc_ctrl_add_info</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">ctrl</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">);</span><span class="w">                                         </span><span class="c1">// ctrl-&gt;info = *info;</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">         </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">initialized</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="n">mapping</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">mend</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">mapping</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uvc_entity_match_guid</span><span class="p">(</span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">entity</span><span class="p">,</span><span class="w"> </span><span class="n">mapping</span><span class="o">-&gt;</span><span class="n">entity</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ctrl</span><span class="o">-&gt;</span><span class="n">info</span><span class="p">.</span><span class="n">selector</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">mapping</span><span class="o">-&gt;</span><span class="n">selector</span><span class="p">)</span><span class="w">                                   </span><span class="c1">// 通过前面的info来帮顶mapping</span>
+<span class="w">            </span><span class="n">__uvc_ctrl_add_mapping</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">ctrl</span><span class="p">,</span><span class="w"> </span><span class="n">mapping</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

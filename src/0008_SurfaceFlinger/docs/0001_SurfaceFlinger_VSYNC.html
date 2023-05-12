@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SurfaceFlinger VSYNC</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#vsync">VSYNC</a></li>
+<li><a class="reference internal" href="#dispsync">DispSync 模型</a></li>
+<li><a class="reference internal" href="#dispsync-loop">DispSync loop</a></li>
+<li><a class="reference internal" href="#hwc">HWC</a></li>
+<li><a class="reference internal" href="#logcat">logcat</a></li>
+<li><a class="reference internal" href="#client">Client</a></li>
+<li><a class="reference internal" href="#mtk-libhwcomposer">mtk libhwcomposer</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="surfaceflinger-vsync">
+<h1>SurfaceFlinger VSYNC<a class="headerlink" href="#surfaceflinger-vsync" title="Permalink to this headline"></a></h1>
+<p>理解SF是如何处理VSYNC</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_34211365/article/details/107996767">AndroidQ 图形系统（11）UI刷新，SurfaceFlinger，Vsync机制总结</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_34211365/article/details/105123790">AndroidQ 应用层Vsync信号的注册与接收（上）</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_34211365/article/details/105239145">AndroidQ SurfaceFlinger进程对Vsync的接收与分发（下）</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/yangwen123/article/details/79854267">AndroidO Treble架构下Hal进程启动及HIDL服务注册过程</a></p></li>
+<li><p><a class="reference external" href="https://blog.zhoujinjian.cn/posts/20220315/">Android 10 Camera源码分析6：Camera HAL3简介 &amp;&amp; Camera Provider分析</a></p></li>
+</ul>
+</section>
+<section id="vsync">
+<h1>VSYNC<a class="headerlink" href="#vsync" title="Permalink to this headline"></a></h1>
+<p>VSYNC就像UI的心脏，不停的跳动，驱动这界面不断刷新，接着来看看VSYNC的分发原理，同样以一张图来描述：</p>
+<p><img alt="0001_VSYNC_ARCH.png" src="../../../_images/0001_VSYNC_ARCH.png" /></p>
+<ul class="simple">
+<li><p>HWComposwer负责最原始的hw_vsync信号的生成和分发（硬件Vsync部分），通过onVsyncReceived首先将hw_vsync分发给SurfaceFlinger，SurfaceFlinger接着调用addResyncSample将hw_vsync分发给DispSync。</p></li>
+<li><p>DispSync接收到的一定数量的hw_vsync之后会计算出sw_vsync模型（Vsync软件模型），在误差范围内会关闭hw_vsync，sw_vsync模型将vsync一分为二，一个给APP，一个给Surfaceflinger，由其内部线程DispSyncThread进行分发。</p></li>
+<li><p>DispSync::DispSyncThread分发vsync的目标是两个EventThread，APP端和Surfaceflinger端，EventThread通过DispSyncSource中间类来连接DispSync，具体就是EventThread通过函数setCallback向DispSyncSource注册回调，其回调函数为onVSyncEvent，DispSyncSource通过函数addEventListener向DispSync注册回调，其回调函数为onDispSyncEvent。</p></li>
+<li><p>vsync到EventThread之后，通过其内部线程调用dispatchEvent将vsync传给每个注册了vsync的EventThreadConnection，surfacefling只有唯一一个EventThreadConnection，而每个APP进程都会有一个EventThreadConnection，然后通过其postEvent调用DisplayEventReceiver的sendEvents通知BitTube向mSendFd写数据，BitTube内部是一对socket，一端发送（mSendFd），另一端接收（mReceiveFd），APP和Surfaceflinger都监听了mReceiveFd，此时vsync信号就传递到了APP进程和Surfaceflinger进程中。</p></li>
+</ul>
+</section>
+<section id="dispsync">
+<h1>DispSync 模型<a class="headerlink" href="#dispsync" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>SurfaceFlinger从HWC2（composer）获取VSYNC Binder回调；</p></li>
+<li><p>触发SurfaceFlinger Scheduler的DispSyncThread触发信号，从而唤醒loop中的wait进行处理；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">SurfaceFlinger</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">void</span> <span class="n">SurfaceFlinger</span><span class="p">::</span><span class="n">onVsyncReceived</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">mScheduler</span><span class="o">-&gt;</span><span class="n">addResyncSample</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">vsyncPeriod</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">periodFlushed</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">Scheduler</span><span class="o">/</span><span class="n">Scheduler</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">Scheduler</span><span class="p">::</span><span class="n">addResyncSample</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">needsHwVsync</span> <span class="o">=</span> <span class="n">mPrimaryDispSync</span><span class="o">-&gt;</span><span class="n">addResyncSample</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">periodChanged</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">Scheduler</span><span class="o">/</span><span class="n">DispSync</span><span class="o">.</span><span class="n">cpp</span>
+              <span class="o">*</span> <span class="n">mThread</span><span class="o">-&gt;</span><span class="n">updateModel</span><span class="p">(</span><span class="n">mPeriod</span><span class="p">,</span> <span class="n">mPhase</span><span class="p">,</span> <span class="n">mReferenceTime</span><span class="p">);</span>
+                <span class="o">*</span> <span class="k">class</span> <span class="nc">DispSyncThread</span> <span class="p">:</span> <span class="n">public</span> <span class="n">Thread</span>
+                  <span class="o">*</span> <span class="n">void</span> <span class="n">updateModel</span><span class="p">(</span><span class="n">nsecs_t</span> <span class="n">period</span><span class="p">,</span> <span class="n">nsecs_t</span> <span class="n">phase</span><span class="p">,</span> <span class="n">nsecs_t</span> <span class="n">referenceTime</span><span class="p">)</span>
+                    <span class="o">*</span> <span class="n">mCond</span><span class="o">.</span><span class="n">signal</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="dispsync-loop">
+<h1>DispSync loop<a class="headerlink" href="#dispsync-loop" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>唤醒loop中的wait后会对HWC（Composer）的事件进行封装；</p></li>
+<li><p>转交EventThread进行事件处理；</p></li>
+<li><p>mPendingEvents存储了事件；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">Scheduler</span><span class="o">/</span><span class="n">DispSync</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="k">class</span> <span class="nc">DispSyncThread</span> <span class="p">:</span> <span class="n">public</span> <span class="n">Thread</span>
+    <span class="o">*</span> <span class="n">virtual</span> <span class="nb">bool</span> <span class="n">threadLoop</span><span class="p">()</span>
+      <span class="o">*</span> <span class="n">err</span> <span class="o">=</span> <span class="n">mCond</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">mMutex</span><span class="p">);</span>
+      <span class="o">*</span> <span class="k">if</span> <span class="p">(</span><span class="n">callbackInvocations</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="o">*</span> <span class="n">fireCallbackInvocations</span><span class="p">(</span><span class="n">callbackInvocations</span><span class="p">);</span>
+          <span class="o">*</span> <span class="k">for</span> <span class="p">(</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">callbacks</span><span class="o">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">callbacks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mCallback</span><span class="o">-&gt;</span><span class="n">onDispSyncEvent</span><span class="p">(</span><span class="n">callbacks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mEventTime</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mExpectedVSyncTime</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">Scheduler</span><span class="o">/</span><span class="n">DispSyncSource</span><span class="o">.</span><span class="n">cpp</span>
+                <span class="o">*</span> <span class="n">void</span> <span class="n">DispSyncSource</span><span class="p">::</span><span class="n">onDispSyncEvent</span><span class="p">(</span><span class="n">nsecs_t</span> <span class="n">when</span><span class="p">,</span> <span class="n">nsecs_t</span> <span class="n">expectedVSyncTimestamp</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">callback</span><span class="o">-&gt;</span><span class="n">onVSyncEvent</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">expectedVSyncTimestamp</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="n">Scheduler</span><span class="o">/</span><span class="n">EventThread</span><span class="o">.</span><span class="n">cpp</span>
+                      <span class="o">*</span> <span class="n">void</span> <span class="n">EventThread</span><span class="p">::</span><span class="n">onVSyncEvent</span><span class="p">(</span><span class="n">nsecs_t</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">nsecs_t</span> <span class="n">expectedVSyncTimestamp</span><span class="p">)</span>
+                        <span class="o">*</span> <span class="n">mPendingEvents</span><span class="o">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">makeVSync</span><span class="p">(</span><span class="n">mVSyncState</span><span class="o">-&gt;</span><span class="n">displayId</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="o">++</span><span class="n">mVSyncState</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">,</span> <span class="n">expectedVSyncTimestamp</span><span class="p">));</span>
+                          <span class="o">*</span> <span class="n">DisplayEventReceiver</span><span class="p">::</span><span class="n">Event</span> <span class="n">event</span><span class="p">;</span>
+                          <span class="o">*</span> <span class="n">event</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="n">DisplayEventReceiver</span><span class="p">::</span><span class="n">DISPLAY_EVENT_VSYNC</span><span class="p">,</span> <span class="n">displayId</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">};</span>
+                          <span class="o">*</span> <span class="n">event</span><span class="o">.</span><span class="n">vsync</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="p">;</span>
+                          <span class="o">*</span> <span class="n">event</span><span class="o">.</span><span class="n">vsync</span><span class="o">.</span><span class="n">expectedVSyncTimestamp</span> <span class="o">=</span> <span class="n">expectedVSyncTimestamp</span><span class="p">;</span>
+                          <span class="o">*</span> <span class="k">return</span> <span class="n">event</span><span class="p">;</span>
+                        <span class="o">*</span> <span class="n">mCondition</span><span class="o">.</span><span class="n">notify_all</span><span class="p">();</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>如下是EventThread事件处理</p></li>
+<li><p>从mPendingEvents获取事件；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/native/services/surfaceflinger/Scheduler/EventThread.cpp
+  * void EventThread::threadMain(std::unique_lock&lt;std::mutex&gt;&amp; lock)
+    * while (mState != State::Quit)
+      * if (!mPendingEvents.empty())
+        * event = mPendingEvents.front();
+        * mPendingEvents.pop_front();
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>创建app connection；</p></li>
+<li><p>创建sf connection；</p></li>
+<li><p>ConnectionHandle和EventThreadConnection是以map的形式保存在mConnections中；</p></li>
+<li><p>EventThread分发dispatchEvent是通过BitTube来分发的；</p></li>
+<li><p>mEventQueue默认就加入了mSfConnectionHandle，但是没有加入mAppConnectionHandle；</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+  * void SurfaceFlinger::initScheduler(DisplayId primaryDisplayId)
+    * mScheduler = getFactory().createScheduler([this](bool enabled)
+    * mAppConnectionHandle = mScheduler-&gt;createConnection(&quot;app&quot;, ...)
+    * mSfConnectionHandle = mScheduler-&gt;createConnection(&quot;sf&quot;, ...)
+      * frameworks/native/services/surfaceflinger/Scheduler/Scheduler.cpp
+        * Scheduler::ConnectionHandle Scheduler::createConnection(...)
+          * return createConnection(std::move(eventThread));
+            * auto connection = createConnectionInternal(eventThread.get(), ISurfaceComposer::eConfigChangedSuppress);
+              * return eventThread-&gt;createEventConnection([&amp;] { resync(); }, configChanged);
+                * frameworks/native/services/surfaceflinger/Scheduler/EventThread.cpp
+                  * sp&lt;EventThreadConnection&gt; EventThread::createEventConnection(ResyncCallback resyncCallback, ISurfaceComposer::ConfigChanged configChanged) const
+                    * return new EventThreadConnection(const_cast&lt;EventThread*&gt;(this), std::move(resyncCallback), configChanged);
+                      * EventThreadConnection::EventThreadConnection(EventThread* eventThread, ResyncCallback resyncCallback, ISurfaceComposer::ConfigChanged configChanged)
+                        * mEventThread(eventThread)
+                        * mChannel(gui::BitTube::DefaultSize)
+                      * void EventThreadConnection::onFirstRef()
+                        * mEventThread-&gt;registerDisplayEventConnection(this);
+                          * mDisplayEventConnections.push_back(connection);
+                  * void EventThread::threadMain(std::unique_lock&lt;std::mutex&gt;&amp; lock)
+                    * auto it = mDisplayEventConnections.begin();
+                    * while (it != mDisplayEventConnections.end())
+                      * consumers.push_back(connection);
+                    * if (!consumers.empty())
+                      * dispatchEvent(*event, consumers);
+                        * for (const auto&amp; consumer : consumers)
+                          * consumer-&gt;postEvent(event)
+                            * frameworks/native/services/surfaceflinger/Scheduler/EventThread.cpp
+                              * status_t EventThreadConnection::postEvent(const DisplayEventReceiver::Event&amp; event)
+                                * ssize_t size = DisplayEventReceiver::sendEvents(&amp;mChannel, &amp;event, 1);
+                                  * frameworks/native/libs/gui/DisplayEventReceiver.cpp
+                                    * ssize_t DisplayEventReceiver::sendEvents(gui::BitTube* dataChannel, Event const* events, size_t count)
+                                      * return gui::BitTube::sendObjects(dataChannel, events, count);
+                                        * frameworks/native/libs/gui/BitTube.cpp
+                                          * ssize_t BitTube::sendObjects(BitTube* tube, void const* events, size_t count, size_t objSize) 
+                                            * ssize_t size = tube-&gt;write(vaddr, count * objSize);
+                                              * 数据从BitTube中发出去，问题就是发到哪里去了
+            * mConnections.emplace(handle, Connection{connection, std::move(eventThread)});
+              * 返回的是这里的handle
+    * mEventQueue-&gt;setEventConnection(mScheduler-&gt;getEventConnection(mSfConnectionHandle));
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>mSfConnectionHandle的事件处理</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+  * void SurfaceFlinger::onFirstRef()
+    * mEventQueue-&gt;init(this);
+      * mFlinger = flinger;
+      * mLooper = new Looper(true);
+      * mHandler = new Handler(*this);
+  * void SurfaceFlinger::initScheduler(DisplayId primaryDisplayId)
+    * mScheduler = getFactory().createScheduler([this](bool enabled)
+    * mAppConnectionHandle = mScheduler-&gt;createConnection(&quot;app&quot;, ...)
+    * mSfConnectionHandle = mScheduler-&gt;createConnection(&quot;sf&quot;, ...)
+    * mEventQueue-&gt;setEventConnection(mScheduler-&gt;getEventConnection(enable ? handle : mSfConnectionHandle));
+      * frameworks/native/services/surfaceflinger/Scheduler/MessageQueue.cpp
+        * void MessageQueue::setEventConnection(const sp&lt;EventThreadConnection&gt;&amp; connection)
+          * mLooper-&gt;addFd(mEventTube.getFd(), 0, Looper::EVENT_INPUT, MessageQueue::cb_eventReceiver, this);
+            * mEventTube.getFd()
+              * frameworks/native/libs/gui/BitTube.cpp
+                * int BitTube::getFd() const
+                  * return mReceiveFd;
+            * MessageQueue::cb_eventReceiver
+              * int MessageQueue::cb_eventReceiver(int fd, int events, void* data)
+                * MessageQueue* queue = reinterpret_cast&lt;MessageQueue*&gt;(data);
+                * return queue-&gt;eventReceiver(fd, events);
+                  * while ((n = DisplayEventReceiver::getEvents(&amp;mEventTube, buffer, 8)) &gt; 0)
+                    * if (buffer[i].header.type == DisplayEventReceiver::DISPLAY_EVENT_VSYNC)
+                      * mHandler-&gt;dispatchInvalidate(buffer[i].vsync.expectedVSyncTimestamp);
+                        * void MessageQueue::Handler::dispatchInvalidate(nsecs_t expectedVSyncTimestamp)
+                          * mQueue.mLooper-&gt;sendMessage(this, Message(MessageQueue::INVALIDATE));
+                            * void MessageQueue::Handler::handleMessage(const Message&amp; message)
+                              * switch (message.what)
+                                * case INVALIDATE:
+                                  * mQueue.mFlinger-&gt;onMessageReceived(message.what, mExpectedVSyncTime);
+                                    * frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+                                      * void SurfaceFlinger::onMessageReceived(int32_t what, nsecs_t expectedVSyncTime)
+                                        * switch (what)
+                                          * case MessageQueue::INVALIDATE
+                                            * onMessageInvalidate(expectedVSyncTime);
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>EventThreadConnection实现了IDisplayEventConnection接口</p>
+<ul>
+<li><p>class EventThreadConnection : public BnDisplayEventConnection</p></li>
+</ul>
+</li>
+<li><p>IDisplayEventConnection可以通过stealReceiveChannel()接口获取到EventThread中的mConnections</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+  * sp&lt;IDisplayEventConnection&gt; SurfaceFlinger::createDisplayEventConnection(...)
+    * const auto&amp; handle = vsyncSource == eVsyncSourceSurfaceFlinger ? mSfConnectionHandle : mAppConnectionHandle;
+    * return mScheduler-&gt;createDisplayEventConnection(handle, configChanged);
+      * frameworks/native/services/surfaceflinger/Scheduler/Scheduler.cpp
+        * return createConnectionInternal(mConnections[handle].thread.get(), configChanged);
+          * return eventThread-&gt;createEventConnection([&amp;] { resync(); }, configChanged);
+            * frameworks/native/services/surfaceflinger/Scheduler/EventThread.cpp
+              * sp&lt;EventThreadConnection&gt; EventThread::createEventConnection(...)
+                * EventThreadConnection::EventThreadConnection(...)
+                * void EventThreadConnection::onFirstRef()
+                  * mEventThread-&gt;registerDisplayEventConnection(this);
+</pre></div>
+</div>
+</section>
+<section id="hwc">
+<h1>HWC<a class="headerlink" href="#hwc" title="Permalink to this headline"></a></h1>
+<p>IComposerCallback是SurfaceFlinger给HWC通信的回调</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">graphics</span><span class="o">/</span><span class="n">composer</span><span class="o">/</span><span class="mf">2.1</span><span class="o">/</span><span class="n">default</span>
+  <span class="o">*</span> <span class="n">IComposerCallback</span><span class="o">.</span><span class="n">hal</span>
+</pre></div>
+</div>
+<p>HWComposer Callback注册方法</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">DisplayHardware</span><span class="o">/</span><span class="n">HWComposer</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">void</span> <span class="n">HWComposer</span><span class="p">::</span><span class="n">setConfiguration</span><span class="p">(</span><span class="n">HWC2</span><span class="p">::</span><span class="n">ComposerCallback</span><span class="o">*</span> <span class="n">callback</span><span class="p">,</span> <span class="n">int32_t</span> <span class="n">sequenceId</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">ComposerCallbackBridge</span><span class="o">&gt;</span> <span class="n">callbackBridge</span><span class="p">(</span><span class="n">new</span> <span class="n">ComposerCallbackBridge</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">sequenceId</span><span class="p">,</span> <span class="n">mComposer</span><span class="o">-&gt;</span><span class="n">isVsyncPeriodSwitchSupported</span><span class="p">()));</span>
+      <span class="o">*</span> <span class="k">class</span> <span class="nc">ComposerCallbackBridge</span> <span class="p">:</span> <span class="n">public</span> <span class="n">hal</span><span class="p">::</span><span class="n">IComposerCallback</span>
+        <span class="o">*</span> <span class="n">android</span><span class="p">::</span><span class="n">hardware</span><span class="p">::</span><span class="n">Return</span><span class="o">&lt;</span><span class="n">void</span><span class="o">&gt;</span> <span class="n">onVsync</span><span class="p">(</span><span class="n">hal</span><span class="p">::</span><span class="n">HWDisplayId</span> <span class="n">display</span><span class="p">,</span> <span class="n">int64_t</span> <span class="n">timestamp</span><span class="p">)</span>
+          <span class="o">*</span> <span class="n">mCallback</span><span class="o">-&gt;</span><span class="n">onVsyncReceived</span><span class="p">(</span><span class="n">mSequenceId</span><span class="p">,</span> <span class="n">display</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">std</span><span class="p">::</span><span class="n">nullopt</span><span class="p">);</span>
+    <span class="o">*</span> <span class="n">mComposer</span><span class="o">-&gt;</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">callbackBridge</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">DisplayHardware</span><span class="o">/</span><span class="n">ComposerHal</span><span class="o">.</span><span class="n">cpp</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">Composer</span><span class="p">::</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IComposerCallback</span><span class="o">&gt;&amp;</span> <span class="n">callback</span><span class="p">)</span>
+          <span class="o">*</span> <span class="k">return</span> <span class="n">mClient</span><span class="o">-&gt;</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">callback</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>ps -A | grep composer</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">system</span>          <span class="mi">518</span>      <span class="mi">1</span> <span class="mi">11036444</span> <span class="mi">16868</span> <span class="n">binder_ioctl_write_read</span> <span class="mi">0</span> <span class="n">S</span> <span class="n">android</span><span class="o">.</span><span class="n">hardware</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">composer</span><span class="o">@</span><span class="mf">2.1</span><span class="o">-</span><span class="n">service</span>
+</pre></div>
+</div>
+<p>HWC启动</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">hardware</span><span class="o">/</span><span class="n">interfaces</span><span class="o">/</span><span class="n">graphics</span><span class="o">/</span><span class="n">composer</span><span class="o">/</span><span class="mf">2.1</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">service</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+    <span class="o">*</span> <span class="k">return</span> <span class="n">defaultPassthroughServiceImplementation</span><span class="o">&lt;</span><span class="n">IComposer</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+      <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">libhidl</span><span class="o">/</span><span class="n">transport</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">hidl</span><span class="o">/</span><span class="n">LegacySupport</span><span class="o">.</span><span class="n">h</span>
+        <span class="o">*</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">warn_unused_result</span><span class="p">))</span> <span class="n">status_t</span> <span class="n">defaultPassthroughServiceImplementation</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+          <span class="o">*</span> <span class="k">return</span> <span class="n">defaultPassthroughServiceImplementation</span><span class="o">&lt;</span><span class="n">Interface</span><span class="p">,</span> <span class="n">ExpectInterface</span><span class="o">&gt;</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">maxThreads</span><span class="p">);</span>
+            <span class="o">*</span> <span class="n">status_t</span> <span class="n">result</span> <span class="o">=</span> <span class="n">registerPassthroughServiceImplementation</span><span class="o">&lt;</span><span class="n">Interface</span><span class="p">,</span> <span class="n">ExpectInterface</span><span class="o">&gt;</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+              <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">libhidl</span><span class="o">/</span><span class="n">transport</span><span class="o">/</span><span class="n">LegacySupport</span><span class="o">.</span><span class="n">cpp</span>
+                <span class="o">*</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">warn_unused_result</span><span class="p">))</span> <span class="n">status_t</span> <span class="n">registerPassthroughServiceImplementation</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                  <span class="o">*</span> <span class="n">status_t</span> <span class="n">status</span> <span class="o">=</span> <span class="n">registerServiceCb</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">serviceName</span><span class="p">);</span>
+                    <span class="o">*</span> <span class="k">return</span> <span class="n">details</span><span class="p">::</span><span class="n">registerAsServiceInternal</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+                      <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">libhidl</span><span class="o">/</span><span class="n">transport</span><span class="o">/</span><span class="n">ServiceManagement</span><span class="o">.</span><span class="n">cpp</span>
+                        <span class="o">*</span> <span class="n">status_t</span> <span class="n">registerAsServiceInternal</span><span class="p">(</span><span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IBase</span><span class="o">&gt;&amp;</span> <span class="n">service</span><span class="p">,</span> <span class="n">const</span> <span class="n">std</span><span class="p">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">name</span><span class="p">)</span>
+                          <span class="o">*</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">IServiceManager1_2</span><span class="o">&gt;</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">defaultServiceManager1_2</span><span class="p">();</span>
+                          <span class="o">*</span> <span class="n">registered</span> <span class="o">=</span> <span class="n">sm</span><span class="o">-&gt;</span><span class="n">addWithChain</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">service</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span><span class="o">.</span><span class="n">withDefault</span><span class="p">(</span><span class="n">false</span><span class="p">);</span>
+                            <span class="o">*</span> <span class="n">system</span><span class="o">/</span><span class="n">hwservicemanager</span><span class="o">/</span><span class="n">ServiceManager</span><span class="o">.</span><span class="n">cpp</span>
+                              <span class="o">*</span> <span class="n">Return</span><span class="o">&lt;</span><span class="nb">bool</span><span class="o">&gt;</span> <span class="n">ServiceManager</span><span class="p">::</span><span class="n">addWithChain</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                                <span class="o">*</span> <span class="k">return</span> <span class="n">addImpl</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">callingContext</span><span class="p">);</span>
+                                  <span class="o">*</span> <span class="k">for</span><span class="p">(</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">interfaceChain</span><span class="o">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+                                    <span class="o">*</span> <span class="n">HidlService</span> <span class="o">*</span><span class="n">hidlService</span> <span class="o">=</span> <span class="n">ifaceMap</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+                                    <span class="o">*</span> <span class="nb">bool</span> <span class="n">linkRet</span> <span class="o">=</span> <span class="n">service</span><span class="o">-&gt;</span><span class="n">linkToDeath</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">kServiceDiedCookie</span><span class="p">)</span><span class="o">.</span><span class="n">withDefault</span><span class="p">(</span><span class="n">false</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="logcat">
+<h1>logcat<a class="headerlink" href="#logcat" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>logcat -s SurfaceFlinger</p></li>
+<li><p>logcat -s SurfaceFlinger -s DispSyncThread -s DispSync -s surfaceflinger</p></li>
+<li><p>logcat -s SurfaceFlinger -s DispSyncThread -s DispSync -s BufferQueue -s PhoneWindow -s hwcomposer -s ViewRootImpl</p></li>
+</ul>
+</section>
+<section id="client">
+<h1>Client<a class="headerlink" href="#client" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">frameworks</span><span class="o">/</span><span class="n">native</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">surfaceflinger</span><span class="o">/</span><span class="n">Client</span><span class="o">.</span><span class="n">cpp</span>
+  <span class="o">*</span> <span class="n">Client</span><span class="p">::</span><span class="n">Client</span><span class="p">(</span><span class="n">const</span> <span class="n">sp</span><span class="o">&lt;</span><span class="n">SurfaceFlinger</span><span class="o">&gt;&amp;</span> <span class="n">flinger</span><span class="p">)</span> <span class="p">:</span> <span class="n">mFlinger</span><span class="p">(</span><span class="n">flinger</span><span class="p">)</span>
+    <span class="o">*</span> <span class="n">ALOGI</span><span class="p">(</span><span class="s2">&quot;[SF client] NEW(%p) for (</span><span class="si">%d</span><span class="s2">:</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">mClientPid</span><span class="p">,</span> <span class="n">mClientProcName</span><span class="o">.</span><span class="n">c_str</span><span class="p">());</span>
+</pre></div>
+</div>
+</section>
+<section id="mtk-libhwcomposer">
+<h1>mtk libhwcomposer<a class="headerlink" href="#mtk-libhwcomposer" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>vendor/mediatek/proprietary/hardware/libhwcomposer</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

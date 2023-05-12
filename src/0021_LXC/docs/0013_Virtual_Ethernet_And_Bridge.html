@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Virtual Ethernet And Bridge</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">简要介绍</a></li>
+<li><a class="reference internal" href="#veth">veth</a><ul>
+<li><a class="reference internal" href="#host-veth">host veth</a></li>
+<li><a class="reference internal" href="#guest-veth">guest veth</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lxc-network">lxc network</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="virtual-ethernet-and-bridge">
+<h1>Virtual Ethernet And Bridge<a class="headerlink" href="#virtual-ethernet-and-bridge" title="Permalink to this headline"></a></h1>
+<p>本地以太网隧道，Linux container中用到一个叫做veth的东西，这是一种新的设备，专门为container所建。</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/sld880311/article/details/77650937">Linux-虚拟网络设备-veth pair</a></p></li>
+<li><p><a class="reference external" href="http://blog.nsfocus.net/linux-bridge/">LINUX内核网络设备——BRIDGE设备</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>简要介绍<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>Linux container 中用到一个叫做veth的东西，这是一种新的设备，专门为 container 所建。veth 从名字上来看是 Virtual Ethernet 的缩写，它的作用很简单，就是要把从一个 network namespace 发出的数据包转发到另一个 namespace。veth 设备是成对的，一个是 container 之中，另一个在 container 之外，即在真实机器上能看到的。</p>
+<p>veth设备总是成对出现，送到一端请求发送的数据总是从另一端以请求接受的形式出现。创建并配置正确后，向其一端输入数据，VETH会改变数据的方向并将其送入内核网络子系统，完成数据的注入，而在另一端则能读到此数据。（Namespace，其中往veth设备上任意一端上RX到的数据，都会在另一端上以TX的方式发送出去）veth工作在L2数据链路层，veth-pair设备在转发数据包过程中并不串改数据包内容。</p>
+<p>显然，仅有veth pair设备，容器是无法访问网络的。因为容器发出的数据包，实质上直接进入了veth1设备的协议栈里。如果容器需要访问网络，需要使用bridge等技术，将veth1接收到的数据包通过某种方式转发出去。</p>
+<p><img alt="0013_Veth_Bridge_Container.png" src="../../../_images/0013_Veth_Bridge_Container.png" /></p>
+</section>
+<section id="veth">
+<h1>veth<a class="headerlink" href="#veth" title="Permalink to this headline"></a></h1>
+<p><img alt="0013_Host_Guest_veth_arch.png" src="../../../_images/0013_Host_Guest_veth_arch.png" /></p>
+<section id="host-veth">
+<h2>host veth<a class="headerlink" href="#host-veth" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>创建设置虚拟网卡流程</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">config_host_net_work</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">pid</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pid</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">){</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;pid &lt;= 0&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;ip link add name vm_wlan type veth peer name vm_wlan0&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;ip link add name vm_wlan type veth peer name vm_wlan0 errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;ifconfig vm_wlan 172.17.3.2 netmask 255.255.0.0 up&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;ifconfig vm_wlan 172.17.3.2 netmask 255.255.0.0 up errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;echo 1 &gt; /proc/sys/net/ipv4/ip_forward&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;echo 1 &gt; /proc/sys/net/ipv4/ip_forward errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;iptables -t nat -A POSTROUTING -s 172.17.0.0/16 -o wlan0 -j MASQUERADE&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;iptables -t nat -A POSTROUTING -s 172.17.0.0/16 -o wlan0 -j MASQUERADE errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;iptables -t filter -A FORWARD -i wlan0 -o vm_wlan -j ACCEPT&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;iptables -t filter -A FORWARD -i wlan0 -o vm_wlan -j ACCEPT errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;iptables -t filter -A FORWARD -o wlan0 -i vm_wlan -j ACCEPT&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;iptables -t filter -A FORWARD -o wlan0 -i vm_wlan -j ACCEPT errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="mi">150</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">snprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;ip link set vm_wlan0 netns %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">pid</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;%s errno=%s&quot;</span><span class="p">,</span><span class="n">buf</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>system(“ip link add name vm_wlan type veth peer name vm_wlan0”);</p>
+<ul>
+<li><p>创建虚拟网卡叫vm_wlan，以及其对应的对等虚拟网卡叫vm_wlan0</p></li>
+</ul>
+</li>
+<li><p>system(“ifconfig vm_wlan 172.17.3.2 netmask 255.255.0.0 up”);</p>
+<ul>
+<li><p>配置vm_wlan的IP及掩码，启动vm_wlan</p></li>
+</ul>
+</li>
+<li><p>system(“echo 1 &gt; /proc/sys/net/ipv4/ip_forward”);</p>
+<ul>
+<li><p>使能IP转发</p></li>
+</ul>
+</li>
+<li><p>system(“iptables -t nat -A POSTROUTING -s 172.17.0.0/16 -o wlan0 -j MASQUERADE”);</p>
+<ul>
+<li><p>不管现在wlan0的出口获得了怎样的动态ip，MASQUERADE会自动读取wlan0现在的ip地址然后做SNAT出去，这样就实现了很好的动态SNAT地址转换。</p></li>
+<li><p>对于MASQUERADE，只是计算机的负荷稍微多一点。因为对每个匹配的包，MASQUERADE都要查找可用的IP地址，而不象SNAT用的IP地址是配置好的。当然，这也有好处，就是我们可以使用通过PPP、 PPPOE、SLIP等拨号得到的地址，这些地址可是由ISP的DHCP随机分配的。</p></li>
+<li><p>配置SNAT，将从172.17.0.0/16发出的网络包的 soruce IP address 替换为 wlan0 的 IP 地址</p></li>
+</ul>
+</li>
+<li><p>system(“iptables -t filter -A FORWARD -i wlan0 -o vm_wlan -j ACCEPT”);</p>
+<ul>
+<li><p>过滤目标地址和源地址都不是本机的输入信息都转发给vm_wlan</p></li>
+</ul>
+</li>
+<li><p>system(“iptables -t filter -A FORWARD -o wlan0 -i vm_wlan -j ACCEPT”);</p>
+<ul>
+<li><p>过滤目标地址和源地址都不是本机的输出信息都转发给wlan0</p></li>
+</ul>
+</li>
+<li><p>snprintf(buf, sizeof(buf), “ip link set vm_wlan0 netns %d”, pid);</p>
+<ul>
+<li><p>转移vm_wlan0到pid的namespace空间</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="guest-veth">
+<h2>guest veth<a class="headerlink" href="#guest-veth" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p>设置虚拟网卡</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">config_vm_net_work</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;ip link set vm_wlan0 name wlan0&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;ip link set vm_wlan0 name wlan0 errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;ifconfig wlan0 172.17.3.3 netmask 255.255.0.0 up&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;ifconfig wlan0 172.17.3.3 netmask 255.255.0.0 up errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;route add default gw 172.17.3.2&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;route add default gw 172.17.3.2 errno=%s&quot;</span><span class="p">,</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>system(“ip link set vm_wlan0 name wlan0”);</p>
+<ul>
+<li><p>重置vm_wlan0网卡名字为wlan0</p></li>
+</ul>
+</li>
+<li><p>system(“ifconfig wlan0 172.17.3.3 netmask 255.255.0.0 up”);</p>
+<ul>
+<li><p>配置vm_wlan的IP及掩码，启动vm_wlan</p></li>
+</ul>
+</li>
+<li><p>system(“route add default gw 172.17.3.2”);</p>
+<ul>
+<li><p>设置虚拟网卡路由</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="lxc-network">
+<h1>lxc network<a class="headerlink" href="#lxc-network" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>/var/lib/lxc/zengjf/config</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Template used to create this container: /usr/local/share/lxc/templates/lxc-busybox</span>
+<span class="c1"># Parameters passed to the template:</span>
+<span class="c1"># Template script checksum (SHA-1): 8c9eecce226b033822811007be8946118486872e</span>
+<span class="c1"># For additional config options, please look at lxc.container.conf(5)</span>
+
+<span class="c1"># Uncomment the following line to support nesting containers:</span>
+<span class="c1">#lxc.include = /usr/local/share/lxc/config/nesting.conf</span>
+<span class="c1"># (Be aware this has security implications)</span>
+
+<span class="n">lxc</span><span class="o">.</span><span class="n">net</span><span class="mf">.0</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">empty</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">apparmor</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">generated</span>
+<span class="c1">#lxc.apparmor.allow_nesting = 1</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">rootfs</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">:</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">lxc</span><span class="o">/</span><span class="n">zengjf</span><span class="o">/</span><span class="n">rootfs</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">halt</span> <span class="o">=</span> <span class="n">SIGUSR1</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">reboot</span> <span class="o">=</span> <span class="n">SIGTERM</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">uts</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;zengjf&quot;</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">tty</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">pty</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">cap</span><span class="o">.</span><span class="n">drop</span> <span class="o">=</span> <span class="n">sys_module</span> <span class="n">mac_admin</span> <span class="n">mac_override</span> <span class="n">sys_time</span>
+
+<span class="c1"># When using LXC with apparmor, uncomment the next line to run unconfined:</span>
+<span class="c1">#lxc.apparmor.profile = unconfined</span>
+
+<span class="n">lxc</span><span class="o">.</span><span class="n">mount</span><span class="o">.</span><span class="n">auto</span> <span class="o">=</span> <span class="n">cgroup</span><span class="p">:</span><span class="n">mixed</span> <span class="n">proc</span><span class="p">:</span><span class="n">mixed</span> <span class="n">sys</span><span class="p">:</span><span class="n">mixed</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">mount</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="n">shm</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span> <span class="n">tmpfs</span> <span class="n">defaults</span> <span class="mi">0</span> <span class="mi">0</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">mount</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="o">/</span><span class="n">lib</span> <span class="n">lib</span> <span class="n">none</span> <span class="n">ro</span><span class="p">,</span><span class="n">bind</span> <span class="mi">0</span> <span class="mi">0</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">mount</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span> <span class="n">usr</span><span class="o">/</span><span class="n">lib</span> <span class="n">none</span> <span class="n">ro</span><span class="p">,</span><span class="n">bind</span> <span class="mi">0</span> <span class="mi">0</span>
+<span class="n">lxc</span><span class="o">.</span><span class="n">mount</span><span class="o">.</span><span class="n">entry</span> <span class="o">=</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">kernel</span><span class="o">/</span><span class="n">security</span> <span class="n">sys</span><span class="o">/</span><span class="n">kernel</span><span class="o">/</span><span class="n">security</span> <span class="n">none</span> <span class="n">ro</span><span class="p">,</span><span class="n">bind</span><span class="p">,</span><span class="n">optional</span> <span class="mi">0</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>lxc-start zengjf</p></li>
+<li><p>lxc-console zengjf</p>
+<ul>
+<li><p>ifconfig -a</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lo</span>        <span class="n">Link</span> <span class="n">encap</span><span class="p">:</span><span class="n">Local</span> <span class="n">Loopback</span>
+          <span class="n">LOOPBACK</span>  <span class="n">MTU</span><span class="p">:</span><span class="mi">65536</span>  <span class="n">Metric</span><span class="p">:</span><span class="mi">1</span>
+          <span class="n">RX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">0</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">frame</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">TX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">0</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">carrier</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">collisions</span><span class="p">:</span><span class="mi">0</span> <span class="n">txqueuelen</span><span class="p">:</span><span class="mi">1000</span>
+          <span class="n">RX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">0</span> <span class="p">(</span><span class="mf">0.0</span> <span class="n">B</span><span class="p">)</span>  <span class="n">TX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">0</span> <span class="p">(</span><span class="mf">0.0</span> <span class="n">B</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://linuxcontainers.org/lxc/manpages/man5/lxc.container.conf.5.html">lxc.container.conf</a></p>
+<ul class="simple">
+<li><p>NETWORK</p>
+<ul>
+<li><p>lxc.net.[i].type</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

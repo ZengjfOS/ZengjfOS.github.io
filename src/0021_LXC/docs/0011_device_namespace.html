@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">device namesapce</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">添加设备命令空间</a></li>
+<li><a class="reference internal" href="#id3">设备名命空间架构</a></li>
+<li><a class="reference internal" href="#edev">edev设备</a></li>
+<li><a class="reference internal" href="#id4">示例整体架构</a></li>
+<li><a class="reference internal" href="#namspacebinder">namspace间binder通信</a></li>
+<li><a class="reference internal" href="#devns-demo">devns-demo</a></li>
+<li><a class="reference internal" href="#id5">内核参考源代码</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="device-namesapce">
+<h1>device namesapce<a class="headerlink" href="#device-namesapce" title="Permalink to this headline"></a></h1>
+<p>理解device namespace工作原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://blog.csdn.net/jinzhuojun/article/details/43113195">Device namespace简介 - 基于Kernel namespace的设备虚拟化</a></p></li>
+<li><p>https://lwn.net/Articles/564854/</p></li>
+<li><p>https://github.com/Cellrox/devns-patches/wiki</p></li>
+<li><p>https://github.com/Cellrox/devns-patches</p>
+<ul>
+<li><p>分立的patch，分析的好资料</p></li>
+</ul>
+</li>
+<li><p>https://github.com/Cellrox/devns-demo</p></li>
+<li><p>https://github.com/ZengjfOS/cells-of-Android</p>
+<ul>
+<li><p>实践参考代码</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>添加设备命令空间<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>nsproxy结构作为表示进程的结构task_struct的成员。对于一个进程，其nsproxy下的dev_ns代表了它所在的device namespace。nsproxy结构在同个namespace的进程间可以共享，但当这个nsproxy中的其中一个namespace被拷贝或取消共享，nsproxy就会被拷贝，变成所在进程私有。</p>
+<p><img alt="0011_task_struct_nsproxy_device_namespace.png" src="../../../_images/0011_task_struct_nsproxy_device_namespace.png" /></p>
+</section>
+<section id="id3">
+<h1>设备名命空间架构<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/ZengjfOS/cells-of-Android</p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/jinzhuojun/article/details/43113195">Device namespace简介 - 基于Kernel namespace的设备虚拟化</a></p>
+<ul>
+<li><p>nsproxy结构体作为表示进程的结构task_struct的成员。也就是说，对于一个进程，其nsproxy下的dev_ns代表了它所在的device namespace。nsproxy结构在同个namespace的进程间可以共享，但当这个nsproxy中的其中一个namespace被拷贝或取消共享，nsproxy就会被拷贝，变成所在进程私有。</p></li>
+<li><p>dev_namespace的初始值为init_dev_ns，它是代表init进程的device namespace。全局变量active_dev_ns指示现在active的device namespace。默认当然是init的device namespace。dev_ns_desc是系统中的全局数组，每个元素表示一个需要用device namespace的设备。</p></li>
+<li><p>dev_ns_desc中的一个元素代表一个设备。相当于设备的全局注册表。这里的注册过程是线性搜索第一个空的位置，返回这个位置的index作为evdev_ns_id。这里，设备还没有被真正使用，所以相应的dev_ns_info结构也没有创建，因此元素head中的链表为空。</p></li>
+<li><p>系统中的某一个进程打开了evdev子系统中的一个设备，然后evdev_open()-&gt; evdev_ns_track_client(client)被调用。这个函数中创建evdev_dev_ns结构。前面提到过，每个需要使用device namespace的设备都要定义这个xxx_dev_ns结构。它是deivce driver与device namespace framework的桥梁。evdev_dev_ns中包含了dev_ns_info结构。每次打开evdev设备会创建一个evdev_client对象。所有同一个device namespace下的evdev_client被串到代表该device namespace中evdev设备的结构evdev_dev_ns的成员clients中。</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://github.com/ZengjfOS/cells-of-Android/blob/master/kernel/include/linux/drv_namespace.h#L222">Device namespace操作宏</a></p></li>
+</ul>
+<p><img alt="0011_Device_namespace_ARCH.png" src="../../../_images/0011_Device_namespace_ARCH.png" /></p>
+</section>
+<section id="edev">
+<h1>edev设备<a class="headerlink" href="#edev" title="Permalink to this headline"></a></h1>
+<p>evdev_dev_ns中包含了dev_ns_info结构。每次打开evdev设备会创建一个evdev_client对象。所有同一个device namespace下的evdev_client被串到代表该device namespace中evdev设备的结构evdev_dev_ns的成员clients中。</p>
+<p><img alt="0011_evdev_device_namespace_instance.png" src="../../../_images/0011_evdev_device_namespace_instance.png" /></p>
+</section>
+<section id="id4">
+<h1>示例整体架构<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h1>
+<p>这个例子中，其中有两个device namespace，考虑两个设备evdev和alarm。evdev在在两个device namespace都有使用，其中一个device namespace中有两个client。alarm只在一个device namespace中使用。</p>
+<p><img alt="0011_evdev_alarm_device_namespace_ARCH.png" src="../../../_images/0011_evdev_alarm_device_namespace_ARCH.png" /></p>
+</section>
+<section id="namspacebinder">
+<h1>namspace间binder通信<a class="headerlink" href="#namspacebinder" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>frameworks/native/libs/binder/ProcessState.cpp</p>
+<ul>
+<li><p>#define OTHER_SYSTEM_CONTEXT_MGR_HANDLE 100000000</p></li>
+<li><p>获取servicemanager</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ProcessState</span><span class="o">::</span><span class="n">getInitContextObject</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">sp</span><span class="o">&lt;</span><span class="n">IBinder</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="cm">/*caller*/</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ALOGE</span><span class="p">(</span><span class="s">&quot;initservicemanager getInitContextObject </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">getStrongProxyForHandle</span><span class="p">(</span><span class="n">OTHER_SYSTEM_CONTEXT_MGR_HANDLE</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>kernel/drivers/staging/android/binder.c</p>
+<ul>
+<li><p>#define INIT_CONTEXT_MGR_HANDLE 100000000</p></li>
+<li><p>binder_transaction()</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="p">(</span><span class="n">tr</span><span class="o">-&gt;</span><span class="n">target</span><span class="p">.</span><span class="n">handle</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">){</span><span class="w"></span>
+<span class="w">    </span><span class="n">target_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">proc</span><span class="o">-&gt;</span><span class="n">binder_ns</span><span class="o">-&gt;</span><span class="n">context_mgr_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target_node</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">return_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BR_DEAD_REPLY</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err_no_context_mgr_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tr</span><span class="o">-&gt;</span><span class="n">target</span><span class="p">.</span><span class="n">handle</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">INIT_CONTEXT_MGR_HANDLE</span><span class="p">){</span><span class="w"></span>
+<span class="w">    </span><span class="n">target_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_other_binder_ns_context_mgr_node</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target_node</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">return_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BR_DEAD_REPLY</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err_no_context_mgr_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="k">else</span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">binder_ref</span><span class="w"> </span><span class="o">*</span><span class="n">ref</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">binder_get_ref</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span><span class="w"> </span><span class="n">tr</span><span class="o">-&gt;</span><span class="n">target</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ref</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">binder_user_error</span><span class="p">(</span><span class="s">&quot;%d:%d got transaction to invalid handle</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">proc</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">,</span><span class="w"> </span><span class="kr">thread</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">return_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BR_FAILED_REPLY</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">err_invalid_target_handle</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">target_node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ref</span><span class="o">-&gt;</span><span class="n">node</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>通过100000000这个handle可以获取到另外一个系统的servicemanager</p></li>
+</ul>
+</section>
+<section id="devns-demo">
+<h1>devns-demo<a class="headerlink" href="#devns-demo" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/Cellrox/devns-demo</p></li>
+<li><p>The demo employs two device namespaces: the primary (root namespace) runs Android, and a secondary runs a program that displays the palette. Upon request, it switches to the secondary namespace, and then listens to input events to perform a switch back to the primary namespace.</p></li>
+<li><p>This demo has 4 components:</p>
+<ul>
+<li><p>devns: service that accepts and executes requests for namespace switch.</p></li>
+<li><p>devns_init: init process of the secondary namespace, displays the palette.</p></li>
+<li><p>devns_switch: a CLI utility to request a switch to secondary namespace.</p></li>
+<li><p>DevnsDemo: an Android application to request a namespace switch via GUI.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id5">
+<h1>内核参考源代码<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>可访问https://cs.android.com或https://github.com/aosp-mirror在线搜索及浏览AOSP源码。</p></li>
+<li><p>代码对比工具，对比如下两份代码差异进行分析：</p>
+<ul>
+<li><p>https://github.com/aosp-mirror/kernel_msm/tree/android-msm-angler-3.10-marshmallow-dr</p></li>
+<li><p>https://github.com/ZengjfOS/cells-of-Android</p></li>
+</ul>
+</li>
+<li><p>或者直接看patch，但是版本需要注意:</p>
+<ul>
+<li><p>https://github.com/Cellrox/devns-patches</p></li>
+<li><p>https://github.com/Cellrox/android_kernel_msm/tree/freemium-hammerhead</p></li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

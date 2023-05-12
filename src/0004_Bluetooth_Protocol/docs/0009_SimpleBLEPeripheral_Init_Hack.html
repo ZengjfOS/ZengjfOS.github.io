@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">SimpleBLEPeripheral Init Hack</a></li>
+<li><a class="reference internal" href="#code">code</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simplebleperipheral-init-hack">
+<h1>SimpleBLEPeripheral Init Hack<a class="headerlink" href="#simplebleperipheral-init-hack" title="Permalink to this headline"></a></h1>
+<p>SimpleBLEPeripheral初始化分析</p>
+</section>
+<section id="code">
+<h1>code<a class="headerlink" href="#code" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">SimpleBLEPeripheral_Init</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="n">task_id</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">simpleBLEPeripheral_TaskID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">task_id</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Setup the GAP</span>
+<span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * 1. TGAP_CONN_PAUSE_PERIPHERAL到底是什么意思？</span>
+<span class="cm">     *   https://e2echina.ti.com/question_answer/wireless_connectivity/bluetooth/f/103/t/70278</span>
+<span class="cm">     * 2. 这个和从机向主机发送参数更新请求有关系，就是说从建立连接开始，到发送参数更新请求至少要5s的时间。这个是保证连接的稳定性的一个参数。</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">VOID</span><span class="w"> </span><span class="n">GAP_SetParamValue</span><span class="p">(</span><span class="w"> </span><span class="n">TGAP_CONN_PAUSE_PERIPHERAL</span><span class="p">,</span><span class="w"> </span><span class="n">DEFAULT_CONN_PAUSE_PERIPHERAL</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Setup the GAP Peripheral Role Profile</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="cp">#if defined( CC2540_MINIDK )</span>
+<span class="w">        </span><span class="c1">// For the CC2540DK-MINI keyfob, device doesn&#39;t start advertising until button is pressed</span>
+<span class="w">        </span><span class="c1">// 默认关闭广播功能</span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">initial_advertising_enable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FALSE</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">        </span><span class="c1">// For other hardware platforms, device starts advertising upon initialization</span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">initial_advertising_enable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="w">        </span><span class="c1">// By setting this to zero, the device will go into the waiting state after</span>
+<span class="w">        </span><span class="c1">// being discoverable for 30.72 second, and will not being advertising again</span>
+<span class="w">        </span><span class="c1">// until the enabler is set back to TRUE</span>
+<span class="w">        </span><span class="c1">// 开机32.72秒内没有被连接，后面就不进行广播，也就无法被发现了</span>
+<span class="w">        </span><span class="n">uint16</span><span class="w"> </span><span class="n">gapRole_AdvertOffTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">enable_update_request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_ENABLE_UPDATE_REQUEST</span><span class="p">;</span><span class="w">            </span><span class="c1">// TRUE</span>
+<span class="w">        </span><span class="n">uint16</span><span class="w"> </span><span class="n">desired_min_interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_DESIRED_MIN_CONN_INTERVAL</span><span class="p">;</span><span class="w">        </span><span class="c1">// 80</span>
+<span class="w">        </span><span class="n">uint16</span><span class="w"> </span><span class="n">desired_max_interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_DESIRED_MAX_CONN_INTERVAL</span><span class="p">;</span><span class="w">        </span><span class="c1">// 800</span>
+<span class="w">        </span><span class="n">uint16</span><span class="w"> </span><span class="n">desired_slave_latency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_DESIRED_SLAVE_LATENCY</span><span class="p">;</span><span class="w">           </span><span class="c1">// 0</span>
+<span class="w">        </span><span class="n">uint16</span><span class="w"> </span><span class="n">desired_conn_timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_DESIRED_CONN_TIMEOUT</span><span class="p">;</span><span class="w">             </span><span class="c1">// 1000</span>
+
+<span class="w">        </span><span class="c1">// Set the GAP Role Parameters</span>
+<span class="w">        </span><span class="c1">// 默认关闭广播功能</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_ADVERT_ENABLED</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">initial_advertising_enable</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 开机32.72秒内没有被连接，后面就不进行广播，也就无法被发现了</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_ADVERT_OFF_TIME</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">gapRole_AdvertOffTime</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// 回应扫描请求的响应数据</span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // GAP - SCAN RSP data (max size = 31 bytes)</span>
+<span class="cm">         * static uint8 scanRspData[] =</span>
+<span class="cm">         * {</span>
+<span class="cm">         *     // complete name</span>
+<span class="cm">         *     0x14,   // length of this data</span>
+<span class="cm">         *     GAP_ADTYPE_LOCAL_NAME_COMPLETE,                                  // 0x09</span>
+<span class="cm">         *     0x53,   // &#39;S&#39;</span>
+<span class="cm">         *     0x69,   // &#39;i&#39;</span>
+<span class="cm">         *     0x6d,   // &#39;m&#39;</span>
+<span class="cm">         *     0x70,   // &#39;p&#39;</span>
+<span class="cm">         *     0x6c,   // &#39;l&#39;</span>
+<span class="cm">         *     0x65,   // &#39;e&#39;</span>
+<span class="cm">         *     0x42,   // &#39;B&#39;</span>
+<span class="cm">         *     0x4c,   // &#39;L&#39;</span>
+<span class="cm">         *     0x45,   // &#39;E&#39;</span>
+<span class="cm">         *     0x50,   // &#39;P&#39;</span>
+<span class="cm">         *     0x65,   // &#39;e&#39;</span>
+<span class="cm">         *     0x72,   // &#39;r&#39;</span>
+<span class="cm">         *     0x69,   // &#39;i&#39;</span>
+<span class="cm">         *     0x70,   // &#39;p&#39;</span>
+<span class="cm">         *     0x68,   // &#39;h&#39;</span>
+<span class="cm">         *     0x65,   // &#39;e&#39;</span>
+<span class="cm">         *     0x72,   // &#39;r&#39;</span>
+<span class="cm">         *     0x61,   // &#39;a&#39;</span>
+<span class="cm">         *     0x6c,   // &#39;l&#39;</span>
+<span class="cm">         *</span>
+<span class="cm">         *     // connection interval range</span>
+<span class="cm">         *     0x05,   // length of this data</span>
+<span class="cm">         *     GAP_ADTYPE_SLAVE_CONN_INTERVAL_RANGE,                            // 0x12</span>
+<span class="cm">         *     LO_UINT16( DEFAULT_DESIRED_MIN_CONN_INTERVAL ),   // 100ms       // 0x50</span>
+<span class="cm">         *     HI_UINT16( DEFAULT_DESIRED_MIN_CONN_INTERVAL ),                  // 0x00</span>
+<span class="cm">         *     LO_UINT16( DEFAULT_DESIRED_MAX_CONN_INTERVAL ),   // 1s          // 0x20</span>
+<span class="cm">         *     HI_UINT16( DEFAULT_DESIRED_MAX_CONN_INTERVAL ),                  // 0x03</span>
+<span class="cm">         *</span>
+<span class="cm">         *     // Tx power level</span>
+<span class="cm">         *     0x02,   // length of this data</span>
+<span class="cm">         *     GAP_ADTYPE_POWER_LEVEL,                                          // 0x0A</span>
+<span class="cm">         *     0       // 0dBm</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_SCAN_RSP_DATA</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">scanRspData</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="n">scanRspData</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 向外广播的数据</span>
+<span class="w">        </span><span class="cm">/**</span>
+<span class="cm">         * // GAP - Advertisement data (max size = 31 bytes, though this is</span>
+<span class="cm">         * // best kept short to conserve power while advertisting)</span>
+<span class="cm">         * static uint8 advertData[] =</span>
+<span class="cm">         * {</span>
+<span class="cm">         *     // Flags; this sets the device to use limited discoverable</span>
+<span class="cm">         *     // mode (advertises for 30 seconds at a time) instead of general</span>
+<span class="cm">         *     // discoverable mode (advertises indefinitely)</span>
+<span class="cm">         *     0x02,   // length of this data</span>
+<span class="cm">         *     GAP_ADTYPE_FLAGS,                                                        // 0x01</span>
+<span class="cm">         *     DEFAULT_DISCOVERABLE_MODE | GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED,        // 0x01 | 0x04 = 0x05</span>
+<span class="cm">         * </span>
+<span class="cm">         *     // service UUID, to notify central devices what services are included</span>
+<span class="cm">         *     // in this peripheral</span>
+<span class="cm">         *     0x03,   // length of this data</span>
+<span class="cm">         *     GAP_ADTYPE_16BIT_MORE,      // some of the UUID&#39;s, but not all           // 0x02 </span>
+<span class="cm">         *     LO_UINT16( SIMPLEPROFILE_SERV_UUID ),                                    // 0xF0</span>
+<span class="cm">         *     HI_UINT16( SIMPLEPROFILE_SERV_UUID ),                                    // 0xFF</span>
+<span class="cm">         * };</span>
+<span class="cm">         */</span><span class="w"></span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_ADVERT_DATA</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">advertData</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="n">advertData</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// 连接失败自动调整连接参数</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_PARAM_UPDATE_ENABLE</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">enable_update_request</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 连接间隔，在BLE的两个设备的连接中使用跳频机制。</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_MIN_CONN_INTERVAL</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">desired_min_interval</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_MAX_CONN_INTERVAL</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">desired_max_interval</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Slave latency to use for a param update</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_SLAVE_LATENCY</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">desired_slave_latency</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 超时管理——这个事两个成功连接事件之间的最大允许间隔。如果超过了这个事件而没有连接成功的连接事件，设备认为连接已经丢失。</span>
+<span class="w">        </span><span class="n">GAPRole_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPROLE_TIMEOUT_MULTIPLIER</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="n">uint16</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">desired_conn_timeout</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Set the GAP Characteristics</span>
+<span class="w">    </span><span class="c1">// 修改设备名称：GENERIC ACCESS</span>
+<span class="w">    </span><span class="c1">// The application now has the capability to change the permissions of the device name in the GAP service by calling GGS_SetParameter and changing the value of the parameter GGS_W_PERMIT_DEVICE_NAME_ATT.</span>
+<span class="w">    </span><span class="c1">// GAP GATT服务器参数设置这一句修改的是service的名称</span>
+<span class="w">    </span><span class="n">GGS_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GGS_DEVICE_NAME_ATT</span><span class="p">,</span><span class="w"> </span><span class="n">GAP_DEVICE_NAME_LEN</span><span class="p">,</span><span class="w"> </span><span class="n">attDeviceName</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Set advertising interval </span>
+<span class="w">    </span><span class="c1">// What is the advertising interval when device is discoverable</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint16</span><span class="w"> </span><span class="n">advInt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DEFAULT_ADVERTISING_INTERVAL</span><span class="p">;</span><span class="w">                           </span><span class="c1">// 160</span>
+
+<span class="w">        </span><span class="n">GAP_SetParamValue</span><span class="p">(</span><span class="w"> </span><span class="n">TGAP_LIM_DISC_ADV_INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">advInt</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">GAP_SetParamValue</span><span class="p">(</span><span class="w"> </span><span class="n">TGAP_LIM_DISC_ADV_INT_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">advInt</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">GAP_SetParamValue</span><span class="p">(</span><span class="w"> </span><span class="n">TGAP_GEN_DISC_ADV_INT_MIN</span><span class="p">,</span><span class="w"> </span><span class="n">advInt</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">GAP_SetParamValue</span><span class="p">(</span><span class="w"> </span><span class="n">TGAP_GEN_DISC_ADV_INT_MAX</span><span class="p">,</span><span class="w"> </span><span class="n">advInt</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Setup the GAP Bond Manager</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint32</span><span class="w"> </span><span class="n">passkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// passkey &quot;000000&quot;</span>
+<span class="w">        </span><span class="c1">// Wait for a pairing request or slave security request</span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">pairMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GAPBOND_PAIRING_MODE_WAIT_FOR_REQ</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">mitm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">ioCap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GAPBOND_IO_CAP_DISPLAY_ONLY</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">bonding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//密钥,范围是0-999999,默认值为0</span>
+<span class="w">        </span><span class="n">GAPBondMgr_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPBOND_DEFAULT_PASSCODE</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint32</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">passkey</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//告诉绑定管理器是否配对通过,不论它等待一个请求从控制设备或者是自己发起配对.默认的设置是等待一个请求从控制设备. 配对模式:配置成等待主机的配对请求</span>
+<span class="w">        </span><span class="n">GAPBondMgr_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPBOND_PAIRING_MODE</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">pairMode</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 设置中间人保护是否使能.如果使能了,配对请求将鉴定连接在从和主之间.profile默认的值为FALSE,即使应用设置它为TRUE在初始化的时候. 打开密钥保护的配对算法</span>
+<span class="w">        </span><span class="n">GAPBondMgr_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPBOND_MITM_PROTECTION</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mitm</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//告诉绑定管理器设备的输入和输出的能力.为了判断设备是否有显示屏或者输入键盘这个参数是需要的.然而,默认的值为GAPBOND_IO_CAP_DISPLAY_ONLY,表明设备有一个显示屏但没有键盘.即使设备没有物理意义上的显示器,一个展示的钥匙(在用户指导中)被认为是一个显示器.默认的万能钥匙是一个六位数字字符串”000000”.</span>
+<span class="w">        </span><span class="n">GAPBondMgr_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPBOND_IO_CAPABILITIES</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ioCap</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">//使能绑定.profile默认的值为FALSE,即使SimpleBLEPeripheral应用设置它为TRUE在初始化时.</span>
+<span class="w">        </span><span class="n">GAPBondMgr_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">GAPBOND_BONDING_ENABLED</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">bonding</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 接下来就是注册5个Service了</span>
+<span class="w">    </span><span class="c1">// Initialize GATT attributes</span>
+<span class="w">    </span><span class="n">GGS_AddService</span><span class="p">(</span><span class="w"> </span><span class="n">GATT_ALL_SERVICES</span><span class="w"> </span><span class="p">);</span><span class="w">            </span><span class="c1">// GAP</span>
+<span class="w">    </span><span class="n">GATTServApp_AddService</span><span class="p">(</span><span class="w"> </span><span class="n">GATT_ALL_SERVICES</span><span class="w"> </span><span class="p">);</span><span class="w">    </span><span class="c1">// GATT attributes</span>
+<span class="w">    </span><span class="n">DevInfo_AddService</span><span class="p">();</span><span class="w">                           </span><span class="c1">// Device Information Service</span>
+<span class="w">    </span><span class="n">SimpleProfile_AddService</span><span class="p">(</span><span class="w"> </span><span class="n">GATT_ALL_SERVICES</span><span class="w"> </span><span class="p">);</span><span class="w">  </span><span class="c1">// Simple GATT Profile</span>
+<span class="cp">#if defined FEATURE_OAD</span>
+<span class="w">    </span><span class="n">VOID</span><span class="w"> </span><span class="n">OADTarget_AddService</span><span class="p">();</span><span class="w">                    </span><span class="c1">// OAD Profile</span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="c1">// Setup the SimpleProfile Characteristic Values</span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">charValue1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">charValue2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">charValue3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">charValue4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">uint8</span><span class="w"> </span><span class="n">charValue5</span><span class="p">[</span><span class="n">SIMPLEPROFILE_CHAR5_LEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">        </span><span class="n">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR1</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">charValue1</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR2</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">charValue2</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR3</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">charValue3</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR4</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">uint8</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">charValue4</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">SimpleProfile_SetParameter</span><span class="p">(</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR5</span><span class="p">,</span><span class="w"> </span><span class="n">SIMPLEPROFILE_CHAR5_LEN</span><span class="p">,</span><span class="w"> </span><span class="n">charValue5</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+
+<span class="cp">#if defined( CC2540_MINIDK )</span>
+
+<span class="w">    </span><span class="n">SK_AddService</span><span class="p">(</span><span class="w"> </span><span class="n">GATT_ALL_SERVICES</span><span class="w"> </span><span class="p">);</span><span class="w"> </span><span class="c1">// Simple Keys Profile</span>
+
+<span class="w">    </span><span class="c1">// Register for all key events - This app will handle all key events</span>
+<span class="w">    </span><span class="n">RegisterForKeys</span><span class="p">(</span><span class="w"> </span><span class="n">simpleBLEPeripheral_TaskID</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// makes sure LEDs are off</span>
+<span class="w">    </span><span class="n">HalLedSet</span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="n">HAL_LED_1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">HAL_LED_2</span><span class="p">),</span><span class="w"> </span><span class="n">HAL_LED_MODE_OFF</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// For keyfob board set GPIO pins into a power-optimized state</span>
+<span class="w">    </span><span class="c1">// Note that there is still some leakage current from the buzzer,</span>
+<span class="w">    </span><span class="c1">// accelerometer, LEDs, and buttons on the PCB.</span>
+
+<span class="w">    </span><span class="n">P0SEL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// Configure Port 0 as GPIO</span>
+<span class="w">    </span><span class="n">P1SEL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// Configure Port 1 as GPIO</span>
+<span class="w">    </span><span class="n">P2SEL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// Configure Port 2 as GPIO</span>
+
+<span class="w">    </span><span class="n">P0DIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFC</span><span class="p">;</span><span class="w"> </span><span class="c1">// Port 0 pins P0.0 and P0.1 as input (buttons),</span>
+<span class="w">    </span><span class="c1">// all others (P0.2-P0.7) as output</span>
+<span class="w">    </span><span class="n">P1DIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF</span><span class="p">;</span><span class="w"> </span><span class="c1">// All port 1 pins (P1.0-P1.7) as output</span>
+<span class="w">    </span><span class="n">P2DIR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x1F</span><span class="p">;</span><span class="w"> </span><span class="c1">// All port 1 pins (P2.0-P2.4) as output</span>
+
+<span class="w">    </span><span class="n">P0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x03</span><span class="p">;</span><span class="w"> </span><span class="c1">// All pins on port 0 to low except for P0.0 and P0.1 (buttons)</span>
+<span class="w">    </span><span class="n">P1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">   </span><span class="c1">// All pins on port 1 to low</span>
+<span class="w">    </span><span class="n">P2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">   </span><span class="c1">// All pins on port 2 to low</span>
+
+<span class="cp">#endif </span><span class="c1">// #if defined( CC2540_MINIDK )</span>
+
+<span class="cp">#if (defined HAL_LCD) &amp;&amp; (HAL_LCD == TRUE)</span>
+
+<span class="cp">#if defined FEATURE_OAD</span>
+<span class="cp">#if defined (HAL_IMAGE_A)</span>
+<span class="w">    </span><span class="n">HalLcdWriteStringValue</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;BLE Peri-A&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">OAD_VER_NUM</span><span class="p">(</span><span class="w"> </span><span class="n">_imgHdr</span><span class="p">.</span><span class="n">ver</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_LCD_LINE_1</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="n">HalLcdWriteStringValue</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;BLE Peri-B&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">OAD_VER_NUM</span><span class="p">(</span><span class="w"> </span><span class="n">_imgHdr</span><span class="p">.</span><span class="n">ver</span><span class="w"> </span><span class="p">),</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_LCD_LINE_1</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif </span><span class="c1">// HAL_IMAGE_A</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="n">HalLcdWriteString</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;BLE Peripheral&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">HAL_LCD_LINE_1</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif </span><span class="c1">// FEATURE_OAD</span>
+
+<span class="cp">#endif </span><span class="c1">// (defined HAL_LCD) &amp;&amp; (HAL_LCD == TRUE)</span>
+
+<span class="w">    </span><span class="c1">// Register callback with SimpleGATTprofile</span>
+<span class="w">    </span><span class="c1">// 作为GATT的server和client,主要通过Attribute来进行交互,当client请求server 读取数据时,通过如下注册的回调函数来进行访问。</span>
+<span class="w">    </span><span class="n">VOID</span><span class="w"> </span><span class="n">SimpleProfile_RegisterAppCBs</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">simpleBLEPeripheral_SimpleProfileCBs</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Enable clock divide on halt</span>
+<span class="w">    </span><span class="c1">// This reduces active current while radio is active and CC254x MCU</span>
+<span class="w">    </span><span class="c1">// is halted</span>
+<span class="w">    </span><span class="c1">// BLE 协议栈里面还有一个关32MHz clock地方，需要透过下面API 去开关。 默认会在协议栈里面关闭32MHz，你的uart，timer1，3，4都可能间歇工作不正常.  调试PWM 信号的时候示波器出来总是不对。</span>
+<span class="w">    </span><span class="n">HCI_EXT_ClkDivOnHaltCmd</span><span class="p">(</span><span class="w"> </span><span class="n">HCI_EXT_ENABLE_CLK_DIVIDE_ON_HALT</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="cp">#if defined ( DC_DC_P0_7 )</span>
+
+<span class="w">    </span><span class="c1">// Enable stack to toggle bypass control on TPS62730 (DC/DC converter)</span>
+<span class="w">    </span><span class="n">HCI_EXT_MapPmIoPortCmd</span><span class="p">(</span><span class="w"> </span><span class="n">HCI_EXT_PM_IO_PORT_P0</span><span class="p">,</span><span class="w"> </span><span class="n">HCI_EXT_PM_IO_PORT_PIN7</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="cp">#endif </span><span class="c1">// defined ( DC_DC_P0_7 )</span>
+
+<span class="w">    </span><span class="c1">// Setup a delayed profile startup， 发送事件</span>
+<span class="w">    </span><span class="n">osal_set_event</span><span class="p">(</span><span class="w"> </span><span class="n">simpleBLEPeripheral_TaskID</span><span class="p">,</span><span class="w"> </span><span class="n">SBP_START_DEVICE_EVT</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

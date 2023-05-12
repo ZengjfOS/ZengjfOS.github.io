@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ASoC Platform Driver</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#audio-dma-driver">Audio DMA Driver</a></li>
+<li><a class="reference internal" href="#soc-dai-esai-driver">SoC DAI esai Driver</a></li>
+<li><a class="reference internal" href="#cs42xx8-probe">cs42xx8_probe解析</a></li>
+<li><a class="reference internal" href="#esaidma-component">ESAI、DMA component注册流程：</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asoc-platform-driver">
+<h1>ASoC Platform Driver<a class="headerlink" href="#asoc-platform-driver" title="Permalink to this headline"></a></h1>
+<p>芯片平台声卡接口设备注册</p>
+<p>主要是注册DAI，没有注册route、widget、control，最终填充 <span class="xref myst">snd_soc_component主要域</span>；</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.kernel.org/doc/html/v4.10/sound/soc/platform.html">ASoC Platform Driver</a></p></li>
+</ul>
+</section>
+<section id="audio-dma-driver">
+<h1>Audio DMA Driver<a class="headerlink" href="#audio-dma-driver" title="Permalink to this headline"></a></h1>
+<p>https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/fsl/fsl_esai.c#L915</p>
+</section>
+<section id="soc-dai-esai-driver">
+<h1>SoC DAI esai Driver<a class="headerlink" href="#soc-dai-esai-driver" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>fsl_esai_component</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component_driver</span><span class="w"> </span><span class="n">fsl_esai_component</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">name</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fsl-esai&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>fsl_esai_dai</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_ops</span><span class="w"> </span><span class="n">fsl_esai_dai_ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">startup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_startup</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">shutdown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_shutdown</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">trigger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_trigger</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">hw_params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_hw_params</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">set_sysclk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_set_dai_sysclk</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">set_fmt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_set_dai_fmt</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">set_tdm_slot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_set_dai_tdm_slot</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_driver</span><span class="w"> </span><span class="n">fsl_esai_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_dai_probe</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* DAI capabilities */</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// struct snd_soc_pcm_stream playback;</span>
+<span class="w">    </span><span class="p">.</span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">formats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FSL_ESAI_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* DAI capabilities */</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//struct snd_soc_pcm_stream capture;</span>
+<span class="w">    </span><span class="p">.</span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">formats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FSL_ESAI_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_esai_dai_ops</span><span class="p">,</span><span class="w">                                 </span><span class="c1">// 这里的ops会转移到生成的pcm的ops</span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="cs42xx8-probe">
+<h1>cs42xx8_probe解析<a class="headerlink" href="#cs42xx8-probe" title="Permalink to this headline"></a></h1>
+<p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/fsl/fsl_esai.c#L796">fsl_esai_probe source code</a></p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">fsl_esai_probe</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">platform_device</span><span class="w"> </span><span class="o">*</span><span class="n">pdev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">device_node</span><span class="w"> </span><span class="o">*</span><span class="n">np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">.</span><span class="n">of_node</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">fsl_esai</span><span class="w"> </span><span class="o">*</span><span class="n">esai_priv</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">resource</span><span class="w"> </span><span class="o">*</span><span class="n">res</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">__be32</span><span class="w"> </span><span class="o">*</span><span class="n">iprop</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">__iomem</span><span class="w"> </span><span class="o">*</span><span class="n">regs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">irq</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_kzalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">esai_priv</span><span class="p">),</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">esai_priv</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">pdev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pdev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">snprintf</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;%pOFn&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">np</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Get the addresses and IRQ */</span><span class="w"></span>
+<span class="w">    </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">platform_get_resource</span><span class="p">(</span><span class="n">pdev</span><span class="p">,</span><span class="w"> </span><span class="n">IORESOURCE_MEM</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">regs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_ioremap_resource</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">regs</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">regs</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_regmap_init_mmio_clk</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;core&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">regs</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_esai_regmap_config</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to init regmap: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">coreclk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_clk_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;core&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">coreclk</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get core clock: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">coreclk</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">coreclk</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">extalclk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_clk_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;extal&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">extalclk</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_warn</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get extal clock: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">extalclk</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">fsysclk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_clk_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fsys&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">fsysclk</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_warn</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get fsys clock: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">fsysclk</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">spbaclk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_clk_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;spba&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">IS_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">spbaclk</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_warn</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to get spba clock: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">PTR_ERR</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">spbaclk</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">irq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">platform_get_irq</span><span class="p">(</span><span class="n">pdev</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">irq</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;no irq for node %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">irq</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_request_irq</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">irq</span><span class="p">,</span><span class="w"> </span><span class="n">esai_isr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">                   </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">esai_priv</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to claim irq %u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">irq</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Set a default slot number */</span><span class="w"></span>
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">slots</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Set a default master/slave state */</span><span class="w"></span>
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">slave_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Determine the FIFO depth */</span><span class="w"></span>
+<span class="w">    </span><span class="n">iprop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_get_property</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fsl,fifo-depth&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">iprop</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">fifo_depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">be32_to_cpup</span><span class="p">(</span><span class="n">iprop</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">fifo_depth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">dma_params_tx</span><span class="p">.</span><span class="n">maxburst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">dma_params_rx</span><span class="p">.</span><span class="n">maxburst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">dma_params_tx</span><span class="p">.</span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">-&gt;</span><span class="n">start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">REG_ESAI_ETDR</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">dma_params_rx</span><span class="p">.</span><span class="n">addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">-&gt;</span><span class="n">start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">REG_ESAI_ERDR</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">synchronous</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">        </span><span class="n">of_property_read_bool</span><span class="p">(</span><span class="n">np</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fsl,esai-synchronous&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Implement full symmetry for synchronous mode */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">synchronous</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">fsl_esai_dai</span><span class="p">.</span><span class="n">symmetric_rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">fsl_esai_dai</span><span class="p">.</span><span class="n">symmetric_channels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">fsl_esai_dai</span><span class="p">.</span><span class="n">symmetric_samplebits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dev_set_drvdata</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="n">esai_priv</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Reset ESAI unit */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regmap_write</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">,</span><span class="w"> </span><span class="n">REG_ESAI_ECR</span><span class="p">,</span><span class="w"> </span><span class="n">ESAI_ECR_ERST</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to reset ESAI: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * We need to enable ESAI so as to access some of its registers.</span>
+<span class="cm">     * Otherwise, we would fail to dump regmap from user space.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">regmap_write</span><span class="p">(</span><span class="n">esai_priv</span><span class="o">-&gt;</span><span class="n">regmap</span><span class="p">,</span><span class="w"> </span><span class="n">REG_ESAI_ECR</span><span class="p">,</span><span class="w"> </span><span class="n">ESAI_ECR_ESAIEN</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to enable ESAI: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">devm_snd_soc_register_component</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_esai_component</span><span class="p">,</span><span class="w">              </span><span class="c1">// 注册component</span>
+<span class="w">                          </span><span class="o">&amp;</span><span class="n">fsl_esai_dai</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to register DAI: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">imx_pcm_dma_init</span><span class="p">(</span><span class="n">pdev</span><span class="p">,</span><span class="w"> </span><span class="n">IMX_ESAI_DMABUF_SIZE</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;failed to init imx pcm dma: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="esaidma-component">
+<h1>ESAI、DMA component注册流程：<a class="headerlink" href="#esaidma-component" title="Permalink to this headline"></a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* static int fsl_esai_probe(struct platform_device *pdev)
+  * ret = devm_snd_soc_register_component(&amp;pdev-&gt;dev, &amp;fsl_esai_component, &amp;fsl_esai_dai, 1);
+    * ret = snd_soc_register_component(dev, cmpnt_drv, dai_drv, num_dai);
+      * component = devm_kzalloc(dev, sizeof(*component), GFP_KERNEL);
+      * return snd_soc_add_component(dev, component, component_driver, dai_drv, num_dai);
+        * ret = snd_soc_component_initialize(component, component_driver, dev);
+          * component-&gt;name = fmt_single_name(dev, &amp;component-&gt;id);
+            ```
+            static char *fmt_single_name(struct device *dev, int *id)
+            {
+                [...省略]
+                strlcpy(name, dev_name(dev), NAME_SIZE);
+          
+                /* are we a &quot;%s.%d&quot; name (platform and SPI components) */
+                found = strstr(name, dev-&gt;driver-&gt;name);
+                if (found) {
+                    /* get ID */
+                    if (sscanf(&amp;found[strlen(dev-&gt;driver-&gt;name)], &quot;.%d&quot;, id) == 1) {
+          
+                        /* discard ID from name if ID == -1 */
+                        if (*id == -1)
+                            found[strlen(dev-&gt;driver-&gt;name)] = &#39;\0&#39;;
+                    }
+          
+                } else {
+                    /* I2C component devices are named &quot;bus-addr&quot; */
+                    if (sscanf(name, &quot;%x-%x&quot;, &amp;id1, &amp;id2) == 2) {
+                        char tmp[NAME_SIZE];
+          
+                        /* create unique ID number from I2C addr and bus */
+                        *id = ((id1 &amp; 0xffff) &lt;&lt; 16) + id2;
+          
+                        /* sanitize component name for DAI link creation */
+                        snprintf(tmp, NAME_SIZE, &quot;%s.%s&quot;, dev-&gt;driver-&gt;name,
+                             name);
+                        strlcpy(name, tmp, NAME_SIZE);
+                    } else
+                        *id = 0;
+                }
+          
+                return kstrdup(name, GFP_KERNEL);
+            }
+            ```
+        * ret = snd_soc_register_dais(component, dai_drv, num_dai);
+        * snd_soc_component_add(component);
+          * list_add(&amp;component-&gt;list, &amp;component_list);
+            * static LIST_HEAD(component_list);
+        * snd_soc_try_rebind_card();
+          * if (!snd_soc_bind_card(card))
+            * ret = snd_soc_instantiate_card(card);
+  * ret = imx_pcm_dma_init(pdev, IMX_ESAI_DMABUF_SIZE);                                               // 申请DMA
+    * config = devm_kzalloc(&amp;pdev-&gt;dev, sizeof(struct snd_dmaengine_pcm_config), GFP_KERNEL);
+    * *config = imx_dmaengine_pcm_config;
+    * return devm_snd_dmaengine_pcm_register(&amp;pdev-&gt;dev, config, SND_DMAENGINE_PCM_FLAG_COMPAT);
+      * ret = dmaengine_pcm_request_chan_of(pcm, dev, config);
+      * if (config &amp;&amp; config-&gt;process) ret = snd_soc_add_component(dev, &amp;pcm-&gt;component, &amp;dmaengine_pcm_component_process, NULL, 0);
+      * else ret = snd_soc_add_component(dev, &amp;pcm-&gt;component, &amp;dmaengine_pcm_component, NULL, 0);
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

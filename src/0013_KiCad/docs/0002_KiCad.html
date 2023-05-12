@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">KiCad</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#id2">原理图</a></li>
+<li><a class="reference internal" href="#pcb">PCB图层</a><ul>
+<li><a class="reference internal" href="#id3">查看板层</a></li>
+<li><a class="reference internal" href="#id4">布线层</a></li>
+<li><a class="reference internal" href="#id5">技术层对</a></li>
+<li><a class="reference internal" href="#id6">独立技术层</a></li>
+<li><a class="reference internal" href="#id7">通用层</a></li>
+<li><a class="reference internal" href="#id8">4层板分析需要的层</a></li>
+<li><a class="reference internal" href="#id9">查看铺铜</a></li>
+<li><a class="reference internal" href="#id10">隐藏铺铜</a></li>
+<li><a class="reference internal" href="#id11">测量单位</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gerber">生成 Gerber 文件</a></li>
+<li><a class="reference internal" href="#drill">生成Drill文件</a></li>
+<li><a class="reference internal" href="#id12">树莓派安装KiCad</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="kicad">
+<h1>KiCad<a class="headerlink" href="#kicad" title="Permalink to this headline"></a></h1>
+<p>KiCad基本原理图、PCB使用方法，便于分析CM4 io板，树莓派自身也可以运行KiCad，但版本是5不是6</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="http://haipeng.me/2017/09/04/kicad-pcbnew-layer/">KiCad里Pcbnew中各层的使用说明</a></p></li>
+<li><p><a class="reference internal" href="0001_rpi_Compute_Module_4.html"><span class="doc std std-doc">0001_rpi_Compute_Module_4.md</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>原理图<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>这部分和其他的工具软件差异不大</p>
+</section>
+<section id="pcb">
+<h1>PCB图层<a class="headerlink" href="#pcb" title="Permalink to this headline"></a></h1>
+<p><img alt="0002_KiCad_PCB_Layers_Defines.png" src="../../../_images/0002_KiCad_PCB_Layers_Defines.png" /></p>
+<section id="id3">
+<h2>查看板层<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h2>
+<p>[File] -&gt; [Board Setup] -&gt; [Board Editor Layers] -&gt; [Copper layers] -&gt; 4</p>
+<p><img alt="0002_KiCad_PCB_Copper_Layers.png" src="../../../_images/0002_KiCad_PCB_Copper_Layers.png" /></p>
+</section>
+<section id="id4">
+<h2>布线层<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h2>
+<p>铜层是用于放置和重新布置导线的工作层。 层号从0开始（第一个铜层，在上层，即F.Cu），并以31（最后一个铜层，在下层，即B.Cu）结束。 由于元件不能放置在内层（层1到层30）中，所以只有层0（F.Cu）和层31（B.Cu）是元件层。</p>
+<p>任何铜层的名字都是可以编辑的。层0的默认名称为F.Cu，层31的默认名称为B.Cu。当电路板是2层板时，层0和层31之间没有其他的铜层。当电路板是4层板时，层0和层31中间多了两个铜层，名称按从上层到下层的顺序依次为In1.Cu和In2.Cu。当电路板是6层板时，层0和层31中间多了四个铜层，名称按从上层到下层的顺序依次为In1.Cu，In2.Cu，In3.Cu和In4.Cu。</p>
+<p>通常，电路板是4层时，采用如下结构：</p>
+<ul class="simple">
+<li><p>F.Cu ====Signal</p></li>
+<li><p>In1.Cu ====GND Plane</p></li>
+<li><p>In2.Cu ====VCC Plane</p></li>
+<li><p>B.Cu ====Signal</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>技术层对<a class="headerlink" href="#id5" title="Permalink to this headline"></a></h2>
+<p>KiCad中12个技术层总是成对出现的：上层一个，下层一个。可以通过F.或者B.来区分它们的位置。KiCad中的6个技术层对分别为：</p>
+<ul class="simple">
+<li><p>Adhesive (F.Adhes and B.Adhes)粘合层：用于在波峰焊前将SMD元件的粘合剂粘贴到电路板上的粘合层；</p></li>
+<li><p>Solder Paste (F.Paste and B.Paste)焊膏层：用于在回流焊接之前生产掩模以允许焊膏放置在SMD元件的焊盘上。通常这些层只有表面安装元件的焊盘；</p></li>
+<li><p>Silk Screen (F.SilkS and B.SilkS)丝印层：它们是元件的图样出现的层，也就是你画的东西，用于辅助元件的安装。如元件极性，第一针脚，安装参考图等等；</p></li>
+<li><p>Solder Mask (F.Mask and B.Mask)阻焊层：这两个层定义了焊接的掩模，也就是不过绿油的区域。所有焊盘都要出现在这两个层的其中一个层（SMD元件）或者所有两个层（通孔元件）以防止焊盘被过油，影响导电；</p></li>
+<li><p>Courtyard (F.CrtYd and B.CrtYd)空间层：用于显示元件在PCB上实际占用的空间大小；</p></li>
+<li><p>Fabrication (F.Fab and B.Fab)生产层：用于辅助元件贴装；</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>独立技术层<a class="headerlink" href="#id6" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Edge.Cuts边界层：用于绘制电路板轮廓。 放置在此层上的任何元素（图形，文本…）都显示在所有其他图层上。所以请仅使用此图层绘制PCB的轮廓；</p></li>
+<li><p>Margin边界层（目前没发现有什么特别的用处）；</p></li>
+</ul>
+</section>
+<section id="id7">
+<h2>通用层<a class="headerlink" href="#id7" title="Permalink to this headline"></a></h2>
+<p>这些层可以任意使用。 它们可以是组装或布线等的说明文本，也可以是组装或加工的构造图。 它们的名字是：Comments，E.C.O. 1，E.C.O. 2，Drawings</p>
+</section>
+<section id="id8">
+<h2>4层板分析需要的层<a class="headerlink" href="#id8" title="Permalink to this headline"></a></h2>
+<p><img alt="0002_KiCad_PCB_4_Layers_for_Analysis.png" src="../../../_images/0002_KiCad_PCB_4_Layers_for_Analysis.png" /></p>
+</section>
+<section id="id9">
+<h2>查看铺铜<a class="headerlink" href="#id9" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>点击这种网格会出现铺铜图层信息，就可以查看铺铜范围，好像在KiCad中一般先铺铜，然后布线，可以通过这种方式选择，然后删除铺铜；</p></li>
+<li><p>话说以前我自己画的板子，都是低频板，连铺铜都免了；</p></li>
+<li><p>如下图我们可知，同一个层，有两个铺地，假装是：数字地、模拟地；</p></li>
+</ul>
+<p><img alt="0002_KiCad_PCB_Layers_Fillled_Zones_Layers.png" src="../../../_images/0002_KiCad_PCB_Layers_Fillled_Zones_Layers.png" /></p>
+</section>
+<section id="id10">
+<h2>隐藏铺铜<a class="headerlink" href="#id10" title="Permalink to this headline"></a></h2>
+<p>可以打开In1.Cu、In2.Cu，可以查看这两层的一些布线信息</p>
+<p><img alt="0002_KiCad_PCB_Layers_No_Fillled_Zones.png" src="../../../_images/0002_KiCad_PCB_Layers_No_Fillled_Zones.png" /></p>
+</section>
+<section id="id11">
+<h2>测量单位<a class="headerlink" href="#id11" title="Permalink to this headline"></a></h2>
+<p>[View] -&gt; [Units]</p>
+</section>
+</section>
+<section id="gerber">
+<h1>生成 Gerber 文件<a class="headerlink" href="#gerber" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>参考：<span class="xref myst">getting_started_in_kicad.pdf</span></p>
+<ul>
+<li><p>5.2 生成 Gerber 文件</p></li>
+</ul>
+</li>
+</ul>
+<p>这些是制作典型的 2 层 PCB 时需要选择的层：</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>层</p></th>
+<th class="head"><p>KiCad 层名</p></th>
+<th class="head"><p>默认 Gerber 扩展</p></th>
+<th class="head"><p>“使用 Protel 文件扩展 名”已启用</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Bottom Layer（底层）</p></td>
+<td><p>B.Cu（底层）</p></td>
+<td><p>.GBR</p></td>
+<td><p>.GBL</p></td>
+</tr>
+<tr class="row-odd"><td><p>Top Layer（顶层）</p></td>
+<td><p>F.Cu（顶层）</p></td>
+<td><p>.GBR</p></td>
+<td><p>.GTL</p></td>
+</tr>
+<tr class="row-even"><td><p>Top Overlay（顶层丝印层）</p></td>
+<td><p>F.SilkS（顶层丝印层）</p></td>
+<td><p>.GBR</p></td>
+<td><p>.GTO</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bottom Solder Resist（底层阻焊层）</p></td>
+<td><p>B.Mask（底层阻焊层）</p></td>
+<td><p>.GBR</p></td>
+<td><p>.GBS</p></td>
+</tr>
+<tr class="row-even"><td><p>Top Solder Resist（顶层阻焊层）</p></td>
+<td><p>F.Mask（顶层阻焊层）</p></td>
+<td><p>.GBR</p></td>
+<td><p>.GTS</p></td>
+</tr>
+<tr class="row-odd"><td><p>Edges（边缘（板框）层）</p></td>
+<td><p>Edge.Cuts（边缘（板框）层）</p></td>
+<td><p>.GBR</p></td>
+<td><p>.GM1</p></td>
+</tr>
+</tbody>
+</table>
+<p>[File] -&gt; [Fabrication Outputs] -&gt; [Gerbers]</p>
+<p><img alt="0002_KiCad_PCB_gerbers_output.png" src="../../../_images/0002_KiCad_PCB_gerbers_output.png" /></p>
+</section>
+<section id="drill">
+<h1>生成Drill文件<a class="headerlink" href="#drill" title="Permalink to this headline"></a></h1>
+<p>[File] -&gt; [Fabrication Outputs] -&gt; [Drill Files]</p>
+<p><img alt="0002_KiCad_PCB_Drill_Files.png" src="../../../_images/0002_KiCad_PCB_Drill_Files.png" /></p>
+</section>
+<section id="id12">
+<h1>树莓派安装KiCad<a class="headerlink" href="#id12" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>apt-cache search kicad</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">horizon</span><span class="o">-</span><span class="n">eda</span> <span class="o">-</span> <span class="n">EDA</span> <span class="n">layout</span> <span class="ow">and</span> <span class="n">schematic</span> <span class="n">application</span>
+<span class="n">kicad</span> <span class="o">-</span> <span class="n">Electronic</span> <span class="n">schematic</span> <span class="ow">and</span> <span class="n">PCB</span> <span class="n">design</span> <span class="n">software</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">common</span> <span class="o">-</span> <span class="n">Old</span> <span class="n">common</span> <span class="n">files</span> <span class="n">used</span> <span class="n">by</span> <span class="n">kicad</span> <span class="o">-</span> <span class="n">Transitional</span> <span class="n">Package</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">demos</span> <span class="o">-</span> <span class="n">Demo</span> <span class="n">projects</span> <span class="k">for</span> <span class="n">kicad</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">ca</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Catalan</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">nl</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Dutch</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">footprints</span> <span class="o">-</span> <span class="n">Footprint</span> <span class="n">symbols</span> <span class="k">for</span> <span class="n">KiCad</span><span class="s1">&#39;s Pcbnew</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">libraries</span> <span class="o">-</span> <span class="n">Virtual</span> <span class="n">package</span> <span class="n">providing</span> <span class="n">common</span> <span class="n">used</span> <span class="n">libraries</span> <span class="n">by</span> <span class="n">kicad</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">packages3d</span> <span class="o">-</span> <span class="mi">3</span><span class="n">D</span> <span class="n">models</span> <span class="k">for</span> <span class="mi">3</span><span class="n">D</span> <span class="n">viewer</span> <span class="ow">in</span> <span class="n">KiCad</span><span class="s1">&#39;s Pcbnew and Footprint Editor</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">symbols</span> <span class="o">-</span> <span class="n">Schematic</span> <span class="n">symbols</span> <span class="k">for</span> <span class="n">KiCad</span><span class="s1">&#39;s Eeschema</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">templates</span> <span class="o">-</span> <span class="n">Project</span> <span class="n">templates</span> <span class="k">for</span> <span class="n">KiCad</span>
+<span class="n">pcb</span><span class="o">-</span><span class="n">rnd</span> <span class="o">-</span> <span class="n">Modular</span> <span class="n">Printed</span> <span class="n">Circuit</span> <span class="n">Board</span> <span class="n">layout</span> <span class="n">tool</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">dbgsym</span> <span class="o">-</span> <span class="n">debug</span> <span class="n">symbols</span> <span class="k">for</span> <span class="n">kicad</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">de</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">German</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">en</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">English</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">es</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Spanish</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">fr</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">French</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="nb">id</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Indonesian</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">it</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Italian</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">ja</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Japanese</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">pl</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Polish</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">ru</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Russian</span><span class="p">)</span>
+<span class="n">kicad</span><span class="o">-</span><span class="n">doc</span><span class="o">-</span><span class="n">zh</span> <span class="o">-</span> <span class="n">Kicad</span> <span class="n">help</span> <span class="n">files</span> <span class="p">(</span><span class="n">Chinese</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>未尝试，因为目前的版本5打不开CM4的工程，CM4用的是版本6的</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

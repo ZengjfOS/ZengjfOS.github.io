@@ -1,0 +1,226 @@
+# Android DTBO
+
+Android DTS Overlay，dtsi文件名不能有大写，删除内核重编
+
+# 编译流程
+
+* Android Q
+  * kernel-4.9/arch/arm64/configs/k62v1_64_bsp_defconfig
+    ```
+    CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE=y
+    CONFIG_BUILD_ARM64_APPENDED_DTB_IMAGE_NAMES="mediatek/mt6765"
+    CONFIG_BUILD_ARM64_DTB_OVERLAY_IMAGE_NAMES="mediatek/k62v1_64_bsp"
+    ```
+    * CONFIG_BUILD_ARM64_DTB_OVERLAY_IMAGE_NAMES="mediatek/k62v1_64_bsp"
+      * 多个空格分开
+  * kernel-4.9/scripts/drvgen/drvgen.mk
+    * dtbo id在这里面生成，没有使用`device/mediatek/build/core/build_dtboimage.mk`
+* Android R
+  * device/mediateksample/k62v1_64_bsp/ProjectConfig.mk
+    ```Makefile
+    MTK_PROJECT_DTB_NAMES =
+    ```
+    * 空会使用项目名作为值，多个空格分开
+  * device/mediatek/vendor/common/BoardConfig.mk
+    ```Makefile
+    ifeq ($(strip $(MTK_PROJECT_DTB_NAMES)),)
+    ifeq ($(MTK_K64_SUPPORT), yes)
+    PROJECT_DTB_NAMES ?= mediatek/$(MTK_TARGET_PROJECT)
+    else
+    PROJECT_DTB_NAMES ?= $(MTK_TARGET_PROJECT)
+    endif
+    else
+    PROJECT_DTB_NAMES ?= $(MTK_PROJECT_DTB_NAMES)
+    endif
+    ```
+  * kernel-4.19/Android.mk
+    ```Makefile
+    ## DTB build template
+    MTK_DTBIMAGE_DTS := $(addsuffix .dts,$(addprefix $(KERNEL_DIR)/arch/$(KERNEL_TARGET_ARCH)/boot/dts/,$(PLATFORM_DTB_NAME)))
+    include device/mediatek/build/core/build_dtbimage.mk
+  
+    MTK_DTBOIMAGE_DTS := $(addsuffix .dts,$(addprefix $(KERNEL_DIR)/arch/$(KERNEL_TARGET_ARCH)/boot/dts/,$(PROJECT_DTB_NAMES)))
+    include device/mediatek/build/core/build_dtboimage.mk
+    ```
+  * device/mediatek/build/core/build_dtboimage.mk
+    ```Makefile
+    MTK_DTBOIMAGE_DTB :=
+    MTK_DTBOIMAGE_DTSI :=
+    $(foreach i,$(MTK_DTBOIMAGE_DTS),\
+      $(eval base_prj := $(shell grep -m 1 '#include [<\"].*\/cust\.dtsi[>\"]' $(i) | sed 's/#include [<"]//g' | sed 's/\/cust\.dtsi[>"]//g' | sed 's/\/\*//g' | sed 's/\*\///g' | sed 's/ //g'))\
+      $(if $(strip $(base_prj)),\
+        $(eval prj_path := $(KERNEL_OUT)/arch/$(KERNEL_TARGET_ARCH)/boot/dts/$(base_prj))\
+        $(eval dws_path := $(KERNEL_DIR)/drivers/misc/mediatek/dws/$(MTK_PLATFORM_DIR)/$(base_prj).dws)\
+        $(if $(filter $(prj_path),$(MTK_DTBOIMAGE_DTSI)),,\
+          $(eval $(call drvgen_dws_to_dtsi,$(dws_path),$(prj_path)))\
+          $(eval MTK_DTBOIMAGE_DTSI += $(prj_path))\
+          $(eval LOCAL_ADDITIONAL_DEPENDENCIES := $(prj_path)/cust.dtsi)\
+        )\
+      )\
+      $(eval LOCAL_ADDITIONAL_DEPENDENCIES_D := $(MTK_DTBIMAGE_DTB))\
+      $(eval LOCAL_ADDITIONAL_DEPENDENCIES_D += $(MTK_DTBOIMAGE_DTB))\
+      $(eval LOCAL_SRC_FILES := $(i))\
+      $(eval include device/mediatek/build/core/build_dtb.mk)\
+      $(eval MTK_DTBOIMAGE_DTB += $(my_kernel_dtb))\
+    )
+    
+    kernel: $(my_kernel_dtb).merge
+    my_dtbo_id := 0
+    define mk_dtboimg_cfg
+    echo $(1) >>$(2);\
+    echo " id=$(my_dtbo_id)" >>$(2);\
+    $(eval my_dtbo_id := $(call int_plus,$(my_dtbo_id),1))
+    endef
+    
+    MTK_DTBOIMAGE_CFG := $(KERNEL_OUT)/arch/$(KERNEL_TARGET_ARCH)/boot/dts/dtboimg.cfg
+    $(MTK_DTBOIMAGE_CFG): PRIVATE_DTB := $(MTK_DTBOIMAGE_DTB)
+    $(MTK_DTBOIMAGE_CFG): $(MTK_DTBOIMAGE_DTB)
+        $(hide) rm -f $@.tmp
+        $(hide) $(foreach f,$(PRIVATE_DTB),$(call mk_dtboimg_cfg,$(f),$@.tmp))
+        $(hide) if ! cmp -s $@.tmp $@; then \
+            mv $@.tmp $@; \
+        else \
+            rm $@.tmp; \
+        fi
+    ```
+
+# LK Overlay应用流程
+
+* vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/odm_mdtbo.c
+  * int get_odm_mdtbo_index(void)
+    * vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/custom_dtb_index.c
+      ```CPP
+      /******************************************************************************
+      * NOTE: This function is for the internal projects of MT6771.
+      *        -----------------------------------------
+      *       | GPIO_163    GPIO_164    PCB_ID          |
+      *       |   Low          Low      SEVB  (MTK0963) |
+      *       |   Low          High     Phone (MTK0891) |
+      *       |   High         Low      TBD             |
+      *       |   High         High     TBD             |
+      *        -----------------------------------------
+      *
+      *       Customers need to implement their own customized_get_odm_mdtbo_index()
+      *       function.
+      ******************************************************************************/
+      int customized_get_odm_mdtbo_index(void)
+      {
+          int idx = 0;
+          S32 pin163 = mt_get_gpio_in(GPIO_163);
+          S32 pin164 = mt_get_gpio_in(GPIO_164);
+      
+          dprintf(INFO, "pin163 = %d, pin164 = %d\n", pin163, pin164);
+      
+          if (pin163 == GPIO_HIGH) {
+              if (pin164 == GPIO_HIGH) {
+                  // idx = 3;
+                  dprintf(INFO, "Error: PCB_ID: Unknown, dtb idx = %d\n", idx);
+              } else {
+                  idx = 2;
+                  dprintf(INFO, "Error: PCB_ID: Unknown, dtb idx = %d\n", idx);
+              }
+          } else {
+              if (pin164 == GPIO_HIGH) {
+                  idx = 1;
+                  dprintf(INFO, "PCB_ID: Phone (MTK0891), dtb idx = %d\n", idx);
+              } else {
+                  idx = 0;
+                  dprintf(INFO, "PCB_ID: SEVB (MTK0963), dtb idx = %d\n", idx);
+              }
+          }
+      
+          return idx;
+      }
+      ```
+* log
+  ```
+  [250] [SBC] dtbo vfy pass(1 ms)
+  [251] pin163 = 0, pin164 = 0
+  [251] PCB_ID: SEVB (MTK0963), dtb idx = 0
+  [251] dtbo_offset: 0x80
+  [252] [PROFILE] ::: lvl(3) load_dtbo_buffer takes 31 ms
+  [253] dtbo_size : 43617
+  [264] [PROFILE] ::: lvl(3) dtb_overlay takes 11 ms
+  [265] [PROFILE] ::: lvl(2) lk_dtb_init takes 99 ms
+  ```
+* board id
+  * vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/mt_gpio.c
+    * u32 getBoardIDVals(void)
+
+# Android R修改调试
+
+* kernel-4.19/arch/arm64/boot/dts/mediatek
+  * cp k62v1_64_bsp.dts k62v1_64_bsp_test1.dts
+  * cp k62v1_64_bsp.dts k62v1_64_bsp_test2.dts
+* device/mediateksample/k62v1_64_bsp/ProjectConfig.mk
+  ```diff
+  diff --git a/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk b/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk
+  index 4003272cb91..f692c8ce518 100755
+  --- a/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk
+  +++ b/device/mediateksample/k62v1_64_bsp/ProjectConfig.mk
+  @@ -521,7 +521,8 @@ MTK_BT_HEARING_AID_SUPPORT = no
+   MTK_CAM_VPU_DSDN = no
+   MTK_AI_CAM_SUPPORT = no
+   MTK_BIP_UICC_SERVER_MODE = no
+  -MTK_PROJECT_DTB_NAMES =
+  +# MTK_PROJECT_DTB_NAMES =
+  +MTK_PROJECT_DTB_NAMES = mediatek/k62v1_64_bsp mediatek/k62v1_64_bsp_test1 mediatek/k62v1_64_bsp_test2
+   MTK_TINYSYS_SCP_LOGGER_SUPPORT = yes
+   MTK_CAM_GESTURE_SUPPORT = no
+   MTK_SENSOR_ARCHITECTURE = 1.0
+  ```
+* build
+* cat obj/KERNEL_OBJ/arch/arm64/boot/dts/dtboimg.cfg
+  ```
+  out/target/product/k62v1_64_bsp/obj/KERNEL_OBJ/arch/arm64/boot/dts/mediatek/k62v1_64_bsp.dtb
+   id=0
+  out/target/product/k62v1_64_bsp/obj/KERNEL_OBJ/arch/arm64/boot/dts/mediatek/k62v1_64_bsp_test1.dtb
+   id=1
+  out/target/product/k62v1_64_bsp/obj/KERNEL_OBJ/arch/arm64/boot/dts/mediatek/k62v1_64_bsp_test2.dtb
+   id=2
+  ```
+* out/host/linux-x86/bin/mkdtimg dump out/target/product/k62v1_64_bsp/obj/PACKAGING/dtboimage/dtbo.img
+  ```
+  dt_table_header:
+                 magic = d7b7ab1e
+            total_size = 130979
+           header_size = 32
+         dt_entry_size = 32
+        dt_entry_count = 3
+     dt_entries_offset = 32
+             page_size = 2048
+               version = 0
+  dt_table_entry[0]:
+               dt_size = 43617
+             dt_offset = 128
+                    id = 00000000
+                   rev = 00000000
+             custom[0] = 00000000
+             custom[1] = 00000000
+             custom[2] = 00000000
+             custom[3] = 00000000
+             (FDT)size = 43617
+       (FDT)compatible = (unknown)
+  dt_table_entry[1]:
+               dt_size = 43617
+             dt_offset = 43745
+                    id = 00000001
+                   rev = 00000000
+             custom[0] = 00000000
+             custom[1] = 00000000
+             custom[2] = 00000000
+             custom[3] = 00000000
+             (FDT)size = 43617
+       (FDT)compatible = (unknown)
+  dt_table_entry[2]:
+               dt_size = 43617
+             dt_offset = 87362
+                    id = 00000002
+                   rev = 00000000
+             custom[0] = 00000000
+             custom[1] = 00000000
+             custom[2] = 00000000
+             custom[3] = 00000000
+             (FDT)size = 43617
+       (FDT)compatible = (unknown)
+  ```

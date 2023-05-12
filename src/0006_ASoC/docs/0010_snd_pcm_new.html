@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">snd_pcm_new</a></li>
+<li><a class="reference internal" href="#snd-soc-instantiate-cardsoc-probe-link-dais"><code class="docutils literal notranslate"><span class="pre">snd_soc_instantiate_card</span></code>调用<code class="docutils literal notranslate"><span class="pre">soc_probe_link_dais</span></code></a></li>
+<li><a class="reference internal" href="#soc-probe-link-dais">soc_probe_link_dais</a></li>
+<li><a class="reference internal" href="#soc-new-pcm">soc_new_pcm</a></li>
+<li><a class="reference internal" href="#snd-pcm-new-snd-pcm-new"><code class="docutils literal notranslate"><span class="pre">snd_pcm_new</span></code>调用<code class="docutils literal notranslate"><span class="pre">_snd_pcm_new</span></code></a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="snd-pcm-new">
+<h1>snd_pcm_new<a class="headerlink" href="#snd-pcm-new" title="Permalink to this headline"></a></h1>
+<p>看一下pcm的创建过程</p>
+<ul class="simple">
+<li><p>主要是跟踪snd_pcm_new如何创建PCM设备节点的，以及操作PCM的设备节点的时候对应的操作函数在哪里；</p></li>
+<li><p>驱动中component的dai的ops会被绑定到pcm的<a class="reference external" href="https://elixir.bootlin.com/linux/latest/source/sound/soc/soc-pcm.c#L3096">ops</a>中；</p></li>
+</ul>
+</section>
+<section id="snd-soc-instantiate-cardsoc-probe-link-dais">
+<h1><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L1979"><code class="docutils literal notranslate"><span class="pre">snd_soc_instantiate_card</span></code></a>调用<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L2087"><code class="docutils literal notranslate"><span class="pre">soc_probe_link_dais</span></code></a><a class="headerlink" href="#snd-soc-instantiate-cardsoc-probe-link-dais" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_instantiate_card</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* probe all DAI links on this card */</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_comp_order</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">for_each_card_rtds</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_probe_link_dais</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">);</span><span class="w">                </span><span class="c1">// 接下来解读</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="s">&quot;ASoC: failed to instantiate card %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">probe_dai_err</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="soc-probe-link-dais">
+<h1><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L1502">soc_probe_link_dais</a><a class="headerlink" href="#soc-probe-link-dais" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">soc_probe_link_dais</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_pcm_runtime</span><span class="w"> </span><span class="o">*</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">order</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_link</span><span class="w"> </span><span class="o">*</span><span class="n">dai_link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai</span><span class="w"> </span><span class="o">*</span><span class="n">cpu_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">cpu_dai</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_rtdcom_list</span><span class="w"> </span><span class="o">*</span><span class="n">rtdcom</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component</span><span class="w"> </span><span class="o">*</span><span class="n">component</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai</span><span class="w"> </span><span class="o">*</span><span class="n">codec_dai</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dev_dbg</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: probe %s dai link %d late %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">card</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* set default power off timeout */</span><span class="w"></span>
+<span class="w">    </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">pmdown_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmdown_time</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_probe_dai</span><span class="p">(</span><span class="n">cpu_dai</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">);</span><span class="w">                        </span><span class="c1">// 调用cpu_dai的probe函数</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* probe the CODEC DAI */</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_rtd_codec_dai</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">codec_dai</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_probe_dai</span><span class="p">(</span><span class="n">codec_dai</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 调用codec_dei的probe函数</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* complete DAI probe during last probe */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">order</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">SND_SOC_COMP_ORDER_LAST</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* do machine specific initialization */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="n">rtd</span><span class="p">);</span><span class="w">                              </span><span class="c1">// 调用dai_link的init函数</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: failed to init %s: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">snd_soc_runtime_set_dai_fmt</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dai_fmt</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_post_component_init</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w">         </span><span class="c1">// 将一个rtd（runtime dai_link）注册为一个device，加入设备链：ret = device_add(rtd-&gt;dev);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="cp">#ifdef CONFIG_DEBUG_FS</span>
+<span class="w">    </span><span class="cm">/* add DPCM sysfs entries */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dynamic</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">soc_dpcm_debugfs_add</span><span class="p">(</span><span class="n">rtd</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#endif</span>
+
+<span class="w">    </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num</span><span class="p">;</span><span class="w">                                                         </span><span class="c1">// 获取pcm序号</span>
+
+<span class="w">    </span><span class="cm">/*</span>
+<span class="cm">     * most drivers will register their PCMs using DAI link ordering but</span>
+<span class="cm">     * topology based drivers can use the DAI link id field to set PCM</span>
+<span class="cm">     * device number and then use rtd + a base offset of the BEs.</span>
+<span class="cm">     */</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_rtdcom</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">rtdcom</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">component</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtdcom</span><span class="o">-&gt;</span><span class="n">component</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">use_dai_pcm_id</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">no_pcm</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">num</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">be_pcm_base</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cpu_dai</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">compress_new</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                    </span><span class="c1">// 之前没有怎么关注这部分内容，暂时不管</span>
+<span class="w">        </span><span class="cm">/* create compress_device&quot; */</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cpu_dai</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">compress_new</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: can&#39;t create compress %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                     </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">stream_name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">params</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/* create the pcm */</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_new_pcm</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">);</span><span class="w">                                    </span><span class="c1">// 接下来分析</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: can&#39;t create pcm %s :%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">stream_name</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_link_dai_pcm_new</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cpu_dai</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_link_dai_pcm_new</span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">codec_dais</span><span class="p">,</span><span class="w"></span>
+<span class="w">                           </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">INIT_DELAYED_WORK</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">delayed_work</span><span class="p">,</span><span class="w"></span>
+<span class="w">                        </span><span class="n">codec2codec_close_delayed_work</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="soc-new-pcm">
+<h1><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-pcm.c#L3017">soc_new_pcm</a><a class="headerlink" href="#soc-new-pcm" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* create a new pcm */</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">soc_new_pcm</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_pcm_runtime</span><span class="w"> </span><span class="o">*</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai</span><span class="w"> </span><span class="o">*</span><span class="n">codec_dai</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai</span><span class="w"> </span><span class="o">*</span><span class="n">cpu_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">cpu_dai</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component</span><span class="w"> </span><span class="o">*</span><span class="n">component</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_rtdcom_list</span><span class="w"> </span><span class="o">*</span><span class="n">rtdcom</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_pcm</span><span class="w"> </span><span class="o">*</span><span class="n">pcm</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">new_name</span><span class="p">[</span><span class="mi">64</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dynamic</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">no_pcm</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                      </span><span class="c1">// 假设走else</span>
+<span class="w">        </span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dpcm_playback</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dpcm_capture</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">for_each_rtd_codec_dai</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">codec_dai</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">codec_dai</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">playback</span><span class="p">.</span><span class="n">channels_min</span><span class="p">)</span><span class="w">                       </span><span class="c1">// 从前面codec dai的设定中确实定义了</span>
+<span class="w">                </span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">codec_dai</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">capture</span><span class="p">.</span><span class="n">channels_min</span><span class="p">)</span><span class="w">                        </span><span class="c1">// 从前面codec dai的设定中确实定义了</span>
+<span class="w">                </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">capture</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">cpu_dai</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">capture</span><span class="p">.</span><span class="n">channels_min</span><span class="p">;</span><span class="w">             </span><span class="c1">// capture可以是0</span>
+<span class="w">        </span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">playback</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">cpu_dai</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">playback</span><span class="p">.</span><span class="n">channels_min</span><span class="p">;</span><span class="w">          </span><span class="c1">// playback可以是0</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">playback_only</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                         </span><span class="c1">// 再次确认</span>
+<span class="w">        </span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">capture_only</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                          </span><span class="c1">// 再次确认</span>
+<span class="w">        </span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* create the PCM */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">no_pcm</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                                </span><span class="c1">// 暂时考虑else</span>
+<span class="w">        </span><span class="n">snprintf</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">new_name</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;(%s)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">stream_name</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_new_internal</span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">snd_card</span><span class="p">,</span><span class="w"> </span><span class="n">new_name</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">playback</span><span class="p">,</span><span class="w"> </span><span class="n">capture</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">pcm</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dynamic</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">snprintf</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">new_name</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;%s (*)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">stream_name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">snprintf</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">new_name</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;%s %s-%d&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">stream_name</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w">                                         </span><span class="c1">// 由以前文档可知，num_codecs为1</span>
+<span class="w">                </span><span class="s">&quot;multicodec&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">codec_dai</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_new</span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">snd_card</span><span class="p">,</span><span class="w"> </span><span class="n">new_name</span><span class="p">,</span><span class="w"> </span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="n">playback</span><span class="p">,</span><span class="w">         </span><span class="c1">// 接下来分子这里</span>
+<span class="w">            </span><span class="n">capture</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">pcm</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: can&#39;t create pcm for %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">dev_dbg</span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: registered pcm #%d %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="n">new_name</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* DAPM dai link stream work */</span><span class="w"></span>
+<span class="w">    </span><span class="n">INIT_DELAYED_WORK</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">delayed_work</span><span class="p">,</span><span class="w"> </span><span class="n">close_delayed_work</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">nonatomic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">nonatomic</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">pcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pcm</span><span class="p">;</span><span class="w">                                                             </span><span class="c1">// rtd中记录pcm</span>
+<span class="w">    </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">private_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="p">;</span><span class="w">                                                    </span><span class="c1">// pcm中记录rtd作为私有数据结构</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">no_pcm</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                                </span><span class="c1">// 考虑else</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">playback</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">streams</span><span class="p">[</span><span class="n">SNDRV_PCM_STREAM_PLAYBACK</span><span class="p">].</span><span class="n">substream</span><span class="o">-&gt;</span><span class="n">private_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">capture</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">streams</span><span class="p">[</span><span class="n">SNDRV_PCM_STREAM_CAPTURE</span><span class="p">].</span><span class="n">substream</span><span class="o">-&gt;</span><span class="n">private_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtd</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">out</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* ASoC PCM operations */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">dai_link</span><span class="o">-&gt;</span><span class="n">dynamic</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                           </span><span class="c1">// 考虑else</span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">open</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">dpcm_fe_dai_open</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">hw_params</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">dpcm_fe_dai_hw_params</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">prepare</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">dpcm_fe_dai_prepare</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">trigger</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">dpcm_fe_dai_trigger</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">hw_free</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">dpcm_fe_dai_hw_free</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">close</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">dpcm_fe_dai_close</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">pointer</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_pointer</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">ioctl</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_ioctl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">open</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_open</span><span class="p">;</span><span class="w">                                </span><span class="c1">// 绑定rtd相关的基本操作函数</span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">hw_params</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_hw_params</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">prepare</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_prepare</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">trigger</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_trigger</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">hw_free</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_hw_free</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">close</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_close</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">pointer</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_pointer</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">ioctl</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_ioctl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">for_each_rtdcom</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">rtdcom</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                          </span><span class="c1">// 将component中驱动部分的ops绑定到rtd的ops中</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_pcm_ops</span><span class="w"> </span><span class="o">*</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtdcom</span><span class="o">-&gt;</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ops</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">ack</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">ack</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_rtdcom_ack</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">copy_user</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">copy_user</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_rtdcom_copy_user</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">copy_kernel</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">copy_kernel</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_rtdcom_copy_kernel</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">fill_silence</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">fill_silence</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">soc_rtdcom_fill_silence</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">page</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">page</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_rtdcom_page</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ops</span><span class="o">-&gt;</span><span class="n">mmap</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">.</span><span class="n">mmap</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">soc_rtdcom_mmap</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">playback</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">snd_pcm_set_ops</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span><span class="w"> </span><span class="n">SNDRV_PCM_STREAM_PLAYBACK</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">);</span><span class="w">     </span><span class="c1">// 将rtd注册的ops处理函数注册到pcm playback操作流中，pcmC%iD%i%c设备节点的操作函数就在这里了。</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">capture</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">snd_pcm_set_ops</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span><span class="w"> </span><span class="n">SNDRV_PCM_STREAM_CAPTURE</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">ops</span><span class="p">);</span><span class="w">      </span><span class="c1">// 将rtd注册的ops处理函数注册到pcm capture操作流中，pcmC%iD%i%c设备节点的操作函数就在这里了。</span>
+
+<span class="w">    </span><span class="n">for_each_rtdcom</span><span class="p">(</span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">rtdcom</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                      </span><span class="c1">// component中可能有pcm_new阶段需要回调的函数，在这里被调用</span>
+<span class="w">        </span><span class="n">component</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rtdcom</span><span class="o">-&gt;</span><span class="n">component</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">pcm_new</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">pcm_new</span><span class="p">(</span><span class="n">rtd</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;ASoC: pcm constructor failed: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">private_free</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_pcm_private_free</span><span class="p">;</span><span class="w"></span>
+<span class="nl">out</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">dev_info</span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s &lt;-&gt; %s mapping ok</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">         </span><span class="p">(</span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">num_codecs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;multicodec&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">rtd</span><span class="o">-&gt;</span><span class="n">codec_dai</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"></span>
+<span class="w">         </span><span class="n">cpu_dai</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="snd-pcm-new-snd-pcm-new">
+<h1><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/core/pcm.c#L837"><code class="docutils literal notranslate"><span class="pre">snd_pcm_new</span></code></a>调用<a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/core/pcm.c#L767"><code class="docutils literal notranslate"><span class="pre">_snd_pcm_new</span></code></a><a class="headerlink" href="#snd-pcm-new-snd-pcm-new" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">_snd_pcm_new</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">device</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">playback_count</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">capture_count</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">internal</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_pcm</span><span class="w"> </span><span class="o">**</span><span class="n">rpcm</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_pcm</span><span class="w"> </span><span class="o">*</span><span class="n">pcm</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_device_ops</span><span class="w"> </span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dev_free</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_dev_free</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dev_register</span><span class="w"> </span><span class="o">=</span><span class="w">    </span><span class="n">snd_pcm_dev_register</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dev_disconnect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_dev_disconnect</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_device_ops</span><span class="w"> </span><span class="n">internal_ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">dev_free</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_dev_free</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">snd_BUG_ON</span><span class="p">(</span><span class="o">!</span><span class="n">card</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENXIO</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rpcm</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="o">*</span><span class="n">rpcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kzalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">pcm</span><span class="p">),</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w">                                    </span><span class="c1">// 申请pcm内存</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">pcm</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">card</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">card</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">internal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">internal</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">open_mutex</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">init_waitqueue_head</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">open_wait</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">strlcpy</span><span class="p">(</span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">pcm</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 设备节点的生成就在这里了</span>
+<span class="w">    </span><span class="c1">// dev_set_name(&amp;pstr-&gt;dev, &quot;pcmC%iD%i%c&quot;, pcm-&gt;card-&gt;number, pcm-&gt;device,</span>
+<span class="w">    </span><span class="c1">//          stream == SNDRV_PCM_STREAM_PLAYBACK ? &#39;p&#39; : &#39;c&#39;);</span>
+<span class="w">    </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_new_stream</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span><span class="w"> </span><span class="n">SNDRV_PCM_STREAM_PLAYBACK</span><span class="p">,</span><span class="w">                    </span><span class="c1">// 创建Playback流</span>
+<span class="w">                 </span><span class="n">playback_count</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">free_pcm</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_pcm_new_stream</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span><span class="w"> </span><span class="n">SNDRV_PCM_STREAM_CAPTURE</span><span class="p">,</span><span class="w"> </span><span class="n">capture_count</span><span class="p">);</span><span class="w">     </span><span class="c1">// 创建Capture流</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">free_pcm</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_device_new</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">SNDRV_DEV_PCM</span><span class="p">,</span><span class="w"> </span><span class="n">pcm</span><span class="p">,</span><span class="w"></span>
+<span class="w">                 </span><span class="n">internal</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="o">&amp;</span><span class="n">internal_ops</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ops</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">err</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">free_pcm</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rpcm</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="o">*</span><span class="n">rpcm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pcm</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="nl">free_pcm</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">snd_pcm_free</span><span class="p">(</span><span class="n">pcm</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">err</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

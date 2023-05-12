@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Why StreamExample Always Select Alt6</a></li>
+<li><a class="reference internal" href="#endpointscomboboxalt6">EndPointsComboBox只会留下Alt6节点信息</a></li>
+<li><a class="reference internal" href="#id1">自动选择接口描述符流程</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="why-streamexample-always-select-alt6">
+<h1>Why StreamExample Always Select Alt6<a class="headerlink" href="#why-streamexample-always-select-alt6" title="Permalink to this headline"></a></h1>
+<p>流传输如何设置备选项</p>
+</section>
+<section id="endpointscomboboxalt6">
+<h1>EndPointsComboBox只会留下Alt6节点信息<a class="headerlink" href="#endpointscomboboxalt6" title="Permalink to this headline"></a></h1>
+<div class="highlight-C# notranslate"><div class="highlight"><pre><span></span><span class="na">[...省略]</span><span class="w"></span>
+<span class="cm">/*Summary</span>
+<span class="cm">   Recursive routine populates EndPointsComboBox with strings </span>
+<span class="cm">   representing all the endpoints in the device.</span>
+<span class="cm">*/</span><span class="w"></span>
+<span class="k">private</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="nf">GetEndpointsOfNode</span><span class="p">(</span><span class="n">TreeNode</span><span class="w"> </span><span class="n">devTree</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">Items</span><span class="p">.</span><span class="n">Clear</span><span class="p">();</span><span class="w">                </span><span class="c1">// 这里会清除之前的节点，导致只留下了最后的Alt6节点</span>
+<span class="w">    </span><span class="k">foreach</span><span class="w"> </span><span class="p">(</span><span class="n">TreeNode</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">devTree</span><span class="p">.</span><span class="n">Nodes</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">node</span><span class="p">.</span><span class="n">Nodes</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="p">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">GetEndpointsOfNode</span><span class="p">(</span><span class="n">node</span><span class="p">);</span><span class="w">               </span><span class="c1">// 递归</span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">CyUSBEndPoint</span><span class="w"> </span><span class="n">ept</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">node</span><span class="p">.</span><span class="n">Tag</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">CyUSBEndPoint</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ept</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="c1">//return;</span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="p">(!</span><span class="n">node</span><span class="p">.</span><span class="n">Text</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">&quot;Control&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">CyUSBInterface</span><span class="w"> </span><span class="n">ifc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">node</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Tag</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">CyUSBInterface</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="kt">string</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&quot;ALT-{0}, {1} Byte {2}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ifc</span><span class="p">.</span><span class="n">bAlternateSetting</span><span class="p">,</span><span class="w"> </span><span class="n">ept</span><span class="p">.</span><span class="n">MaxPktSize</span><span class="p">,</span><span class="w"> </span><span class="n">node</span><span class="p">.</span><span class="n">Text</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">Items</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="p">}</span><span class="w"></span>
+<span class="na">[...省略]</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h1>自动选择接口描述符流程<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<div class="highlight-C# notranslate"><div class="highlight"><pre><span></span><span class="na">[...省略]</span><span class="w"></span>
+<span class="cm">/*Summary</span>
+<span class="cm">   Search the device with VID-PID 04b4-00F1 and if found, select the end point</span>
+<span class="cm">*/</span><span class="w"></span>
+<span class="k">private</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="nf">SetDevice</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">bPreserveSelectedDevice</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="na">[...省略]</span><span class="w"></span>
+<span class="w">        </span><span class="n">PpxBox</span><span class="p">.</span><span class="n">Text</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;16&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">//Set default value to 8 Packets</span>
+<span class="w">        </span><span class="n">QueueBox</span><span class="p">.</span><span class="n">Text</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;8&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">Items</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="p">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/**</span>
+<span class="cm">             * ALT-6, 1024 Byte Isoc in endpoint (0x82)</span>
+<span class="cm">             * ALT-6, 1024 Byte Isoc out endpoint (0x06)</span>
+<span class="cm">             */</span><span class="w"></span>
+<span class="w">            </span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">SelectedIndex</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="m">0</span><span class="p">;</span><span class="w">            </span><span class="c1">// 设置索引，会自动触发对应的事件</span>
+<span class="w">            </span><span class="n">StartBtn</span><span class="p">.</span><span class="n">Enabled</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="n">StartBtn</span><span class="p">.</span><span class="n">Enabled</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">false</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="na">[...省略]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="na">[...省略]</span><span class="w"></span>
+<span class="cm">/*Summary</span>
+<span class="cm"> This is a system event handler, when the selected index changes(end point selection).</span>
+<span class="cm">*/</span><span class="w"></span>
+<span class="k">private</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="nf">EndPointsComboBox_SelectedIndexChanged</span><span class="p">(</span><span class="kt">object</span><span class="w"> </span><span class="n">sender</span><span class="p">,</span><span class="w"> </span><span class="n">EventArgs</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Get the Alt setting</span>
+<span class="w">    </span><span class="c1">// EndPointsComboBox.Text = &quot;ALT-6, 1024 Byte Isoc in endpoint (0x82)&quot;</span>
+<span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="n">sAlt</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">Text</span><span class="p">.</span><span class="n">Substring</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">byte</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">Convert</span><span class="p">.</span><span class="n">ToByte</span><span class="p">(</span><span class="n">sAlt</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">MyDevice</span><span class="p">.</span><span class="n">AltIntfc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w">                                  </span><span class="c1">// a = 6</span>
+
+<span class="w">    </span><span class="c1">// Get the endpoint</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">aX</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">Text</span><span class="p">.</span><span class="n">LastIndexOf</span><span class="p">(</span><span class="s">&quot;0x&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="n">sAddr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">EndPointsComboBox</span><span class="p">.</span><span class="n">Text</span><span class="p">.</span><span class="n">Substring</span><span class="p">(</span><span class="n">aX</span><span class="p">,</span><span class="w"> </span><span class="m">4</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">byte</span><span class="w"> </span><span class="n">addr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="p">)</span><span class="n">Util</span><span class="p">.</span><span class="n">HexToInt</span><span class="p">(</span><span class="n">sAddr</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">EndPoint</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">MyDevice</span><span class="p">.</span><span class="n">EndPointOf</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Ensure valid PPX for this endpoint</span>
+<span class="w">    </span><span class="n">PpxBox_SelectedIndexChanged</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span><span class="w"> </span><span class="k">null</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="na">[...省略]</span><span class="w"></span>
+</pre></div>
+</div>
+<p><img alt="0014_StreamExample_Always_Select_Alt6.png" src="../../../_images/0014_StreamExample_Always_Select_Alt6.png" /></p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

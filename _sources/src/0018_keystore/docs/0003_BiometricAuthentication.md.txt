@@ -1,0 +1,88 @@
+# Biometric Authentication 
+
+指纹识别示例分析
+
+# 参考文档
+
+* [BiometricAuthentication](https://github.com/android/security-samples/tree/main/BiometricAuthentication/)
+* [CBC模式解读](https://blog.csdn.net/chengqiuming/article/details/82288851)
+* [Android AES 加密、解密](https://blog.csdn.net/q4878802/article/details/76690493)
+
+# Cypher
+
+Cypher无法直接获得实例，只能通过getInstance方法来获得实例
+
+```
+This class provides access to implementations of cryptographic ciphers for encryption and decryption. 
+Cipher classes can not be instantiated directly, one has to call the Cipher's getInstance method with 
+the name of a requested transformation, optionally with a provider. A transformation specifies an 
+operation (or a set of operations) as a string in the form:
+
+"algorithm/mode/padding"or
+"algorithm"
+```
+
+Cypher实例时需要使用getInstance方法，且必须传入一个参数，这个参数包括加密算法，加密模式和填充方式三部分，当然也可以只指定加密算法，从而使用默认的模式和填充方式。此次我的设计传入"AES"参数，那么系统会默认使用" AES/CFB8/NoPadding"来做为这三部分的设置参数。当获得Cypher实例以后，就可以调用它的一些方法来进行加解密
+
+# Biometric Authentication
+
+* 获取keyStore对象；
+* 获取keyGenerator对象；
+* 获取加密Cipher操作对象
+* 创建biometricPrompt
+* 绑定按键功能
+  * 判断是否支持指纹
+  * 生成key
+  * 设置点击事件
+    * 触发点击事件
+      * 初始化cipher为加密模式
+      * 开始指纹认证，注入cipher
+        * 指纹认证成功回调，APP是接触不到指纹数据的，只能在回调中处理需求
+          * 获取到cipher，对数据进行加密
+
+```
+* com/example/android/biometricauth/MainActivity.kt
+  └── override fun onCreate(savedInstanceState: Bundle?)
+      ├── setupKeyStoreAndKeyGenerator()
+      │   ├── keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+      │   │   └── ANDROID_KEY_STORE
+      │   │       └── private const val ANDROID_KEY_STORE = "AndroidKeyStore"
+      │   └── keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
+      ├── val (defaultCipher: Cipher, cipherNotInvalidated: Cipher) = setupCiphers()
+      │   ├── val cipherString = "$KEY_ALGORITHM_AES/$BLOCK_MODE_CBC/$ENCRYPTION_PADDING_PKCS7"
+      │   ├── defaultCipher = Cipher.getInstance(cipherString)
+      │   └── cipherNotInvalidated = Cipher.getInstance(cipherString)
+      ├── biometricPrompt = createBiometricPrompt()
+      │   ├── val callback = object : BiometricPrompt.AuthenticationCallback()
+      │   └── val biometricPrompt = BiometricPrompt(this, executor, callback)
+      └── setUpPurchaseButtons(cipherNotInvalidated, defaultCipher)
+          ├── val purchaseButton = findViewById<Button>(R.id.purchase_button)
+          ├── val purchaseButtonNotInvalidated = findViewById<Button>(R.id.purchase_button_not_invalidated)
+          └── if (BiometricManager.from(application).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS)
+              ├── createKey(DEFAULT_KEY_NAME)
+              │   ├── keyStore.load(null)
+              │   ├── val keyProperties = KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+              │   │   └── key的属性支持加密、解密
+              │   ├── val builder = KeyGenParameterSpec.Builder(keyName, keyProperties).setBlockModes(BLOCK_MODE_CBC).setUserAuthenticationRequired(true).setEncryptionPaddings(ENCRYPTION_PADDING_PKCS7).setInvalidatedByBiometricEnrollment(invalidatedByBiometricEnrollment)
+              │   └── keyGenerator.run {init(builder.build()) generateKey() }
+              ├── createKey(KEY_NAME_NOT_INVALIDATED, false)
+              └── purchaseButton.run {}
+                  └── setOnClickListener(PurchaseButtonClickListener(defaultCipher, KEY_NAME_NOT_INVALIDATED))
+                      └── private inner class PurchaseButtonClickListener
+                          ├── val promptInfo = createPromptInfo()
+                          │   └── val promptInfo = BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.prompt_info_title)).setSubtitle(getString(R.string.prompt_info_subtitle)).setDescription(getString(R.string.prompt_info_description)).setConfirmationRequired(false).setNegativeButtonText(getString(R.string.prompt_info_use_app_password))
+                          └── if (initCipher(cipher, keyName))
+                              ├── initCipher()
+                              │   └── cipher.init(Cipher.ENCRYPT_MODE, keyStore.getKey(keyName, null) as SecretKey)
+                              └── biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher)) 
+                                  └── val callback = object : BiometricPrompt.AuthenticationCallback()
+                                      └── override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult)
+                                          └── onPurchased(true, result.cryptoObject)
+                                              └── if (withBiometrics)
+                                                  └── crypto?.cipher?.let { tryEncrypt(it) }
+                                                      └── tryEncrypt(it)
+                                                          └── showConfirmation(cipher.doFinal(SECRET_MESSAGE.toByteArray()))
+                                                              ├── findViewById<View>(R.id.confirmation_message).visibility = View.VISIBLE
+                                                              └── findViewById<TextView>(R.id.encrypted_message).run {}
+                                                                  └── text = Base64.encodeToString(encrypted, 0 /* flags */)
+```

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android P Build</a></li>
+<li><a class="reference internal" href="#id1">硬件要求</a></li>
+<li><a class="reference internal" href="#ubuntu">Ubuntu版本</a></li>
+<li><a class="reference internal" href="#android-bsp">Android BSP包及相关文档</a></li>
+<li><a class="reference internal" href="#id2">更换Ubuntu软件源</a></li>
+<li><a class="reference internal" href="#aosp-ubuntu">安装AOSP Ubuntu依赖</a></li>
+<li><a class="reference internal" href="#install-samba">Install Samba</a></li>
+<li><a class="reference internal" href="#android-p">获取Android P源代码</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-p-build">
+<h1>Android P Build<a class="headerlink" href="#android-p-build" title="Permalink to this headline"></a></h1>
+<p>Android P源代码下载编译</p>
+</section>
+<section id="id1">
+<h1>硬件要求<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>Ubuntu 16.04 64bit version</p></li>
+<li><p>openjdk-8-jdk</p></li>
+<li><p>16 GB RAM</p></li>
+<li><p>300 GB hard disk</p></li>
+</ul>
+</section>
+<section id="ubuntu">
+<h1>Ubuntu版本<a class="headerlink" href="#ubuntu" title="Permalink to this headline"></a></h1>
+<p>ubuntu-16.04.6-desktop-amd64</p>
+</section>
+<section id="android-bsp">
+<h1>Android BSP包及相关文档<a class="headerlink" href="#android-bsp" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.nxp.com/design/development-boards/i.mx-evaluation-and-development-boards/android-os-for-i.mx-applications-processors:IMXANDROID?tab=Documentation_Tab">IMXANDROID: Android OS for i.MX Applications Processors</a></p></li>
+<li><p><a class="reference external" href="https://www.nxp.com/design/development-boards/i.mx-evaluation-and-development-boards/android-os-for-i.mx-applications-processors:IMXANDROID?&amp;tab=Design_Tools_Tab">BSP, Drivers and Middleware</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>更换Ubuntu软件源<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>参考：</p>
+<ul class="simple">
+<li><p>清华源：https://mirror.tuna.tsinghua.edu.cn/help/ubuntu/</p></li>
+<li><p>阿里源：https://developer.aliyun.com/mirror/ubuntu</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">cp</span> <span class="pre">/etc/apt/source.list</span> <span class="pre">/etc/apt/source.list.bak</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">vim</span> <span class="pre">/etc/apt/sources.list</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span> <span class="n">main</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span> <span class="n">main</span>
+
+<span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">updates</span> <span class="n">main</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">updates</span> <span class="n">main</span>
+
+<span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span> <span class="n">universe</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span> <span class="n">universe</span>
+<span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">updates</span> <span class="n">universe</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">updates</span> <span class="n">universe</span>
+
+<span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">security</span> <span class="n">main</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">security</span> <span class="n">main</span>
+<span class="n">deb</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">security</span> <span class="n">universe</span>
+<span class="n">deb</span><span class="o">-</span><span class="n">src</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">mirrors</span><span class="o">.</span><span class="n">aliyun</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span> <span class="n">xenial</span><span class="o">-</span><span class="n">security</span> <span class="n">universe</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">update</span></code></p></li>
+</ul>
+</section>
+<section id="aosp-ubuntu">
+<h1>安装AOSP Ubuntu依赖<a class="headerlink" href="#aosp-ubuntu" title="Permalink to this headline"></a></h1>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+sudo apt-get update
+sudo apt-get install -y uuid uuid-dev <span class="se">\</span>
+	zlib1g-dev liblz-dev <span class="se">\</span>
+	liblzo2-2 liblzo2-dev <span class="se">\</span>
+	lzop <span class="se">\</span>
+	git-core curl <span class="se">\</span>
+	u-boot-tools <span class="se">\</span>
+	mtd-utils <span class="se">\</span>
+	android-tools-fsutils <span class="se">\</span>
+	openjdk-8-jdk <span class="se">\</span>
+	device-tree-compiler <span class="se">\</span>
+	gdisk <span class="se">\</span>
+	liblz4-tool <span class="se">\</span>
+	m4 <span class="se">\</span>
+	libz-dev 
+sudo apt-get install -y vim
+</pre></div>
+</div>
+</section>
+<section id="install-samba">
+<h1>Install Samba<a class="headerlink" href="#install-samba" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>sudo apt-get install samba samba-common-bin</p></li>
+<li><p>sudo smbpasswd -a zengjf</p></li>
+<li><p>sudo vim /etc/samba/smb.conf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+<span class="c1">#======================= Share Definitions =======================</span>
+
+<span class="c1"># Un-comment the following (and tweak the other settings below to suit)</span>
+<span class="c1"># to enable the default home directory shares. This will share each</span>
+<span class="c1"># user&#39;s home directory as \\server\username</span>
+<span class="p">[</span><span class="n">homes</span><span class="p">]</span>
+   <span class="n">comment</span> <span class="o">=</span> <span class="n">Home</span> <span class="n">Directories</span>
+   <span class="n">browseable</span> <span class="o">=</span> <span class="n">no</span>
+
+<span class="c1"># By default, the home directories are exported read-only. Change the</span>
+<span class="c1"># next parameter to &#39;no&#39; if you want to be able to write to them.</span>
+   <span class="n">read</span> <span class="n">only</span> <span class="o">=</span> <span class="n">no</span>
+
+<span class="c1"># File creation mask is set to 0700 for security reasons. If you want to</span>
+<span class="c1"># create files with group=rw permissions, set next parameter to 0775.</span>
+   <span class="n">create</span> <span class="n">mask</span> <span class="o">=</span> <span class="mi">0700</span>
+
+<span class="c1"># Directory creation mask is set to 0700 for security reasons. If you want to</span>
+<span class="c1"># create dirs. with group=rw permissions, set next parameter to 0775.</span>
+<span class="p">;</span>   <span class="n">directory</span> <span class="n">mask</span> <span class="o">=</span> <span class="mi">0700</span>
+
+<span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>ifconfig获取虚拟网卡IP</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ens33</span>     <span class="n">Link</span> <span class="n">encap</span><span class="p">:</span><span class="n">Ethernet</span>  <span class="n">HWaddr</span> <span class="mi">00</span><span class="p">:</span><span class="mi">0</span><span class="n">c</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">2</span><span class="n">b</span><span class="p">:</span><span class="mi">13</span><span class="p">:</span><span class="mi">45</span>  
+          <span class="n">inet</span> <span class="n">addr</span><span class="p">:</span><span class="mf">192.168.40.129</span>  <span class="n">Bcast</span><span class="p">:</span><span class="mf">192.168.40.255</span>  <span class="n">Mask</span><span class="p">:</span><span class="mf">255.255.255.0</span>
+          <span class="n">inet6</span> <span class="n">addr</span><span class="p">:</span> <span class="n">fe80</span><span class="p">::</span><span class="n">d706</span><span class="p">:</span><span class="n">b357</span><span class="p">:</span><span class="n">b851</span><span class="p">:</span><span class="n">fae3</span><span class="o">/</span><span class="mi">64</span> <span class="n">Scope</span><span class="p">:</span><span class="n">Link</span>
+          <span class="n">UP</span> <span class="n">BROADCAST</span> <span class="n">RUNNING</span> <span class="n">MULTICAST</span>  <span class="n">MTU</span><span class="p">:</span><span class="mi">1500</span>  <span class="n">Metric</span><span class="p">:</span><span class="mi">1</span>
+          <span class="n">RX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">5083460</span> <span class="n">errors</span><span class="p">:</span><span class="mi">2067</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">10</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">frame</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">TX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">1856310</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">carrier</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">collisions</span><span class="p">:</span><span class="mi">0</span> <span class="n">txqueuelen</span><span class="p">:</span><span class="mi">1000</span> 
+          <span class="n">RX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">6645705115</span> <span class="p">(</span><span class="mf">6.6</span> <span class="n">GB</span><span class="p">)</span>  <span class="n">TX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">102631434</span> <span class="p">(</span><span class="mf">102.6</span> <span class="n">MB</span><span class="p">)</span>
+          <span class="n">Interrupt</span><span class="p">:</span><span class="mi">19</span> <span class="n">Base</span> <span class="n">address</span><span class="p">:</span><span class="mh">0x2000</span> 
+
+<span class="n">lo</span>        <span class="n">Link</span> <span class="n">encap</span><span class="p">:</span><span class="n">Local</span> <span class="n">Loopback</span>  
+          <span class="n">inet</span> <span class="n">addr</span><span class="p">:</span><span class="mf">127.0.0.1</span>  <span class="n">Mask</span><span class="p">:</span><span class="mf">255.0.0.0</span>
+          <span class="n">inet6</span> <span class="n">addr</span><span class="p">:</span> <span class="p">::</span><span class="mi">1</span><span class="o">/</span><span class="mi">128</span> <span class="n">Scope</span><span class="p">:</span><span class="n">Host</span>
+          <span class="n">UP</span> <span class="n">LOOPBACK</span> <span class="n">RUNNING</span>  <span class="n">MTU</span><span class="p">:</span><span class="mi">65536</span>  <span class="n">Metric</span><span class="p">:</span><span class="mi">1</span>
+          <span class="n">RX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">10014</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">frame</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">TX</span> <span class="n">packets</span><span class="p">:</span><span class="mi">10014</span> <span class="n">errors</span><span class="p">:</span><span class="mi">0</span> <span class="n">dropped</span><span class="p">:</span><span class="mi">0</span> <span class="n">overruns</span><span class="p">:</span><span class="mi">0</span> <span class="n">carrier</span><span class="p">:</span><span class="mi">0</span>
+          <span class="n">collisions</span><span class="p">:</span><span class="mi">0</span> <span class="n">txqueuelen</span><span class="p">:</span><span class="mi">1000</span> 
+          <span class="n">RX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">1179157</span> <span class="p">(</span><span class="mf">1.1</span> <span class="n">MB</span><span class="p">)</span>  <span class="n">TX</span> <span class="nb">bytes</span><span class="p">:</span><span class="mi">1179157</span> <span class="p">(</span><span class="mf">1.1</span> <span class="n">MB</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Win10连接Samba</p></li>
+<li><p>Samba连接正常</p></li>
+</ul>
+</section>
+<section id="android-p">
+<h1>获取Android P源代码<a class="headerlink" href="#android-p" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>i.MX8 Android参考文档：<a class="reference external" href="https://www.nxp.com/design/development-boards/i.mx-evaluation-and-development-boards/android-os-for-i.mx-applications-processors:IMXANDROID?tab=Documentation_Tab">IMXANDROID: Android OS for i.MX Applications Processors</a></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://community.nxp.com/thread/501070">how to Download imx-p9.0.0_2.0.0-ga.tar.gz from nxp.com?</a></p></li>
+</ul>
+</li>
+<li><p>将下载好的imx-p9.0.0_2.3.0.tar.gz通过Samba放到Ubuntu的zengjf账号的家目录；</p>
+<div class="highlight-Console notranslate"><div class="highlight"><pre><span></span><span class="gp">zengjf@zengjf:~$ </span>ls
+<span class="go">bin               imx-p9.0.0_2.3.0.tar.gz  Videos</span>
+<span class="go">Desktop           Music                    VMwareTools-10.2.5-8068393.tar.gz</span>
+<span class="go">Documents         Pictures                 vmware-tools-distrib</span>
+<span class="go">Downloads         Public</span>
+<span class="go">examples.desktop  Templates</span>
+</pre></div>
+</div>
+</li>
+<li><p>git config –global user.email “zengjf42&#64;163.com”</p></li>
+<li><p>git config –global user.name ZengjfOS</p></li>
+<li><p>mkdir ~/zengjf/</p></li>
+<li><p>cp imx-p9.0.0_2.3.0.tar.gz ~/zengjf</p></li>
+<li><p>cd ~/zengjf</p></li>
+<li><p>获取repo执行脚本内容</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+mkdir ~/bin
+curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo
+chmod a+x ~/bin/repo
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">PATH</span><span class="si">}</span>:~/bin
+</pre></div>
+</div>
+</li>
+<li><p>tar xzvf imx-p9.0.0_2.3.0.tar.gz</p></li>
+<li><p>更换AOSP源</p>
+<ul>
+<li><p>参考：</p>
+<ul class="simple">
+<li><p>https://mirror.tuna.tsinghua.edu.cn/help/AOSP/</p></li>
+<li><p>https://mirrors.tuna.tsinghua.edu.cn/help/git-repo/</p></li>
+</ul>
+</li>
+<li><p>修改imx-p9.0.0_2.3.0/imx_android_setup.sh文件</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>...省略<span class="o">]</span>
+<span class="nb">export</span> <span class="nv">REPO_URL</span><span class="o">=</span><span class="s1">&#39;https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/&#39;</span>                                          <span class="c1"># 设置repo默认使用路径</span>
+<span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&quot;</span><span class="nv">$android_builddir</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    <span class="c1"># Create android build dir if it does not exist.</span>
+    mkdir <span class="s2">&quot;</span><span class="nv">$android_builddir</span><span class="s2">&quot;</span>
+    <span class="nb">cd</span> <span class="s2">&quot;</span><span class="nv">$android_builddir</span><span class="s2">&quot;</span>
+    repo init -u https://source.codeaurora.org/external/imx/imx-manifest.git -b imx-android-pie -m imx-p9.0.0_2.3.0.xml
+      <span class="nv">rc</span><span class="o">=</span><span class="nv">$?</span>
+      <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$rc</span><span class="s2">&quot;</span> !<span class="o">=</span> <span class="m">0</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+         <span class="nb">echo</span> <span class="s2">&quot;---------------------------------------------------&quot;</span>
+         <span class="nb">echo</span> <span class="s2">&quot;-----Repo Init failure&quot;</span>
+         <span class="nb">echo</span> <span class="s2">&quot;---------------------------------------------------&quot;</span>
+         <span class="k">return</span> <span class="m">1</span>
+      <span class="k">fi</span>
+      sed -i -e <span class="s2">&quot;s/android.googlesource.com/aosp.tuna.tsinghua.edu.cn/&quot;</span> <span class="nv">$android_builddir</span>/.repo/manifests/*   <span class="c1"># 改写android源目标路径</span>
+<span class="k">else</span>
+    <span class="nb">cd</span> <span class="s2">&quot;</span><span class="nv">$android_builddir</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+<span class="o">[</span>...省略<span class="o">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>source imx-p9.0.0_2.3.0/imx_android_setup.sh</p>
+<ul class="simple">
+<li><p><strong>注意</strong>：如果出现</p></li>
+</ul>
+</li>
+<li><p>export MY_ANDROID=~/zengjf/android_build</p></li>
+<li><p>source build/envsetup.sh</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx6dq</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx6sl</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx6sx</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx7d</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx7ulp</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx8m</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx8q</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">car</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">mini</span><span class="o">-</span><span class="n">emulator</span><span class="o">-</span><span class="n">arm64</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">mini</span><span class="o">-</span><span class="n">emulator</span><span class="o">-</span><span class="n">armv7</span><span class="o">-</span><span class="n">a</span><span class="o">-</span><span class="n">neon</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">mini</span><span class="o">-</span><span class="n">emulator</span><span class="o">-</span><span class="n">mips64</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">mini</span><span class="o">-</span><span class="n">emulator</span><span class="o">-</span><span class="n">mips</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">mini</span><span class="o">-</span><span class="n">emulator</span><span class="o">-</span><span class="n">x86_64</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">mini</span><span class="o">-</span><span class="n">emulator</span><span class="o">-</span><span class="n">x86</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">generic</span><span class="o">/</span><span class="n">uml</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">crosshatch</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">cuttlefish</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">marlin</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">muskie</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">google</span><span class="o">/</span><span class="n">taimen</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">device</span><span class="o">/</span><span class="n">linaro</span><span class="o">/</span><span class="n">hikey</span><span class="o">/</span><span class="n">vendorsetup</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">including</span> <span class="n">sdk</span><span class="o">/</span><span class="n">bash_completion</span><span class="o">/</span><span class="n">adb</span><span class="o">.</span><span class="n">bash</span>
+</pre></div>
+</div>
+</li>
+<li><p>lunch</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">You</span><span class="s1">&#39;re building on Linux</span>
+
+<span class="n">Lunch</span> <span class="n">menu</span><span class="o">...</span> <span class="n">pick</span> <span class="n">a</span> <span class="n">combo</span><span class="p">:</span>
+     <span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+     <span class="mf">23.</span> <span class="n">evk_8mq</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">24.</span> <span class="n">evk_8mq</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">25.</span> <span class="n">evk_8mq_drm</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">26.</span> <span class="n">evk_8mq_drm</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">27.</span> <span class="n">evk_8mm</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">28.</span> <span class="n">evk_8mm</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">29.</span> <span class="n">evk_8mm_drm</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">30.</span> <span class="n">evk_8mm_drm</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">31.</span> <span class="n">aiy_8mq</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">32.</span> <span class="n">aiy_8mq</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">33.</span> <span class="n">evk_8mn</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">34.</span> <span class="n">evk_8mn</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">35.</span> <span class="n">mek_8q</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">36.</span> <span class="n">mek_8q</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">37.</span> <span class="n">mek_8q_car</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">38.</span> <span class="n">mek_8q_car</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="mf">39.</span> <span class="n">mek_8q_car2</span><span class="o">-</span><span class="n">user</span>
+     <span class="mf">40.</span> <span class="n">mek_8q_car2</span><span class="o">-</span><span class="n">userdebug</span>
+     <span class="p">[</span><span class="o">...</span><span class="n">省略</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>lunch mek_8q_car2-userdebug</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">============================================</span>
+<span class="n">PLATFORM_VERSION_CODENAME</span><span class="o">=</span><span class="n">REL</span>
+<span class="n">PLATFORM_VERSION</span><span class="o">=</span><span class="mi">9</span>
+<span class="n">TARGET_PRODUCT</span><span class="o">=</span><span class="n">mek_8q_car2</span>
+<span class="n">TARGET_BUILD_VARIANT</span><span class="o">=</span><span class="n">userdebug</span>
+<span class="n">TARGET_BUILD_TYPE</span><span class="o">=</span><span class="n">release</span>
+<span class="n">TARGET_ARCH</span><span class="o">=</span><span class="n">arm64</span>
+<span class="n">TARGET_ARCH_VARIANT</span><span class="o">=</span><span class="n">armv8</span><span class="o">-</span><span class="n">a</span>
+<span class="n">TARGET_CPU_VARIANT</span><span class="o">=</span><span class="n">cortex</span><span class="o">-</span><span class="n">a53</span>
+<span class="n">TARGET_2ND_ARCH</span><span class="o">=</span><span class="n">arm</span>
+<span class="n">TARGET_2ND_ARCH_VARIANT</span><span class="o">=</span><span class="n">armv7</span><span class="o">-</span><span class="n">a</span><span class="o">-</span><span class="n">neon</span>
+<span class="n">TARGET_2ND_CPU_VARIANT</span><span class="o">=</span><span class="n">cortex</span><span class="o">-</span><span class="n">a9</span>
+<span class="n">HOST_ARCH</span><span class="o">=</span><span class="n">x86_64</span>
+<span class="n">HOST_2ND_ARCH</span><span class="o">=</span><span class="n">x86</span>
+<span class="n">HOST_OS</span><span class="o">=</span><span class="n">linux</span>
+<span class="n">HOST_OS_EXTRA</span><span class="o">=</span><span class="n">Linux</span><span class="o">-</span><span class="mf">4.15.0</span><span class="o">-</span><span class="mi">45</span><span class="o">-</span><span class="n">generic</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">Ubuntu</span><span class="o">-</span><span class="mf">16.04.6</span><span class="o">-</span><span class="n">LTS</span>
+<span class="n">HOST_CROSS_OS</span><span class="o">=</span><span class="n">windows</span>
+<span class="n">HOST_CROSS_ARCH</span><span class="o">=</span><span class="n">x86</span>
+<span class="n">HOST_CROSS_2ND_ARCH</span><span class="o">=</span><span class="n">x86_64</span>
+<span class="n">HOST_BUILD_TYPE</span><span class="o">=</span><span class="n">release</span>
+<span class="n">BUILD_ID</span><span class="o">=</span><span class="mf">2.1.0</span><span class="o">-</span><span class="n">auto</span><span class="o">-</span><span class="n">ga</span><span class="o">-</span><span class="n">rc4</span>
+<span class="n">OUT_DIR</span><span class="o">=</span><span class="n">out</span>
+<span class="o">============================================</span>
+</pre></div>
+</div>
+</li>
+<li><p>make 2&gt;&amp;1 | tee build-log.txt</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">============================================</span>
+<span class="n">PLATFORM_VERSION_CODENAME</span><span class="o">=</span><span class="n">REL</span>
+<span class="n">PLATFORM_VERSION</span><span class="o">=</span><span class="mi">9</span>
+<span class="n">TARGET_PRODUCT</span><span class="o">=</span><span class="n">mek_8q_car2</span>
+<span class="n">TARGET_BUILD_VARIANT</span><span class="o">=</span><span class="n">userdebug</span>
+<span class="n">TARGET_BUILD_TYPE</span><span class="o">=</span><span class="n">release</span>
+<span class="n">TARGET_ARCH</span><span class="o">=</span><span class="n">arm64</span>
+<span class="n">TARGET_ARCH_VARIANT</span><span class="o">=</span><span class="n">armv8</span><span class="o">-</span><span class="n">a</span>
+<span class="n">TARGET_CPU_VARIANT</span><span class="o">=</span><span class="n">cortex</span><span class="o">-</span><span class="n">a53</span>
+<span class="n">TARGET_2ND_ARCH</span><span class="o">=</span><span class="n">arm</span>
+<span class="n">TARGET_2ND_ARCH_VARIANT</span><span class="o">=</span><span class="n">armv7</span><span class="o">-</span><span class="n">a</span><span class="o">-</span><span class="n">neon</span>
+<span class="n">TARGET_2ND_CPU_VARIANT</span><span class="o">=</span><span class="n">cortex</span><span class="o">-</span><span class="n">a9</span>
+<span class="n">HOST_ARCH</span><span class="o">=</span><span class="n">x86_64</span>
+<span class="n">HOST_2ND_ARCH</span><span class="o">=</span><span class="n">x86</span>
+<span class="n">HOST_OS</span><span class="o">=</span><span class="n">linux</span>
+<span class="n">HOST_OS_EXTRA</span><span class="o">=</span><span class="n">Linux</span><span class="o">-</span><span class="mf">4.15.0</span><span class="o">-</span><span class="mi">45</span><span class="o">-</span><span class="n">generic</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">Ubuntu</span><span class="o">-</span><span class="mf">16.04.6</span><span class="o">-</span><span class="n">LTS</span>
+<span class="n">HOST_CROSS_OS</span><span class="o">=</span><span class="n">windows</span>
+<span class="n">HOST_CROSS_ARCH</span><span class="o">=</span><span class="n">x86</span>
+<span class="n">HOST_CROSS_2ND_ARCH</span><span class="o">=</span><span class="n">x86_64</span>
+<span class="n">HOST_BUILD_TYPE</span><span class="o">=</span><span class="n">release</span>
+<span class="n">BUILD_ID</span><span class="o">=</span><span class="mf">2.1.0</span><span class="o">-</span><span class="n">auto</span><span class="o">-</span><span class="n">ga</span><span class="o">-</span><span class="n">rc4</span>
+<span class="n">OUT_DIR</span><span class="o">=</span><span class="n">out</span>
+<span class="o">============================================</span>
+<span class="n">ninja</span><span class="p">:</span> <span class="n">no</span> <span class="n">work</span> <span class="n">to</span> <span class="n">do</span><span class="o">.</span>
+<span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">1</span><span class="p">]</span> <span class="n">out</span><span class="o">/</span><span class="n">soong</span><span class="o">/.</span><span class="n">bootstrap</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">soong_build</span> <span class="n">out</span><span class="o">/</span><span class="n">soong</span><span class="o">/</span><span class="n">build</span><span class="o">.</span><span class="n">ninja</span>
+<span class="n">out</span><span class="o">/</span><span class="n">build</span><span class="o">-</span><span class="n">mek_8q_car2</span><span class="o">-</span><span class="n">cleanspec</span><span class="o">.</span><span class="n">ninja</span> <span class="ow">is</span> <span class="n">missing</span><span class="p">,</span> <span class="n">regenerating</span><span class="o">...</span>
+<span class="n">out</span><span class="o">/</span><span class="n">build</span><span class="o">-</span><span class="n">mek_8q_car2</span><span class="o">.</span><span class="n">ninja</span> <span class="ow">is</span> <span class="n">missing</span><span class="p">,</span> <span class="n">regenerating</span><span class="o">...</span>
+<span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">1005</span><span class="p">]</span> <span class="n">including</span> <span class="n">out</span><span class="o">/</span><span class="n">soong</span><span class="o">/</span><span class="n">Android</span><span class="o">-</span><span class="n">mek_8q_car2</span><span class="o">.</span><span class="n">mk</span> <span class="o">...</span>
+<span class="p">[</span><span class="mi">2</span><span class="o">/</span><span class="mi">1005</span><span class="p">]</span> <span class="n">including</span> <span class="n">art</span><span class="o">/</span><span class="n">Android</span><span class="o">.</span><span class="n">mk</span> <span class="o">...</span>
+<span class="p">[</span><span class="mi">3</span><span class="o">/</span><span class="mi">1005</span><span class="p">]</span> <span class="n">including</span> <span class="n">bionic</span><span class="o">/</span><span class="n">Android</span><span class="o">.</span><span class="n">mk</span> <span class="o">...</span>
+<span class="p">[</span><span class="mi">4</span><span class="o">/</span><span class="mi">1005</span><span class="p">]</span> <span class="n">including</span> <span class="n">bootable</span><span class="o">/</span><span class="n">recovery</span><span class="o">/</span><span class="n">Android</span><span class="o">.</span><span class="n">mk</span> <span class="o">...</span>
+<span class="p">[</span><span class="mi">5</span><span class="o">/</span><span class="mi">1005</span><span class="p">]</span> <span class="n">including</span> <span class="n">build</span><span class="o">/</span><span class="n">make</span><span class="o">/</span><span class="n">Android</span><span class="o">.</span><span class="n">mk</span> <span class="o">...</span>
+<span class="n">device</span><span class="o">/</span><span class="n">fsl</span><span class="o">/</span><span class="n">imx8q</span><span class="o">/</span><span class="n">mek_8q</span><span class="o">/</span><span class="n">AndroidUboot</span><span class="o">.</span><span class="n">mk</span><span class="p">:</span><span class="mi">21</span><span class="p">:</span> <span class="n">error</span><span class="p">:</span> <span class="n">please</span> <span class="n">install</span> <span class="n">arm</span><span class="o">-</span><span class="n">none</span><span class="o">-</span><span class="n">eabi</span><span class="o">-</span><span class="n">gcc</span> <span class="n">toolchain</span> <span class="ow">and</span> <span class="nb">set</span> <span class="n">the</span> <span class="n">installed</span> <span class="n">path</span> <span class="n">to</span> <span class="n">ARMGCC_DIR</span><span class="o">.</span>
+<span class="mi">07</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="mi">44</span> <span class="n">ckati</span> <span class="n">failed</span> <span class="k">with</span><span class="p">:</span> <span class="n">exit</span> <span class="n">status</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ARMGCC_DIR</span></code>是编译单片机程序的编译器，Car版本需要单独配置，在User Guild中有描述，貌似新版本的没有，老一点版本的有；</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

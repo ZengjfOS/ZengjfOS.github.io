@@ -1,0 +1,14 @@
+# Android Java CallStack
+
+Java层调用栈
+
+# 参考文档
+
+* [Android 打印堆栈的几种方法](https://blog.csdn.net/deng0zhaotai/article/details/44957673)
+
+# 处理方法
+
+```Java
+Exception e = new Exception("this is a log");
+e.printStackTrace();
+```

@@ -1,0 +1,69 @@
+# LXC Template Download
+
+Busybox系统用于LXC原理分析，Ubuntu用于容器性能分析
+
+# 参考文档
+
+* [Download Additional LXC Image Templates](http://www.bonsaiframework.com/wiki/display/bonsai/Download+Additional+LXC+Image+Templates)
+* [Image server for LXC and LXD](https://uk.images.linuxcontainers.org/)
+
+# 文件系统路径
+
+* /var/lib/lxc/
+
+# Steps
+
+* sudo su
+* export PATH=/home/pi/zengjf/lxc/src/lxc:$PATH
+* chmod +x /usr/local/share/lxc/templates/lxc-download
+* mkdir /usr/local/share/lxc/config/
+* sudo cp config/templates/* /usr/local/share/lxc/config/ -r
+* lxc-create --template download --name ubuntu
+  ```
+  root@raspberrypi:/home/pi/zengjf/lxc/templates# lxc-create --template download --name ubuntu
+  Setting up the GPG keyring
+  Downloading the image index
+  
+  ---
+  DIST    RELEASE ARCH    VARIANT BUILD
+  ---
+  alpine  3.10    amd64   default 20210416_13:00
+  alpine  3.10    arm64   default 20210416_13:00
+  alpine  3.10    armhf   default 20210416_13:02
+  alpine  3.10    i386    default 20210416_13:00
+  alpine  3.10    ppc64el default 20210416_13:00
+  ...省略
+  ubuntu  trusty  i386    default 20210417_07:42
+  ubuntu  trusty  ppc64el default 20210417_07:57
+  ubuntu  xenial  amd64   default 20210417_07:42
+  ubuntu  xenial  arm64   default 20210416_07:42
+  ubuntu  xenial  armhf   default 20210417_07:42
+  ubuntu  xenial  i386    default 20210417_07:42
+  ubuntu  xenial  ppc64el default 20210417_07:42
+  ubuntu  xenial  s390x   default 20210417_07:42
+  ...省略
+  ---
+  
+  Distribution:
+  ubuntu
+  Release:
+  xenial
+  Architecture:
+  armhf
+  
+  Downloading the image index
+  Downloading the rootfs
+  Downloading the metadata
+  The image cache is now ready
+  Unpacking the rootfs
+  
+  ---
+  You just created an Ubuntu xenial armhf (20210417_07:42) container.
+  
+  To enable SSH, run: apt install openssh-server
+  No default root or user password are set by LXC.
+  ```
+* lxc-start ubuntu
+* lxc-attach -n ubuntu
+  * passwd
+* lxc-console -n ubuntu -t 0

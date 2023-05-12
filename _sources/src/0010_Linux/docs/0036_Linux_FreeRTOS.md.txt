@@ -1,0 +1,234 @@
+# Linux FreeRTOS
+
+在Linux系统上运行FreeRTOS
+
+# 参考文档
+
+* [Posix/Linux Simulator Demo for FreeRTOS using GCC](https://www.freertos.org/FreeRTOS-simulator-for-Linux.html)
+* [API Reference](https://www.freertos.org/a00106.html)
+
+# Demo
+
+* FreeRTOS/Demo/Posix_GCC
+* make
+* ./build/posix_demo 
+  ```
+  
+  Trace started.
+  The trace will be dumped to disk if a call to configASSERT() fails.
+  Starting echo blinky demo
+  Message received from task
+  Message received from task
+  Message received from task
+  Message received from task
+  Message received from task
+  Message received from task
+  Message received from task
+  Message received from task
+  Message received from task
+  ```
+
+# DEMO Select
+
+默认BLINKY DEMO
+
+```c
+// FreeRTOS/Demo/Posix_GCC/main.c
+
+// ...省略
+
+/* Demo type is passed as an argument */
+#ifdef USER_DEMO
+    #define     mainSELECTED_APPLICATION    USER_DEMO
+#else /* Default Setting */
+    #define    mainSELECTED_APPLICATION     BLINKY_DEMO
+#endif
+
+// ...省略
+
+int main( void )
+{
+    // ...省略
+
+    console_init();
+    #if ( mainSELECTED_APPLICATION == BLINKY_DEMO )
+        {
+            console_print( "Starting echo blinky demo\n" );
+            main_blinky();
+        }
+    #elif ( mainSELECTED_APPLICATION == FULL_DEMO )
+        {
+            console_print( "Starting full demo\n" );
+            main_full();
+        }
+    #else
+        {
+            #error "The selected demo is not valid"
+        }
+    #endif /* if ( mainSELECTED_APPLICATION ) */
+
+    return 0;
+}
+
+// ...省略
+```
+
+# 调用关系
+
+main_blinky调用关系
+
+```
+* FreeRTOS/Demo/Posix_GCC/main.c
+  * int main( void )
+    * main_blinky();
+      * FreeRTOS/Demo/Posix_GCC/main_blinky.c
+        * void main_blinky( void )
+```
+
+main_blinky
+
+```c
+/*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
+void main_blinky( void )
+{
+    const TickType_t xTimerPeriod = mainTIMER_SEND_FREQUENCY_MS;
+
+    /* Create the queue. */
+    xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
+
+    if( xQueue != NULL )
+    {
+        /* Start the two tasks as described in the comments at the top of this
+         * file. */
+        xTaskCreate( prvQueueReceiveTask,             /* The function that implements the task. */
+                     "Rx",                            /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+                     configMINIMAL_STACK_SIZE,        /* The size of the stack to allocate to the task. */
+                     NULL,                            /* The parameter passed to the task - not used in this simple case. */
+                     mainQUEUE_RECEIVE_TASK_PRIORITY, /* The priority assigned to the task. */
+                     NULL );                          /* The task handle is not required, so NULL is passed. */
+
+        xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+
+        /* Create the software timer, but don't start it yet. */
+        xTimer = xTimerCreate( "Timer",                     /* The text name assigned to the software timer - for debug only as it is not used by the kernel. */
+                               xTimerPeriod,                /* The period of the software timer in ticks. */
+                               pdTRUE,                      /* xAutoReload is set to pdTRUE. */
+                               NULL,                        /* The timer's ID is not used. */
+                               prvQueueSendTimerCallback ); /* The function executed when the timer expires. */
+
+        if( xTimer != NULL )
+        {
+            xTimerStart( xTimer, 0 );
+        }
+
+        /* Start the tasks and timer running. */
+        vTaskStartScheduler();
+    }
+
+    /* If all is well, the scheduler will now be running, and the following
+     * line will never be reached.  If the following line does execute, then
+     * there was insufficient FreeRTOS heap memory available for the idle and/or
+     * timer tasks  to be created.  See the memory management section on the
+     * FreeRTOS web site for more details. */
+    for( ; ; )
+    {
+    }
+}
+```
+
+# prvQueueSendTask
+
+```c
+static void prvQueueSendTask( void * pvParameters )
+{
+    TickType_t xNextWakeTime;
+    const TickType_t xBlockTime = mainTASK_SEND_FREQUENCY_MS;
+    const uint32_t ulValueToSend = mainVALUE_SENT_FROM_TASK;
+
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    /* Initialise xNextWakeTime - this only needs to be done once. */
+    xNextWakeTime = xTaskGetTickCount();
+
+    for( ; ; )
+    {
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelayUntil( &xNextWakeTime, xBlockTime );
+
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        xQueueSend( xQueue, &ulValueToSend, 0U );
+    }
+}
+/*-----------------------------------------------------------*/
+```
+
+# prvQueueSendTimerCallback
+
+```c
+static void prvQueueSendTimerCallback( TimerHandle_t xTimerHandle )
+{
+    const uint32_t ulValueToSend = mainVALUE_SENT_FROM_TIMER;
+
+    /* This is the software timer callback function.  The software timer has a
+     * period of two seconds and is reset each time a key is pressed.  This
+     * callback function will execute if the timer expires, which will only happen
+     * if a key is not pressed for two seconds. */
+
+    /* Avoid compiler warnings resulting from the unused parameter. */
+    ( void ) xTimerHandle;
+
+    /* Send to the queue - causing the queue receive task to unblock and
+     * write out a message.  This function is called from the timer/daemon task, so
+     * must not block.  Hence the block time is set to 0. */
+    xQueueSend( xQueue, &ulValueToSend, 0U );
+}
+/*-----------------------------------------------------------*/
+```
+
+# prvQueueReceiveTask
+
+```c
+static void prvQueueReceiveTask( void * pvParameters )
+{
+    uint32_t ulReceivedValue;
+
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Wait until something arrives in the queue - this task will block
+         * indefinitely provided INCLUDE_vTaskSuspend is set to 1 in
+         * FreeRTOSConfig.h.  It will not use any CPU time while it is in the
+         * Blocked state. */
+        xQueueReceive( xQueue, &ulReceivedValue, portMAX_DELAY );
+
+        /* To get here something must have been received from the queue, but
+         * is it an expected value?  Normally calling printf() from a task is not
+         * a good idea.  Here there is lots of stack space and only one task is
+         * using console IO so it is ok.  However, note the comments at the top of
+         * this file about the risks of making Linux system calls (such as
+         * console output) from a FreeRTOS task. */
+        if( ulReceivedValue == mainVALUE_SENT_FROM_TASK )
+        {
+            console_print( "Message received from task\n" );
+        }
+        else if( ulReceivedValue == mainVALUE_SENT_FROM_TIMER )
+        {
+            console_print( "Message received from software timer\n" );
+        }
+        else
+        {
+            console_print( "Unexpected message\n" );
+        }
+    }
+}
+/*-----------------------------------------------------------*/
+```

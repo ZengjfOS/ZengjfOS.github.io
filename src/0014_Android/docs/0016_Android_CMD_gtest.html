@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android CMD gtest</a></li>
+<li><a class="reference internal" href="#log">log头文件</a></li>
+<li><a class="reference internal" href="#alogd">ALOGD分析</a></li>
+<li><a class="reference internal" href="#gtest-example-source">gtest example source</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-cmd-gtest">
+<h1>Android CMD gtest<a class="headerlink" href="#android-cmd-gtest" title="Permalink to this headline"></a></h1>
+<p>gtest单元测试so库</p>
+</section>
+<section id="log">
+<h1>log头文件<a class="headerlink" href="#log" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>加入头文件方法：<code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;log/log.h&gt;</span></code></p></li>
+<li><p>TAG及ALOGV使用注意事项：<code class="docutils literal notranslate"><span class="pre">system/core/include/log/log.h</span></code></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * Normally we strip ALOGV (VERBOSE messages) from release builds.</span>
+<span class="cm"> * You can modify this (for example with &quot;#define LOG_NDEBUG 0&quot;</span>
+<span class="cm"> * at the top of your source file) to change that behavior.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cp">#ifndef LOG_NDEBUG</span>
+<span class="cp">#ifdef NDEBUG</span>
+<span class="cp">#define LOG_NDEBUG 1</span>
+<span class="cp">#else</span>
+<span class="cp">#define LOG_NDEBUG 0</span>
+<span class="cp">#endif</span>
+<span class="cp">#endif</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * This is the local tag used for the following simplified</span>
+<span class="cm"> * logging macros.  You can change this preprocessor definition</span>
+<span class="cm"> * before using the other macros to change the tag.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cp">#ifndef LOG_TAG</span>
+<span class="cp">#define LOG_TAG NULL</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>在引用<code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;log/log.h&gt;</span></code>之前，先定义宏<code class="docutils literal notranslate"><span class="pre">LOG_TAG</span></code>;</p></li>
+<li><p>想要看<code class="docutils literal notranslate"><span class="pre">ALOGV</span></code>输出信息，在文件头处，先定义宏<code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">LOG_NDEBUG</span> <span class="pre">0</span></code>;</p></li>
+</ul>
+</li>
+<li><p>使用方法：https://android.googlesource.com/platform/system/core/+/4a6e5a3/liblog/README</p></li>
+</ul>
+</section>
+<section id="alogd">
+<h1>ALOGD分析<a class="headerlink" href="#alogd" title="Permalink to this headline"></a></h1>
+<p>通过<code class="docutils literal notranslate"><span class="pre">system/core/include/log/log.h</span></code>查看ALOGD宏处理流程</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * ===========================================================================</span>
+<span class="cm"> *</span>
+<span class="cm"> * The stuff in the rest of this file should not be used directly.</span>
+<span class="cm"> */</span><span class="w"></span>
+
+<span class="cp">#define android_printLog(prio, tag, fmt...) \</span>
+<span class="cp">    __android_log_print(prio, tag, fmt)</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Basic log message macro.</span>
+<span class="cm"> *</span>
+<span class="cm"> * Example:</span>
+<span class="cm"> *  ALOG(LOG_WARN, NULL, &quot;Failed with error %d&quot;, errno);</span>
+<span class="cm"> *</span>
+<span class="cm"> * The second argument may be NULL or &quot;&quot; to indicate the &quot;global&quot; tag.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cp">#ifndef ALOG</span>
+<span class="cp">#define ALOG(priority, tag, ...) \</span>
+<span class="cp">    LOG_PRI(ANDROID_##priority, tag, __VA_ARGS__)</span>
+<span class="cp">#endif</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Log macro that allows you to specify a number for the priority.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cp">#ifndef LOG_PRI</span>
+<span class="cp">#define LOG_PRI(priority, tag, ...) \</span>
+<span class="cp">    android_printLog(priority, tag, __VA_ARGS__)</span>
+<span class="cp">#endif</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Simplified macro to send a debug log message using the current LOG_TAG.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="cp">#ifndef ALOGD</span>
+<span class="cp">#define ALOGD(...) ((void)ALOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>其中<code class="docutils literal notranslate"><span class="pre">system/core/lude/android/log.h</span></code>定义了<code class="docutils literal notranslate"><span class="pre">ANDROID_LOG_DEBUG</span></code></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * Android log priority values, in ascending priority order.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">android_LogPriority</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_UNKNOWN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_DEFAULT</span><span class="p">,</span><span class="w">    </span><span class="cm">/* only for SetMinPriority() */</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_VERBOSE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_DEBUG</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_INFO</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_WARN</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_ERROR</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_FATAL</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ANDROID_LOG_SILENT</span><span class="p">,</span><span class="w">     </span><span class="cm">/* only for SetMinPriority(); must be last */</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">android_LogPriority</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="gtest-example-source">
+<h1>gtest example source<a class="headerlink" href="#gtest-example-source" title="Permalink to this headline"></a></h1>
+<p>Android.mk</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LOCAL_PATH</span><span class="o">:=</span> <span class="k">$(</span>call my-dir<span class="k">)</span>
+
+<span class="cp">include $(CLEAR_VARS)</span>
+
+<span class="nv">LOCAL_CLANG</span> <span class="o">:=</span> <span class="nb">true</span>
+
+<span class="nv">LOCAL_MODULE</span> <span class="o">:=</span> zengjf-unit-tests
+
+<span class="nv">LOCAL_CFLAGS</span> <span class="o">+=</span> -g -Wall -Werror -std<span class="o">=</span>gnu++11 -Wno-missing-field-initializers -Wno-sign-compare -Wno-writable-strings
+
+<span class="nv">LOCAL_SHARED_LIBRARIES</span> <span class="o">+=</span> liblog
+<span class="nv">LOCAL_STATIC_LIBRARIES</span> <span class="o">+=</span> libgtest_main
+
+<span class="nv">LOCAL_C_INCLUDES</span> <span class="o">+=</span> <span class="se">\</span>
+	<span class="k">$(</span>TOPDIR<span class="k">)</span>system/core/include/
+
+<span class="nv">LOCAL_SRC_FILES</span> <span class="o">:=</span> <span class="se">\</span>
+	zengjf_test.cpp
+
+<span class="cp">include $(BUILD_NATIVE_TEST)</span>
+</pre></div>
+</div>
+<p>zengjf_test.cpp</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#define LOG_NDEBUG 0</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gtest/gtest.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;errno.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pthread.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#define LOG_TAG &quot;zengjf&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;log/log.h&gt;</span><span class="cp"></span>
+
+<span class="n">TEST</span><span class="p">(</span><span class="n">zengjf_test</span><span class="p">,</span><span class="w"> </span><span class="n">test</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">	</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;just check for run test</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">	</span><span class="n">ALOGD</span><span class="p">(</span><span class="s">&quot;just check for run test</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">	</span><span class="n">ALOGW</span><span class="p">(</span><span class="s">&quot;just check for ALOGW</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>执行命令</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>root@zengjf:/ <span class="c1"># zengjf_test</span>
+just check <span class="k">for</span> run <span class="nb">test</span>
+root@zengjf:/ <span class="c1"># zengjf-unit-tests</span>
+Running main<span class="o">()</span> from gtest_main.cc
+<span class="o">[==========]</span> Running <span class="m">1</span> <span class="nb">test</span> from <span class="m">1</span> <span class="nb">test</span> <span class="k">case</span>.
+<span class="o">[</span>----------<span class="o">]</span> Global <span class="nb">test</span> environment set-up.
+<span class="o">[</span>----------<span class="o">]</span> <span class="m">1</span> <span class="nb">test</span> from zengjf_test
+<span class="o">[</span> RUN      <span class="o">]</span> zengjf_test.test
+just check <span class="k">for</span> run <span class="nb">test</span>
+<span class="o">[</span>       OK <span class="o">]</span> zengjf_test.test <span class="o">(</span><span class="m">1</span> ms<span class="o">)</span>
+<span class="o">[</span>----------<span class="o">]</span> <span class="m">1</span> <span class="nb">test</span> from zengjf_test <span class="o">(</span><span class="m">2</span> ms total<span class="o">)</span>
+
+<span class="o">[</span>----------<span class="o">]</span> Global <span class="nb">test</span> environment tear-down
+<span class="o">[==========]</span> <span class="m">1</span> <span class="nb">test</span> from <span class="m">1</span> <span class="nb">test</span> <span class="k">case</span> ran. <span class="o">(</span><span class="m">2</span> ms total<span class="o">)</span>
+<span class="o">[</span>  PASSED  <span class="o">]</span> <span class="m">1</span> test.
+</pre></div>
+</div>
+<p>adb logcat -s zengjf</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">zengjianfeng</span>\<span class="n">Desktop</span><span class="o">&gt;</span><span class="n">adb</span> <span class="n">logcat</span> <span class="o">-</span><span class="n">s</span> <span class="n">zengjf</span>
+<span class="o">---------</span> <span class="n">beginning</span> <span class="n">of</span> <span class="n">main</span>
+<span class="o">---------</span> <span class="n">beginning</span> <span class="n">of</span> <span class="n">system</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">20</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">06.661</span>  <span class="mi">8645</span>  <span class="mi">8645</span> <span class="n">D</span> <span class="n">zengjf</span>  <span class="p">:</span> <span class="n">just</span> <span class="n">check</span> <span class="k">for</span> <span class="n">run</span> <span class="n">test</span>
+<span class="mi">12</span><span class="o">-</span><span class="mi">31</span> <span class="mi">20</span><span class="p">:</span><span class="mi">36</span><span class="p">:</span><span class="mf">06.661</span>  <span class="mi">8645</span>  <span class="mi">8645</span> <span class="n">W</span> <span class="n">zengjf</span>  <span class="p">:</span> <span class="n">just</span> <span class="n">check</span> <span class="k">for</span> <span class="n">ALOGW</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

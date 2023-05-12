@@ -1,0 +1,49 @@
+# LXC ptmx Console
+
+lxc-console为什么能像串口一样工作？
+
+# 参考文档
+
+* [ptmx(4) - Linux man page](https://linux.die.net/man/4/ptmx)
+* [Linux终端简介与pty编程](https://www.cnblogs.com/dux2016/articles/6236131.html)
+* [pty/pty_master_open.c](https://man7.org/tlpi/code/online/dist/pty/pty_master_open.c.html)
+
+# ptmx测试
+
+* https://github.com/ZengjfOS/RaspberryPi/tree/ptmx
+ * make
+* ./pty
+  ```
+  Get a pty pair, FD -- master[3] slave[4]
+  Slave name is:/dev/pts/6
+  -----------------------------------
+  Message from slave:
+  zengjf
+  ------6 bytes------
+  ```
+* echo "zengjf" > /dev/pts/6 
+
+# Console
+
+* 挂载节点：
+  ```
+  * https://github.com/ZengjfOS/lxc-android/blob/lxc-3.0.3-android-28/src/lxc/start.c
+    * static int do_start(void *data)
+      * ret = lxc_setup(handler);
+        * ret = lxc_setup_console(&lxc_conf->rootfs, &lxc_conf->console, lxc_conf->ttys.dir);
+          * return lxc_setup_dev_console(rootfs, console);
+            * ret = safe_mount(console->name, path, "none", MS_BIND, 0, rootfs_path);
+            * DEBUG("Mounted pts device \"%s\" onto \"%s\"", console->name, path);
+  ```
+* sudo lxc-start -n zengjf -l TRACE -o lxc.log
+* sudo cat lxc.log
+  ```
+  DEBUG    conf - conf.c:lxc_fill_autodev:1206 - Created device node "/usr/local/lib/lxc/rootfs/dev/full"
+  DEBUG    conf - conf.c:lxc_fill_autodev:1206 - Created device node "/usr/local/lib/lxc/rootfs/dev/null"
+  DEBUG    conf - conf.c:lxc_fill_autodev:1206 - Created device node "/usr/local/lib/lxc/rootfs/dev/random"
+  DEBUG    conf - conf.c:lxc_fill_autodev:1206 - Created device node "/usr/local/lib/lxc/rootfs/dev/tty"
+  DEBUG    conf - conf.c:lxc_fill_autodev:1206 - Created device node "/usr/local/lib/lxc/rootfs/dev/urandom"
+  DEBUG    conf - conf.c:lxc_fill_autodev:1206 - Created device node "/usr/local/lib/lxc/rootfs/dev/zero"
+  INFO     conf - conf.c:lxc_fill_autodev:1268 - Populated "/dev"
+  DEBUG    conf - conf.c:lxc_setup_dev_console:1730 - Mounted pts device "/dev/pts/4" onto "/usr/local/lib/lxc/rootfs/dev/console"
+  ```

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android gdb</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#gdb">gdb交互命令</a></li>
+<li><a class="reference internal" href="#id2">设置断点</a></li>
+<li><a class="reference internal" href="#id3">查看运行信息</a></li>
+<li><a class="reference internal" href="#android">Android</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-gdb">
+<h1>Android gdb<a class="headerlink" href="#android-gdb" title="Permalink to this headline"></a></h1>
+<p>在Windows上通过gdb远程调试Android命令行程序</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/gdb.html">gdb 调试利器</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/u012188065/article/details/83785556">Android手机gdb调试</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/CaspianSea/article/details/16798735">solib-absolute-prefix 和solib-search-path的区别</a></p></li>
+<li><p><a class="reference external" href="https://blog.csdn.net/qq_34488499/article/details/51870658?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_title-0&amp;spm=1001.2101.3001.4242">GDB动态库搜索路径</a></p></li>
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/27850335/gdb-no-such-file-or-directory/27851351">GDB no such file or directory</a></p></li>
+</ul>
+</section>
+<section id="gdb">
+<h1>gdb交互命令<a class="headerlink" href="#gdb" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>run：简记为r，其作用是运行程序，当遇到断点后，程序会在断点处停止运行，等待用户输入下一步的命令。</p></li>
+<li><p>continue（简写c）：继续执行，到下一个断点处（或运行结束）</p></li>
+<li><p>next：（简写n），单步跟踪程序，当遇到函数调用时，也不进入此函数体；此命令同step的主要区别是，step遇到用户自定义的函数，将步进到函数中去运行，而next则直接调用函数，不会进入到函数体内。</p></li>
+<li><p>step：（简写s）：单步调试如果有函数调用，则进入函数；与命令n不同，n是不进入调用的函数的</p></li>
+<li><p>until：当你厌倦了在一个循环体内单步跟踪时，这个命令可以运行程序直到退出循环体。</p></li>
+<li><p>until+行号：运行至某行，不仅仅用来跳出循环</p></li>
+<li><p>finish：运行程序，直到当前函数完成返回，并打印函数返回时的堆栈地址和返回值及参数值等信息。</p></li>
+<li><p>call 函数(参数)：调用程序中可见的函数，并传递”参数”，如：call gdb_test(55)</p></li>
+<li><p>quit：简记为q，退出gdb</p></li>
+</ul>
+</section>
+<section id="id2">
+<h1>设置断点<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>break func（break缩写为b）：在函数func()的入口处设置断点，如：break cb_button</p></li>
+<li><p>break n （简写b n）:在第n行处设置断点（可以带上代码路径和代码名称： b OAGUPDATE.cpp:578）</p></li>
+<li><p>info break：显示当前程序的断点设置情况</p></li>
+<li><p>delete 断点号n：删除第n个断点</p></li>
+</ul>
+</section>
+<section id="id3">
+<h1>查看运行信息<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>where：当前运行的堆栈列表；</p></li>
+<li><p>backtrace/bt：显示当前调用堆栈</p></li>
+<li><p>frame：当前执行的程序行</p></li>
+<li><p>info program：来查看程序的是否在运行，进程号，被暂停的原因。</p></li>
+</ul>
+</section>
+<section id="android">
+<h1>Android<a class="headerlink" href="#android" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Android</p>
+<ul>
+<li><p>adb shell</p></li>
+<li><p>gdbserver –version</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GNU</span> <span class="n">gdbserver</span> <span class="p">(</span><span class="n">GDB</span><span class="p">)</span> <span class="mf">7.11</span>
+<span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mi">2016</span> <span class="n">Free</span> <span class="n">Software</span> <span class="n">Foundation</span><span class="p">,</span> <span class="n">Inc</span><span class="o">.</span>
+<span class="n">gdbserver</span> <span class="ow">is</span> <span class="n">free</span> <span class="n">software</span><span class="p">,</span> <span class="n">covered</span> <span class="n">by</span> <span class="n">the</span> <span class="n">GNU</span> <span class="n">General</span> <span class="n">Public</span> <span class="n">License</span><span class="o">.</span>
+<span class="n">This</span> <span class="n">gdbserver</span> <span class="n">was</span> <span class="n">configured</span> <span class="k">as</span> <span class="s2">&quot;arm-eabi-linux&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>gdbserver64 :1235 ls</p>
+<ul>
+<li><p>ps -A | grep gdbserver</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span>           <span class="mi">5083</span>   <span class="mi">5072</span>    <span class="mi">3652</span>   <span class="mi">1296</span> <span class="n">poll_schedule_timeout</span> <span class="mi">0</span> <span class="n">S</span> <span class="n">gdbserver</span>
+</pre></div>
+</div>
+</li>
+<li><p>kill -9 5083</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>CMD</p>
+<ul>
+<li><p>adb forward tcp:1235 tcp:1235</p></li>
+<li><p>跳转到NDK目录</p>
+<ul class="simple">
+<li><p>ndk\21.3.6528147\prebuilt\windows-x86_64\bin</p></li>
+</ul>
+</li>
+<li><p>gdb</p>
+<ul>
+<li><p>设置说明</p>
+<ul class="simple">
+<li><p>solib-absolute-prefix 和solib-search-path是gdb比较常用的选项，用来设置符号文件的位置。solib-absolute-prefix设置的是被搜索文件路径的前缀，solib-search-path设置的是被搜索文件的路径。solib-search-path可以有多个路径，中间按用:隔开， solib-absolute-prefix的值只能有一个。</p>
+<ul>
+<li><p>不用设置这个，直接设置下面的sysroot</p></li>
+<li><p>set sysroot 与 set solib-absolute-prefix 是同一条命令，实际上，set sysroot是set solib-absolute-prefix 的别名。</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>set sysroot X:\zengjf\android-project\out\target\product\k62v1_64_bsp\symbols</p></li>
+<li><p>dir X:/zengjf/android-project/</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/27850335/gdb-no-such-file-or-directory/27851351">GDB no such file or directory</a></p></li>
+<li><p>要用/，不能用\</p></li>
+</ul>
+</li>
+<li><p>target remote localhost:1235</p></li>
+<li><p>all log</p>
+<div class="highlight-gdb notranslate"><div class="highlight"><pre><span></span>GNU gdb (GDB) 8.3
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type &quot;show copying&quot; and &quot;show warranty&quot; for details.
+This GDB was configured as &quot;x86_64-w64-mingw32&quot;.
+Type &quot;show configuration&quot; for configuration details.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;.
+Find the GDB manual and other documentation resources online at:
+    &lt;http://www.gnu.org/software/gdb/documentation/&gt;.
+
+For help, type &quot;help&quot;.
+Type &quot;apropos word&quot; to search for commands related to &quot;word&quot;.
+(gdb) set sysroot X:\zengjf\MTK6762D-project\out\target\product\k62v1_64_bsp\symbols
+(gdb) dir X:/zengjf/MTK6762D-project
+Source directories searched: X:/zengjf/MTK6762D-project;$cdir;$cwd
+(gdb) target remote localhost:1235
+Remote debugging using localhost:1235
+warning: A handler for the OS ABI &quot;Cygwin&quot; is not built into this configuration
+of GDB.  Attempting to continue with the default aarch64 settings.
+
+Reading symbols from X:\zengjf\MTK6762D-project\out\target\product\k62v1_64_bsp\symbols/system/bin/toybox...
+warning: Unable to find dynamic linker breakpoint function.
+GDB will be unable to debug shared library initializers
+and track explicitly loaded dynamic code.
+0x0000007ff7f52d10 in ?? ()
+(gdb) b main
+Breakpoint 1 at 0x5555588e5c: file external/toybox/main.c, line 220.
+(gdb) continue
+Continuing.
+warning: Could not load shared library symbols for /system/bin/linker64.
+Do you need &quot;set solib-search-path&quot; or &quot;set sysroot&quot;?
+
+Breakpoint 1, main (argc=1, argv=0x7ffffff218) at external/toybox/main.c:220
+220       if (!*argv) return 127;
+(gdb) list
+215     }
+216
+217     int main(int argc, char *argv[])
+218     {
+219       // don&#39;t segfault if our environment is crazy
+220       if (!*argv) return 127;
+221
+222       // Snapshot stack location so we can detect recursion depth later.
+223       // Nommu has special reentry path, !stacktop = &quot;vfork/exec self happened&quot;
+224       if (!CFG_TOYBOX_FORK &amp;&amp; (0x80 &amp; **argv)) **argv &amp;= 0x7f;
+(gdb)
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">component probe</a></li>
+<li><a class="reference internal" href="#dai-widget">dai widget</a></li>
+<li><a class="reference internal" href="#snd-soc-register-card">snd_soc_register_card调用</a></li>
+<li><a class="reference internal" href="#soc-probe-link-components">soc_probe_link_components代码分析</a></li>
+<li><a class="reference internal" href="#snd-soc-component-initialize">snd_soc_component_initialize分析</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="component-probe">
+<h1>component probe<a class="headerlink" href="#component-probe" title="Permalink to this headline"></a></h1>
+<p>了解一下component中的那些widgets/controls/routes/dai/probe等如何被调用起作用的</p>
+<p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L2053">soc_probe_link_components Source Code</a></p>
+<p>主要是对component中的widget/controls/route进行处理，当然其中也将component中的dai转化成widget，这样看来route既可以连接widget，也可以连接dai widget。</p>
+</section>
+<section id="dai-widget">
+<h1>dai widget<a class="headerlink" href="#dai-widget" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>Codec Driver</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_driver</span><span class="w"> </span><span class="n">cs42xx8_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_min</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_max</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">rates</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">formats</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">CS42XX8_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">stream_name</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">channels_min</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">rates</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="n">formats</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">CS42XX8_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">cs42xx8_dai_ops</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Platform Driver</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai_driver</span><span class="w"> </span><span class="n">fsl_esai_dai</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="p">.</span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fsl_esai_dai_probe</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="cm">/* DAI capabilities */</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// struct snd_soc_pcm_stream playback;</span>
+<span class="w">      </span><span class="p">.</span><span class="n">playback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">channels_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">channels_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">formats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FSL_ESAI_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">},</span><span class="w"></span>
+<span class="w">      </span><span class="cm">/* DAI capabilities */</span><span class="w"></span>
+<span class="w">      </span><span class="c1">//struct snd_soc_pcm_stream capture;</span>
+<span class="w">      </span><span class="p">.</span><span class="n">capture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">stream_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">channels_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">channels_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SNDRV_PCM_RATE_8000_192000</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="p">.</span><span class="n">formats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FSL_ESAI_FORMATS</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">},</span><span class="w"></span>
+<span class="w">      </span><span class="p">.</span><span class="n">ops</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">fsl_esai_dai_ops</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+<li><p>Machine route</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_route</span><span class="w"> </span><span class="n">audio_map</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* 1st half -- Normal DAPM routes */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;Playback&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Capture&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* 2nd half -- ASRC DAPM routes */</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;CPU-Playback&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASRC-Playback&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="s">&quot;ASRC-Capture&quot;</span><span class="p">,</span><span class="w">  </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CPU-Capture&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="snd-soc-register-card">
+<h1>snd_soc_register_card调用<a class="headerlink" href="#snd-soc-register-card" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_instantiate_card</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* probe all components used by DAI links on this card */</span><span class="w"></span>
+<span class="w">    </span><span class="n">for_each_comp_order</span><span class="p">(</span><span class="n">order</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">for_each_card_rtds</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">soc_probe_link_components</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">rtd</span><span class="p">,</span><span class="w"> </span><span class="n">order</span><span class="p">);</span><span class="w">          </span><span class="c1">// &lt;------</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">dev_err</span><span class="p">(</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="s">&quot;ASoC: failed to instantiate card %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">probe_dai_err</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">[...</span><span class="n">省略</span><span class="p">]</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">snd_soc_bind_card</span><span class="p">(</span><span class="n">card</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">EXPORT_SYMBOL_GPL</span><span class="p">(</span><span class="n">snd_soc_register_card</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>static int snd_soc_instantiate_card(struct snd_soc_card *card)</p>
+<ul>
+<li><p>ret = soc_probe_link_components(card, rtd, order);</p>
+<ul>
+<li><p>ret = soc_probe_component(card, component);</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="soc-probe-link-components">
+<h1>soc_probe_link_components代码分析<a class="headerlink" href="#soc-probe-link-components" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://elixir.bootlin.com/linux/v5.0-rc6/source/sound/soc/soc-core.c#L2053">soc_probe_link_components Source Code</a></p></li>
+<li><p><span class="xref myst">i.MX6 soc dai_link添加link-component数组结构展开</span></p></li>
+<li><p><span class="xref myst">snd_soc_component主要域</span></p></li>
+</ul>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">soc_probe_component</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_card</span><span class="w"> </span><span class="o">*</span><span class="n">card</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component</span><span class="w"> </span><span class="o">*</span><span class="n">component</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_context</span><span class="w"> </span><span class="o">*</span><span class="n">dapm</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">            </span><span class="n">snd_soc_component_get_dapm</span><span class="p">(</span><span class="n">component</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dai</span><span class="w"> </span><span class="o">*</span><span class="n">dai</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;snd-soc-dummy&quot;</span><span class="p">))</span><span class="w">              </span><span class="c1">// component-&gt;name看下面小结《snd_soc_component_initialize分析》，这个snd-soc-dummy在dai_link注册的地方多次出现</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">card</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                      </span><span class="c1">// 检查component的card归属</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">card</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">card</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;Trying to bind component to card </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;</span><span class="s"> but is already bound to card </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="n">card</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENODEV</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">try_module_get</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENODEV</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">card</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">card</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">card</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">card</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">soc_set_name_prefix</span><span class="p">(</span><span class="n">card</span><span class="p">,</span><span class="w"> </span><span class="n">component</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">soc_init_component_debugfs</span><span class="p">(</span><span class="n">component</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">dapm_widgets</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                          </span><span class="c1">// 注册component driver中的widget</span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_dapm_new_controls</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">dapm_widgets</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">num_dapm_widgets</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;Failed to create new controls %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">err_probe</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">for_each_component_dais</span><span class="p">(</span><span class="n">component</span><span class="p">,</span><span class="w"> </span><span class="n">dai</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_dapm_new_dai_widgets</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"> </span><span class="n">dai</span><span class="p">);</span><span class="w">              </span><span class="c1">// 将dai(snd_soc_dai_driver) playback/capture转换成dai widget</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;Failed to create DAI widgets %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">err_probe</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">probe</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">probe</span><span class="p">(</span><span class="n">component</span><span class="p">);</span><span class="w">                  </span><span class="c1">// 执行driver预设的probe函数</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;ASoC: failed to probe component %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">err_probe</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">WARN</span><span class="p">(</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">idle_bias_off</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">            </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">bias_level</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">SND_SOC_BIAS_OFF</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s">&quot;codec %s can not start from non-off bias with idle_bias_off==1</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* machine specific init */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                                          </span><span class="c1">// 如果存在init程序，那就执行init程序</span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="n">component</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">dev_err</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="s">&quot;Failed to do machine specific init %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">err_probe</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">controls</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">snd_soc_add_component_controls</span><span class="p">(</span><span class="n">component</span><span class="p">,</span><span class="w">                   </span><span class="c1">// 添加驱动中预置的controls</span>
+<span class="w">                           </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">controls</span><span class="p">,</span><span class="w"></span>
+<span class="w">                           </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">num_controls</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">dapm_routes</span><span class="p">)</span><span class="w">                             </span><span class="c1">// 添加驱动中预置的routes</span>
+<span class="w">        </span><span class="n">snd_soc_dapm_add_routes</span><span class="p">(</span><span class="n">dapm</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">dapm_routes</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">num_dapm_routes</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">list_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">list</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">dapm_list</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* see for_each_card_components */</span><span class="w"></span>
+<span class="w">    </span><span class="n">list_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">card_list</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">card</span><span class="o">-&gt;</span><span class="n">component_dev_list</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="nl">err_probe</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">soc_cleanup_component_debugfs</span><span class="p">(</span><span class="n">component</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">card</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">module_put</span><span class="p">(</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">owner</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="snd-soc-component-initialize">
+<h1>snd_soc_component_initialize分析<a class="headerlink" href="#snd-soc-component-initialize" title="Permalink to this headline"></a></h1>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">snd_soc_component_initialize</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component</span><span class="w"> </span><span class="o">*</span><span class="n">component</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_component_driver</span><span class="w"> </span><span class="o">*</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_context</span><span class="w"> </span><span class="o">*</span><span class="n">dapm</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fmt_single_name</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">id</span><span class="p">);</span><span class="w">                     </span><span class="c1">// &lt;--- component名称来自这里</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">dev_err</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ASoC: Failed to allocate name</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="n">ENOMEM</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">component</span><span class="o">-&gt;</span><span class="n">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dapm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_component_get_dapm</span><span class="p">(</span><span class="n">component</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dev</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">component</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">component</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">bias_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SND_SOC_BIAS_OFF</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">idle_bias_off</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">idle_bias_on</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">suspend_bias_off</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">suspend_bias_off</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">seq_notifier</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">seq_notifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_component_seq_notifier</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">stream_event</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">stream_event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_component_stream_event</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">set_bias_level</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">dapm</span><span class="o">-&gt;</span><span class="n">set_bias_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snd_soc_component_set_bias_level</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">INIT_LIST_HEAD</span><span class="p">(</span><span class="o">&amp;</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">dai_list</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">component</span><span class="o">-&gt;</span><span class="n">io_mutex</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<ul>
+<li><p>fmt_single_name</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="nf">fmt_single_name</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">found</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">[</span><span class="n">NAME_SIZE</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">id1</span><span class="p">,</span><span class="w"> </span><span class="n">id2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dev_name</span><span class="p">(</span><span class="n">dev</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">strlcpy</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">dev_name</span><span class="p">(</span><span class="n">dev</span><span class="p">),</span><span class="w"> </span><span class="n">NAME_SIZE</span><span class="p">);</span><span class="w">                                    </span><span class="c1">// 提取设备名称</span>
+
+<span class="w">    </span><span class="cm">/* are we a &quot;%s.%d&quot; name (platform and SPI components) */</span><span class="w"></span>
+<span class="w">    </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strstr</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span><span class="w">                                    </span><span class="c1">// 查找字符串，这个应该找不到的样子</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">found</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* get ID */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sscanf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">found</span><span class="p">[</span><span class="n">strlen</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">)],</span><span class="w"> </span><span class="s">&quot;.%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">            </span><span class="cm">/* discard ID from name if ID == -1 */</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">found</span><span class="p">[</span><span class="n">strlen</span><span class="p">(</span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">)]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* I2C component devices are named &quot;bus-addr&quot; */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sscanf</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%x-%x&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">id1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">id2</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="kt">char</span><span class="w"> </span><span class="n">tmp</span><span class="p">[</span><span class="n">NAME_SIZE</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">            </span><span class="cm">/* create unique ID number from I2C addr and bus */</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">id1</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xffff</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">id2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="cm">/* sanitize component name for DAI link creation */</span><span class="w"></span>
+<span class="w">            </span><span class="n">snprintf</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">NAME_SIZE</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%s.%s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dev</span><span class="o">-&gt;</span><span class="n">driver</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span><span class="w"></span>
+<span class="w">                 </span><span class="n">name</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">strlcpy</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">tmp</span><span class="p">,</span><span class="w"> </span><span class="n">NAME_SIZE</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="o">*</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">kstrdup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">GFP_KERNEL</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

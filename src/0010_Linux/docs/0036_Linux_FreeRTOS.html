@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Linux FreeRTOS</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#demo">Demo</a></li>
+<li><a class="reference internal" href="#demo-select">DEMO Select</a></li>
+<li><a class="reference internal" href="#id2">调用关系</a></li>
+<li><a class="reference internal" href="#prvqueuesendtask">prvQueueSendTask</a></li>
+<li><a class="reference internal" href="#prvqueuesendtimercallback">prvQueueSendTimerCallback</a></li>
+<li><a class="reference internal" href="#prvqueuereceivetask">prvQueueReceiveTask</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linux-freertos">
+<h1>Linux FreeRTOS<a class="headerlink" href="#linux-freertos" title="Permalink to this headline"></a></h1>
+<p>在Linux系统上运行FreeRTOS</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.freertos.org/FreeRTOS-simulator-for-Linux.html">Posix/Linux Simulator Demo for FreeRTOS using GCC</a></p></li>
+<li><p><a class="reference external" href="https://www.freertos.org/a00106.html">API Reference</a></p></li>
+</ul>
+</section>
+<section id="demo">
+<h1>Demo<a class="headerlink" href="#demo" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>FreeRTOS/Demo/Posix_GCC</p></li>
+<li><p>make</p></li>
+<li><p>./build/posix_demo</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="n">Trace</span> <span class="n">started</span><span class="o">.</span>
+<span class="n">The</span> <span class="n">trace</span> <span class="n">will</span> <span class="n">be</span> <span class="n">dumped</span> <span class="n">to</span> <span class="n">disk</span> <span class="k">if</span> <span class="n">a</span> <span class="n">call</span> <span class="n">to</span> <span class="n">configASSERT</span><span class="p">()</span> <span class="n">fails</span><span class="o">.</span>
+<span class="n">Starting</span> <span class="n">echo</span> <span class="n">blinky</span> <span class="n">demo</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+<span class="n">Message</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">task</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="demo-select">
+<h1>DEMO Select<a class="headerlink" href="#demo-select" title="Permalink to this headline"></a></h1>
+<p>默认BLINKY DEMO</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// FreeRTOS/Demo/Posix_GCC/main.c</span>
+
+<span class="c1">// ...省略</span>
+
+<span class="cm">/* Demo type is passed as an argument */</span><span class="w"></span>
+<span class="cp">#ifdef USER_DEMO</span>
+<span class="w">    </span><span class="cp">#define     mainSELECTED_APPLICATION    USER_DEMO</span>
+<span class="cp">#else </span><span class="cm">/* Default Setting */</span><span class="cp"></span>
+<span class="w">    </span><span class="cp">#define    mainSELECTED_APPLICATION     BLINKY_DEMO</span>
+<span class="cp">#endif</span>
+
+<span class="c1">// ...省略</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...省略</span>
+
+<span class="w">    </span><span class="n">console_init</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="cp">#if ( mainSELECTED_APPLICATION == BLINKY_DEMO )</span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">console_print</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Starting echo blinky demo</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">main_blinky</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cp">#elif ( mainSELECTED_APPLICATION == FULL_DEMO )</span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">console_print</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Starting full demo</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">main_full</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cp">#else</span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="cp">#error &quot;The selected demo is not valid&quot;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cp">#endif </span><span class="cm">/* if ( mainSELECTED_APPLICATION ) */</span><span class="cp"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// ...省略</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>调用关系<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<p>main_blinky调用关系</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">FreeRTOS</span><span class="o">/</span><span class="n">Demo</span><span class="o">/</span><span class="n">Posix_GCC</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">c</span>
+  <span class="o">*</span> <span class="nb">int</span> <span class="n">main</span><span class="p">(</span> <span class="n">void</span> <span class="p">)</span>
+    <span class="o">*</span> <span class="n">main_blinky</span><span class="p">();</span>
+      <span class="o">*</span> <span class="n">FreeRTOS</span><span class="o">/</span><span class="n">Demo</span><span class="o">/</span><span class="n">Posix_GCC</span><span class="o">/</span><span class="n">main_blinky</span><span class="o">.</span><span class="n">c</span>
+        <span class="o">*</span> <span class="n">void</span> <span class="n">main_blinky</span><span class="p">(</span> <span class="n">void</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>main_blinky</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">main_blinky</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">TickType_t</span><span class="w"> </span><span class="n">xTimerPeriod</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mainTIMER_SEND_FREQUENCY_MS</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Create the queue. */</span><span class="w"></span>
+<span class="w">    </span><span class="n">xQueue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xQueueCreate</span><span class="p">(</span><span class="w"> </span><span class="n">mainQUEUE_LENGTH</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">xQueue</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* Start the two tasks as described in the comments at the top of this</span>
+<span class="cm">         * file. */</span><span class="w"></span>
+<span class="w">        </span><span class="n">xTaskCreate</span><span class="p">(</span><span class="w"> </span><span class="n">prvQueueReceiveTask</span><span class="p">,</span><span class="w">             </span><span class="cm">/* The function that implements the task. */</span><span class="w"></span>
+<span class="w">                     </span><span class="s">&quot;Rx&quot;</span><span class="p">,</span><span class="w">                            </span><span class="cm">/* The text name assigned to the task - for debug only as it is not used by the kernel. */</span><span class="w"></span>
+<span class="w">                     </span><span class="n">configMINIMAL_STACK_SIZE</span><span class="p">,</span><span class="w">        </span><span class="cm">/* The size of the stack to allocate to the task. */</span><span class="w"></span>
+<span class="w">                     </span><span class="nb">NULL</span><span class="p">,</span><span class="w">                            </span><span class="cm">/* The parameter passed to the task - not used in this simple case. */</span><span class="w"></span>
+<span class="w">                     </span><span class="n">mainQUEUE_RECEIVE_TASK_PRIORITY</span><span class="p">,</span><span class="w"> </span><span class="cm">/* The priority assigned to the task. */</span><span class="w"></span>
+<span class="w">                     </span><span class="nb">NULL</span><span class="w"> </span><span class="p">);</span><span class="w">                          </span><span class="cm">/* The task handle is not required, so NULL is passed. */</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">xTaskCreate</span><span class="p">(</span><span class="w"> </span><span class="n">prvQueueSendTask</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;TX&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">configMINIMAL_STACK_SIZE</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">mainQUEUE_SEND_TASK_PRIORITY</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Create the software timer, but don&#39;t start it yet. */</span><span class="w"></span>
+<span class="w">        </span><span class="n">xTimer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xTimerCreate</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Timer&quot;</span><span class="p">,</span><span class="w">                     </span><span class="cm">/* The text name assigned to the software timer - for debug only as it is not used by the kernel. */</span><span class="w"></span>
+<span class="w">                               </span><span class="n">xTimerPeriod</span><span class="p">,</span><span class="w">                </span><span class="cm">/* The period of the software timer in ticks. */</span><span class="w"></span>
+<span class="w">                               </span><span class="n">pdTRUE</span><span class="p">,</span><span class="w">                      </span><span class="cm">/* xAutoReload is set to pdTRUE. */</span><span class="w"></span>
+<span class="w">                               </span><span class="nb">NULL</span><span class="p">,</span><span class="w">                        </span><span class="cm">/* The timer&#39;s ID is not used. */</span><span class="w"></span>
+<span class="w">                               </span><span class="n">prvQueueSendTimerCallback</span><span class="w"> </span><span class="p">);</span><span class="w"> </span><span class="cm">/* The function executed when the timer expires. */</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">xTimer</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">xTimerStart</span><span class="p">(</span><span class="w"> </span><span class="n">xTimer</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Start the tasks and timer running. */</span><span class="w"></span>
+<span class="w">        </span><span class="n">vTaskStartScheduler</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* If all is well, the scheduler will now be running, and the following</span>
+<span class="cm">     * line will never be reached.  If the following line does execute, then</span>
+<span class="cm">     * there was insufficient FreeRTOS heap memory available for the idle and/or</span>
+<span class="cm">     * timer tasks  to be created.  See the memory management section on the</span>
+<span class="cm">     * FreeRTOS web site for more details. */</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="prvqueuesendtask">
+<h1>prvQueueSendTask<a class="headerlink" href="#prvqueuesendtask" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">prvQueueSendTask</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pvParameters</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">TickType_t</span><span class="w"> </span><span class="n">xNextWakeTime</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">TickType_t</span><span class="w"> </span><span class="n">xBlockTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mainTASK_SEND_FREQUENCY_MS</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">ulValueToSend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mainVALUE_SENT_FROM_TASK</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Prevent the compiler warning about the unused parameter. */</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">pvParameters</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Initialise xNextWakeTime - this only needs to be done once. */</span><span class="w"></span>
+<span class="w">    </span><span class="n">xNextWakeTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xTaskGetTickCount</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* Place this task in the blocked state until it is time to run again.</span>
+<span class="cm">        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to</span>
+<span class="cm">        *  convert a time specified in milliseconds into a time specified in ticks.</span>
+<span class="cm">        *  While in the Blocked state this task will not consume any CPU time. */</span><span class="w"></span>
+<span class="w">        </span><span class="n">vTaskDelayUntil</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">xNextWakeTime</span><span class="p">,</span><span class="w"> </span><span class="n">xBlockTime</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* Send to the queue - causing the queue receive task to unblock and</span>
+<span class="cm">         * write to the console.  0 is used as the block time so the send operation</span>
+<span class="cm">         * will not block - it shouldn&#39;t need to block as the queue should always</span>
+<span class="cm">         * have at least one space at this point in the code. */</span><span class="w"></span>
+<span class="w">        </span><span class="n">xQueueSend</span><span class="p">(</span><span class="w"> </span><span class="n">xQueue</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ulValueToSend</span><span class="p">,</span><span class="w"> </span><span class="mi">0U</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="cm">/*-----------------------------------------------------------*/</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="prvqueuesendtimercallback">
+<h1>prvQueueSendTimerCallback<a class="headerlink" href="#prvqueuesendtimercallback" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">prvQueueSendTimerCallback</span><span class="p">(</span><span class="w"> </span><span class="n">TimerHandle_t</span><span class="w"> </span><span class="n">xTimerHandle</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">ulValueToSend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mainVALUE_SENT_FROM_TIMER</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* This is the software timer callback function.  The software timer has a</span>
+<span class="cm">     * period of two seconds and is reset each time a key is pressed.  This</span>
+<span class="cm">     * callback function will execute if the timer expires, which will only happen</span>
+<span class="cm">     * if a key is not pressed for two seconds. */</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Avoid compiler warnings resulting from the unused parameter. */</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">xTimerHandle</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Send to the queue - causing the queue receive task to unblock and</span>
+<span class="cm">     * write out a message.  This function is called from the timer/daemon task, so</span>
+<span class="cm">     * must not block.  Hence the block time is set to 0. */</span><span class="w"></span>
+<span class="w">    </span><span class="n">xQueueSend</span><span class="p">(</span><span class="w"> </span><span class="n">xQueue</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ulValueToSend</span><span class="p">,</span><span class="w"> </span><span class="mi">0U</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="cm">/*-----------------------------------------------------------*/</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="prvqueuereceivetask">
+<h1>prvQueueReceiveTask<a class="headerlink" href="#prvqueuereceivetask" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">prvQueueReceiveTask</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pvParameters</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">ulReceivedValue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* Prevent the compiler warning about the unused parameter. */</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">pvParameters</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* Wait until something arrives in the queue - this task will block</span>
+<span class="cm">         * indefinitely provided INCLUDE_vTaskSuspend is set to 1 in</span>
+<span class="cm">         * FreeRTOSConfig.h.  It will not use any CPU time while it is in the</span>
+<span class="cm">         * Blocked state. */</span><span class="w"></span>
+<span class="w">        </span><span class="n">xQueueReceive</span><span class="p">(</span><span class="w"> </span><span class="n">xQueue</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ulReceivedValue</span><span class="p">,</span><span class="w"> </span><span class="n">portMAX_DELAY</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* To get here something must have been received from the queue, but</span>
+<span class="cm">         * is it an expected value?  Normally calling printf() from a task is not</span>
+<span class="cm">         * a good idea.  Here there is lots of stack space and only one task is</span>
+<span class="cm">         * using console IO so it is ok.  However, note the comments at the top of</span>
+<span class="cm">         * this file about the risks of making Linux system calls (such as</span>
+<span class="cm">         * console output) from a FreeRTOS task. */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">ulReceivedValue</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">mainVALUE_SENT_FROM_TASK</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">console_print</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Message received from task</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">ulReceivedValue</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">mainVALUE_SENT_FROM_TIMER</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">console_print</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Message received from software timer</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">console_print</span><span class="p">(</span><span class="w"> </span><span class="s">&quot;Unexpected message</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="cm">/*-----------------------------------------------------------*/</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

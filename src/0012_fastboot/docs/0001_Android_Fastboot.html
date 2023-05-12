@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Android Fastboot</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#fastbootgsi">fastboot烧录GSI</a></li>
+<li><a class="reference internal" href="#id2">启动模式</a></li>
+<li><a class="reference internal" href="#boot-mode">Boot Mode</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="android-fastboot">
+<h1>Android Fastboot<a class="headerlink" href="#android-fastboot" title="Permalink to this headline"></a></h1>
+<p>bootloader fastboot命令处理原理</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>https://github.com/mediatek-android-development/android_kernel_mediatek_mt6761-62-4.9</p></li>
+<li><p><a class="reference external" href="https://mabin004.github.io/2018/07/25/Android-FRP%E5%8A%9F%E8%83%BD%E5%88%86%E6%9E%90%EF%BC%88Factory-Reset-Protection%EF%BC%89/">Android FRP功能分析（Factory Reset Protection）</a></p></li>
+</ul>
+</section>
+<section id="fastbootgsi">
+<h1>fastboot烧录GSI<a class="headerlink" href="#fastbootgsi" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p>开机后，插入USB（ADB）线连接电脑</p></li>
+<li><p>进入fastboot模式：</p>
+<ul>
+<li><p>命令进入：</p>
+<ul>
+<li><p>adb reboot bootloader</p>
+<ul>
+<li><p>fastboot是bootloader阶段的一个功能</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>按Power + 音量加键</p></li>
+</ul>
+</li>
+<li><p>查看是否进入fastboot模式</p>
+<ul>
+<li><p>fastboot devices</p></li>
+</ul>
+</li>
+<li><p>unlock</p>
+<ul>
+<li><p>fastboot flashing unlock</p></li>
+</ul>
+</li>
+<li><p>重启到fastboot烧录模式(recovery模式)</p>
+<ul>
+<li><p>fastboot reboot fastboot</p></li>
+</ul>
+</li>
+<li><p>烧录gsi固件</p>
+<ul>
+<li><p>fastboot flash system system.img</p></li>
+<li><p>fastboot flash system_a system.img</p></li>
+<li><p>fastboot flash system_b system.img</p></li>
+<li><p>还可以烧录modem</p>
+<ul>
+<li><p>fastboot erase modem</p></li>
+<li><p>fastboot flash modem NON-HLOS.bin</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>lock</p>
+<ul>
+<li><p>fastboot reboot bootloader</p></li>
+<li><p>fastboot flashing lock</p></li>
+</ul>
+</li>
+<li><p>退出fastboot模式</p>
+<ul>
+<li><p>fastboot reboot</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h1>启动模式<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6589/uboot/inc/asm/arch/boot_mode.h</p>
+<div class="highlight-CPP notranslate"><div class="highlight"><pre><span></span><span class="cm">/* boot type definitions */</span><span class="w"></span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">NORMAL_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">META_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">RECOVERY_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">SW_REBOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">FACTORY_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">ADVMETA_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">ATE_FACTORY_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">ALARM_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">KERNEL_POWER_OFF_CHARGING_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">LOW_POWER_OFF_CHARGING_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">FASTBOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">DOWNLOAD_BOOT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">UNKNOWN_BOOT</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="n">BOOTMODE</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="boot-mode">
+<h1>Boot Mode<a class="headerlink" href="#boot-mode" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>高通平台在app/aboot/aboot.c中有调用aboot_init函数，而联发科平台则在app/mt_boot/mt_boot.c中有调用mt_boot_init函数。</p></li>
+<li><p>fastboot命令处理如下：</p>
+<ul>
+<li><p>启动模式获取</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6765/boot_mode.c
+  └── void boot_mode_select(void)
+      ├── Check_RTC_PDN1_bit13()
+      │   ├── g_boot_mode = FASTBOOT;
+      │   └── Set_Clr_RTC_PDN1_bit13(false);
+      ├── g_boot_mode == FASTBOOT
+      │   └── dprintf(CRITICAL, &quot;[FASTBOOT] reboot to boot loader\n&quot;);
+      └── Check_RTC_Recovery_Mode()
+          └── g_boot_mode = RECOVERY_BOOT;
+</pre></div>
+</div>
+</li>
+<li><p>进入fastboot，getvar、flash、unlock简要分析</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/mt_boot.c
+  └── void aboot_init(const struct app_descriptor *app)
+      └── reboot_mode == FASTBOOT_MODE
+          └── goto fastboot;
+              └── fastboot_init(target_get_scratch_address(), sz);
+                  └── vendor/mediatek/proprietary/bootable/bootloader/lk/app/mt_boot/fastboot.c
+                      └── int fastboot_init(void *base, unsigned size)
+                          ├── fastboot_register(&quot;getvar:&quot;, cmd_getvar, TRUE, FALSE);
+                          │   └── fastboot_publish(&quot;version&quot;, &quot;0.5&quot;);
+                          │       └── pc端访问命令：fastboot getvar version
+                          │           └── version: 0.5
+                          ├── fastboot_register(&quot;flash:&quot;, cmd_flash_mmc, TRUE, TRUE);
+                          │   └── void cmd_flash_mmc(const char *arg, void *data, unsigned sz)
+                          │       └── result = flash_storage(arg, data, sz);
+                          │           └── result = cmd_flash_mmc_standard(arg, data, sz);
+                          │               └── result = cmd_flash_mmc_sparse_img(arg, data, sz);
+                          │                   ├── index = partition_get_index(arg);
+                          │                   ├── ptn = partition_get_offset(index);
+                          │                   └── for (chunk=0; chunk&lt;sparse_header-&gt;total_chunks; chunk++)
+                          │                       └── emmc_write(part_id, ptn + ((unsigned long long)total_blocks*sparse_header-&gt;blk_sz) , data, chunk_data_sz) != chunk_data_sz
+                          └── fastboot_register(&quot;flashing unlock&quot;,fastboot_oem_unlock, TRUE, FALSE);
+                              ├── ret = fastboot_get_unlock_perm(&amp;unlock_allowed);
+                              │   ├── part_ret = partition_exists(&quot;frp&quot;);
+                              │   ├── size = partition_get_size_by_name(&quot;frp&quot;);
+                              │   └── ret = partition_read(&quot;frp&quot;, unlock_allowed_flag_offset, (u8 *)unlock_allowed, sizeof(unsigned int)); 
+                              │       ├── FRP（Factory Reset Protection）
+                              │       └── *unlock_allowed = 0;
+                              └── ret = fastboot_oem_unlock_chk();
+                                  ├── ret = fastboot_oem_key_chk()
+                                  ├── ret = fastboot_data_part_wipe()
+                                  └── ret = sec_set_device_lock(0);
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

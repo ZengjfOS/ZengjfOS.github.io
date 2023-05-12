@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">aidl parcelable cpp</a></li>
+<li><a class="reference internal" href="#id1">参考文档</a></li>
+<li><a class="reference internal" href="#list-parcel-build-error">list parcel build error</a></li>
+<li><a class="reference internal" href="#parcelable">parcelable传统实现</a></li>
+<li><a class="reference internal" href="#id2">parcelable自动实现</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aidl-parcelable-cpp">
+<h1>aidl parcelable cpp<a class="headerlink" href="#aidl-parcelable-cpp" title="Permalink to this headline"></a></h1>
+<p>aidl直接定义parcelable数据，用数组替代list parcelable类型的数据</p>
+</section>
+<section id="id1">
+<h1>参考文档<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://developer.android.com/guide/components/aidl#PassingObjects">Passing objects over IPC</a></p>
+<ul>
+<li><p>In Android 10 (API level 29), you can define Parcelable objects directly in AIDL.</p></li>
+</ul>
+</li>
+<li><p>https://android.googlesource.com/platform/system/tools/aidl/+show/brillo-m10-dev/docs/aidl-cpp.md</p></li>
+</ul>
+</section>
+<section id="list-parcel-build-error">
+<h1>list parcel build error<a class="headerlink" href="#list-parcel-build-error" title="Permalink to this headline"></a></h1>
+<p>暂时不支持List的Parcelable</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aidl</span> <span class="n">E</span> <span class="mi">01</span><span class="o">-</span><span class="mi">11</span> <span class="mi">03</span><span class="p">:</span><span class="mi">28</span><span class="p">:</span><span class="mi">12</span>   <span class="mi">411</span>   <span class="mi">411</span> <span class="n">type_cpp</span><span class="o">.</span><span class="n">cpp</span><span class="p">:</span><span class="mi">509</span><span class="p">]</span> <span class="n">aidl</span><span class="o">-</span><span class="n">cpp</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">yet</span> <span class="n">support</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">com</span><span class="o">.</span><span class="n">networkmanager</span><span class="o">.</span><span class="n">aidl</span><span class="o">.</span><span class="n">FilterItem</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>将上面的list换成数组处理</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">DnsItem</span><span class="o">&gt;</span> <span class="n">listSysAllowDnsItems</span><span class="p">();</span> <span class="o">--&gt;</span> <span class="n">DnsItem</span><span class="p">[]</span> <span class="n">listSysAllowDnsItems</span><span class="p">();</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>https://android.googlesource.com/platform/system/tools/aidl/+show/brillo-m10-dev/docs/aidl-cpp.md</p>
+<ul>
+<li><p>如下是代码数据转换表</p></li>
+</ul>
+</li>
+</ul>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Java Type</p></th>
+<th class="head"><p>C++ Type</p></th>
+<th class="head"><p>inout</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>boolean</p></td>
+<td><p>bool</p></td>
+<td><p>in</p></td>
+<td><p>These 8 types are all considered primitives.</p></td>
+</tr>
+<tr class="row-odd"><td><p>byte</p></td>
+<td><p>int8_t</p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>char</p></td>
+<td><p>char16_t</p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>int</p></td>
+<td><p>int32_t</p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>long</p></td>
+<td><p>int64_t</p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>float</p></td>
+<td><p>float</p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>double</p></td>
+<td><p>double</p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>String</p></td>
+<td><p>String16</p></td>
+<td><p>in</p></td>
+<td><p>Supports null references.</p></td>
+</tr>
+<tr class="row-even"><td><p>android.os.Parcelable</p></td>
+<td><p>android::Parcelable</p></td>
+<td><p>inout</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>T extends IBinder</p></td>
+<td><p>sp<T></p></td>
+<td><p>in</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Arrays (T[])</p></td>
+<td><p>vector<T></p></td>
+<td><p>inout</p></td>
+<td><p>May contain only primitives, Strings and parcelables.</p></td>
+</tr>
+<tr class="row-odd"><td><p>List<String></p></td>
+<td><p>vector<String16></p></td>
+<td><p>inout</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>PersistableBundle</p></td>
+<td><p>PersistableBundle</p></td>
+<td><p>inout</p></td>
+<td><p>binder/PersistableBundle.h</p></td>
+</tr>
+<tr class="row-odd"><td><p>List<IBinder></p></td>
+<td><p>vector&lt;sp<IBinder>&gt;</p></td>
+<td><p>inout</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>FileDescriptor</p></td>
+<td><p>ScopedFd</p></td>
+<td><p>inout</p></td>
+<td><p>nativehelper/ScopedFd.h</p></td>
+</tr>
+</tbody>
+</table>
+<p>如下是list转换为数组的diff，作为参考</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl b/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl</span><span class="w"></span>
+<span class="gh">index 3f5619b0..da16aaf5 100755</span><span class="w"></span>
+<span class="gd">--- a/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl</span><span class="w"></span>
+<span class="gi">+++ b/packages/OsManager/src/com/networkmanager/aidl/FilterItem.aidl</span><span class="w"></span>
+<span class="gu">@@ -1,2 +1,8 @@</span><span class="w"></span>
+<span class="w"> </span>package com.networkmanager.aidl;<span class="w"></span>
+<span class="gd">-parcelable FilterItem;</span><span class="w"></span>
+<span class="w">\ No newline at end of file</span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+parcelable FilterItem {</span><span class="w"></span>
+<span class="gi">+       String opType;</span><span class="w"></span>
+<span class="gi">+       String pkgName;</span><span class="w"></span>
+<span class="gi">+       String addr;</span><span class="w"></span>
+<span class="gi">+}</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gh">diff --git a/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl b/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl</span><span class="w"></span>
+<span class="gh">index 8b8257b2..1b1231c4 100755</span><span class="w"></span>
+<span class="gd">--- a/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl</span><span class="w"></span>
+<span class="gi">+++ b/packages/OsManager/src/com/networkmanager/aidl/INetWorkControlManager.aidl</span><span class="w"></span>
+<span class="gu">@@ -1,5 +1,6 @@</span><span class="w"></span>
+<span class="w"> </span>package com.networkmanager.aidl;<span class="w"></span>
+<span class="w"> </span>import com.networkmanager.aidl.FilterItem;<span class="w"></span>
+<span class="gi">+import com.networkmanager.aidl.DnsItem;</span><span class="w"></span>
+
+<span class="w"> </span>interface INetWorkControlManager {<span class="w"></span>
+<span class="w"> </span>       //增加一条应用规则，为包名为pkgName的应用启用过滤（黑白名单均可）<span class="w"></span>
+<span class="gu">@@ -15,11 +16,11 @@ interface INetWorkControlManager {</span><span class="w"></span>
+<span class="w"> </span>       //根据包名获取该应用所有的过滤规则<span class="w"></span>
+<span class="w"> </span>       //入参 pkgName   应用包名<span class="w"></span>
+<span class="w"> </span>       //返回 过滤规则列表<span class="w"></span>
+<span class="gd">-       List&lt;FilterItem&gt; listAppFilterItems(String pkgName);</span><span class="w"></span>
+<span class="gi">+       FilterItem[] listAppFilterItems(String pkgName);</span><span class="w"></span>
+
+<span class="w"> </span>       //获取所有应用的过滤规则<span class="w"></span>
+<span class="w"> </span>       //返回 过滤规则列表<span class="w"></span>
+<span class="gd">-       List&lt;FilterItem&gt; listAllAppFilterItems();</span><span class="w"></span>
+<span class="gi">+       FilterItem[] listAllAppFilterItems();</span><span class="w"></span>
+
+<span class="w"> </span>       //获取系统禁止访问的所有地址<span class="w"></span>
+<span class="w"> </span>       //返回 地址列表<span class="w"></span>
+</pre></div>
+</div>
+<p>aidl编译Android.bp参考</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aidl_interface</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;aidl-test&quot;</span><span class="p">,</span>
+    <span class="n">srcs</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;src/com/networkmanager/aidl/DnsItem.aidl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;src/com/networkmanager/aidl/FilterItem.aidl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;src/com/networkmanager/aidl/INetWorkControlManager.aidl&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">include_dirs</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;frameworks/base/core/java&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">local_include_dir</span><span class="p">:</span> <span class="s2">&quot;src&quot;</span><span class="p">,</span>
+    <span class="n">vendor_available</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">cpp</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">enabled</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">java</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">enabled</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">ndk</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">enabled</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="parcelable">
+<h1>parcelable传统实现<a class="headerlink" href="#parcelable" title="Permalink to this headline"></a></h1>
+<p>声明</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.networkmanager.aidl</span><span class="p">;</span>
+
+<span class="n">parcelable</span> <span class="n">DnsItem</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>实现</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.networkmanager.aidl</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">android.os.Parcel</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Parcelable</span><span class="p">;</span>
+
+<span class="cm">/***************************************</span>
+<span class="cm"> * @author tangkw</span>
+<span class="cm"> * 过滤黑白名单数据结构类</span>
+<span class="cm"> **************************************/</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DnsItem</span> <span class="kd">implements</span> <span class="n">Parcelable</span> <span class="p">{</span>
+
+        <span class="kd">private</span> <span class="n">String</span> <span class="n">dns</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">;</span><span class="c1">// 包名</span>
+        <span class="kd">private</span> <span class="n">String</span> <span class="n">addr</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">;</span><span class="c1">// IP地址(若为*代表所有)</span>
+
+        <span class="kd">public</span> <span class="nf">DnsItem</span><span class="p">(){</span>
+
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="nf">DnsItem</span><span class="p">(</span><span class="n">String</span> <span class="n">dns</span><span class="p">,</span> <span class="n">String</span> <span class="n">addr</span><span class="p">)</span> <span class="p">{</span>
+
+                <span class="k">this</span><span class="p">.</span><span class="na">dns</span> <span class="o">=</span> <span class="n">dns</span><span class="p">;</span>
+                <span class="k">this</span><span class="p">.</span><span class="na">addr</span> <span class="o">=</span> <span class="n">addr</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">describeContents</span><span class="p">()</span> <span class="p">{</span>
+                <span class="c1">// TODO Auto-generated method stub</span>
+                <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">getDns</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">dns</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setDns</span><span class="p">(</span><span class="n">String</span> <span class="n">dns</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="na">dns</span><span class="o">=</span> <span class="n">dns</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAddr</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">addr</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAddr</span><span class="p">(</span><span class="n">String</span> <span class="n">addr</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="na">addr</span> <span class="o">=</span> <span class="n">addr</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="p">()</span> <span class="p">{</span>
+                <span class="c1">// return &quot;DnsItem [dns=&quot; + dns</span>
+                <span class="c1">// + &quot;, addr=&quot; + addr + &quot;]&quot;;</span>
+                <span class="k">return</span> <span class="s">&quot;DnsItem: &quot;</span><span class="o">+</span> <span class="n">dns</span><span class="o">+</span><span class="s">&quot; -&gt; &quot;</span><span class="o">+</span><span class="n">addr</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">writeToParcel</span><span class="p">(</span><span class="n">Parcel</span> <span class="n">dest</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// TODO Auto-generated method stub</span>
+                <span class="n">dest</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">dns</span><span class="p">);</span>
+                <span class="n">dest</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">addr</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="n">Parcelable</span><span class="p">.</span><span class="na">Creator</span><span class="o">&lt;</span><span class="n">DnsItem</span><span class="o">&gt;</span> <span class="nf">getCreator</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">CREATOR</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Parcelable</span><span class="p">.</span><span class="na">Creator</span><span class="o">&lt;</span><span class="n">DnsItem</span><span class="o">&gt;</span> <span class="n">CREATOR</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Creator</span><span class="o">&lt;</span><span class="n">DnsItem</span><span class="o">&gt;</span><span class="p">()</span> <span class="p">{</span>
+
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="n">DnsItem</span><span class="o">[]</span> <span class="nf">newArray</span><span class="p">(</span><span class="kt">int</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">return</span> <span class="k">new</span> <span class="n">DnsItem</span><span class="o">[</span><span class="n">size</span><span class="o">]</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="n">DnsItem</span> <span class="nf">createFromParcel</span><span class="p">(</span><span class="n">Parcel</span> <span class="n">source</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">return</span> <span class="k">new</span> <span class="n">DnsItem</span><span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="na">readString</span><span class="p">(),</span>
+                                        <span class="n">source</span><span class="p">.</span><span class="na">readString</span><span class="p">());</span>
+                <span class="p">}</span>
+        <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h1>parcelable自动实现<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">com.networkmanager.aidl</span><span class="p">;</span>
+
+<span class="n">parcelable</span> <span class="n">DnsItem</span> <span class="p">{</span>
+        <span class="n">String</span> <span class="n">dns</span><span class="p">;</span>
+        <span class="n">String</span> <span class="n">addr</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

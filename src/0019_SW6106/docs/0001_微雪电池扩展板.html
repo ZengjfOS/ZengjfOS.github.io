@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">微雪电池扩展板</a></li>
+<li><a class="reference internal" href="#id2">参考文档</a></li>
+<li><a class="reference internal" href="#pin">PIN</a></li>
+<li><a class="reference internal" href="#id3">电池电压</a></li>
+<li><a class="reference internal" href="#i2c">I2C</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>微雪电池扩展板<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p>微雪电池扩展板采用SW6106芯片</p>
+</section>
+<section id="id2">
+<h1>参考文档<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.waveshare.net/shop/Li-polymer-Battery-HAT.htm">树莓派锂电池扩展板 SW6106移动电源方案 内置保护电路 带3000mAh大电量锂电池</a></p></li>
+<li><p><a class="reference external" href="http://www.ismartware.com/details-2-33.html">SW6106官网</a></p>
+<ul>
+<li><p>用邮箱、手机号获取资料包</p></li>
+<li><p>官网资料包，含寄存器描述</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/7bec054be12e9d14004555aa74a04b9f/0001_202207211609549053.zip"><span class="xref download myst">0001_202207211609549053.zip</span></a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/fa8796f18b0f18595e0d0d4f97b09e23/0001_Li-polymer_Battery_HAT.pdf"><span class="xref download myst">0001_Li-polymer_Battery_HAT.pdf</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/c406a5f99bdbb7425ed33b2ec592315c/0001_SW6106_Datasheet_V1.0.pdf"><span class="xref download myst">0001_SW6106_Datasheet_V1.0.pdf</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../../_downloads/8fb729bac8ad438380c7dd072f20ca28/0001_Li-polymer_Battery_HAT_manual_CN.pdf"><span class="xref download myst">0001_Li-polymer_Battery_HAT_manual_CN.pdf</span></a></p></li>
+</ul>
+</section>
+<section id="pin">
+<h1>PIN<a class="headerlink" href="#pin" title="Permalink to this headline"></a></h1>
+<p>移除LED，引出I2C引脚</p>
+<p><img alt="0001_I2C_PIN_ACCESS.png" src="../../../_images/0001_I2C_PIN_ACCESS.png" /></p>
+<p>叠板安装，这种方式可以让电池给树莓派供电，让树莓派耗电</p>
+<p><img alt="0001_HAT_Connector.png" src="../../../_images/0001_HAT_Connector.png" /></p>
+<p>杜邦连接，用于测试充电电流，因为芯片内的电流计不是专门到电池的，而是整个系统的电流，如果用叠板，那么有一部分电流会到树莓派，不知道到电池的电流</p>
+<p><img alt="0001_dubang_Connector.png" src="../../../_images/0001_dubang_Connector.png" /></p>
+</section>
+<section id="id3">
+<h1>电池电压<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h1>
+<p>参考设计</p>
+<p><img alt="0001_battery_default_voltage.png" src="../../../_images/0001_battery_default_voltage.png" /></p>
+<p>实际电路为NC电路，也就是4.2V电池</p>
+<p><img alt="0001_battery_voltage_4v2.png" src="../../../_images/0001_battery_voltage_4v2.png" /></p>
+</section>
+<section id="i2c">
+<h1>I2C<a class="headerlink" href="#i2c" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>i2cdetect -y 1</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">9</span>  <span class="n">a</span>  <span class="n">b</span>  <span class="n">c</span>  <span class="n">d</span>  <span class="n">e</span>  <span class="n">f</span>
+<span class="mi">00</span><span class="p">:</span>          <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">10</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">20</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">30</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="mi">3</span><span class="n">c</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">40</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">50</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">60</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+<span class="mi">70</span><span class="p">:</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> <span class="o">--</span> 
+</pre></div>
+</div>
+</li>
+<li><p>i2cget -f -y 1 0x3c 0x1b</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mh">0x28</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

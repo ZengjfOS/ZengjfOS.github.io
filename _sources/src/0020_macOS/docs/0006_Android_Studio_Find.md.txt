@@ -1,0 +1,9 @@
+# Android Studio Find
+
+AS默认的查找工具只能查找类，所以要使用文件内容查找
+
+## Steps
+
+* [View] -> [Appearence] -> [Toolbar]
+
+![0006_Android_Studio_Find.png](images/0006_Android_Studio_Find.png)

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>zengjf</title>
+
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/login.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> 分析文档
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Input mouse driver analysis</a></li>
+<li><a class="reference internal" href="#input">Input子系统架构</a></li>
+<li><a class="reference internal" href="#usb">USB键盘</a></li>
+<li><a class="reference internal" href="#id1">Input子系统</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">分析文档</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs"> 
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.forward()">Forward</a></li>
+<li style="float: right;margin-left: 10px;"><a href="javascript:history.back()">Go Back</a> | </li>
+<li style="float: right;margin-left: 10px;"><a href="/index.html">Home</a> | </li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-mouse-driver-analysis">
+<h1>Input mouse driver analysis<a class="headerlink" href="#input-mouse-driver-analysis" title="Permalink to this headline"></a></h1>
+<p>基于usb mouse理解Input子系统架构</p>
+</section>
+<section id="input">
+<h1>Input子系统架构<a class="headerlink" href="#input" title="Permalink to this headline"></a></h1>
+<p><img alt="0012_input_framework.png" src="../../../_images/0012_input_framework.png" /></p>
+<ul class="simple">
+<li><p>一个handler可以被多个应用程序同时打开；</p></li>
+<li><p>一个handler适配多个input device，每个input device生成一个handler对应的设备节点，可以将handler视为input device的驱动，input device driver会注册input device；</p></li>
+<li><p>evdev_handler会被所有的input设备适配；</p></li>
+<li><p>常见handler：</p>
+<ul>
+<li><p>evdev_handler: 事件处理层，它支持所有设备，并将输入事情通知用户程序，或反过来，通知驱动程序</p></li>
+<li><p>joydev_handler: 游戏杆设备处理，游戏杆有不同类型，它只处理支持joydev_handler类型的设备</p></li>
+<li><p>mousedev_handler: 同理，鼠标也有不同类型呀，它支持的鼠标类型设备才能处理</p></li>
+</ul>
+</li>
+<li><p>grab 是为了独占，保证此设备不会被别的进程捕获</p></li>
+</ul>
+</section>
+<section id="usb">
+<h1>USB键盘<a class="headerlink" href="#usb" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>drivers/hid/usbhid/usbkbd.c</p></li>
+<li><p>drivers/hid/usbhid/usbmouse.c</p></li>
+<li><p>usb mouse注册input device、上报数据处理流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/hid/usbhid/usbmouse.c
+  └── module_usb_driver(usb_mouse_driver);
+      └── static struct usb_driver usb_mouse_driver
+          └── .probe      = usb_mouse_probe,
+              └── static int usb_mouse_probe(struct usb_interface *intf, const struct usb_device_id *id)
+                  ├── input_dev = input_allocate_device();
+                  ├── mouse-&gt;dev = input_dev;
+                  ├── error = input_register_device(mouse-&gt;dev);                  --&gt; 注册input device
+                  │   └── input_attach_handler(dev, handler);                       --&gt; 匹配input device driver(handler)
+                  │       └── error = handler-&gt;connect(handler, dev, id);             --&gt; connect调用mousedev_connect()，注册设备
+                  └── usb_fill_int_urb(mouse-&gt;irq, dev, pipe, mouse-&gt;data, (maxp &gt; 8 ? 8 : maxp), usb_mouse_irq, mouse, endpoint-&gt;bInterval);
+                      └── static void usb_mouse_irq(struct urb *urb)
+                          └── input_sync(dev);
+                              └── input_event(dev, EV_SYN, SYN_REPORT, 0);
+                                  └── input_handle_event(dev, type, code, value);
+                                      └── disposition &amp; INPUT_FLUSH
+                                          └── input_pass_values(dev, dev-&gt;vals, dev-&gt;num_vals);
+                                              └── input_to_handler(handle, vals, count);
+                                                  └── else if (handler-&gt;event)
+                                                      └── handler-&gt;event(handle, v-&gt;type, v-&gt;code, v-&gt;value);     // 上报事件
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id1">
+<h1>Input子系统<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<ul>
+<li><p>input子系统注册、打开、上报数据流程</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>* drivers/input/mousedev.c
+  └── module_init(mousedev_init);
+      └── error = input_register_handler(&amp;mousedev_handler);                  // 完成input驱动器注册
+          ├── static struct input_handler mousedev_handler
+          │   ├── .connect    = mousedev_connect,
+          │   │   └── mousedev = mousedev_create(dev, handler, false);              // usb鼠标注册到input子系统来之后会调用这里创建设备节点
+          │   │       ├── mousedev-&gt;open_device = mousedev_open_device;
+          │   │       └── cdev_init(&amp;mousedev-&gt;cdev, &amp;mousedev_fops);                 // usb鼠标设备节点处理函数
+          │   │           └── static const struct file_operations mousedev_fops
+          │   │               └── .open       = mousedev_open,
+          │   │                   ├── mousedev_attach_client(mousedev, client);             // 将当前设备加入open设备链表
+          │   │                   │   └── list_add_tail_rcu(&amp;client-&gt;node, &amp;mousedev-&gt;client_list);
+          │   │                   └── error = mousedev-&gt;open_device(mousedev);
+          │   │                       └── static int mousedev_open_device(struct mousedev *mousedev)
+          │   │                           └── retval = input_open_device(&amp;mousedev-&gt;handle);
+          │   │                               └── dev-&gt;open(dev)
+          │   └── .event      = mousedev_event,
+          │       └── case EV_SYN:
+          │           └── code == SYN_REPORT
+          │               └── mousedev_notify_readers(mousedev, &amp;mousedev-&gt;packet);
+          │                   └── list_for_each_entry_rcu(client, &amp;mousedev-&gt;client_list, node)
+          │                       └── 逐一通知open设备链表
+          └── int input_register_handler(struct input_handler *handler)
+              ├── list_add_tail(&amp;handler-&gt;node, &amp;input_handler_list);             // 相当于注册input bus驱动
+              └── list_for_each_entry(dev, &amp;input_dev_list, node)
+                  └── input_attach_handler(dev, handler);                           // 检查一下是否有合适的设备
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, zengjf.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id: "JjOE14XScyd75b2C",ck: "JjOE14XScyd75b2C"})</script>
+
+<br/>
+<script id="LA-DATA-WIDGET" crossorigin="anonymous" charset="UTF-8" src="https://v6-widget.51.la/v6/JjOE14XScyd75b2C/quote.js?theme=0&f=12&display=1,0,0,0,0,0,1,1"></script>
+
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

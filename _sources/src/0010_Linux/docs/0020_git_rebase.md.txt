@@ -1,0 +1,16 @@
+# git rebase
+
+使用rebase处理多个commit处理同一任务
+
+# 参考文档
+
+* [Git进阶之合并多次commit](https://blog.csdn.net/yinchuan_111/article/details/106913632)
+
+# steps
+
+* git rebase -i [start commit id] [end commit id]
+  * 前开后闭，可以没有[end commit id]
+* 修改你不想保留的 commit 记录前的 `pick` 为 `squash`(或者`s`)。`git` 会把前面为 `squash`的 commit 记录与它的上一条记录合并为一条。注意要确保第一条为 `pick`，因为`squash`的作用是把 commit 合并到上一个提交，所以必须保证至少第一个提交被 `pick`；
+* 如果你不小心把所有的`pick`都改为了`s`，然后保存退出，会收到一个错误提示：`cannot 'squash' without a previous commit`；
+* 如果操作出问题，推荐使用`git rebase --abort`，然后重来一次 rebase，这样最稳妥；
+* 配合cherry pick可以达到更好的效果，譬如将中间的某个commit去掉。

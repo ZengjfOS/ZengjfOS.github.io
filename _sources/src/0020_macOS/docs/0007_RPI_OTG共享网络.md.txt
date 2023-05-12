@@ -1,0 +1,140 @@
+# RPI OTG
+
+树莓派直接通过OTG来访问MAC的网络
+
+# 参考文档
+
+* [Remote Access](https://www.raspberrypi.com/documentation/computers/remote-access.html)
+
+# 树莓派启动配置
+
+* /boot/cmdline.txt
+  * 第一行末尾添加：`modules-load=dwc2,g_ether dwc_otg.lpm_enable=1`
+* /boot/config.txt
+  * 文件最后添加行：`dtoverlay=dwc2`
+* touch /boot/ssh.txt
+* reboot
+  * 接上Type-C线到电脑
+
+# Network
+
+* [System Preferences] -> [Network]  
+  ![0007_SystemPreferences_Network.png](images/0007_SystemPreferences_Network.png)
+* ping raspberrypi.local
+  ```
+  PING raspberrypi.local (169.254.190.217): 56 data bytes
+  Request timeout for icmp_seq 0
+  64 bytes from 169.254.190.217: icmp_seq=1 ttl=64 time=0.908 ms
+  64 bytes from 169.254.190.217: icmp_seq=2 ttl=64 time=0.815 ms
+  64 bytes from 169.254.190.217: icmp_seq=3 ttl=64 time=0.804 ms
+  64 bytes from 169.254.190.217: icmp_seq=4 ttl=64 time=0.716 ms
+  64 bytes from 169.254.190.217: icmp_seq=5 ttl=64 time=0.647 ms
+  ^C
+  --- raspberrypi.local ping statistics ---
+  6 packets transmitted, 5 packets received, 16.7% packet loss
+  round-trip min/avg/max/stddev = 0.647/0.778/0.908/0.089 ms
+  ```
+  * 169.254.190.217
+
+# ssh
+
+* ssh pi@raspberrypi.local
+  * yes
+  * raspberry
+* ssh pi@169.254.190.217
+
+```sh
+The authenticity of host '169.254.190.217 (169.254.190.217)' can't be established.
+ED25519 key fingerprint is SHA256:5pJgnoJUGlMHQgSCZPPL2081EoeIERup+kGh4lrxno0.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? 
+Host key verification failed.
+(base) zengjf@zengjf ~ % ssh pi@169.254.190.217
+The authenticity of host '169.254.190.217 (169.254.190.217)' can't be established.
+ED25519 key fingerprint is SHA256:5pJgnoJUGlMHQgSCZPPL2081EoeIERup+kGh4lrxno0.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '169.254.190.217' (ED25519) to the list of known hosts.
+pi@169.254.190.217's password: 
+Permission denied, please try again.
+pi@169.254.190.217's password: 
+Linux raspberrypi 5.10.92-v8+ #1514 SMP PREEMPT Mon Jan 17 17:39:38 GMT 2022 aarch64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Fri Jan 28 03:23:30 2022
+
+SSH is enabled and the default password for the 'pi' user has not been changed.
+This is a security risk - please login as the 'pi' user and type 'passwd' to set a new password.
+
+
+Wi-Fi is currently blocked by rfkill.
+Use raspi-config to set the country before use.
+
+pi@raspberrypi:~ $ ls
+Bookshelf  Documents  Music     Public     Videos
+Desktop    Downloads  Pictures  Templates
+pi@raspberrypi:~ $ 
+```
+
+# Network Sharing
+
+* sharing  
+  ![0007_Network_Sharing.png](images/0007_Network_Sharing.png)
+* ssh pi@raspberrypi.local
+  * 开了共享网络之后，树莓派的IP会被更新，所以最好直接使用raspberrypi.local直接处理比较合适
+* ping baidu.com
+  ```
+  PING baidu.com (220.181.38.148) 56(84) bytes of data.
+  64 bytes from 220.181.38.148 (220.181.38.148): icmp_seq=1 ttl=52 time=43.9 ms
+  64 bytes from 220.181.38.148 (220.181.38.148): icmp_seq=2 ttl=52 time=44.3 ms
+  64 bytes from 220.181.38.148 (220.181.38.148): icmp_seq=3 ttl=52 time=43.4 ms
+  64 bytes from 220.181.38.148 (220.181.38.148): icmp_seq=4 ttl=52 time=44.5 ms
+  64 bytes from 220.181.38.148 (220.181.38.148): icmp_seq=5 ttl=52 time=44.6 ms
+  ^C
+  --- baidu.com ping statistics ---
+  5 packets transmitted, 5 received, 0% packet loss, time 5198ms
+  rtt min/avg/max/mdev = 43.376/44.123/44.634/0.458 ms
+  ```
+
+# pip proxy
+
+* `vim ~/.config/pip/pip.conf`
+  ```
+  [global]
+  timeout = 600
+  index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+  extra-index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+  ```
+* vim /etc/pip.conf
+
+# github
+
+* [0003_github_mirror.md](0003_github_mirror.md)
+
+# wifi
+
+* 在boot分区根目录创建wpa_supplicant.conf文件，并写入
+* 可以通过raspi-config配置国家码
+
+```
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=CN
+
+network={
+        ssid="your wifi ssid"
+        psk="your wifi password"
+        key_mgmt=WPA-PSK
+}
+
+network={
+	      ssid="HUAWEI-10GCP6"
+	      psk="mdcleefung10281105"
+	      key_mgmt=WPA-PSK
+}
+```

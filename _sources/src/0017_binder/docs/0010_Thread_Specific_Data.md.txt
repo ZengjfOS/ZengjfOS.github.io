@@ -1,0 +1,78 @@
+# Thread Specific Data
+
+多线程独立拥有全局变量
+
+# 参考文档
+
+* [pthread_key_t和pthread_key_create()详解](https://www.cnblogs.com/lit10050528/p/4325882.html)
+* [[bionic源码解读]pthread_key](https://zhuanlan.zhihu.com/p/33411235)
+
+# 简述
+
+在Linux中，新建的线程并不是在原先的进程中，而是系统通过一个系统调用clone()。该系统copy了一个和原先进程完全一样的进程，并在这个进程中执行线程函数。不过这个copy过程和fork不一样。copy后的进程和原先的进程共享了所有的变量，运行环境（clone的实现是可以指定新进程与老进程之间的共享关系，100%共享就表示创建了一个线程）。这样，原先进程中的变量变动在copy后的进程中便能体现出来。
+
+不论哪个线程调用了 pthread_key_create()，所创建的 key 都是所有线程可以访问的，但各个线程可以根据自己的需要往 key 中填入不同的值，相当于提供了一个同名而不同值的全局变量(这个全局变量相对于拥有这个变量的线程来说)。
+
+# example
+
+```cpp
+#include <malloc.h>
+#include <pthread.h>
+#include <stdio.h>
+
+/* The key used to associate a log file pointer with each thread. */
+static pthread_key_t thread_log_key;
+
+/* Write MESSAGE to the log file for the current thread. */
+void write_to_thread_log (const char* message)
+{
+    FILE* thread_log = (FILE*) pthread_getspecific (thread_log_key);
+    fprintf (thread_log, "%s\n", message);
+}
+
+/* Close the log file pointer THREAD_LOG. */
+void close_thread_log (void* thread_log)
+{
+    fclose ((FILE*) thread_log);
+}
+
+void* thread_function (void* args)
+{
+    char thread_log_filename[20];
+    FILE* thread_log;
+
+    /* Generate the filename for this thread’s log file. */
+    sprintf (thread_log_filename, "thread%d.log", (int) pthread_self ());
+
+    /* Open the log file. */
+    thread_log = fopen (thread_log_filename, "w");
+
+    /* Store the file pointer in thread-specific data under thread_log_key. */
+    pthread_setspecific (thread_log_key, thread_log);
+    write_to_thread_log ("Thread starting.");
+    /* Do work here... */
+
+    return NULL;
+}
+
+int main ()
+{
+    int i;
+    pthread_t threads[5];
+
+    /* Create a key to associate thread log file pointers in
+    thread-specific data. Use close_thread_log to clean up the file
+    pointers. */
+    pthread_key_create (&thread_log_key, close_thread_log);
+
+    /* Create threads to do the work. */
+    for (i = 0; i < 5; ++i)
+        pthread_create (&(threads[i]), NULL, thread_function, NULL);
+
+    /* Wait for all threads to finish. */
+    for (i = 0; i < 5; ++i)
+        pthread_join (threads[i], NULL);
+
+    return 0;
+}
+```

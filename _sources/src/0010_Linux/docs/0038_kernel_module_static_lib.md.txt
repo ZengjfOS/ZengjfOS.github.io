@@ -1,0 +1,28 @@
+# kernel module static lib
+
+内核模块静态库
+
+# 参考文档
+
+* [Linux内核---61.linux内核静态库的编译与使用](https://blog.csdn.net/wangcong02345/article/details/52022477)
+* [如何在kernel中预置obj文件 ，将编译的驱动文件xxx.c用xxx.o替代编译](https://blog.csdn.net/MrDongShiYi/article/details/99940605)
+* [3. Creating a Kbuild File for an External Module](https://elixir.bootlin.com/linux/latest/source/Documentation/kbuild/modules.rst#L155)
+  * 3.3 Binary Blobs
+
+# shipped
+
+Some external modules need to include an object file as a blob. kbuild has support for this, but requires the blob file to be named \<filename\>_shipped. When the kbuild rules kick in, a copy of \<filename\>_shipped is created with _shipped stripped off, giving us \<filename\>. This shortened filename can be used in the assignment to the module.
+
+# 生成.a文件
+
+* 正常编译内核，会输出对应的.c的.o文件
+* `ar rcs libother.a obj.o obj1.o obj2.o`
+  * 上面是shell下手动打包静态库，每一个obj.o都是一个内核输出的.c对应的.o文件
+
+# build
+
+* 拷贝`libother.a`到对应内核目录，并重命名为`libother.a_shipped`
+  * `_shipped`结尾的文件会在内核编译阶段自动识别为不需要重新编译的模块，只需要进行link
+* 在内核的Makefile中引用静态库
+  * `obj-y += libother.a`
+    * Makefile不需要加`_shipped`

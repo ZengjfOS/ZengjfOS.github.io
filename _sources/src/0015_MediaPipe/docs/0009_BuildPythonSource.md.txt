@@ -1,0 +1,58 @@
+# Build Python Source
+
+从源码编译制定Python版本，解决树莓派Python版本问题
+
+# Build And Install
+
+* `scp ~/Downloads/Python-3.7.0.tgz pi@raspberrypi.local:~/zengjf`
+* ssh pi@raspberrypi.local
+  * cd ~/zengjf
+  * sudo apt-get install libffi-dev
+    * 如果没有安装没有ctypes
+  * sudo apt-get install libssl-dev
+    * 如果没有安装无法处理https
+  * tar zxf Python-3.7.0.tgz
+  * cd Python-3.7.0
+  * ./configure
+  * sudo make -j4
+  * sudo make install
+  * pip3.7 --version
+    ```
+    pip 10.0.1 from /usr/local/lib/python3.7/site-packages/pip (python 3.7)
+    ```
+  * python3.7 --version
+    ```
+    Python 3.7.0 (default, Feb  9 2022, 12:24:14) 
+    [GCC 10.2.1 20210110]
+    ```
+
+# pip.conf
+
+* vim ~/.config/pip/pip.conf
+  ```
+  [global]
+  timeout = 600
+  index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+  extra-index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+  ```
+* vim /etc/pip.conf
+
+# tflite
+
+* [安装 TensorFlow Lite 解释器](https://www.tensorflow.org/lite/guide/python)
+  * sudo pip3.7 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_aarch64.whl
+  * 或者另外下载安装
+    * sudo pip3.7 install tflite_runtime-2.1.0.post1-cp37-cp37m-linux_aarch64.whl
+      ```
+      Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple, https://pypi.tuna.tsinghua.edu.cn/simple
+      Processing ./tflite_runtime-2.1.0.post1-cp37-cp37m-linux_aarch64.whl
+      Collecting numpy>=1.12.1 (from tflite-runtime==2.1.0.post1)
+        Downloading https://pypi.tuna.tsinghua.edu.cn/packages/c2/a8/a924a09492bdfee8c2ec3094d0a13f2799800b4fdc9c890738aeeb12c72e/numpy-1.21.5.zip (10.7MB)
+          100% |████████████████████████████████| 10.7MB 1.2MB/s 
+        Installing build dependencies ... done
+      Installing collected packages: numpy, tflite-runtime
+        Running setup.py install for numpy ... done
+      Successfully installed numpy-1.21.5 tflite-runtime-2.1.0.post1
+      You are using pip version 10.0.1, however version 22.0.3 is available.
+      You should consider upgrading via the 'pip install --upgrade pip' command.
+      ```

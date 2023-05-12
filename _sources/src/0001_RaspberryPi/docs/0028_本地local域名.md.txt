@@ -1,0 +1,71 @@
+# 本地local域名
+
+为什么可以通过raspberrypi.local访问树莓派
+
+# 参考文档
+
+* [raspberrypi.local 为什么可以ping通以及ssh登录？它是如何被解析的？又如何改变？](https://blog.csdn.net/u011031257/article/details/80812180)
+* [ubuntu setup .local domain in lan](https://notes.leconiot.com/mdns.html)
+
+# 简述
+
+.local结尾的设备主机名大多数使用在私有的网络中也就是局域网中，并且该主机名是通过mdns(多播域名解析服务apple的)或本地域名服务系统来解析(有一个微软的 Link-local Multicast Name Resolution (LLMNR)兼容性和安全性都很差)。由此可以看出raspberrypi.local应该是有本地局域网中的某主机名解析系统所解析出来的。
+
+多播主机名解析服务的另一个重要特性就是zeroconf–零配置，也就是说不用人为做任何配置开启mdns的设备在接入局域网时会自动发送组播消息给局域网中所有主机，告诉它们自己的域名和ip。这也就是为什么我们可以直接ssh raspberrypi.local登录树莓派的原因，在树莓派zero Raspbian中其开机自启了mdns服务
+
+Avahi是Zeroconf规范的开源实现，常见使用在Linux上。它可以在没有 DNS 服务的局域网里发现基于 zeroconf 协议的设备和服务。它跟 mDNS 一样。包含了一整套多播DNS(multicastDNS)/DNS-SD网络服务的实现。它使用的发布授权是LGPL。Zeroconf规范的另一个实现是Apple公司的Bonjour程式。Avahi和Bonjour相互兼容。Avahi允许程序在不需要进行手动网络配置的情况下，在一个本地网络中发布和获知各种服务和主机。例如，当某用户把他的计算机接入到某个局域网时，如果他的机器运行有Avahi服务，则Avahi程式自动广播，从而发现网络中可用的打印机、共享文件和可相互聊天的其他用户。这有点象他正在接收局域网中的各种网络广告一样。
+
+Linux下系统实际启动的进程名，是avahi-daemon
+
+# 树莓派
+
+* sudo systemctl status avahi-daemon.service
+  ```
+  ● avahi-daemon.service - Avahi mDNS/DNS-SD Stack
+     Loaded: loaded (/lib/systemd/system/avahi-daemon.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sat 2022-06-11 14:49:47 BST; 14h ago
+   Main PID: 405 (avahi-daemon)
+     Status: "avahi-daemon 0.7 starting up."
+      Tasks: 2 (limit: 4915)
+     CGroup: /system.slice/avahi-daemon.service
+             ├─405 avahi-daemon: running [raspberrypi.local]
+             └─440 avahi-daemon: chroot helper
+  
+  Jun 11 14:49:50 raspberrypi avahi-daemon[405]: Registering new address record for fe80::39a6:8bd3:3b78:fdae on wlan0.*.
+  Jun 11 14:49:53 raspberrypi avahi-daemon[405]: Joining mDNS multicast group on interface docker0.IPv4 with address 172.17.0.
+  Jun 11 14:49:53 raspberrypi avahi-daemon[405]: New relevant interface docker0.IPv4 for mDNS.
+  Jun 11 14:49:53 raspberrypi avahi-daemon[405]: Registering new address record for 172.17.0.1 on docker0.IPv4.
+  Jun 11 14:49:54 raspberrypi avahi-daemon[405]: Joining mDNS multicast group on interface usb0.IPv4 with address 192.168.137.
+  Jun 11 14:49:54 raspberrypi avahi-daemon[405]: New relevant interface usb0.IPv4 for mDNS.
+  Jun 11 14:49:54 raspberrypi avahi-daemon[405]: Registering new address record for 192.168.137.2 on usb0.IPv4.
+  Jun 11 14:49:56 raspberrypi avahi-daemon[405]: Joining mDNS multicast group on interface wlan0.IPv4 with address 192.168.3.1
+  Jun 11 14:49:56 raspberrypi avahi-daemon[405]: New relevant interface wlan0.IPv4 for mDNS.
+  Jun 11 14:49:56 raspberrypi avahi-daemon[405]: Registering new address record for 192.168.3.143 on wlan0.IPv4.
+  ```
+* ps -A | grep avahi
+  ```
+    405 ?        00:00:09 avahi-daemon
+    440 ?        00:00:00 avahi-daemon
+  ```
+* /etc/hosts
+  ```
+  127.0.0.1       localhost
+  ::1             localhost ip6-localhost ip6-loopback
+  ff02::1         ip6-allnodes
+  ff02::2         ip6-allrouters
+  
+  127.0.1.1               raspberrypi
+  
+  ```
+* /etc/hostname
+  ```
+  raspberrypi
+  ```
+
+# avahi
+
+* sudo apt-get install avahi-daemon
+* 操作
+  * systemctl status avahi-daemon.service
+  * sudo systemctl start avahi-daemon.service
+  * sudo systemctl status restart.service
